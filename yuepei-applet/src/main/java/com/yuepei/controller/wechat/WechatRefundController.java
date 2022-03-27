@@ -55,16 +55,40 @@ public class WechatRefundController {
     @Autowired
     private UserRefundService userRefundService;
 
+    /**
+     * 后台手动退款
+     * @param request
+     * @param orderNumber
+     * @return
+     */
     @GetMapping("/userRefund")
     public AjaxResult userRefund(HttpServletRequest request ,String orderNumber){
         SysUser user = tokenUtils.analysis(request);
         return AjaxResult.success(userRefundService.userRefund(user.getOpenid(),orderNumber));
     }
 
-
+    /**
+     * 退款回调
+     * @param request
+     * @return
+     * @throws GeneralSecurityException
+     */
     @PostMapping("/userRefundCallBack")
     public HashMap<String, String> userRefundCallBack(HttpServletRequest request) throws GeneralSecurityException {
         return userRefundService.userRefundCallBack(request);
     }
 
+
+    /**
+     * 用户押金退款
+     * @param request
+     * @return
+     */
+    @PostMapping("/userDepositRefund")
+    public AjaxResult userDepositRefund(HttpServletRequest request){
+        SysUser user = tokenUtils.analysis(request);
+        return AjaxResult.success(userRefundService.userDepositRefund(user.getOpenid()));
+    }
+
+    //TODO 后台处理用户退款申请
 }

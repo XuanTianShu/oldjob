@@ -1,18 +1,23 @@
 package com.yuepei.controller.wechat;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.service.CallBackService;
 import com.yuepei.service.WechatCreateOrderService;
 import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.utils.TokenUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.security.GeneralSecurityException;
 import java.text.ParseException;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * 　　　　 ┏┓       ┏┓+ +
@@ -41,6 +46,7 @@ import java.util.HashMap;
  * @author ：AK
  * @create ：2022/12/19 10:48
  **/
+@Slf4j
 @RestController
 @RequestMapping("/wechat/user/order")
 public class WechatCreateOrderController {
@@ -144,4 +150,40 @@ public class WechatCreateOrderController {
         SysUser user = tokenUtils.analysis(request);
         return callBackService.balancePrepaymentOrder(user.getOpenid(),couponId,userLeaseOrder);
     }
+
+
+    @PostMapping("/bluetoothCallback")
+    public AjaxResult bluetoothCallback(HttpServletRequest request) throws IOException {
+//        BufferedReader bufferedReader = request.getReader();
+//        String str,wholeStr = "";
+//        while ((str = bufferedReader.readLine()) != null) {
+//            wholeStr += str;
+//        }
+//        System.out.println(wholeStr+"-------------------------");
+
+
+//        Map<String, String> result = new HashMap<>(16);
+//        log.info("请求方式GET/POST等:============={}", request.getMethod());
+//        log.info("getRequestURL:============={}", request.getRequestURL());
+//         获取URL的传参
+//        Enumeration<String> params = request.getParameterNames();
+//        while (params.hasMoreElements()) {
+//            String paraName = params.nextElement();
+//            log.info("paraName:============={}", paraName);
+//            String[] paraValues = request.getParameterValues(paraName);
+//            log.info("paraValues:============={}", paraValues);
+//            result.put(paraName, paraValues.length == 1 ? paraValues[0] : paraValues[paraValues.length - 1]);
+//        }
+        // 获取body的传参
+//        Map<String, String> map = new HashMap<>(16);
+
+//        result.putAll(map);
+//        log.info("数据上报:============={}", result);
+//        SortedMap<String, String> sort = new TreeMap<>(result);
+//        log.info("sort:============={}", sort);
+
+        return callBackService.bluetoothCallback(request);
+    }
+
+
 }

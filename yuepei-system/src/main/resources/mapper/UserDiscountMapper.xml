@@ -71,6 +71,10 @@
             </if>
         </where>
     </select>
+    <select id="selectUserCouponById" parameterType="long" resultMap="UserDiscountResult">
+        <include refid="selectUserDiscountVo"></include>
+        where Id = #{parseLong}
+    </select>
 
     <insert id="insertUserDiscount" parameterType="UserDiscount" useGeneratedKeys="true" keyProperty="id">
         insert into user_discount

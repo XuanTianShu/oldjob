@@ -84,4 +84,6 @@ public interface UserDiscountMapper
      * @return
      */
     List<UserDiscount> selectMyDiscountByOpenId(@Param("openid") String openid, @Param("userDiscount") UserDiscount userDiscount);
+
+    UserDiscount selectUserCouponById(@Param("parseLong") Long parseLong);
 }

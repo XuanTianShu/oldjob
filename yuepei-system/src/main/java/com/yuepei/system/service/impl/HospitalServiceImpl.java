@@ -170,4 +170,9 @@ public class HospitalServiceImpl implements HospitalService {
         }
         return objectHashMap;
     }
+
+    @Override
+    public List<HospitalVO> selectHospitalListVO(HospitalVO hospital) {
+        return hospitalMapper.selectHospitalListVO(hospital);
+    }
 }

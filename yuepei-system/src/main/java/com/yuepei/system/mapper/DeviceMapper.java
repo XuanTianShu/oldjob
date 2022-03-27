@@ -1,5 +1,6 @@
 package com.yuepei.system.mapper;
 
+import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.AgentHospital;
 import com.yuepei.system.domain.Device;
@@ -109,4 +110,6 @@ public interface DeviceMapper {
     List<Device> selectDeviceByHospitalId(Long hospitalId);
 
     List<Device> selectDeviceByDeviceNumberList(List<String> device);
+
+    List<String> selectDeviceByDeviceIds(Long[] deviceIds);
 }

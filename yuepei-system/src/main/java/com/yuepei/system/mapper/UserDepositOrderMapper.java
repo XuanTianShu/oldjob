@@ -2,6 +2,7 @@ package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.Deposit;
 import com.yuepei.system.domain.UserDepositOrder;
+import com.yuepei.system.domain.vo.UserDepositVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -90,4 +91,8 @@ public interface UserDepositOrderMapper {
     int  checkLeaseOrderByOpenId(@Param("deviceNumber") String deviceNumber);
 
     int checkLeaseOrder(@Param("orderNumber") String orderNumber);
+
+    List<UserDepositVO> selectUserDepositList(@Param("openid") String openid);
+
+    void bathUpdateUserDeposit(@Param("userDepositVOList") List<UserDepositVO> userDepositVOList);
 }

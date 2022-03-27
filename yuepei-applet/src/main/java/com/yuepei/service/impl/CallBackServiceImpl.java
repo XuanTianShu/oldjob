@@ -1,4 +1,5 @@
 package com.yuepei.service.impl;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.wechat.pay.contrib.apache.httpclient.util.AesUtil;
 import com.yuepei.common.core.domain.AjaxResult;
@@ -11,12 +12,16 @@ import com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo;
 import com.yuepei.system.mapper.*;
 import com.yuepei.utils.RequestUtils;
 import com.yuepei.utils.WXCallBackUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.*;
 import java.time.LocalDateTime;
@@ -53,6 +58,7 @@ import java.util.Map;
  * @author ：AK
  * @create ：2023/1/5 16:31
  **/
+@Slf4j
 @Service
 public class CallBackServiceImpl implements CallBackService {
 
@@ -94,6 +100,9 @@ public class CallBackServiceImpl implements CallBackService {
 
     @Autowired
     private UserCouponMapper userCouponMapper;
+
+    @Autowired
+    private UserDiscountMapper userDiscountMapper;
 
     private HashMap<String, String> hashMap = new HashMap<>();
 
@@ -263,6 +272,7 @@ public class CallBackServiceImpl implements CallBackService {
     @Transactional
     @Override
     public HashMap<String, String> paymentCallBack(HttpServletRequest request) throws GeneralSecurityException {
+        System.out.println("订单支付回调成功");
         HashMap params = requestUtils.requestParams(request);
         Map resource = (Map) params.get("resource");
         Object stringBuffer = params.get("stringBuffer");
@@ -283,7 +293,7 @@ public class CallBackServiceImpl implements CallBackService {
 
             Object amount = parseObject.get("amount");
             JSONObject jsonObject1 = JSONObject.parseObject(amount.toString());
-            Long price = (Long) jsonObject1.get("payer_total");
+            Long price = Long.parseLong(jsonObject1.get("payer_total").toString());
 
             //支付时间
             Object success_time = parseObject.get("success_time");
@@ -308,15 +318,16 @@ public class CallBackServiceImpl implements CallBackService {
                 userLeaseOrder.setPayType("1");
                 //修改状态
                 userLeaseOrder.setStatus("2");
+                //支付成功押金订单为0
                 userLeaseOrder.setDepositNumber("0");
                 //修改用户租赁信息
                 userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
                 if(cacheMap.get("couponId")!=null ||cacheMap.get("couponId")!= ""){
                     //扣除 优惠券
-                    UserCoupon userCoupon = new UserCoupon();
-                    userCoupon.setStatus(1);
-                    userCoupon.setUserId((Long) cacheMap.get("couponId"));
-                    userCouponMapper.updateUserCoupon(userCoupon);
+                    UserDiscount userDiscount = new UserDiscount();
+                    userDiscount.setStatus(1L);
+                    userDiscount.setUserId((Long) cacheMap.get("couponId"));
+                    userDiscountMapper.updateUserDiscount(userDiscount);
 
                 }
                 //响应接口
@@ -367,5 +378,73 @@ public class CallBackServiceImpl implements CallBackService {
         }
     }
 
+    @Override
+    public AjaxResult bluetoothCallback(HttpServletRequest request) {
+        try {
+            String reader = getAllRequestParam2(request);
+            log.info("数据上报:============={}", reader);
+//            map = JSONObject.parseObject(reader, Map.class);
+            JSONObject jsonObject = JSON.parseObject(reader);
+            Map<String,Object> map = (Map<String, Object>) jsonObject.get("service");
+            String serviceType = (String) map.get("serviceType");
+            Map<String,Object> map1 = (Map<String, Object>) map.get("data");
+            //锁状态上报
+            if (serviceType.equals("VehicleDetectorBasic")){
+                int status = Integer.parseInt(map1.get("status").toString());
+                /**
+                 * 当 status==‘0’；temperature 用来指示开锁方式：
+                 * NB 开锁：temperature == 2；
+                 * 蓝牙开锁：temperature == 3；
+                 * 异常（钥匙，自动弹开）开锁：temperature == 4；
+                 * 当 status==‘1’；temperature 用来指示还床状态：
+                 * 异常还床：temperature == 0；
+                 * 正常还床：temperature == 1；
+                 */
+                int temperature = Integer.parseInt(map1.get("temperature").toString());
+                //设备编号
+                String deviceNumber = (String) map1.get("NO");
+                /**
+                 * 长度为 16 位字符，eg：”timestamp”:
+                 * "D002061049050051"
+                 * 第 1 位为’D’；第 2~4 位为卡槽号/锁号，002 表示 2 号锁
+                 * 头；第 5~16 位表示插销 ID/共享物品的 ID，为 12 位字符，
+                 * 其中第 16 位表示共享品种类
+                 */
+                String timestamp = (String) map1.get("timestamp");
+                if (status == 0){
+                    System.out.println("借床");
+                }else if (status == 1){
+                    if (temperature == 0){
+                        System.out.println("异常还床");
+                    }else if (temperature == 1){
+                        String substring = timestamp.substring(0, 1);
+                        if (substring.equals("D")){
+                            String substring1 = timestamp.substring(3, 4);
+                            UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectOrderByDeviceNumberAndChoose(deviceNumber,substring1);
+                        }
+                        System.out.println("正常还床");
+                    }
+                }
+            }else if (serviceType.equals("Battery")){
+                //电量上报
+                Integer integer = Integer.parseInt(map1.get("batteryLevel").toString());
+                log.info("电量:==============={}",integer);
+            }
+//            log.info("map:============={}", map);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String getAllRequestParam2(HttpServletRequest request) throws IOException {
+        BufferedReader br = request.getReader();
+        String str;
+        StringBuilder wholeStr = new StringBuilder();
+        while((str = br.readLine()) != null){
+            wholeStr.append(str);
+        }
+        return wholeStr.toString();
+    }
 
 }

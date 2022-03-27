@@ -11,6 +11,7 @@ import com.yuepei.utils.DictionaryEnum;
 import com.yuepei.utils.WXPayUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +74,12 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
     @Autowired
     private UserDiscountMapper userDiscountMapper;
 
+//    @Autowired
+//    private RedisServer redisServer;
+
+    @Value("${coupon.prefix}")
+    private String couponPre;
+
 
 
     @Override
@@ -130,22 +137,27 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
     @Transactional
     @Override
     public AjaxResult paymentPrepaymentOrder(String openid,UserLeaseOrder userLeaseOrder,Integer couponId) {
+        System.out.println(userLeaseOrder.getPrice()+"===========金额==========");
         String notifyUrl = "https://www.yp10000.com/prod-api/wechat/user/order/paymentCallBack";
-        UserCoupon userCoupon = null;
+        UserDiscount userDiscount1 = null;
         if(couponId != null){
-            userCoupon = userCouponMapper.selectUserCouponById(Long.parseLong(couponId.toString()));
+//            userCoupon = userCouponMapper.selectUserCouponById(Long.parseLong(couponId.toString()));
+            userDiscount1 = userDiscountMapper.selectUserCouponById(Long.parseLong(couponId.toString()));
 //            BigDecimal bigDecimal = new BigDecimal(userCoupon.getDiscountAmount());
 //            BigDecimal subtract = userLeaseOrder.getPrice().subtract(bigDecimal);
 //            price  = subtract.multiply(new BigDecimal(100));
             //修改使用后的优惠卷
+
             UserDiscount userDiscount = new UserDiscount();
             userDiscount.setId(Long.parseLong(String.valueOf(couponId)));
             userDiscount.setStatus(1L);
             userDiscountMapper.updateUserDiscount(userDiscount);
             UserLeaseOrder userLeaseOrder1 = new UserLeaseOrder();
             userLeaseOrder1.setOrderNumber(userLeaseOrder.getOrderNumber());
-            userLeaseOrder1.setCouponPrice(new BigDecimal(userCoupon.getDiscountAmount()).multiply(new BigDecimal(100)).longValue());
+            userLeaseOrder1.setCouponPrice(new BigDecimal(String.valueOf(userDiscount1.getPrice())).multiply(new BigDecimal(100)).longValue());
             userLeaseOrderMapper.updateUserLeaseOrder(userLeaseOrder1);
+
+//            redisServer.deleteObject(couponPre+couponId);
             log.info("优惠卷状态更新成功");
         }
         if (userLeaseOrder.getPrice().compareTo(BigDecimal.ZERO) > 0){
@@ -156,8 +168,8 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
                     HashMap hashMap = new HashMap();
                     hashMap.put("couponId",couponId);
                     hashMap.put("orderNumber",userLeaseOrder.getOrderNumber());
-                    if(userCoupon != null ){
-                        hashMap.put("couponPrice",userCoupon.getDiscountAmount() * 100 );
+                    if(userDiscount1 != null ){
+                        hashMap.put("couponPrice",new BigDecimal(String.valueOf(userDiscount1.getPrice())).multiply(new BigDecimal(100)) );
                     }
                     redisCache.setCacheMap(userLeaseOrder.getOrderNumber(),hashMap);
                     //修改租赁订单状态
@@ -175,6 +187,7 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
                     return AjaxResult.error(pay.get("message"));
                 }
             }
+            System.out.println(pay+"========回调结果========");
             return AjaxResult.success(pay);
         }else {
             //实付金额
@@ -185,6 +198,8 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
             userLeaseOrder.setPayType("1");
             //修改状态
             userLeaseOrder.setStatus("2");
+            //支付成功押金订单为0
+            userLeaseOrder.setDepositNumber("0");
             //修改用户租赁信息
             userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
             return AjaxResult.success();

@@ -3,6 +3,8 @@ package com.yuepei.system.domain;
 import com.yuepei.common.core.domain.BaseEntity;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 　　　　 ┏┓       ┏┓+ +
  * 　　　　┏┛┻━━━━━━━┛┻┓ + +

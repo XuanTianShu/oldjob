@@ -22,6 +22,7 @@
         <result property="investorId" column="investor_id"/>
         <result property="electric" column="electric"/>
         <result property="electricEarly" column="electric_early"/>
+        <result property="userId" column="user_id"/>
     </resultMap>
 
     <resultMap id="DeviceRuleResult" type="com.yuepei.system.domain.vo.DeviceVO">
@@ -61,17 +62,18 @@
         <result property="agentName" column="agentName"/>
         <result property="hospitalName" column="hospitalName"/>
         <result property="content" column="content"/>
+        <result property="userId" column="user_id"/>
     </resultMap>
 
 
     <sql id="selectDeviceVo">
         select device_id, device_type_id, device_number,device_iot_number,device_mac,
                device_deposit, billing_id,hospital_id, device_qR_code, device_address,content,
-    device_full_address,`rows`,heart_time, create_time, status,investor_id,electric,electric_early from device
+    device_full_address,`rows`,heart_time, create_time, status,investor_id,electric,electric_early,user_id from device
     </sql>
 
     <select id="selectDeviceList" parameterType="Device" resultMap="DeviceByPersonnelResult">
-        SELECT d.device_id, d.device_type_id, d.device_number,d.device_iot_number,d.device_mac,
+        <!--SELECT d.device_id, d.device_type_id, d.device_number,d.device_iot_number,d.device_mac,d.user_id,
         d.device_deposit, d.billing_id,d.hospital_id, d.device_qR_code, d.device_address,d.content,
         d.device_full_address,d.`rows`,d.heart_time, d.create_time, d.status,d.investor_id,
         d.electric,d.electric_early,IFNULL(su.`nick_name`,'无') AS agentName,
@@ -79,12 +81,21 @@
         LEFT JOIN agent_hospital AS ah ON ah.`hospital_id` = d.`hospital_id`
         LEFT JOIN sys_user AS su ON su.`user_id` = ah.`agent_id`
         LEFT JOIN hospital_user AS hu ON hu.`hospital_id` = d.`hospital_id`
+        LEFT JOIN sys_user AS s ON s.`user_name` = hu.`user_name`-->
+        SELECT d.device_id, d.device_type_id, d.device_number,d.device_iot_number,d.device_mac,d.user_id,
+        d.device_deposit, d.billing_id,d.hospital_id, d.device_qR_code, d.device_address,d.content,
+        d.device_full_address,d.`rows`,d.heart_time, d.create_time, d.status,d.investor_id,
+        d.electric,d.electric_early,IFNULL(su.`nick_name`,'无') AS agentName,
+        IFNULL(s.`nick_name`,'无') AS hospitalName FROM device AS d
+        LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+        LEFT JOIN hospital_user AS hu ON hu.`hospital_id` = d.`hospital_id`
         LEFT JOIN sys_user AS s ON s.`user_name` = hu.`user_name`
         <where>
             <if test="deviceTypeId !=null"> and d.device_type_id = #{deviceTypeId}</if>
             <if test="deviceNumber != null "> and d.device_number = #{deviceNumber}</if>
             <if test="hospitalId != null "> and d.hospital_id = #{hospitalId}</if>
             <if test="status != null "> and d.status = #{status}</if>
+            <if test="userId != null"> and d.user_id = #{userId}</if>
             and d.device_number IN(SELECT device_number FROM device_investor)
         </where>
     </select>
@@ -100,7 +111,7 @@
     </select>
 
     <select id="selectDeviceInfoByDeviceNumber" parameterType="String" resultMap="DeviceRuleResult">
-    SELECT d.device_id, d.device_type_id, d.device_number,
+    SELECT d.device_id, d.device_type_id, d.device_number,d.user_id,
        d.device_iot_number,d.device_mac,dt.`device_type_deposit` as deviceDeposit, d.billing_id,
        d.hospital_id, d.device_qR_code, d.device_address,
        d.device_full_address,d.`rows`,d.heart_time,
@@ -157,6 +168,7 @@
             <if test="electric != null">electric,</if>
             <if test="electricEarly != null">electric_early,</if>
             <if test="content != null">content,</if>
+            <if test="userId != null">user_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="deviceTypeId != null">#{deviceTypeId},</if>
@@ -177,6 +189,7 @@
             <if test="electric != null">#{electric},</if>
             <if test="electricEarly != null">#{electricEarly},</if>
             <if test="content != null">#{content},</if>
+            <if test="userId != null">#{userId},</if>
         </trim>
     </insert>
 
@@ -201,6 +214,7 @@
             <if test="electric != null">electric = #{electric},</if>
             <if test="electricEarly != null">electric_early = #{electricEarly},</if>
             <if test="content != null">content = #{content},</if>
+            <if test="userId != null">user_id = #{userId},</if>
         </trim>
         where device_id = #{deviceId}
     </update>
@@ -208,7 +222,7 @@
         update device
         <trim prefix="SET" suffixOverrides=",">
             <if test=" rows!= null ">`rows` = #{rows},</if>
-            <if test="status != null">`status` = #{status}</if>
+            <if test="status != null">`status` = #{status},</if>
         </trim>
         where device_number = #{deviceNumber}
     </update>
@@ -231,6 +245,12 @@
         <include refid="selectDeviceVo"/>
         where device_number in
         <foreach item="deviceNumber" collection="list" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </select>
+    <select id="selectDeviceByDeviceIds" resultType="java.lang.String">
+        select device_number from device where device_id in
+        <foreach item="deviceNumber" collection="array" open="(" separator="," close=")">
             #{deviceNumber}
         </foreach>
     </select>

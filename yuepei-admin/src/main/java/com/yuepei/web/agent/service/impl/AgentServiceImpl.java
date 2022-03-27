@@ -1165,10 +1165,10 @@ public class AgentServiceImpl implements AgentService {
         sysUserFeedback.setFeedbackDescribe(feedback.getFeedbackDescribe());
         sysUserFeedback.setDevicePicture(feedback.getDevicePicture());
         sysUserFeedback.setStatus(1);
-        Date date = new Date();
-        SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-DD HH:mm:ss");
-        String time = format.format(date);
-        sysUserFeedback.setFeedbackTime(time);
+//        Date date = new Date();
+//        SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-DD HH:mm:ss");
+//        String time = format.format(date);
+        sysUserFeedback.setFeedbackTime(new Date());
         return sysUserFeedbackMapper.updateSysUserFeedback(sysUserFeedback);
     }
 

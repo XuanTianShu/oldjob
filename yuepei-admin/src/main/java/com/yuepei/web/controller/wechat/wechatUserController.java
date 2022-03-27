@@ -13,12 +13,15 @@ import com.yuepei.service.MyIntegralService;
 import com.yuepei.system.domain.Discount;
 import com.yuepei.system.domain.DiscountRecord;
 import com.yuepei.system.domain.DiscountThreshold;
+import com.yuepei.system.domain.UserDiscount;
 import com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo;
 import com.yuepei.system.service.*;
 import com.yuepei.utils.DictionaryEnum;
 import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.connection.RedisServer;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -82,6 +85,12 @@ public class wechatUserController extends BaseController {
     @Autowired
     private IUserDiscountService userDiscountService;
 
+//    @Autowired
+//    private RedisServer redisServer;
+
+    @Value("${coupon.prefix}")
+    private String couponPre;
+
     /**
      * 获取用户列表
      */
@@ -137,6 +146,14 @@ public class wechatUserController extends BaseController {
             String s = simpleDateFormat.format(instance.getTime());
             discountRecordService.sendDiscountRecord(SecurityUtils.getUserId(),userId,discount,discountThreshold,new Date());
             userDiscountService.sendUserDiscount(userId,discountThreshold,simpleDateFormat.parse(format),simpleDateFormat.parse(s),discount.getMoney());
+
+            UserDiscount userDiscount = new UserDiscount();
+            userDiscount.setStatus(0L);
+            List<UserDiscount> userDiscounts = userDiscountService.selectUserDiscountList(userDiscount);
+            for (int i = 0; i < userDiscounts.size(); i++) {
+                System.out.println(userDiscounts.get(i).getId()+"-----------------"+i);
+            }
+
             discount.setSentNum(discount.getSentNum()+userId.length);
             discount.setUnbilledNum(discount.getUnbilledNum()-userId.length);
             discountService.updateDiscount(discount);

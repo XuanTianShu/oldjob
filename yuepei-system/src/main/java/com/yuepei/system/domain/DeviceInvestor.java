@@ -2,6 +2,8 @@ package com.yuepei.system.domain;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class DeviceInvestor {
 
@@ -10,4 +12,8 @@ public class DeviceInvestor {
     private String deviceNumber;
 
     private Long investorId;
+
+    private String proportion;
+
+    private Date createTime;
 }

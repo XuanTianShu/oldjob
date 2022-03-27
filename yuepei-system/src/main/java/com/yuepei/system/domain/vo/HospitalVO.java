@@ -11,6 +11,8 @@ public class HospitalVO {
     /** 主键 */
     private Long parentId;
 
+    private String proportion;
+
     /** 名称 */
     @Excel(name = "名称")
     private String hospitalName;

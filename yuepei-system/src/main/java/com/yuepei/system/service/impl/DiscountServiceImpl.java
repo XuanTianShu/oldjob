@@ -11,6 +11,7 @@ import com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo;
 import com.yuepei.system.mapper.*;
 import com.yuepei.system.service.IDiscountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +47,12 @@ public class DiscountServiceImpl implements IDiscountService
 
     @Autowired
     private UserDiscountMapper userDiscountMapper;
+
+//    @Autowired
+//    private RedisServer redisServer;
+
+    @Value("${coupon.prefix}")
+    private String couponPre;
 
     /**
      * 查询优惠券
@@ -129,9 +136,15 @@ public class DiscountServiceImpl implements IDiscountService
     @Transactional(rollbackFor = Exception.class)
     @Override
     public AjaxResult updateUserIntegral(Long discountId, SysUser user) {
+        System.out.println(user.getOpenid()+"==================openid");
+        System.out.println(discountId+"=======================discountId");
         try {
             SysUser sysUser = sysUserMapper.selectUserByOpenid(user.getOpenid());
             Discount discount = discountMapper.selectDiscountById(discountId);
+
+            System.out.println(sysUser.getIntegral()+"用户积分");
+            System.out.println(discount.getIntegral()+"兑换券积分");
+
             int num = Integer.parseInt(String.valueOf(sysUser.getIntegral() - discount.getIntegral())) ;
             if (num >= 0){
                 //添加兑换记录
@@ -151,8 +164,9 @@ public class DiscountServiceImpl implements IDiscountService
                 BigDecimal bigDecimal = new BigDecimal(discount.getIntegral());
                 userIntegralBalanceDepositVo.setSum(bigDecimal);
                 userIntegralBalanceDepositVo.setCreateTime(new Date());
-                userIntegralBalanceDepositVo.setStatus(2);
+                userIntegralBalanceDepositVo.setStatus(1);
                 userIntegralOrderMapper.insertUserIntegralOrder(userIntegralBalanceDepositVo);
+
 
                 //添加优惠券到用户卡包
                 UserDiscount userDiscount = new UserDiscount();
@@ -162,6 +176,7 @@ public class DiscountServiceImpl implements IDiscountService
                 userDiscount.setFull(0L);
                 userDiscount.setCreateTime(new Date());
                 userDiscount.setStatus(0L);
+                userDiscount.setType(1L);
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 Calendar instance = Calendar.getInstance();
                 String format = simpleDateFormat.format(instance.getTime());
@@ -169,17 +184,23 @@ public class DiscountServiceImpl implements IDiscountService
                 String s = simpleDateFormat.format(instance.getTime());
                 userDiscount.setExpireTime(simpleDateFormat.parse(s));
                 userDiscountMapper.insertUserDiscount(userDiscount);
+//                System.out.println(insertUserDiscount.getId()+"====================兑换之后的主键===========================");
+                //TODO 存储redis修改过期
+//                redisServer.setCacheObject(couponPre+);
 
                 //更新用户积分
                 user.setIntegral(Integer.parseInt(String.valueOf(sysUser.getIntegral() - discount.getIntegral())));
-                sysUserMapper.updateUser(sysUser);
+
+                System.out.println(user.getIntegral()+"剩余积分");
+
+                sysUserMapper.updateUser(user);
+                return AjaxResult.success();
             }else {
-                return AjaxResult.error();
+                return AjaxResult.error("积分不足");
             }
-            return AjaxResult.success();
         }catch (Exception e){
             e.printStackTrace();
-            return AjaxResult.error();
+            return AjaxResult.error("未知错误");
         }
     }
 

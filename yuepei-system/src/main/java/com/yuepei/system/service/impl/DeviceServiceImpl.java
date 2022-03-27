@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.validation.Validator;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -116,7 +118,7 @@ public class DeviceServiceImpl implements DeviceService {
         Long[] longs = new Long[]{};
         JSONArray objects = JSON.parseArray(device.getInvestorId());
         List<Long> list = objects.toJavaList(Long.class);
-        deviceInvestorMapper.delByInvestorId(list.toArray(longs),device.getDeviceNumber());
+        deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
         deviceInvestorMapper.insert(list.toArray(longs),device.getDeviceNumber());
         try{
             //二维码是否跳转小程序暂定
@@ -219,14 +221,17 @@ public class DeviceServiceImpl implements DeviceService {
      * @param device 设备
      * @return 结果
      */
+    @Transactional
     @Override
     public int updateDevice(Device device)
     {
         Long[] longs = new Long[]{};
         JSONArray objects = JSON.parseArray(device.getInvestorId());
         List<Long> list = objects.toJavaList(Long.class);
-        deviceInvestorMapper.delByInvestorId(list.toArray(longs),device.getDeviceNumber());
-        deviceInvestorMapper.insert(list.toArray(longs),device.getDeviceNumber());
+        int i = deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
+        System.out.println(i+"------------");
+        int insert = deviceInvestorMapper.insert(list.toArray(longs), device.getDeviceNumber());
+        System.out.println(insert+"============");
         return deviceMapper.updateDevice(device);
     }
 
@@ -236,9 +241,12 @@ public class DeviceServiceImpl implements DeviceService {
      * @param deviceIds 需要删除的设备主键
      * @return 结果
      */
+    @Transactional
     @Override
     public int deleteDeviceByDeviceIds(Long[] deviceIds)
     {
+        List<String> list = deviceMapper.selectDeviceByDeviceIds(deviceIds);
+        deviceInvestorMapper.deleteByInvestorIds(list);
         return deviceMapper.deleteDeviceByDeviceIds(deviceIds);
     }
 
@@ -248,9 +256,12 @@ public class DeviceServiceImpl implements DeviceService {
      * @param deviceId 设备主键
      * @return 结果
      */
+    @Transactional
     @Override
     public int deleteDeviceByDeviceId(Long deviceId)
     {
+        Device device = deviceMapper.selectDeviceByDeviceId(deviceId);
+        deviceInvestorMapper.deleteByInvestorId(device.getDeviceNumber());
         return deviceMapper.deleteDeviceByDeviceId(deviceId);
     }
 

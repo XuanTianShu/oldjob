@@ -64,7 +64,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
             deviceTypes.add(deviceType);
         });
-        return deviceTypes;
+        List<DeviceType> collect = deviceTypes.stream().distinct().collect(Collectors.toList());
+        return collect;
     }
 
     @Override
@@ -90,6 +91,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 Hospital deviceBed = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[3]));
                 deviceDetailsVo.setDeviceFloor(deviceFloor.getHospitalId());
                 deviceDetailsVo.setDeviceDepartment(Department.getHospitalId());
+                deviceDetailsVo.setDeviceDepartmentName(Department.getHospitalName());
                 deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
                 deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
                 deviceDetailsVo.setDeviceFullAddress(device_full_address);
@@ -119,12 +121,12 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         BigDecimal reduce = leaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         deviceStatisticsVo.setDeviceAmount(reduce);
         if (!deviceDepartment.equals("")){
-            List<Hospital> hospital = hospitalDeviceMapper.selectHospitalByDepartment(deviceDepartment);
             List<DeviceDetailsVo> collect = new ArrayList<>();
-            hospital.stream().forEach(map->{
-                List<DeviceDetailsVo> deviceDetailsVos1 = deviceDetailsVos.stream().filter(i -> i.getDeviceDepartment().equals(map.getHospitalId())).collect(Collectors.toList());
-                collect.addAll(deviceDetailsVos1);
-            });
+            List<DeviceDetailsVo> deviceDetailsVos1 = deviceDetailsVos.stream()
+                    .filter(map -> map.getDeviceDepartmentName()!=null)
+                    .filter(i -> i.getDeviceDepartmentName().equals(deviceDepartment))
+                    .collect(Collectors.toList());
+            collect.addAll(deviceDetailsVos1);
             deviceDetailsVos.clear();
             deviceDetailsVos.addAll(collect);
             List<UserLeaseOrderVo> userLeaseOrderVos = new ArrayList<>();
@@ -140,6 +142,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             BigDecimal bigDecimal = userLeaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
             deviceStatisticsVo.setDeviceAmount(bigDecimal);
         }
+        deviceStatisticsVo.setHospitalId(hospitalName.getHospitalId());
         deviceStatisticsVo.setHospitalName(hospitalName.getHospitalName());
         deviceStatisticsVo.setDeviceDetailsVoList(deviceDetailsVos);
         return deviceStatisticsVo;
@@ -699,12 +702,19 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             });
         });
         BigDecimal decimal = userLeaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        List<DeviceType> deviceTypes = new ArrayList<>();
+        deviceList.stream().forEach(map->{
+            DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
+            deviceTypes.add(deviceType);
+        });
+        List<DeviceType> collect = deviceTypes.stream().distinct().collect(Collectors.toList());
         indexVo.setDeviceAmount(decimal);
         indexVo.setHospitalName(hospital.getHospitalName());
-        indexVo.setSum(deviceList.size());
+        indexVo.setSum(collect.size());
         indexVo.setProportion(sysUser.getProportion());
         return indexVo;
     }
+
 
     @Override
     public SysUser selectPersonalData(Long userId) {

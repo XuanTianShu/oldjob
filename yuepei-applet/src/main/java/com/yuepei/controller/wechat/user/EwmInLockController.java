@@ -3,14 +3,17 @@ package com.yuepei.controller.wechat.user;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.utils.StringUtils;
+import com.yuepei.service.UnlockingService;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.pojo.DevicePo;
 import com.yuepei.system.domain.vo.DeviceVO;
 import com.yuepei.system.mapper.UserLeaseOrderMapper;
 import com.yuepei.system.service.DeviceService;
 import com.yuepei.utils.TokenUtils;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -59,6 +62,9 @@ public class EwmInLockController {
     private UserLeaseOrderMapper userLeaseOrderMapper;
 
     @Autowired
+    private UnlockingService unlockingService;
+
+    @Autowired
     private TokenUtils tokenUtils;
 
     @GetMapping("/ewmInLock")
@@ -68,7 +74,9 @@ public class EwmInLockController {
         if (StringUtils.isNull(device)) {
             return AjaxResult.error("该设备不存在");
         }
+        //2023888020903
         List<String> depositList = userLeaseOrderMapper.selectUserDepositList(analysis.getOpenid(),deviceNumber);
+        System.out.println(depositList);
         List<String> uSerLeaseOrderDeposit = userLeaseOrderMapper.selectUSerLeaseOrderDeposit(analysis.getOpenid(),deviceNumber);
         if (depositList.size() != 0 && uSerLeaseOrderDeposit.size() != 0){
             for (String s : uSerLeaseOrderDeposit) {
@@ -78,10 +86,22 @@ public class EwmInLockController {
                     }
                 }
             }
+            System.out.println(depositList+"------------是否为空1-----------------------");
             device.setDepositList(depositList);
-        }else if (uSerLeaseOrderDeposit.size() == 0){
+        }else  {
+            System.out.println(depositList+"------------是否为空2-----------------------");
             device.setDepositList(depositList);
         }
         return AjaxResult.success(device);
+    }
+
+
+    /**
+     * 创建设备开锁指令
+     * @return
+     */
+    @PostMapping("/unlocking")
+    public AjaxResult unlocking(){
+        return unlockingService.unlocking();
     }
 }

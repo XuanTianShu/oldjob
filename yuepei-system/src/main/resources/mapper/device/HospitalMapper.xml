@@ -18,6 +18,7 @@
         <result property="hospitalId"    column="hospital_id"    />
         <result property="hospitalName"    column="hospital_name"    />
         <result property="parentId"    column="parent_id"    />
+        <result property="proportion" column="proportion"/>
     </resultMap>
 
     <sql id="selectHospitalVo">
@@ -54,6 +55,14 @@
         <where>
             <if test="hospitalName != null and hospitalName != ''"> and hospital_name = #{hospitalName}</if>
             <if test="hospitalId != null"> and hospital_id != #{hospitalId}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+        </where>
+    </select>
+    <select id="selectHospitalListVO" parameterType="com.yuepei.system.domain.vo.HospitalVO" resultMap="HospitalResultVO">
+        select hospital_id, hospital_name, parent_id,proportion from hospital
+        <where>
+            <if test="hospitalId != null"> and hospital_id = #{hospitalId}</if>
+            <if test="hospitalName != null  and hospitalName != ''"> and hospital_name like concat('%', #{hospitalName}, '%')</if>
             <if test="parentId != null "> and parent_id = #{parentId}</if>
         </where>
     </select>

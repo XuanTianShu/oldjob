@@ -40,7 +40,6 @@ public class AgentUserController extends BaseController {
     public TableDataInfo list(SysUser user)
     {
         startPage();
-        user.setUserType("05");
         List<SysUser> list = userService.selectWechatUserList(user);
         return getDataTable(list);
     }

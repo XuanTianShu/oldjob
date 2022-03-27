@@ -17,6 +17,17 @@
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
+    <resultMap id="UserDepositResult" type="com.yuepei.system.domain.vo.UserDepositVO">
+        <result property="id" column="id"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="status" column="status"/>
+        <result property="createTime" column="create_time"/>
+        <result property="openid" column="openid"/>
+        <result property="depositNum" column="deposit_num"/>
+        <result property="depositStatus" column="deposit_status"/>
+    </resultMap>
+
     <sql id="selectUserDepositOrderVo">
         select id, openid, order_number, device_number, deposit_num, device_status,
                deposit_status, status, create_time, update_time from user_deposit_order
@@ -82,6 +93,17 @@
         </trim>
         where order_number = #{orderNumber}
     </update>
+    <update id="bathUpdateUserDeposit">
+        <foreach collection="userDepositVOList" item="userDepositVO" separator=";" index="index">
+            update user_deposit_order
+            <set>
+                `status` = 3
+            </set>
+            <where>
+                order_number = #{userDepositVO.orderNumber}
+            </where>
+        </foreach>
+    </update>
 
     <delete id="deleteUserDepositOrderById" parameterType="Long">
         delete from user_deposit_order where id = #{id}
@@ -122,5 +144,10 @@
     </select>
     <select id="checkLeaseOrderByOpenId" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM user_deposit_order WHERE deposit_status = 0 AND STATUS = 1 AND device_number = #{deviceNumber}
+    </select>
+    <select id="selectUserDepositList" resultMap="UserDepositResult">
+        SELECT id, openid, order_number, device_number, deposit_num,
+               deposit_status, STATUS, create_time FROM user_deposit_order
+        WHERE openid = #{openid} AND STATUS = 1 AND deposit_status = 0
     </select>
 </mapper>

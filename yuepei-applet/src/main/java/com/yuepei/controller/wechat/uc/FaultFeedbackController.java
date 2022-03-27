@@ -29,6 +29,7 @@ public class FaultFeedbackController {
     public AjaxResult insertFaultFeed(HttpServletRequest request, @RequestBody SysUserFeedback feedback){
         SysUser user = tokenUtils.analysis(request);
         feedback.setUserId(user.getUserId());
+        System.out.println(feedback.getPhoneNumber()+"--------------手机号");
         return AjaxResult.success(userFeedbackService.insertSysUserFeedback(feedback));
     }
 

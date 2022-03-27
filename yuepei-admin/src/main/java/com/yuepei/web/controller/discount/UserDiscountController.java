@@ -54,7 +54,9 @@ public class UserDiscountController extends BaseController
     @PostMapping("/selectMyDiscountByOpenId")
     public TableDataInfo selectMyDiscountByOpenId(HttpServletRequest request, UserDiscount userDiscount){
         startPage();
+        System.out.println("========================================================");
         SysUser user = tokenUtils.analysis(request);
+        System.out.println(user.getOpenid()+"-----------------");
         return getDataTable(userDiscountService.selectMyDiscountByOpenId(user.getOpenid(),userDiscount));
     }
 
@@ -89,7 +91,7 @@ public class UserDiscountController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody UserDiscount userDiscount)
     {
-        return toAjax(userDiscountService.insertUserDiscount(userDiscount));
+        return AjaxResult.success(userDiscountService.insertUserDiscount(userDiscount));
     }
 
     /**

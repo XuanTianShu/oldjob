@@ -106,4 +106,18 @@ public class UserLeaseOrder extends BaseEntity {
     private Long agentProportion;
 
     private Long platformProportion;
+
+    private Long electric;
+
+    private String deviceMac;
+
+    private String deviceAddress;
+
+    private String rows;
+
+    private String deviceRule;
+
+    private BigDecimal timePrice;
+
+    private BigDecimal fixedPrice;
 }

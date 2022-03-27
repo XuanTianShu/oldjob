@@ -3,7 +3,9 @@ package com.yuepei.controller.wechat.iTunes;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.service.MyLeaseOrderService;
+import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.UserLeaseOrder;
+import com.yuepei.system.mapper.DeviceMapper;
 import com.yuepei.system.mapper.UserDepositOrderMapper;
 import com.yuepei.system.mapper.UserLeaseOrderMapper;
 import com.yuepei.utils.TokenUtils;
@@ -56,6 +58,9 @@ public class MyLeaseOrderController {
     @Autowired
     private UserLeaseOrderMapper userLeaseOrderMapper;
 
+    @Autowired
+    private DeviceMapper deviceMapper;
+
     @GetMapping("/userLeaseOrder")
     public AjaxResult userLeaseOrder(HttpServletRequest request,Integer status){
         SysUser user = tokenUtils.analysis(request);
@@ -77,7 +82,31 @@ public class MyLeaseOrderController {
     @PostMapping("/insertUserLeaseOrder")
     public AjaxResult insertUserLeaseOrder(HttpServletRequest request, String rows, @RequestBody UserLeaseOrder userLeaseOrder){
         SysUser user = tokenUtils.analysis(request);
+        System.out.println(rows+"--------获取值-------"+userLeaseOrder.getDeviceNumber());
         return myLeaseOrderService.insertUserLeaseOrder(user.getOpenid(),rows,userLeaseOrder);
+    }
+
+    /**
+     * 修改设备电量
+     * @param device
+     * @return
+     */
+    @PutMapping
+    public AjaxResult updateDeviceElectric(Device device){
+        //修改该设备状态
+        Device deviceNumber = deviceMapper.selectDeviceByDeviceNumber(device.getDeviceNumber());
+        if (deviceNumber.getElectricEarly() > device.getElectric()){
+            deviceNumber.setElectric(device.getElectric());
+            deviceNumber.setStatus(2L);
+            deviceMapper.updateDevice(deviceNumber);
+            System.out.println("出现故障无法借床!");
+            return AjaxResult.error("出现故障无法借床！");
+        }else {
+            deviceNumber.setStatus(0L);
+            deviceNumber.setElectric(device.getElectric());
+            deviceMapper.updateDevice(deviceNumber);
+        }
+        return AjaxResult.success();
     }
 
 

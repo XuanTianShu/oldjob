@@ -25,6 +25,10 @@
         <result property="rule"       column="rule"/>
         <result property="choose" column="choose"/>
         <result property="child" column="child"/>
+        <result property="deviceAddress" column="device_address"/>
+        <result property="deviceMac" column="device_mac"/>
+        <result property="rows" column="rows"/>
+        <result property="deviceRule" column="device_rule"/>
         <result property="investorProportion" column="investorProportion"/>
         <result property="agentProportion" column="agentProportion"/>
         <result property="hospitalProportion" column="hospitalProportion"/>
@@ -60,6 +64,13 @@
         <result property="platformProportion" column="platformProportion"/>
     </resultMap>
 
+    <resultMap id="UserOrderResult" type="com.yuepei.system.domain.vo.UserOrderVO">
+        <result property="openid" column="openid"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="depositNumber" column="deposit_number"/>
+    </resultMap>
+
     <sql id="selectUserLeaseOrderVo">
         select id, openid, order_number, device_number, device_type, lease_time,
                lease_address, restore_time, restore_address, price, pay_type,
@@ -69,7 +80,7 @@
     </sql>
 
     <sql id="selectLeaseOrderVO">
-        SELECT lo.id,u.`nick_name`,u.`phone_number`,d.`device_type_id`, lo.order_number,
+        <!--SELECT lo.id,u.`nick_name`,u.`phone_number`,d.`device_type_id`, lo.order_number,
                lo.device_number, lo.device_type, lo.lease_time,
                lo.lease_address, h.`hospital_name`,lo.choose,lo.child,
                lo.restore_time, lo.restore_address, lo.price, lo.pay_type,
@@ -80,7 +91,18 @@
                INNER JOIN device AS d ON d.`device_number` = lo.`device_number`
                INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
                INNER JOIN agent_hospital AS ah ON ah.`hospital_id` = h.`hospital_id`
-               INNER JOIN sys_user AS su ON su.`user_id` = ah.`agent_id`
+               INNER JOIN sys_user AS su ON su.`user_id` = ah.`agent_id`-->
+        SELECT lo.id,u.`nick_name`,u.`phone_number`,d.`device_type_id`, lo.order_number,
+        lo.device_number, lo.device_type, lo.lease_time,
+        lo.lease_address, h.`hospital_name`,lo.choose,lo.child,
+        lo.restore_time, lo.restore_address, lo.price, lo.pay_type,
+        lo.net_amount, lo.coupon_price, lo.`status`,IFNULL(su.`nick_name`,'无') AS agentName,
+        lo.play_time,lo.create_time,lo.investorProportion,lo.agentProportion
+        ,lo.hospitalProportion,lo.platformProportion FROM user_lease_order AS lo
+        INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`
+        INNER JOIN device AS d ON d.`device_number` = lo.`device_number`
+        INNER JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+        INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
     </sql>
 
     <select id="leaseOrderList" parameterType="LeaseOrderVO" resultMap="LeaseOrderResult">
@@ -121,11 +143,18 @@
         <include refid="selectUserLeaseOrderVo"/>
         where id = #{id}
     </select>
+
     <select id="userLeaseOrder" resultMap="UserLeaseOrderResult">
-        select a.*,b.rule from user_lease_order a,device_rule b
+        SELECT a.openid,a.`order_number`,a.`device_number`,a.`device_type`,
+        a.`lease_time`,a.`lease_address`,a.`restore_time`,a.`restore_address`,a.`price`,
+        a.`investorProportion`,a.`hospitalProportion`,a.`agentProportion`,a.`platformProportion`,
+        a.`pay_type`,a.`net_amount`,a.`coupon_price`,a.`status`,a.`play_time`,a.`choose`,a.`deposit`,
+        a.`child`,a.`create_time`,a.`deposit_number`,b.rule,d.`device_mac`,d.`rows`,d.`device_address`
+        FROM user_lease_order a,device_rule b,device d
         <where>
             a.openid = #{openid}
-            and a.device_number=b.device_number
+            and a.device_number = b.device_number
+            and d.device_number = a.device_number
             <if test="status != null">and a.status = #{status}</if>
         </where>
     </select>
@@ -150,10 +179,13 @@
             <if test="createTime != null">create_time,</if>
             <if test="choose != null">choose,</if>
             <if test="child != null">child,</if>
+            <if test="deposit != null">deposit,</if>
             <if test="investorProportion != null">investorProportion,</if>
             <if test="agentProportion != null">agentProportion,</if>
             <if test="hospitalProportion != null">hospitalProportion,</if>
             <if test="platformProportion != null">platformProportion,</if>
+            <if test="depositNumber != null">deposit_number,</if>
+            <if test="rule != null">device_rule,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="openid != null">#{openid},</if>
@@ -173,10 +205,13 @@
             <if test="createTime != null">#{createTime},</if>
             <if test="choose != null">#{choose},</if>
             <if test="child != null">#{child},</if>
+            <if test="deposit != null">#{deposit},</if>
             <if test="investorProportion != null">#{investorProportion},</if>
             <if test="agentProportion != null">#{agentProportion},</if>
             <if test="hospitalProportion != null">#{hospitalProportion},</if>
             <if test="platformProportion != null">#{platformProportion},</if>
+            <if test="depositNumber != null">#{depositNumber},</if>
+            <if test="rule != null">#{rule},</if>
         </trim>
     </insert>
 
@@ -203,6 +238,7 @@
             <if test="hospitalProportion != null">hospitalProportion = #{hospitalProportion},</if>
             <if test="agentProportion != null">agentProportion = #{agentProportion},</if>
             <if test="platformProportion != null">platformProportion = #{platformProportion},</if>
+            <if test="depositNumber != null">deposit_number = #{depositNumber},</if>
         </trim>
         where id = #{id}
     </update>
@@ -228,7 +264,7 @@
             <if test="hospitalProportion != null">hospitalProportion = #{hospitalProportion},</if>
             <if test="agentProportion != null">agentProportion = #{agentProportion},</if>
             <if test="platformProportion != null">platformProportion = #{platformProportion},</if>
-            <if test="depositNumber != null">depositNumber = #{depositNumber}</if>
+            <if test="depositNumber != null">deposit_number = #{depositNumber},</if>
         </trim>
         where order_number = #{orderNumber}
     </update>
@@ -319,5 +355,16 @@
     <select id="selectUSerLeaseOrderDeposit" resultType="java.lang.String">
         SELECT deposit_number FROM user_lease_order
         WHERE openid = #{openid} AND device_number = #{deviceNumber}
+    </select>
+    <select id="selectUserOrderDepositList" resultMap="UserOrderResult">
+        SELECT openid,order_number,device_number,deposit_number
+        FROM user_lease_order WHERE openid = #{openid}
+                                AND `status` IN (0,1)
+    </select>
+    <select id="selectOrderByDeviceNumberAndChoose" resultType="com.yuepei.system.domain.UserLeaseOrder">
+        select * from user_lease_order where device_number = #{deviceNumber} and choose = #{substring1}
+    </select>
+    <select id="selectUserLeaseOrderByOpenId" resultMap="UserLeaseOrderResult">
+        select * from user_lease_order where order_number = #{orderNumber}
     </select>
 </mapper>

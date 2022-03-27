@@ -2,6 +2,7 @@ package com.yuepei.system.service;
 
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.Hospital;
+import com.yuepei.system.domain.vo.HospitalVO;
 
 import java.util.List;
 import java.util.Map;
@@ -83,4 +84,6 @@ public interface HospitalService {
     public int deleteHospitalByHospitalId(Long hospitalId);
 
     Map<String,Object> queryTreeByDeviceNumber(Device device);
+
+    List<HospitalVO> selectHospitalListVO(HospitalVO hospital);
 }

@@ -107,4 +107,6 @@ public class Device extends BaseEntity {
     private String investorId;
 
     private List<DeviceRule> deviceRules;
+
+    private Long userId;
 }
