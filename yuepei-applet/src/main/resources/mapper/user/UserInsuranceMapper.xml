@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.mapper.UserInsuranceMapper">
+
+    <resultMap type="UserInsurance" id="UserInsuranceResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="urlRows"    column="url_rows"    />
+    </resultMap>
+
+    <sql id="selectUserInsuranceVo">
+        select id, user_id, url_rows from user_insurance
+    </sql>
+
+    <select id="selectUserInsuranceList" parameterType="UserInsurance" resultMap="UserInsuranceResult">
+        <include refid="selectUserInsuranceVo"/>
+        <where>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="urlRows != null  and urlRows != ''"> and url_rows = #{urlRows}</if>
+        </where>
+    </select>
+
+    <select id="selectUserInsuranceById" parameterType="Long" resultMap="UserInsuranceResult">
+        <include refid="selectUserInsuranceVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectUserInsuranceByUserId" parameterType="Long" resultMap="UserInsuranceResult">
+        <include refid="selectUserInsuranceVo"/>
+        where user_id = #{userId}
+    </select>
+
+    <insert id="insertUserInsurance" parameterType="UserInsurance">
+        insert into user_insurance
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="urlRows != null">url_rows,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="urlRows != null">#{urlRows},</if>
+        </trim>
+    </insert>
+
+    <update id="updateUserInsurance" parameterType="UserInsurance">
+        update user_insurance
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="urlRows != null">url_rows = #{urlRows},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteUserInsuranceById" parameterType="Long">
+        delete from user_insurance where id = #{id}
+    </delete>
+
+    <delete id="deleteUserInsuranceByIds" parameterType="String">
+        delete from user_insurance where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

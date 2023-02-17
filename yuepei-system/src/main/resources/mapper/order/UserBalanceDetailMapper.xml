@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.UserBalanceDetailMapper">
+
+    <resultMap type="UserIntegralBalanceDepositVo" id="UserBalanceDetailResult">
+        <result property="id"    column="id"    />
+        <result property="openid"    column="openid"    />
+        <result property="sum"    column="sum"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectUserBalanceDetailVo">
+        select id, openid, sum, create_time, status from user_balance_detail
+    </sql>
+
+    <select id="selectUserBalanceDetailList" parameterType="UserIntegralBalanceDepositVo" resultMap="UserBalanceDetailResult">
+        <include refid="selectUserBalanceDetailVo"/>
+        <where>
+            <if test="openid != null  and openid != ''"> and openid = #{openid}</if>
+            <if test="sum != null  and sum != ''"> and sum = #{sum}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectUserBalanceDetailById" parameterType="Long" resultMap="UserBalanceDetailResult">
+        <include refid="selectUserBalanceDetailVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectUserBalanceDetailByOpenid"  parameterType="String" resultMap="UserBalanceDetailResult">
+        select * from user_balance_detail
+        <where>
+            openid = #{openid}
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="selectBalanceDetailList" resultType="com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo">
+        SELECT id,openid,`sum`,create_time AS createTime,`status` FROM user_balance_detail
+        <where>
+            <if test="openid != null and openid != ''">
+                and openid = #{openid}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertUserBalanceDetail" parameterType="UserIntegralBalanceDepositVo" useGeneratedKeys="true" keyProperty="id">
+        insert into user_balance_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="openid != null">openid,</if>
+            <if test="sum != null">sum,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="openid != null">#{openid},</if>
+            <if test="sum != null">#{sum},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="status != null">#{status},</if>
+        </trim>
+    </insert>
+
+    <update id="updateUserBalanceDetail" parameterType="UserIntegralBalanceDepositVo">
+        update user_balance_detail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="openid != null">openid = #{openid},</if>
+            <if test="sum != null">sum = #{sum},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteUserBalanceDetailById" parameterType="Long">
+        delete from user_balance_detail where id = #{id}
+    </delete>
+
+    <delete id="deleteUserBalanceDetailByIds" parameterType="String">
+        delete from user_balance_detail where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.InvestorUserMapper">
+
+    <resultMap type="InvestorUser" id="InvestorUserResult">
+        <result property="id"    column="id"    />
+        <result property="account"    column="account"    />
+        <result property="password"    column="password"    />
+        <result property="phone"    column="phone"    />
+        <result property="nickName"    column="nick_name"    />
+        <result property="hospitalId"    column="hospital_id"    />
+        <result property="proportion"    column="proportion"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectInvestorUserVo">
+        select id, account, password, phone, nick_name, hospital_id, proportion, create_time, update_time from investor_user
+    </sql>
+
+    <select id="selectInvestorUserList" parameterType="InvestorUser" resultMap="InvestorUserResult">
+        <include refid="selectInvestorUserVo"/>
+        <where>
+            <if test="account != null  and account != ''"> and account = #{account}</if>
+            <if test="password != null  and password != ''"> and password = #{password}</if>
+            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
+            <if test="nickName != null  and nickName != ''"> and nick_name like concat('%', #{nickName}, '%')</if>
+            <if test="hospitalId != null "> and hospital_id = #{hospitalId}</if>
+            <if test="proportion != null "> and proportion = #{proportion}</if>
+        </where>
+    </select>
+
+    <select id="selectInvestorUserById" parameterType="Long" resultMap="InvestorUserResult">
+        <include refid="selectInvestorUserVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertInvestorUser" parameterType="InvestorUser" useGeneratedKeys="true" keyProperty="id">
+        insert into investor_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="account != null">account,</if>
+            <if test="password != null">password,</if>
+            <if test="phone != null">phone,</if>
+            <if test="nickName != null">nick_name,</if>
+            <if test="hospitalId != null">hospital_id,</if>
+            <if test="proportion != null">proportion,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="account != null">#{account},</if>
+            <if test="password != null">#{password},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="nickName != null">#{nickName},</if>
+            <if test="hospitalId != null">#{hospitalId},</if>
+            <if test="proportion != null">#{proportion},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateInvestorUser" parameterType="InvestorUser">
+        update investor_user
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="account != null">account = #{account},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="nickName != null">nick_name = #{nickName},</if>
+            <if test="hospitalId != null">hospital_id = #{hospitalId},</if>
+            <if test="proportion != null">proportion = #{proportion},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteInvestorUserById" parameterType="Long">
+        delete from investor_user where id = #{id}
+    </delete>
+
+    <delete id="deleteInvestorUserByIds" parameterType="String">
+        delete from investor_user where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

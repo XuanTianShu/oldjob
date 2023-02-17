@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.UserCouponMapper">
+
+    <resultMap type="UserCoupon" id="UserCouponResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="title"    column="title"    />
+        <result property="useLimit"    column="use_limit"    />
+        <result property="discountAmount"    column="discount_amount"    />
+        <result property="couponStartTime"    column="coupon_start_time"    />
+        <result property="couponEndTime"    column="coupon_end_time"    />
+        <result property="couponCreateTime"    column="coupon_create_time"    />
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <sql id="selectUserCouponVo">
+        select id, user_id, title, use_limit, discount_amount, coupon_start_time, coupon_end_time, coupon_create_time, status from user_coupon
+    </sql>
+
+    <select id="selectUserCouponList" parameterType="UserCoupon" resultMap="UserCouponResult">
+        <include refid="selectUserCouponVo"/>
+        <where>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="useLimit != null  and useLimit != ''"> and use_limit = #{useLimit}</if>
+            <if test="discountAmount != null  and discountAmount != ''"> and discount_amount = #{discountAmount}</if>
+            <if test="couponStartTime != null "> and coupon_start_time = #{couponStartTime}</if>
+            <if test="couponEndTime != null "> and coupon_end_time = #{couponEndTime}</if>
+            <if test="couponCreateTime != null "> and coupon_create_time = #{couponCreateTime}</if>
+        </where>
+    </select>
+
+    <select id="selectUserCouponById" parameterType="Long" resultMap="UserCouponResult">
+        <include refid="selectUserCouponVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectUserCoupon" parameterType="Long" resultMap="UserCouponResult">
+        select * from user_coupon
+        <where>
+            user_id = #{userId}
+            <if test="status != null">and status = #{status}</if>
+        </where>
+    </select>
+
+    <insert id="insertUserCoupon" parameterType="UserCoupon" useGeneratedKeys="true" keyProperty="id">
+        insert into user_coupon
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="title != null">title,</if>
+            <if test="useLimit != null">use_limit,</if>
+            <if test="discountAmount != null">discount_amount,</if>
+            <if test="couponStartTime != null">coupon_start_time,</if>
+            <if test="couponEndTime != null">coupon_end_time,</if>
+            <if test="couponCreateTime != null">coupon_create_time,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="title != null">#{title},</if>
+            <if test="useLimit != null">#{useLimit},</if>
+            <if test="discountAmount != null">#{discountAmount},</if>
+            <if test="couponStartTime != null">#{couponStartTime},</if>
+            <if test="couponEndTime != null">#{couponEndTime},</if>
+            <if test="couponCreateTime != null">#{couponCreateTime},</if>
+            <if test="status != null">#{status}</if>
+        </trim>
+    </insert>
+
+    <update id="updateUserCoupon" parameterType="UserCoupon">
+        update user_coupon
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="useLimit != null">use_limit = #{useLimit},</if>
+            <if test="discountAmount != null">discount_amount = #{discountAmount},</if>
+            <if test="couponStartTime != null">coupon_start_time = #{couponStartTime},</if>
+            <if test="couponEndTime != null">coupon_end_time = #{couponEndTime},</if>
+            <if test="couponCreateTime != null">coupon_create_time = #{couponCreateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteUserCouponById" parameterType="Long">
+        delete from user_coupon where id = #{id}
+    </delete>
+
+    <delete id="deleteUserCouponByIds" parameterType="String">
+        delete from user_coupon where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

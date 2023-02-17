@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.NoteInfoLogMapper">
+
+    <resultMap type="NoteInfoLog" id="NoteInfoLogResult">
+        <result property="noteLogId"    column="note_log_id"    />
+        <result property="noteLogTitle"    column="note_log_title"    />
+        <result property="noteLogPhone"    column="note_log_phone"    />
+        <result property="sendTime"    column="send_time"    />
+        <result property="sendStatus"    column="send_status"    />
+        <result property="receiptStatus"    column="receipt_status"    />
+        <result property="receiptTime"    column="receipt_time"    />
+        <result property="requestMethod"    column="request_method"    />
+        <result property="noteLogName"    column="note_log_name"    />
+        <result property="noteLogRole"    column="note_log_role"    />
+        <result property="noteLogUrl"    column="note_log_url"    />
+        <result property="noteLogIp"    column="note_log_ip"    />
+        <result property="errorMsg"    column="error_msg"    />
+    </resultMap>
+
+    <sql id="selectNoteInfoLogVo">
+        select note_log_id, note_log_title, note_log_phone, send_time, send_status, receipt_status, receipt_time, request_method, note_log_name, note_log_role, note_log_url, note_log_ip, error_msg from note_log
+    </sql>
+
+    <select id="selectNoteInfoLogList" parameterType="NoteInfoLog" resultMap="NoteInfoLogResult">
+        <include refid="selectNoteInfoLogVo"/>
+        <where>
+            <if test="noteLogTitle != null  and noteLogTitle != ''"> and note_log_title = #{noteLogTitle}</if>
+            <if test="noteLogPhone != null  and noteLogPhone != ''"> and note_log_phone = #{noteLogPhone}</if>
+            <if test="sendTime != null "> and send_time = #{sendTime}</if>
+            <if test="sendStatus != null "> and send_status = #{sendStatus}</if>
+            <if test="receiptStatus != null  and receiptStatus != ''"> and receipt_status = #{receiptStatus}</if>
+            <if test="receiptTime != null "> and receipt_time = #{receiptTime}</if>
+            <if test="requestMethod != null  and requestMethod != ''"> and request_method = #{requestMethod}</if>
+            <if test="noteLogName != null  and noteLogName != ''"> and note_log_name like concat('%', #{noteLogName}, '%')</if>
+            <if test="noteLogRole != null  and noteLogRole != ''"> and note_log_role = #{noteLogRole}</if>
+            <if test="noteLogUrl != null  and noteLogUrl != ''"> and note_log_url = #{noteLogUrl}</if>
+            <if test="noteLogIp != null  and noteLogIp != ''"> and note_log_ip = #{noteLogIp}</if>
+            <if test="errorMsg != null  and errorMsg != ''"> and error_msg = #{errorMsg}</if>
+        </where>
+    </select>
+
+    <select id="selectNoteInfoLogByNoteLogId" parameterType="Long" resultMap="NoteInfoLogResult">
+        <include refid="selectNoteInfoLogVo"/>
+        where note_log_id = #{noteLogId}
+    </select>
+
+    <insert id="insertNoteInfoLog" parameterType="NoteInfoLog" useGeneratedKeys="true" keyProperty="noteLogId">
+        insert into note_log
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="noteLogTitle != null">note_log_title,</if>
+            <if test="noteLogPhone != null">note_log_phone,</if>
+            <if test="sendTime != null">send_time,</if>
+            <if test="sendStatus != null">send_status,</if>
+            <if test="receiptStatus != null">receipt_status,</if>
+            <if test="receiptTime != null">receipt_time,</if>
+            <if test="requestMethod != null">request_method,</if>
+            <if test="noteLogName != null">note_log_name,</if>
+            <if test="noteLogRole != null">note_log_role,</if>
+            <if test="noteLogUrl != null">note_log_url,</if>
+            <if test="noteLogIp != null">note_log_ip,</if>
+            <if test="errorMsg != null">error_msg,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="noteLogTitle != null">#{noteLogTitle},</if>
+            <if test="noteLogPhone != null">#{noteLogPhone},</if>
+            <if test="sendTime != null">#{sendTime},</if>
+            <if test="sendStatus != null">#{sendStatus},</if>
+            <if test="receiptStatus != null">#{receiptStatus},</if>
+            <if test="receiptTime != null">#{receiptTime},</if>
+            <if test="requestMethod != null">#{requestMethod},</if>
+            <if test="noteLogName != null">#{noteLogName},</if>
+            <if test="noteLogRole != null">#{noteLogRole},</if>
+            <if test="noteLogUrl != null">#{noteLogUrl},</if>
+            <if test="noteLogIp != null">#{noteLogIp},</if>
+            <if test="errorMsg != null">#{errorMsg},</if>
+        </trim>
+    </insert>
+
+    <delete id="deleteNoteInfoLogByNoteLogId" parameterType="Long">
+        delete from note_log where note_log_id = #{noteLogId}
+    </delete>
+
+    <delete id="deleteNoteInfoLogByNoteLogIds" parameterType="String">
+        delete from note_log where note_log_id in
+        <foreach item="noteLogId" collection="array" open="(" separator="," close=")">
+            #{noteLogId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.CarouselMapper">
+
+    <resultMap type="Carousel" id="CarouselResult">
+        <result property="carouselId"    column="carousel_id"    />
+        <result property="carouselTop"    column="carousel_top"    />
+        <result property="carouselBottom"    column="carousel_bottom"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectCarouselVo">
+        select carousel_id, carousel_top, carousel_bottom, create_time from carousel
+    </sql>
+
+    <select id="selectCarouselList" parameterType="Carousel" resultMap="CarouselResult">
+        <include refid="selectCarouselVo"/>
+        <where>
+            <if test="carouselTop != null  and carouselTop != ''"> and carousel_top = #{carouselTop}</if>
+            <if test="carouselBottom != null  and carouselBottom != ''"> and carousel_bottom = #{carouselBottom}</if>
+        </where>
+    </select>
+
+    <select id="selectCarouselByCarouselId" parameterType="Long" resultMap="CarouselResult">
+        <include refid="selectCarouselVo"/>
+        where carousel_id = #{carouselId}
+    </select>
+
+    <insert id="insertCarousel" parameterType="Carousel" useGeneratedKeys="true" keyProperty="carouselId">
+        insert into carousel
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="carouselTop != null">carousel_top,</if>
+            <if test="carouselBottom != null">carousel_bottom,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="carouselTop != null">#{carouselTop},</if>
+            <if test="carouselBottom != null">#{carouselBottom},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCarousel" parameterType="Carousel">
+        update carousel
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="carouselTop != null">carousel_top = #{carouselTop},</if>
+            <if test="carouselBottom != null">carousel_bottom = #{carouselBottom},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where carousel_id = #{carouselId}
+    </update>
+
+    <delete id="deleteCarouselByCarouselId" parameterType="Long">
+        delete from carousel where carousel_id = #{carouselId}
+    </delete>
+
+    <delete id="deleteCarouselByCarouselIds" parameterType="String">
+        delete from carousel where carousel_id in
+        <foreach item="carouselId" collection="array" open="(" separator="," close=")">
+            #{carouselId}
+        </foreach>
+    </delete>
+</mapper>

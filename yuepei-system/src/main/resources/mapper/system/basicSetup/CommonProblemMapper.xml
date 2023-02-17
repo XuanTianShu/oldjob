@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.CommonProblemMapper">
+
+    <resultMap type="CommonProblem" id="CommonProblemResult">
+        <result property="commonProblemId"    column="common_problem_id"    />
+        <result property="commonProblemTitle"    column="common_problem_title"    />
+        <result property="commonProblemSolution"    column="common_problem_solution"    />
+    </resultMap>
+
+    <sql id="selectCommonProblemVo">
+        select common_problem_id, common_problem_title, common_problem_solution from common_problem
+    </sql>
+
+    <select id="selectCommonProblemList" parameterType="CommonProblem" resultMap="CommonProblemResult">
+        <include refid="selectCommonProblemVo"/>
+        <where>
+            <if test="commonProblemTitle != null  and commonProblemTitle != ''"> and common_problem_title = #{commonProblemTitle}</if>
+            <if test="commonProblemSolution != null  and commonProblemSolution != ''"> and common_problem_solution = #{commonProblemSolution}</if>
+        </where>
+    </select>
+
+    <select id="selectCommonProblemByCommonProblemId" parameterType="Long" resultMap="CommonProblemResult">
+        <include refid="selectCommonProblemVo"/>
+        where common_problem_id = #{commonProblemId}
+    </select>
+
+    <insert id="insertCommonProblem" parameterType="CommonProblem" useGeneratedKeys="true" keyProperty="commonProblemId">
+        insert into common_problem
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="commonProblemTitle != null">common_problem_title,</if>
+            <if test="commonProblemSolution != null">common_problem_solution,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="commonProblemTitle != null">#{commonProblemTitle},</if>
+            <if test="commonProblemSolution != null">#{commonProblemSolution},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCommonProblem" parameterType="CommonProblem">
+        update common_problem
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="commonProblemTitle != null">common_problem_title = #{commonProblemTitle},</if>
+            <if test="commonProblemSolution != null">common_problem_solution = #{commonProblemSolution},</if>
+        </trim>
+        where common_problem_id = #{commonProblemId}
+    </update>
+
+    <delete id="deleteCommonProblemByCommonProblemId" parameterType="Long">
+        delete from common_problem where common_problem_id = #{commonProblemId}
+    </delete>
+
+    <delete id="deleteCommonProblemByCommonProblemIds" parameterType="String">
+        delete from common_problem where common_problem_id in
+        <foreach item="commonProblemId" collection="array" open="(" separator="," close=")">
+            #{commonProblemId}
+        </foreach>
+    </delete>
+</mapper>

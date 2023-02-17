@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.PayTypeMapper">
+
+    <resultMap type="PayType" id="PayTypeResult">
+        <result property="id"    column="id"    />
+        <result property="paySum"    column="pay_sum"    />
+        <result property="integral"    column="integral"    />
+    </resultMap>
+
+    <sql id="selectPayTypeVo">
+        select id, pay_sum, integral from pay_type
+    </sql>
+
+    <select id="selectPayTypeList" parameterType="PayType" resultMap="PayTypeResult">
+        <include refid="selectPayTypeVo"/>
+        <where>
+            <if test="paySum != null "> and pay_sum = #{paySum}</if>
+            <if test="integral != null "> and integral = #{integral}</if>
+        </where>
+    </select>
+
+    <select id="selectPayTypeById" parameterType="Long" resultMap="PayTypeResult">
+        <include refid="selectPayTypeVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectPayTypeAll" resultMap="PayTypeResult">
+        <include refid="selectPayTypeVo"></include>
+    </select>
+
+    <insert id="insertPayType" parameterType="PayType" useGeneratedKeys="true" keyProperty="id">
+        insert into pay_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="paySum != null">pay_sum,</if>
+            <if test="integral != null">integral,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="paySum != null">#{paySum},</if>
+            <if test="integral != null">#{integral},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePayType" parameterType="PayType">
+        update pay_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="paySum != null">pay_sum = #{paySum},</if>
+            <if test="integral != null">integral = #{integral},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePayTypeById" parameterType="Long">
+        delete from pay_type where id = #{id}
+    </delete>
+
+    <delete id="deletePayTypeByIds" parameterType="String">
+        delete from pay_type where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

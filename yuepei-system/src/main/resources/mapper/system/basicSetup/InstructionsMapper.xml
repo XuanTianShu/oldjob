@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.InstructionsMapper">
+
+    <resultMap type="Instructions" id="InstructionsResult">
+        <result property="instructionsId"    column="instructions_id"    />
+        <result property="instructionsTitle"    column="instructions_title"    />
+        <result property="instructionsInfo"    column="instructions_info"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectInstructionsVo">
+        select instructions_id, instructions_title, instructions_info, create_time from instructions
+    </sql>
+
+    <select id="selectInstructionsList" parameterType="Instructions" resultMap="InstructionsResult">
+        <include refid="selectInstructionsVo"/>
+        <where>
+            <if test="instructionsId != null "> and instructions_id = #{instructionsId}</if>
+            <if test="instructionsTitle != null  and instructionsTitle != ''"> and instructions_title = #{instructionsTitle}</if>
+            <if test="instructionsInfo != null  and instructionsInfo != ''"> and instructions_info = #{instructionsInfo}</if>
+        </where>
+    </select>
+
+    <select id="selectInstructionsByInstructionsId" parameterType="Long" resultMap="InstructionsResult">
+        <include refid="selectInstructionsVo"/>
+        where instructions_id = #{instructionsId}
+    </select>
+
+    <insert id="insertInstructions" parameterType="Instructions" useGeneratedKeys="true" keyProperty="instructionsId">
+        insert into instructions
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="instructionsTitle != null">instructions_title,</if>
+            <if test="instructionsInfo != null">instructions_info,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="instructionsTitle != null">#{instructionsTitle},</if>
+            <if test="instructionsInfo != null">#{instructionsInfo},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateInstructions" parameterType="Instructions">
+        update instructions
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="instructionsTitle != null">instructions_title = #{instructionsTitle},</if>
+            <if test="instructionsInfo != null">instructions_info = #{instructionsInfo},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where instructions_id = #{instructionsId}
+    </update>
+
+    <delete id="deleteInstructionsByInstructionsId" parameterType="Long">
+        delete from instructions where instructions_id = #{instructionsId}
+    </delete>
+
+    <delete id="deleteInstructionsByInstructionsIds" parameterType="String">
+        delete from instructions where instructions_id in
+        <foreach item="instructionsId" collection="array" open="(" separator="," close=")">
+            #{instructionsId}
+        </foreach>
+    </delete>
+</mapper>

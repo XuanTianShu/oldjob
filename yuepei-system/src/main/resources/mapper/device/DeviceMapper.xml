@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.DeviceMapper">
+
+    <resultMap type="Device" id="DeviceResult">
+        <result property="deviceId"    column="device_id"    />
+        <result property="deviceTypeId"    column="device_type_id"    />
+        <result property="deviceNumber"    column="device_number"    />
+        <result property="deviceDeposit"    column="device_deposit"    />
+        <result property="billingId"    column="billing_id"    />
+        <result property="hospitalId"    column="hospital_id"    />
+        <result property="deviceQrCode"    column="device_qR_code"    />
+        <result property="deviceAddress"    column="device_address"    />
+        <result property="deviceFullAddress"    column="device_full_address"    />
+        <result property="heartTime"    column="heart_time"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="status"    column="status"    />
+        <result property="deviceIotNumber"    column="device_iot_number"    />
+        <result property="deviceMac"    column="device_mac"    />
+    </resultMap>
+
+    <resultMap id="DeviceRuleResult" type="DeviceVO">
+        <result property="deviceId" column="device_id"/>
+        <result property="deviceTypeId" column="device_type_id"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="deviceIotNumber" column="device_iot_number"/>
+        <result property="deviceMac" column="device_mac"/>
+        <result property="deviceDeposit" column="device_deposit"/>
+        <result property="billingId" column="billing_id"/>
+        <result property="hospitalId" column="hospital_id"/>
+        <result property="deviceQRCode" column="device_qR_code"/>
+        <result property="deviceAddress" column="device_address"/>
+        <result property="deviceFullAddress" column="device_full_address"/>
+        <result property="rows" column="rows"/>
+        <result property="heartTime" column="heart_time"/>
+        <result property="status" column="status"/>
+        <result property="hospitalName" column="hospital_name"/>
+        <result property="hospitalRule" column="hospital_rule"/>
+    </resultMap>
+
+
+    <sql id="selectDeviceVo">
+        select device_id, device_type_id, device_number,device_iot_number,device_mac,device_deposit, billing_id,hospital_id, device_qR_code, device_address, device_full_address,`rows`,heart_time, create_time, status from device
+    </sql>
+
+    <select id="selectDeviceList" parameterType="Device" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        <where>
+            <if test="deviceTypeId !=null"> and device_type_id = #{deviceTypeId}</if>
+            <if test="deviceNumber != null "> and device_number = #{deviceNumber}</if>
+            <if test="billingId != null "> and billing_id = #{billingId}</if>
+            <if test="hospitalId != null "> and hospital_id = #{hospitalId}</if>
+            <if test="deviceQrCode != null  and deviceQrCode != ''"> and device_qR_code = #{deviceQrCode}</if>
+            <if test="deviceAddress != null  and deviceAddress != ''"> and device_address = #{deviceAddress}</if>
+            <if test="deviceFullAddress != null  and deviceFullAddress != ''"> and device_full_address = #{deviceFullAddress}</if>
+            <if test="heartTime != null "> and heart_time = #{heartTime}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectDeviceByDeviceId" parameterType="Long" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        where device_id = #{deviceId}
+    </select>
+
+    <select id="selectDeviceByDeviceNumber" parameterType="String" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        where device_number = #{deviceNumber}
+    </select>
+
+    <select id="selectDeviceInfoByDeviceNumber" parameterType="String" resultMap="DeviceRuleResult">
+        SELECT d.device_id, d.device_type_id, d.device_number,
+        d.device_iot_number,d.device_mac,d.device_deposit, d.billing_id,
+        d.hospital_id, d.device_qR_code, d.device_address,
+        d.device_full_address,d.`rows`,d.heart_time,
+        d.`status`,h.hospital_id,h.hospital_name,
+        h.hospital_rule FROM device AS d
+        INNER JOIN hospital AS h ON d.`hospital_id` = h.hospital_id
+        WHERE d.device_number = #{deviceNumber}
+    </select>
+    <select id="checkDeviceByType" resultType="java.lang.Integer">
+        select count(1) from device where device_type_id in
+        <foreach item="deviceId" collection="array" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+    </select>
+    <select id="checkDeviceByHospitalId" resultType="java.lang.Integer">
+        select count(1) from device where hospital_id in
+        <foreach item="deviceId" collection="array" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+    </select>
+    <select id="checkDeviceNumber" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM device
+        <where>
+            (device_number = #{deviceNumber} OR device_mac = #{deviceMac})
+            <if test="deviceId != null">
+                and device_id != #{deviceId}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertDevice" parameterType="Device" useGeneratedKeys="true" keyProperty="deviceId">
+        insert into device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceTypeId != null">device_type_id,</if>
+            <if test="deviceIotNumber != null">device_iot_number,</if>
+            <if test="deviceMac != null">device_mac,</if>
+            <if test="deviceNumber != null">device_number,</if>
+            <if test="deviceDeposit != null">device_deposit,</if>
+            <if test="billingId != null">billing_id,</if>
+            <if test="hospitalId != null">hospital_id,</if>
+            <if test="deviceQrCode != null">device_qR_code,</if>
+            <if test="deviceAddress != null">device_address,</if>
+            <if test="deviceFullAddress != null">device_full_address,</if>
+            <if test="rows != null"> `rows`,</if>
+            <if test="heartTime != null">heart_time,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceTypeId != null">#{deviceTypeId},</if>
+            <if test="deviceIotNumber != null">#{deviceIotNumber},</if>
+            <if test="deviceMac != null">#{deviceMac},</if>
+            <if test="deviceNumber != null">#{deviceNumber},</if>
+            <if test="deviceDeposit != null">#{deviceDeposit},</if>
+            <if test="billingId != null">#{billingId},</if>
+            <if test="hospitalId != null">#{hospitalId},</if>
+            <if test="deviceQrCode != null">#{deviceQrCode},</if>
+            <if test="deviceAddress != null">#{deviceAddress},</if>
+            <if test="deviceFullAddress != null">#{deviceFullAddress},</if>
+            <if test="rows != null">#{rows},</if>
+            <if test="heartTime != null">#{heartTime},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="status != null">#{status},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDevice" parameterType="Device">
+        update device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceTypeId != null">device_type_id = #{deviceTypeId},</if>
+            <if test="deviceMac != null">device_mac = #{deviceMac},</if>
+            <if test="deviceIotNumber != null">device_iot_number = #{deviceIotNumber},</if>
+            <if test="deviceNumber != null">device_number = #{deviceNumber},</if>
+            <if test="deviceDeposit != null">device_deposit = #{deviceDeposit},</if>
+            <if test="billingId != null">billing_id = #{billingId},</if>
+            <if test="hospitalId != null">hospital_id = #{hospitalId},</if>
+            <if test="deviceQrCode != null">device_qR_code = #{deviceQrCode},</if>
+            <if test="deviceAddress != null">device_address = #{deviceAddress},</if>
+            <if test="deviceFullAddress != null">device_full_address = #{deviceFullAddress},</if>
+            <if test=" rows!= null">`rows` = #{rows},</if>
+            <if test="heartTime != null">heart_time = #{heartTime},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where device_id = #{deviceId}
+    </update>
+    <update id="updateDeviceByDeviceNumber">
+        update device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test=" rows!= null ">`rows` = #{rows},</if>
+        </trim>
+        where device_number = #{deviceNumber}
+    </update>
+
+    <delete id="deleteDeviceByDeviceId" parameterType="Long">
+        delete from device where device_id = #{deviceId}
+    </delete>
+
+    <delete id="deleteDeviceByDeviceIds" parameterType="String">
+        delete from device where device_id in
+        <foreach item="deviceId" collection="array" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+    </delete>
+</mapper>

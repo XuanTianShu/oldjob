@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.mapper.UserCaseMapper">
+
+    <resultMap type="UserCase" id="UserCaseResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="hospitalName"    column="hospital_name"    />
+        <result property="sectionName"    column="section_name"    />
+        <result property="urlRow"    column="url_row"    />
+    </resultMap>
+
+    <sql id="selectUserCaseVo">
+        select id, user_id, hospital_name, section_name, url_row from user_case
+    </sql>
+
+    <select id="selectUserCaseList" parameterType="UserCase" resultMap="UserCaseResult">
+        <include refid="selectUserCaseVo"/>
+        <where>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="hospitalName != null  and hospitalName != ''"> and hospital_name like concat('%', #{hospitalName}, '%')</if>
+            <if test="sectionName != null  and sectionName != ''"> and section_name like concat('%', #{sectionName}, '%')</if>
+            <if test="urlRow != null  and urlRow != ''"> and url_row = #{urlRow}</if>
+        </where>
+    </select>
+
+    <select id="selectUserCaseById" parameterType="Long" resultMap="UserCaseResult">
+        <include refid="selectUserCaseVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectUserCaseByUserId" parameterType="Long" resultMap="UserCaseResult">
+        <include refid="selectUserCaseVo"/>
+        where user_id = #{userId}
+    </select>
+
+    <insert id="insertUserCase" parameterType="UserCase" useGeneratedKeys="true" keyProperty="id">
+        insert into user_case
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="hospitalName != null">hospital_name,</if>
+            <if test="sectionName != null">section_name,</if>
+            <if test="urlRow != null">url_row,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="hospitalName != null">#{hospitalName},</if>
+            <if test="sectionName != null">#{sectionName},</if>
+            <if test="urlRow != null">#{urlRow},</if>
+        </trim>
+    </insert>
+
+    <update id="updateUserCase" parameterType="UserCase">
+        update user_case
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="hospitalName != null">hospital_name = #{hospitalName},</if>
+            <if test="sectionName != null">section_name = #{sectionName},</if>
+            <if test="urlRow != null">url_row = #{urlRow},</if>
+        </trim>
+        where user_id = #{userId}
+    </update>
+
+    <delete id="deleteUserCaseById" parameterType="Long">
+        delete from user_case where id = #{id}
+    </delete>
+
+    <delete id="deleteUserCaseByIds" parameterType="String">
+        delete from user_case where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

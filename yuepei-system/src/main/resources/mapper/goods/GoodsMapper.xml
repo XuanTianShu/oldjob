@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.GoodsMapper">
+
+    <resultMap type="Goods" id="GoodsResult">
+        <result property="goodsId"    column="goods_id"    />
+        <result property="goodsTypeId"    column="goods_type_id"    />
+        <result property="goodsName"    column="goods_name"    />
+        <result property="goodsUrl"    column="goods_url"    />
+        <result property="goodsPrice"    column="goods_price"    />
+        <result property="goodsAllStock"    column="goods_all_stock"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectGoodsVo">
+        select goods_id, goods_type_id, goods_name, goods_url, goods_price, goods_all_stock, create_time from goods
+    </sql>
+
+    <select id="selectGoodsList" parameterType="Goods" resultMap="GoodsResult">
+        <include refid="selectGoodsVo"/>
+        <where>
+            <if test="goodsTypeId != null "> and goods_type_id = #{goodsTypeId}</if>
+            <if test="goodsName != null  and goodsName != ''"> and goods_name like concat('%', #{goodsName}, '%')</if>
+            <if test="goodsUrl != null  and goodsUrl != ''"> and goods_url = #{goodsUrl}</if>
+            <if test="goodsPrice != null "> and goods_price = #{goodsPrice}</if>
+            <if test="goodsAllStock != null "> and goods_all_stock = #{goodsAllStock}</if>
+        </where>
+    </select>
+
+    <select id="selectGoodsByGoodsId" parameterType="Long" resultMap="GoodsResult">
+        <include refid="selectGoodsVo"/>
+        where goods_id = #{goodsId}
+    </select>
+
+    <insert id="insertGoods" parameterType="Goods" useGeneratedKeys="true" keyProperty="goodsId">
+        insert into goods
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="goodsTypeId != null">goods_type_id,</if>
+            <if test="goodsName != null">goods_name,</if>
+            <if test="goodsUrl != null">goods_url,</if>
+            <if test="goodsPrice != null">goods_price,</if>
+            <if test="goodsAllStock != null">goods_all_stock,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="goodsTypeId != null">#{goodsTypeId},</if>
+            <if test="goodsName != null">#{goodsName},</if>
+            <if test="goodsUrl != null">#{goodsUrl},</if>
+            <if test="goodsPrice != null">#{goodsPrice},</if>
+            <if test="goodsAllStock != null">#{goodsAllStock},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateGoods" parameterType="Goods">
+        update goods
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="goodsTypeId != null">goods_type_id = #{goodsTypeId},</if>
+            <if test="goodsName != null">goods_name = #{goodsName},</if>
+            <if test="goodsUrl != null">goods_url = #{goodsUrl},</if>
+            <if test="goodsPrice != null">goods_price = #{goodsPrice},</if>
+            <if test="goodsAllStock != null">goods_all_stock = #{goodsAllStock},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where goods_id = #{goodsId}
+    </update>
+
+    <delete id="deleteGoodsByGoodsId" parameterType="Long">
+        delete from goods where goods_id = #{goodsId}
+    </delete>
+
+    <delete id="deleteGoodsByGoodsIds" parameterType="String">
+        delete from goods where goods_id in
+        <foreach item="goodsId" collection="array" open="(" separator="," close=")">
+            #{goodsId}
+        </foreach>
+    </delete>
+</mapper>

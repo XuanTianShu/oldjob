@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.ServicePhoneMapper">
+
+    <resultMap type="ServicePhone" id="ServicePhoneResult">
+        <result property="serviceId"    column="service_id"    />
+        <result property="servicePhone"    column="service_phone"    />
+    </resultMap>
+
+    <sql id="selectServicePhoneVo">
+        select service_id, service_phone from service
+    </sql>
+
+    <select id="selectServicePhoneList" parameterType="ServicePhone" resultMap="ServicePhoneResult">
+        <include refid="selectServicePhoneVo"/>
+        <where>
+            <if test="servicePhone != null  and servicePhone != ''"> and service_phone = #{servicePhone}</if>
+        </where>
+    </select>
+
+    <select id="selectServicePhoneByServiceId" parameterType="Long" resultMap="ServicePhoneResult">
+        <include refid="selectServicePhoneVo"/>
+        where service_id = #{serviceId}
+    </select>
+
+    <insert id="insertServicePhone" parameterType="ServicePhone" useGeneratedKeys="true" keyProperty="serviceId">
+        insert into service
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="servicePhone != null">service_phone,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="servicePhone != null">#{servicePhone},</if>
+        </trim>
+    </insert>
+
+    <update id="updateServicePhone" parameterType="ServicePhone">
+        update service
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="servicePhone != null">service_phone = #{servicePhone},</if>
+        </trim>
+        where service_id = #{serviceId}
+    </update>
+
+    <delete id="deleteServicePhoneByServiceId" parameterType="Long">
+        delete from service where service_id = #{serviceId}
+    </delete>
+
+    <delete id="deleteServicePhoneByServiceIds" parameterType="String">
+        delete from service where service_id in
+        <foreach item="serviceId" collection="array" open="(" separator="," close=")">
+            #{serviceId}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.OrderMapper">
+
+    <resultMap type="Order" id="OrderResult">
+        <result property="id"    column="id"    />
+        <result property="orderNumber" column="order_number"/>
+        <result property="userId"    column="user_id"    />
+        <result property="deviceNumber"    column="device_number"    />
+        <result property="payType"    column="pay_type"    />
+        <result property="payTime"    column="pay_time"    />
+        <result property="payAmount"    column="pay_amount"    />
+        <result property="couponAmount"    column="coupon_amount"    />
+        <result property="netAmount"    column="net_amount"    />
+        <result property="payRows"    column="pay_rows"    />
+        <result property="status"    column="status"    />
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectOrderVo">
+        select id,order_number, user_id, device_number, pay_type, pay_time, pay_amount, coupon_amount, net_amount, pay_rows, status,create_time from user_order
+    </sql>
+
+    <select id="selectOrderList" parameterType="Order" resultMap="OrderResult">
+        <include refid="selectOrderVo"/>
+        <where>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="deviceNumber != null  and deviceNumber != ''"> and device_number = #{deviceNumber}</if>
+            <if test="payType != null  and payType != ''"> and pay_type = #{payType}</if>
+            <if test="payTime != null "> and pay_time = #{payTime}</if>
+            <if test="payAmount != null  and payAmount != ''"> and pay_amount = #{payAmount}</if>
+            <if test="couponAmount != null  and couponAmount != ''"> and coupon_amount = #{couponAmount}</if>
+            <if test="netAmount != null  and netAmount != ''"> and net_amount = #{netAmount}</if>
+            <if test="payRows != null  and payRows != ''"> and pay_rows = #{payRows}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectOrderByOrderId" parameterType="Long" resultMap="OrderResult">
+        <include refid="selectOrderVo"/>
+        where order_id = #{orderId}
+    </select>
+
+    <update id="updateOrder" parameterType="Order">
+        update user_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null">status = #{status}</if>
+        </trim>
+        where order_id = #{orderId}
+    </update>
+</mapper>
