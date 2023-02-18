@@ -12,13 +12,13 @@
     <resultMap id="AgentResult" type="Agent">
         <result property="agentId" column="agent_id"></result>
         <result property="agentName" column="agent_name"></result>
-        <result property="deviceNumber" column="device_number"></result>
+        <result property="hospitalId" column="hospital_id"></result>
         <result property="createTime" column="create_time"></result>
         <result property="updateTime" column="update_time"></result>
     </resultMap>
 
     <sql id="selectAgent">
-        select a.agent_id,a.agent_name,a.device_number,a.create_time,a.update_time from agent a
+        select a.agent_id,a.agent_name,a.hospital_id,a.create_time,a.update_time from agent a
         left join agent_user au on a.agent_id=au.agent_id
     </sql>
 

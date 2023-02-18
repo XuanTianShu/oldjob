@@ -3,9 +3,11 @@ package com.yuepei.system.mapper;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.DeviceRule;
+import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.pojo.DevicePo;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -90,4 +92,6 @@ public interface DeviceMapper {
     public int updateDeviceByDeviceNumber(@Param("rows") String rows, @Param("deviceNumber") String deviceNumber);
 
     public List<DeviceRule> selectDeviceInfoByDeviceNumber(Long deviceTypeId);
+
+    List<Device> selectDeviceByHospitalId(@Param("hospitalId") Long hospitalId);
 }

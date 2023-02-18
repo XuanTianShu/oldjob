@@ -137,4 +137,9 @@
             #{deviceId}
         </foreach>
     </delete>
+
+    <select id="selectDeviceByHospitalId" parameterType="device" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        where hospital_id = #{hospitalId}
+    </select>
 </mapper>

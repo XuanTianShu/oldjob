@@ -40,28 +40,30 @@ public class AgentServiceImpl implements AgentService {
     @Override
     public List<DeviceDetailsVo> selectAgentInfo(Long userId) {
         Agent agent = agentMapper.selectAgentByAgentId(userId);
-        /*Device device = deviceMapper.selectDeviceByDeviceNumber(agent.getDeviceNumber());
-        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(device.getHospitalId());
-        DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(device.getDeviceTypeId());
+        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(agent.getHospitalId());
+        List<Device> devices = deviceMapper.selectDeviceByHospitalId(agent.getHospitalId());
         List<DeviceDetailsVo> deviceDetailsVos = new ArrayList<>();
-        DeviceDetailsVo deviceDetailsVo = new DeviceDetailsVo();
-        String device_full_address = device.getDeviceFullAddress();
-        if (!device_full_address.isEmpty()) {
-            String[] split = device_full_address.split(",");
-            for (int j = 0; j < split.length; j++) {
-                deviceDetailsVo.setDeviceFllor(split[0]);
-                deviceDetailsVo.setDeviceDepartment(split[1]);
-                deviceDetailsVo.setDeviceRoom(split[2]);
-                deviceDetailsVo.setDeviceBed(split[3]);
+        devices.stream().forEach(map->{
+            DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
+            DeviceDetailsVo deviceDetailsVo = new DeviceDetailsVo();
+            String device_full_address = map.getDeviceFullAddress();
+            if (!device_full_address.isEmpty()) {
+                String[] split = device_full_address.split(",");
+                for (int j = 0; j < split.length; j++) {
+                    deviceDetailsVo.setDeviceFllor(split[0]);
+                    deviceDetailsVo.setDeviceDepartment(split[1]);
+                    deviceDetailsVo.setDeviceRoom(split[2]);
+                    deviceDetailsVo.setDeviceBed(split[3]);
+                }
+                deviceDetailsVo.setDeviceFullAddress(device_full_address);
+                deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
+                deviceDetailsVo.setStatus(map.getStatus());
+                BeanUtils.copyProperties(hospital,deviceDetailsVo);
+                BeanUtils.copyProperties(deviceType,deviceDetailsVo);
+                deviceDetailsVos.add(deviceDetailsVo);
             }
-            deviceDetailsVo.setDeviceFullAddress(device_full_address);
-            deviceDetailsVo.setDeviceNumber(device.getDeviceNumber());
-            deviceDetailsVo.setStatus(device.getStatus());
-            BeanUtils.copyProperties(hospital,deviceDetailsVo);
-            BeanUtils.copyProperties(deviceType,deviceDetailsVo);
-            deviceDetailsVos.add(deviceDetailsVo);
-        }*/
-        return null;
+        });
+        return deviceDetailsVos;
     }
 
     @Override
