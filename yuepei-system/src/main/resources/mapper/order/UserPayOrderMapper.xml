@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.UserPayOrderMapper">
+
+    <resultMap type="UserPayOrder" id="UserPayOrderResult">
+        <result property="id"    column="id"    />
+        <result property="openid"    column="openid"    />
+        <result property="outTradeNo"    column="out_trade_no"    />
+        <result property="price"    column="price"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="status"    column="status"    />
+        <result property="errMsg"    column="err_msg"    />
+    </resultMap>
+
+    <sql id="selectUserPayOrderVo">
+        select id, openid, out_trade_no, price, end_time, status, err_msg from user_pay_order
+    </sql>
+
+    <select id="selectUserPayOrderList" parameterType="UserPayOrder" resultMap="UserPayOrderResult">
+        <include refid="selectUserPayOrderVo"/>
+        <where>
+            <if test="openid != null "> and openid = #{openid}</if>
+            <if test="outTradeNo != null  and outTradeNo != ''"> and out_trade_no = #{outTradeNo}</if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="endTime != null "> and end_time = #{endTime}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="errMsg != null  and errMsg != ''"> and err_msg = #{errMsg}</if>
+        </where>
+    </select>
+
+    <select id="selectUserPayOrderById" parameterType="Long" resultMap="UserPayOrderResult">
+        <include refid="selectUserPayOrderVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertUserPayOrder" parameterType="UserPayOrder" useGeneratedKeys="true" keyProperty="id">
+        insert into user_pay_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="openid != null">openid,</if>
+            <if test="outTradeNo != null">out_trade_no,</if>
+            <if test="price != null">price,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="status != null">status,</if>
+            <if test="errMsg != null">err_msg,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="openid != null">#{openid},</if>
+            <if test="outTradeNo != null">#{outTradeNo},</if>
+            <if test="price != null">#{price},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="errMsg != null">#{errMsg},</if>
+        </trim>
+    </insert>
+
+    <update id="updateUserPayOrder" parameterType="UserPayOrder">
+        update user_pay_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="openid != null">openid = #{openid},</if>
+            <if test="outTradeNo != null">out_trade_no = #{outTradeNo},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="errMsg != null">err_msg = #{errMsg},</if>
+        </trim>
+        where out_trade_no = #{outTradeNo}
+    </update>
+
+    <delete id="deleteUserPayOrderById" parameterType="Long">
+        delete from user_pay_order where id = #{id}
+    </delete>
+
+    <delete id="deleteUserPayOrderByIds" parameterType="String">
+        delete from user_pay_order where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

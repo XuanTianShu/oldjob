@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.UserDepositOrderMapper">
+
+    <resultMap type="UserDepositOrder" id="UserDepositOrderResult">
+        <result property="id"    column="id"    />
+        <result property="openid"    column="openid"    />
+        <result property="orderNumber"    column="order_number"    />
+        <result property="deviceNumber"    column="device_number"    />
+        <result property="depositNum"    column="deposit_num"    />
+        <result property="deviceStatus"    column="device_status"    />
+        <result property="depositStatus"    column="deposit_status"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectUserDepositOrderVo">
+        select id, openid, order_number, device_number, deposit_num, device_status, deposit_status, status, create_time, update_time from user_deposit_order
+    </sql>
+
+    <select id="selectUserDepositOrderList" parameterType="UserDepositOrder" resultMap="UserDepositOrderResult">
+        <include refid="selectUserDepositOrderVo"/>
+        <where>
+            <if test="openid != null  and openid != ''"> and openid = #{openid}</if>
+            <if test="orderNumber != null  and orderNumber != ''"> and order_number = #{orderNumber}</if>
+            <if test="deviceNumber != null  and deviceNumber != ''"> and device_number = #{deviceNumber}</if>
+            <if test="depositNum != null "> and deposit_num = #{depositNum}</if>
+            <if test="deviceStatus != null  and deviceStatus != ''"> and device_status = #{deviceStatus}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectUserDepositOrderById" parameterType="Long" resultMap="UserDepositOrderResult">
+        <include refid="selectUserDepositOrderVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertUserDepositOrder" parameterType="UserDepositOrder">
+        insert into user_deposit_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            <if test="openid != null">openid,</if>
+            <if test="orderNumber != null">order_number,</if>
+            <if test="deviceNumber != null">device_number,</if>
+            <if test="depositNum != null">deposit_num,</if>
+            <if test="deviceStatus != null">device_status,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="openid != null">#{openid},</if>
+            <if test="orderNumber != null">#{orderNumber},</if>
+            <if test="deviceNumber != null">#{deviceNumber},</if>
+            <if test="depositNum != null">#{depositNum},</if>
+            <if test="deviceStatus != null">#{deviceStatus},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateUserDepositOrder" parameterType="UserDepositOrder">
+        update user_deposit_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="openid != null">openid = #{openid},</if>
+            <if test="orderNumber != null">order_number = #{orderNumber},</if>
+            <if test="deviceNumber != null">device_number = #{deviceNumber},</if>
+            <if test="depositNum != null">deposit_num = #{depositNum},</if>
+            <if test="deviceStatus != null">device_status = #{deviceStatus},</if>
+            <if test="depositStatus!= null"> deposit_status = #{depositStatus},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where order_number = #{orderNumber}
+    </update>
+
+    <delete id="deleteUserDepositOrderById" parameterType="Long">
+        delete from user_deposit_order where id = #{id}
+    </delete>
+
+    <delete id="deleteUserDepositOrderByIds" parameterType="String">
+        delete from user_deposit_order where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectUserDepositInfo" parameterType="Long" resultMap="UserDepositOrderResult">
+        select * from user_deposit_order
+        <where>
+            openid = #{openid}
+            <if test="status != null and status != '' ">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectUserDepositOrderByOrderNumber" parameterType="String" resultMap="UserDepositOrderResult">
+        <include refid="selectUserDepositOrderVo"/>
+        where order_number = #{orderNumber}
+    </select>
+</mapper>

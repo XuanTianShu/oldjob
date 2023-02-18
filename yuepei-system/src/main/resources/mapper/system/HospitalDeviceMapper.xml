@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.HospitalDeviceMapper">
+
+    <sql id="DeviceTypeVo">
+        select dt.device_type_id ,dt.device_type_name from device_type dt
+        left join device d on dt.device_type_id=d.device_type_id
+        left join hospital h on d.hospital_id=h.hospital_id
+        left join hospital_user hu on h.hospital_id=hu.hospital_id
+        left join sys_user su on hu.user_id=su.user_id
+    </sql>
+
+    <resultMap id="DeviceTypeResult" type="DeviceType">
+        <result property="deviceTypeId" column="device_type_id"></result>
+        <result property="deviceTypeName" column="device_type_name"></result>
+    </resultMap>
+
+    <sql id="DeviceDetails">
+        select COUNT(d.device_type_id),h.hospital_id,h.hospital_name,d.device_number,d.device_full_address from device d
+        left join hospital h on d.hospital_id=h.hospital_id
+    </sql>
+
+    <resultMap id="DeviceTypeDetailsResult" type="Device">
+        <result property="deviceId" column="device_id"></result>
+        <result property="deviceNumber" column="device_number"></result>
+        <result property="deviceMac" column="device_mac"></result>
+        <result property="deviceIotNumber" column="device_iot_number"></result>
+        <result property="deviceTypeId" column="device_type_id"></result>
+        <result property="hospitalId" column="hospital_id"></result>
+        <result property="deviceDeposit" column="device_deposit"></result>
+        <result property="billingId" column="billing_id"></result>
+        <result property="deviceQrCode" column="device_qR_code"></result>
+        <result property="deviceAddress" column="device_address"></result>
+        <result property="deviceFullAddress" column="device_full_address"></result>
+        <result property="rows" column="rows"></result>
+        <result property="heartTime" column="heart_time"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="status" column="status"></result>
+    </resultMap>
+
+    <resultMap id="HospitalResult" type="Hospital">
+        <result property="hospitalId" column="hospital_id"></result>
+        <result property="hospitalName" column="hospital_name"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="updateTime" column="update_time"></result>
+    </resultMap>
+
+    <resultMap id="GoodsOrderResult" type="GoodsOrder">
+        <result property="orderId" column="order_id"></result>
+        <result property="userId" column="user_id"></result>
+        <result property="goodsOrderNumber" column="goods_order_number"></result>
+        <result property="deviceTypeId" column="device_type_id"></result>
+        <result property="deviceNumber" column="device_number"></result>
+        <result property="goodsId" column="goods_id"></result>
+        <result property="goodsMoney" column="goods_money"></result>
+        <result property="creatTime" column="creat_time"></result>
+        <result property="paymentMoney" column="payment_money"></result>
+        <result property="hospitalId" column="hospital_id"></result>
+        <result property="paymentMethod" column="payment_method"></result>
+        <result property="transactionStatus" column="transaction_status"></result>
+    </resultMap>
+
+    <sql id="goodsOrders">
+        select order_id,user_id,goods_order_number,device_type_id,device_number,goods_id,goods_money,creat_time,payment_money,hospital_id,payment_method,transaction_status
+        from goods_order
+    </sql>
+
+    <resultMap id="GoodsResult" type="Goods">
+        <result property="goodsId" column="goods_id"></result>
+        <result property="goodsTypeId" column="goods_type_id"></result>
+        <result property="goodsName" column="goods_name"></result>
+        <result property="goodsUrl" column="goods_url"></result>
+        <result property="goodsPrice" column="goods_price"></result>
+        <result property="goodsAllStock" column="goods_all_stock"></result>
+        <result property="createTime" column="create_time"></result>
+    </resultMap>
+
+    <sql id="GoodsSql">
+        select goods_id,goods_type_id,goods_name,goods_url,goods_price,goods_all_stock,create_time from Goods
+    </sql>
+
+    <select id="selectDeviceType" parameterType="DeviceType" resultMap="DeviceTypeResult">
+        <include refid="DeviceTypeVo"/>
+        where su.user_id=#{userId}
+        group by device_type_name
+    </select>
+
+    <select id="selectDeviceTypeDetails" parameterType="Device" resultMap="DeviceTypeDetailsResult">
+        select hospital_id,device_number,device_full_address,status
+        from device
+        where device_type_id=#{deviceTypeId}
+        and hospital_id=#{hospitalId}
+    </select>
+
+    <select id="selectHospitalByHospitalName" parameterType="Hospital" resultMap="HospitalResult">
+        select hospital_id,hospital_name from hospital where hospital_id=#{hospitalId}
+    </select>
+
+    <update id="updateDeviceDetails" parameterType="Device">
+        update device
+        <trim prefix="set" suffixOverrides="," suffix =" where device_number=#{deviceNumber} ">
+            <if test="deviceFullAddress!=null and deviceFullAddress!=''">
+                device_full_address=#{deviceFullAddress}
+            </if>
+        </trim>
+    </update>
+
+    <select id="selectGoodsOrder" parameterType="GoodsOrder" resultMap="GoodsOrderResult">
+        <include refid="goodsOrders"/>
+        where user_id = #{userId}
+    </select>
+
+    <select id="selectDeviceByTypeName" parameterType="DeviceType" resultMap="DeviceTypeResult">
+        select device_type_id,device_type_name from device_type where device_type_id=#{deviceTypeId}
+    </select>
+
+    <select id="selectGoodsByGoodsName" parameterType="Goods" resultMap="GoodsResult">
+        <include refid="GoodsSql"/>
+        where goods_id = #{goodsId}
+    </select>
+
+    <select id="selectLeaseOrder" resultType="java.lang.String">
+        select device_number from device where hospital_id = #{hospitalId}
+    </select>
+</mapper>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.UserIntegralOrderMapper">
+
+    <resultMap type="UserIntegralBalanceDepositVo" id="UserIntegralOrderResult">
+        <result property="id"    column="id"    />
+        <result property="openid"    column="openid"    />
+        <result property="sum"    column="sum"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectUserIntegralOrderVo">
+        select id, openid, sum, create_time, status from user_integral_detail
+    </sql>
+
+    <select id="selectUserIntegralOrderList" parameterType="UserIntegralBalanceDepositVo" resultMap="UserIntegralOrderResult">
+        <include refid="selectUserIntegralOrderVo"/>
+        <where>
+            <if test="openid != null "> and openid = #{openid}</if>
+            <if test="sum != null  and sum != ''"> and sum = #{sum}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectUserIntegralOrderById" parameterType="Long" resultMap="UserIntegralOrderResult">
+        <include refid="selectUserIntegralOrderVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectUserIntegralOrderByUserId" parameterType="Integer" resultMap="UserIntegralOrderResult">
+        select * from user_integral_detail
+        <where>
+            openid = #{openid}
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertUserIntegralOrder" parameterType="UserIntegralBalanceDepositVo" useGeneratedKeys="true" keyProperty="id">
+        insert into user_integral_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="openid != null">openid,</if>
+            <if test="sum != null">sum,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="openid != null">#{openid},</if>
+            <if test="sum != null">#{sum},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="status != null">#{status},</if>
+        </trim>
+    </insert>
+</mapper>

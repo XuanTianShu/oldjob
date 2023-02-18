@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.AboutUsMapper">
+
+    <resultMap type="AboutUs" id="AboutUsResult">
+        <result property="aboutUsId"    column="about_us_id"    />
+        <result property="aboutUsTitle"    column="about_us_title"    />
+        <result property="aboutUsInfo"    column="about_us_info"    />
+        <result property="createTime"    column="create_time"    />
+    </resultMap>
+
+    <sql id="selectAboutUsVo">
+        select about_us_id, about_us_title, about_us_info, create_time from about_us
+    </sql>
+
+    <select id="selectAboutUsList" parameterType="AboutUs" resultMap="AboutUsResult">
+        <include refid="selectAboutUsVo"/>
+        <where>
+            <if test="aboutUsTitle != null  and aboutUsTitle != ''"> and about_us_title = #{aboutUsTitle}</if>
+            <if test="aboutUsInfo != null  and aboutUsInfo != ''"> and about_us_info = #{aboutUsInfo}</if>
+        </where>
+    </select>
+
+    <select id="selectAboutUsByAboutUsId" parameterType="Long" resultMap="AboutUsResult">
+        <include refid="selectAboutUsVo"/>
+        where about_us_id = #{aboutUsId}
+    </select>
+    <select id="aboutUsList" resultMap="AboutUsResult">
+        <include refid="selectAboutUsVo"/>
+    </select>
+
+    <insert id="insertAboutUs" parameterType="AboutUs" useGeneratedKeys="true" keyProperty="aboutUsId">
+        insert into about_us
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="aboutUsTitle != null">about_us_title,</if>
+            <if test="aboutUsInfo != null">about_us_info,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="aboutUsTitle != null">#{aboutUsTitle},</if>
+            <if test="aboutUsInfo != null">#{aboutUsInfo},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateAboutUs" parameterType="AboutUs">
+        update about_us
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="aboutUsTitle != null">about_us_title = #{aboutUsTitle},</if>
+            <if test="aboutUsInfo != null">about_us_info = #{aboutUsInfo},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+        </trim>
+        where about_us_id = #{aboutUsId}
+    </update>
+
+    <delete id="deleteAboutUsByAboutUsId" parameterType="Long">
+        delete from about_us where about_us_id = #{aboutUsId}
+    </delete>
+
+    <delete id="deleteAboutUsByAboutUsIds" parameterType="String">
+        delete from about_us where about_us_id in
+        <foreach item="aboutUsId" collection="array" open="(" separator="," close=")">
+            #{aboutUsId}
+        </foreach>
+    </delete>
+</mapper>
