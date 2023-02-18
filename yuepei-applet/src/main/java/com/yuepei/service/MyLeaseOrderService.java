@@ -1,7 +1,9 @@
 package com.yuepei.service;
 
 import com.yuepei.system.domain.UserLeaseOrder;
+import com.yuepei.system.domain.vo.ConditionOrderVO;
 import com.yuepei.system.domain.vo.LeaseOrderVO;
+import com.yuepei.system.domain.vo.OrderSumAndMoneyVO;
 
 import java.util.List;
 
@@ -43,4 +45,8 @@ public interface MyLeaseOrderService {
      * @return
      */
     List<UserLeaseOrder> leaseOrderList(LeaseOrderVO leaseOrderVO);
+
+    OrderSumAndMoneyVO selectDayOrder();
+
+    ConditionOrderVO selectConditionOrder(LeaseOrderVO leaseOrderVO);
 }

@@ -14,6 +14,8 @@ public class LeaseOrderVO extends BaseEntity {
     /** 编号 */
     private Long id;
 
+    private String openid;
+
     /** 用户名称 */
     private String nickName;
 
@@ -61,5 +63,7 @@ public class LeaseOrderVO extends BaseEntity {
 
     /** 租赁时长 */
     private String playTime;
+
+    private String outTradeNo;
 
 }

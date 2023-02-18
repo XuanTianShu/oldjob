@@ -85,4 +85,6 @@ public class UserLeaseOrder extends BaseEntity {
 
     /** 支付时间 */
     private Date endTime;
+
+    private String outTradeNo;
 }

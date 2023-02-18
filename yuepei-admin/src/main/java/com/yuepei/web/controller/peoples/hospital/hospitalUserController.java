@@ -1,4 +1,4 @@
-package com.yuepei.web.controller.peoples.investor;
+package com.yuepei.web.controller.peoples.hospital;
 
 import com.yuepei.common.annotation.Log;
 import com.yuepei.common.core.controller.BaseController;
@@ -18,15 +18,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
- * 投资人管理Controller
+ * 医院用户管理Controller
  *
  * @author ohy
  * @date 2023-02-14
  */
 @RestController
-@RequestMapping("/system/investorUser")
-public class InvestorUserController extends BaseController
-{
+@RequestMapping("/system/hospitalUser")
+public class hospitalUserController extends BaseController {
+
     @Autowired
     private IInvestorUserService investorUserService;
 
@@ -34,36 +34,35 @@ public class InvestorUserController extends BaseController
     private ISysUserService userService;
 
     /**
-     * 查询投资人管理列表
+     * 查询医院用户管理列表
      */
-    @PreAuthorize("@ss.hasPermi('system:investorUser:list')")
+    @PreAuthorize("@ss.hasPermi('system:hospitalUser:list')")
     @GetMapping("/list")
     public TableDataInfo list(SysUser user)
     {
         startPage();
-        user.setUserType("03");
-//        List<InvestorUser> list = investorUserService.selectInvestorUserList(investorUser);
+        user.setUserType("04");
         List<SysUser> list = userService.selectWechatUserList(user);
         return getDataTable(list);
     }
 
     /**
-     * 导出投资人管理列表
+     * 导出医院用户列表
      */
-    @PreAuthorize("@ss.hasPermi('system:investorUser:export')")
+    @PreAuthorize("@ss.hasPermi('system:hospitalUser:export')")
     @Log(title = "投资人管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, InvestorUser investorUser)
     {
         List<InvestorUser> list = investorUserService.selectInvestorUserList(investorUser);
         ExcelUtil<InvestorUser> util = new ExcelUtil<InvestorUser>(InvestorUser.class);
-        util.exportExcel(response, list, "投资人管理数据");
+        util.exportExcel(response, list, "医院用户数据");
     }
 
     /**
-     * 获取投资人管理详细信息
+     * 获取医院用户详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:investorUser:query')")
+    @PreAuthorize("@ss.hasPermi('system:hospitalUser:query')")
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
@@ -71,9 +70,9 @@ public class InvestorUserController extends BaseController
     }
 
     /**
-     * 新增投资人管理
+     * 新增医院用户
      */
-    @PreAuthorize("@ss.hasPermi('system:investorUser:add')")
+    @PreAuthorize("@ss.hasPermi('system:hospitalUser:add')")
     @Log(title = "投资人管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody InvestorUser investorUser)
@@ -82,9 +81,9 @@ public class InvestorUserController extends BaseController
     }
 
     /**
-     * 修改投资人管理
+     * 修改医院用户
      */
-    @PreAuthorize("@ss.hasPermi('system:investorUser:edit')")
+    @PreAuthorize("@ss.hasPermi('system:hospitalUser:edit')")
     @Log(title = "投资人管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InvestorUser investorUser)
@@ -93,9 +92,9 @@ public class InvestorUserController extends BaseController
     }
 
     /**
-     * 删除投资人管理
+     * 删除医院用户
      */
-    @PreAuthorize("@ss.hasPermi('system:investorUser:remove')")
+    @PreAuthorize("@ss.hasPermi('system:hospitalUser:remove')")
     @Log(title = "投资人管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)

@@ -8,14 +8,18 @@ import com.yuepei.common.enums.BusinessType;
 import com.yuepei.service.MyLeaseOrderService;
 import com.yuepei.system.domain.Order;
 import com.yuepei.system.domain.UserLeaseOrder;
+import com.yuepei.system.domain.vo.ConditionOrderVO;
 import com.yuepei.system.domain.vo.LeaseOrderVO;
+import com.yuepei.system.domain.vo.OrderSumAndMoneyVO;
 import com.yuepei.system.mapper.UserLeaseOrderMapper;
 import com.yuepei.system.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 　　　　 ┏┓       ┏┓+ +
@@ -76,10 +80,16 @@ public class OrderController extends BaseController {
      */
     @PreAuthorize("@ss.hasPermi('order:order:list')")
     @GetMapping("/leaseList")
-    public TableDataInfo LeaseList(LeaseOrderVO leaseOrderVO){
+    public AjaxResult LeaseList(LeaseOrderVO leaseOrderVO){
         startPage();
         List<UserLeaseOrder> list = myLeaseOrderService.leaseOrderList(leaseOrderVO);
-        return getDataTable(list);
+        OrderSumAndMoneyVO orderSumAndMoneyVO = myLeaseOrderService.selectDayOrder();
+        ConditionOrderVO conditionOrderVO = myLeaseOrderService.selectConditionOrder(leaseOrderVO);
+        Map<String,Object> map = new HashMap<>();
+        map.put("leaseList",getDataTable(list));
+        map.put("todayOrder",orderSumAndMoneyVO);
+        map.put("conditionOrder",conditionOrderVO);
+        return AjaxResult.success(map);
     }
 
 

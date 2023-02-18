@@ -3,7 +3,9 @@ import com.yuepei.service.MyLeaseOrderService;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.DeviceType;
 import com.yuepei.system.domain.UserLeaseOrder;
+import com.yuepei.system.domain.vo.ConditionOrderVO;
 import com.yuepei.system.domain.vo.LeaseOrderVO;
+import com.yuepei.system.domain.vo.OrderSumAndMoneyVO;
 import com.yuepei.system.mapper.DeviceMapper;
 import com.yuepei.system.mapper.DeviceTypeMapper;
 import com.yuepei.system.mapper.UserLeaseOrderMapper;
@@ -88,6 +90,16 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
     @Override
     public List<UserLeaseOrder> leaseOrderList(LeaseOrderVO leaseOrderVO) {
         return userLeaseOrderMapper.leaseOrderList(leaseOrderVO);
+    }
+
+    @Override
+    public OrderSumAndMoneyVO selectDayOrder() {
+        return userLeaseOrderMapper.selectDayOrder();
+    }
+
+    @Override
+    public ConditionOrderVO selectConditionOrder(LeaseOrderVO leaseOrderVO) {
+        return userLeaseOrderMapper.selectConditionOrder(leaseOrderVO);
     }
 
 }

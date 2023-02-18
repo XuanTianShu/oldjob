@@ -17,7 +17,7 @@ import com.yuepei.common.xss.Xss;
 
 /**
  * 用户对象 sys_user
- * 
+ *
  * @author ruoyi
  */
 @Data
@@ -61,12 +61,16 @@ public class SysUser extends BaseEntity
     @Excel(name = "手机号码")
     private String phoneNumber;
 
+    private Long proportion;
+
     /** 用户性别 */
     @Excel(name = "用户性别", readConverterExp = "0=男,1=女,2=未知")
     private String sex;
 
     /** 用户头像 */
     private String avatar;
+
+    private String userType;
 
     /** 密码 */
     private String password;
@@ -123,6 +127,14 @@ public class SysUser extends BaseEntity
     public void setUserId(Long userId)
     {
         this.userId = userId;
+    }
+
+    public String getUserType(){
+        return userType;
+    }
+
+    public void  setUserType(String userType){
+        this.userType = userType;
     }
 
     public boolean isAdmin()

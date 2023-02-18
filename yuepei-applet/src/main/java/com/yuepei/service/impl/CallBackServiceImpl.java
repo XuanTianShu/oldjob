@@ -299,6 +299,8 @@ public class CallBackServiceImpl implements CallBackService {
                 userLeaseOrder.setCreateTime(time);
                 //订单号
                 userLeaseOrder.setOrderNumber(out_trade_no);
+                //支付方式
+                userLeaseOrder.setPayType("1");
                 //修改状态
                 userLeaseOrder.setStatus("2");
                 //修改用户租赁信息

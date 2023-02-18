@@ -1,7 +1,9 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.UserLeaseOrder;
+import com.yuepei.system.domain.vo.ConditionOrderVO;
 import com.yuepei.system.domain.vo.LeaseOrderVO;
+import com.yuepei.system.domain.vo.OrderSumAndMoneyVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -92,4 +94,8 @@ public interface UserLeaseOrderMapper {
      * @return
      */
     List<UserLeaseOrder> leaseOrderList(LeaseOrderVO leaseOrderVO);
+
+    OrderSumAndMoneyVO selectDayOrder();
+
+    ConditionOrderVO selectConditionOrder(LeaseOrderVO leaseOrderVO);
 }

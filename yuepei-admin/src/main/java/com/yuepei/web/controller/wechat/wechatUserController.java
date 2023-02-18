@@ -65,6 +65,7 @@ public class wechatUserController extends BaseController {
     public TableDataInfo list(SysUser user)
     {
         startPage();
+        user.setUserType("01");
         List<SysUser> list = userService.selectWechatUserList(user);
         return getDataTable(list);
     }
