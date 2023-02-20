@@ -22,9 +22,16 @@ public interface HospitalDeviceMapper {
 
     List<GoodsOrder> selectGoodsOrder(@Param("userId") Long userId);
 
+    GoodsOrder selectOrderByOrderId(@Param("orderId") Long orderId);
+
     DeviceType selectDeviceByTypeName(@Param("deviceTypeId") Long deviceTypeId);
 
     Goods selectGoodsByGoodsName(@Param("goodsId") Long goodsId);
 
     List<String> selectLeaseOrder(@Param("hospitalId") Long hospitalId);
+
+    Hospital selectHospital(@Param("hospitalName") String hospitalName);
+
+    void insertHospital(@Param("hospitalName") String hospitalName);
+
 }

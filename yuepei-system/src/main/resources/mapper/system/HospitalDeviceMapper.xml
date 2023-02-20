@@ -112,6 +112,11 @@
         where user_id = #{userId}
     </select>
 
+    <select id="selectOrderByOrderId" parameterType="goodsOrder" resultMap="GoodsOrderResult">
+        <include refid="goodsOrders"/>
+        where order_id = #{orderId}
+    </select>
+
     <select id="selectDeviceByTypeName" parameterType="DeviceType" resultMap="DeviceTypeResult">
         select device_type_id,device_type_name from device_type where device_type_id=#{deviceTypeId}
     </select>
@@ -124,4 +129,17 @@
     <select id="selectLeaseOrder" resultType="java.lang.String">
         select device_number from device where hospital_id = #{hospitalId}
     </select>
+
+    <select id="selectHospital" parameterType="Hospital" resultMap="HospitalResult">
+        select hospital_id,hospital_name from hospital where hospital_name = #{hospitalName}
+    </select>
+
+    <insert id="insertHospital" parameterType="hospital">
+        insert into hospital(
+            <if test="hospital_name!=null and hospital_name!=''">hospital_name</if>
+        )
+        value (
+            <if test="hospital_name!=null and hospital_name!=''">#{hospitalName}</if>
+        )
+    </insert>
 </mapper>

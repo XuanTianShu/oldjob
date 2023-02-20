@@ -1,19 +1,17 @@
 package com.yuepei.web.agent.service.impl;
 
-import com.yuepei.system.domain.Agent;
-import com.yuepei.system.domain.Device;
-import com.yuepei.system.domain.DeviceType;
-import com.yuepei.system.domain.Hospital;
-import com.yuepei.system.domain.vo.DeviceDetailsVo;
-import com.yuepei.system.domain.vo.DeviceWorkStatusVo;
+import com.yuepei.system.domain.*;
+import com.yuepei.system.domain.vo.*;
 import com.yuepei.system.mapper.AgentMapper;
 import com.yuepei.system.mapper.DeviceMapper;
 import com.yuepei.system.mapper.DeviceTypeMapper;
 import com.yuepei.system.mapper.HospitalDeviceMapper;
 import com.yuepei.web.agent.service.AgentService;
+import com.yuepei.web.hospital.service.HospitalDeviceService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.method.HandlerMethod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +35,17 @@ public class AgentServiceImpl implements AgentService {
     @Autowired
     private DeviceTypeMapper deviceTypeMapper;
 
+    @Autowired
+    private HospitalDeviceService hospitalDeviceService;
+
     @Override
     public List<DeviceDetailsVo> selectAgentInfo(Long userId) {
-        Agent agent = agentMapper.selectAgentByAgentId(userId);
-        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(agent.getHospitalId());
-        List<Device> devices = deviceMapper.selectDeviceByHospitalId(agent.getHospitalId());
+        List<Agent> agent = agentMapper.selectAgentByAgentId(userId);
+        List<Device> devices = new ArrayList<>();
+        agent.stream().forEach(map->{
+            List<Device> device = deviceMapper.selectDeviceByHospitalId(map.getHospitalId());
+            devices.addAll(device);
+        });
         List<DeviceDetailsVo> deviceDetailsVos = new ArrayList<>();
         devices.stream().forEach(map->{
             DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
@@ -55,13 +59,15 @@ public class AgentServiceImpl implements AgentService {
                     deviceDetailsVo.setDeviceRoom(split[2]);
                     deviceDetailsVo.setDeviceBed(split[3]);
                 }
-                deviceDetailsVo.setDeviceFullAddress(device_full_address);
-                deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
-                deviceDetailsVo.setStatus(map.getStatus());
-                BeanUtils.copyProperties(hospital,deviceDetailsVo);
-                BeanUtils.copyProperties(deviceType,deviceDetailsVo);
-                deviceDetailsVos.add(deviceDetailsVo);
             }
+            deviceDetailsVo.setDeviceFullAddress(device_full_address);
+            deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
+            deviceDetailsVo.setStatus(map.getStatus());
+            Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(map.getHospitalId());
+            deviceDetailsVo.setHospitalId(hospital.getHospitalId());
+            deviceDetailsVo.setHospitalName(hospital.getHospitalName());
+            BeanUtils.copyProperties(deviceType,deviceDetailsVo);
+            deviceDetailsVos.add(deviceDetailsVo);
         });
         return deviceDetailsVos;
     }
@@ -77,6 +83,7 @@ public class AgentServiceImpl implements AgentService {
             String[] split = device_full_address.split(",");
             StringBuilder builder = new StringBuilder();
             builder.append(hospital.getHospitalName()).append(split[0]).append(split[1]).append(split[2]).append(split[3]);
+            workStatusVo.setDeviceTypeId(deviceType.getDeviceTypeId());
             workStatusVo.setDeviceTypeName(deviceType.getDeviceTypeName());
             workStatusVo.setDeviceNumber(device.getDeviceNumber());
             workStatusVo.setDeviceAddress(device.getDeviceAddress());
@@ -87,6 +94,52 @@ public class AgentServiceImpl implements AgentService {
             workStatusVo.setCumulativeTime(null);
         }
         return workStatusVo;
+    }
+
+    @Override
+    public List<HospitalManagementVo> selectHospitalAdministration(Long userId) {
+        List<Agent> agent = agentMapper.selectAgentByAgentId(userId);
+        List<Device> devices = new ArrayList<>();
+        agent.stream().forEach(map->{
+            List<Device> device = deviceMapper.selectDeviceByHospitalId(map.getHospitalId());
+            devices.addAll(device);
+        });
+        List<HospitalManagementVo> hospitalManagementVos = new ArrayList<>();
+        devices.stream().forEach(map->{
+            HospitalManagementVo hospitalManagementVo = new HospitalManagementVo();
+            Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(map.getHospitalId());
+            hospitalManagementVo.setHospitalId(hospital.getHospitalId());
+            hospitalManagementVo.setHospitalName(hospital.getHospitalName());
+            hospitalManagementVo.setDeviceAddress(map.getDeviceAddress());
+            List<Device> deviceList = deviceMapper.selectDeviceByHospitalId(hospital.getHospitalId());
+            hospitalManagementVo.setDeviceNum(deviceList.size());
+            hospitalManagementVos.add(hospitalManagementVo);
+        });
+        return hospitalManagementVos;
+    }
+
+
+    /*需求修改*/
+    @Override
+    public String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo) {
+        Hospital hospital = hospitalDeviceMapper.selectHospital(hospitalAgentVo.getHospitalName());
+        if (hospital!=null){
+            return "该医院已被其他代理商代理";
+        }
+        hospitalDeviceMapper.insertHospital(hospitalAgentVo.getHospitalName());
+
+        return null;
+    }
+
+    @Override
+    public List<UserLeaseOrderVo> selectLeaseOrder(Long userId) {
+        List<Agent> agents = agentMapper.selectAgentByAgentId(userId);
+        List<UserLeaseOrderVo> userLeaseOrderList = new ArrayList<>();
+        agents.stream().forEach(map->{
+            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(map.getHospitalId());
+            userLeaseOrderList.addAll(userLeaseOrders);
+        });
+        return userLeaseOrderList;
     }
 
 

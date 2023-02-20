@@ -3,6 +3,7 @@ package com.yuepei.web.agent.controller;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.vo.DeviceDetailsVo;
+import com.yuepei.system.domain.vo.HospitalAgentVo;
 import com.yuepei.utils.TokenUtils;
 import com.yuepei.web.agent.service.AgentService;
 import com.yuepei.web.hospital.service.HospitalDeviceService;
@@ -58,6 +59,19 @@ public class AgentController {
     @GetMapping("/selectHospitalAdministration")
     private AjaxResult selectHospitalAdministration(HttpServletRequest request){
         SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(/*agentService.selectHospitalAdministration(analysis.getUserId())*/);
+        return AjaxResult.success(agentService.selectHospitalAdministration(analysis.getUserId()));
+    }
+
+    /**代理端添加医院    需求修改*/
+    @PostMapping("/addHospitalByAgent")
+    private AjaxResult addHospitalByAgent(@RequestBody HospitalAgentVo hospitalAgentVo){
+        return AjaxResult.success(agentService.insertHospitalByAgent(hospitalAgentVo));
+    }
+
+    /**代理端租借订单*/
+    @GetMapping("/selectLeaseOrder")
+    private AjaxResult selectLeaseOrder(HttpServletRequest request){
+        SysUser analysis = tokenUtils.analysis(request);
+        return AjaxResult.success(agentService.selectLeaseOrder(analysis.getUserId()));
     }
 }

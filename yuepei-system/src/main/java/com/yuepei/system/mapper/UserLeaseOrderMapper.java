@@ -2,6 +2,7 @@ package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.LeaseOrderVO;
+import com.yuepei.system.domain.vo.UserLeaseOrderVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.parameters.P;
 
@@ -94,13 +95,13 @@ public interface UserLeaseOrderMapper {
      */
     List<UserLeaseOrder> leaseOrderList(LeaseOrderVO leaseOrderVO);
 
-    List<UserLeaseOrder> selectUserLeaseOrder(@Param("deviceNumber") String deviceNumber);
+    List<UserLeaseOrderVo> selectUserLeaseOrder(@Param("deviceNumber") String deviceNumber);
 
     UserLeaseOrder selectLeaseOrderDetails(@Param("orderNumber") String orderNumber);
 
-    List<UserLeaseOrder> selectRevenueStatistics(@Param("deviceNumber") String deviceNumber);
+    List<UserLeaseOrderVo> selectRevenueStatistics(@Param("deviceNumber") String deviceNumber);
 
-    List<UserLeaseOrder> selectRevenueStatistics2(@Param("deviceNumber") String deviceNumber);
+    List<UserLeaseOrderVo> selectRevenueStatistics2(@Param("deviceNumber") String deviceNumber);
 
-    List<UserLeaseOrder> selectRevenueStatistics3(@Param("deviceNumber") String deviceNumber);
+    List<UserLeaseOrderVo> selectRevenueStatistics3(@Param("deviceNumber") String deviceNumber);
 }

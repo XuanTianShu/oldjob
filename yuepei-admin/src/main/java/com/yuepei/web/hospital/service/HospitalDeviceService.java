@@ -23,9 +23,12 @@ public interface HospitalDeviceService {
 
     List<GoodsOrderVo> selectGoodsOrder(Long userId);
 
-    List<UserLeaseOrder> selectLeaseOrder(Long hospitalId);
+    GoodsOrderVo selectOrderByOrderId(Long orderId);
+
+    List<UserLeaseOrderVo> selectLeaseOrder(Long hospitalId);
 
     UserLeaseOrderVo selectLeaseOrderDetails(String orderNumber);
 
-    List<UserLeaseOrder> selectRevenueStatistics(Long hospitalId, int statistics);
+    List<UserLeaseOrderVo> selectRevenueStatistics(Long hospitalId, int statistics);
+
 }

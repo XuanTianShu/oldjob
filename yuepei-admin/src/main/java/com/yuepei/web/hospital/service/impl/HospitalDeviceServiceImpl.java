@@ -6,6 +6,7 @@ import com.yuepei.system.domain.vo.GoodsOrderVo;
 import com.yuepei.system.domain.vo.RevenueStatisticsVo;
 import com.yuepei.system.domain.vo.UserLeaseOrderVo;
 import com.yuepei.system.mapper.HospitalDeviceMapper;
+import com.yuepei.system.mapper.OrderMapper;
 import com.yuepei.system.mapper.UserLeaseOrderMapper;
 import com.yuepei.web.hospital.service.HospitalDeviceService;
 import org.springframework.beans.BeanUtils;
@@ -96,11 +97,25 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     }
 
     @Override
-    public List<UserLeaseOrder> selectLeaseOrder(Long hospitalId) {
+    public GoodsOrderVo selectOrderByOrderId(Long orderId) {
+        GoodsOrder goodsOrder = hospitalDeviceMapper.selectOrderByOrderId(orderId);
+        GoodsOrderVo goodsOrderVo = new GoodsOrderVo();
+        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(goodsOrder.getHospitalId());
+        DeviceType deviceType = hospitalDeviceMapper.selectDeviceByTypeName(goodsOrder.getDeviceTypeId());
+        Goods goods = hospitalDeviceMapper.selectGoodsByGoodsName(goodsOrder.getGoodsId());
+        BeanUtils.copyProperties(hospital,goodsOrderVo);
+        BeanUtils.copyProperties(deviceType,goodsOrderVo);
+        BeanUtils.copyProperties(goods,goodsOrderVo);
+        BeanUtils.copyProperties(goodsOrder,goodsOrderVo);
+        return goodsOrderVo;
+    }
+
+    @Override
+    public List<UserLeaseOrderVo> selectLeaseOrder(Long hospitalId) {
         List<String> numberList = hospitalDeviceMapper.selectLeaseOrder(hospitalId);
-        List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
+        List<UserLeaseOrderVo> userLeaseOrders = new ArrayList<>();
         for (String deviceNumber : numberList) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrder(deviceNumber);
+            List<UserLeaseOrderVo> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrder(deviceNumber);
             userLeaseOrders.addAll(userLeaseOrderList);
         }
         return userLeaseOrders;
@@ -115,27 +130,27 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     }
 
     @Override
-    public List<UserLeaseOrder> selectRevenueStatistics(Long hospitalId, int statistics) {
+    public List<UserLeaseOrderVo> selectRevenueStatistics(Long hospitalId, int statistics) {
         List<String> numberList = hospitalDeviceMapper.selectLeaseOrder(hospitalId);
-        List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
+        List<UserLeaseOrderVo> userLeaseOrders = new ArrayList<>();
         if (statistics==1){
             for (String deviceNumber : numberList) {
-                List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectRevenueStatistics(deviceNumber);
+                List<UserLeaseOrderVo> userLeaseOrderList = userLeaseOrderMapper.selectRevenueStatistics(deviceNumber);
                 userLeaseOrders.addAll(userLeaseOrderList);
             }
         }else if (statistics==2){
             for (String deviceNumber : numberList) {
-                List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectRevenueStatistics2(deviceNumber);
+                List<UserLeaseOrderVo> userLeaseOrderList = userLeaseOrderMapper.selectRevenueStatistics2(deviceNumber);
                 userLeaseOrders.addAll(userLeaseOrderList);
             }
         }else if (statistics==3){
             for (String deviceNumber : numberList) {
-                List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectRevenueStatistics3(deviceNumber);
+                List<UserLeaseOrderVo> userLeaseOrderList = userLeaseOrderMapper.selectRevenueStatistics3(deviceNumber);
                 userLeaseOrders.addAll(userLeaseOrderList);
             }
         }else {
             for (String deviceNumber : numberList) {
-                List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrder(deviceNumber);
+                List<UserLeaseOrderVo> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrder(deviceNumber);
                 userLeaseOrders.addAll(userLeaseOrderList);
             }
         }

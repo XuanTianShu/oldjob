@@ -3,6 +3,7 @@ package com.yuepei.web.hospital.controller;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.vo.DeviceDetailsVo;
+import com.yuepei.system.service.OrderService;
 import com.yuepei.utils.TokenUtils;
 import com.yuepei.web.agent.service.AgentService;
 import com.yuepei.web.hospital.service.HospitalDeviceService;
@@ -23,7 +24,7 @@ public class HospitalDeviceController {
     private TokenUtils tokenUtils;
 
     @Autowired
-    private HospitalDeviceService HospitalInfoService;
+    private HospitalDeviceService hospitalDeviceService;
 
     /**
     * 查询医院设备类型
@@ -31,7 +32,7 @@ public class HospitalDeviceController {
     @GetMapping("/selectDeviceType")
     public AjaxResult selectHospital(HttpServletRequest request){
         SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(HospitalInfoService.selectDeviceType(analysis.getUserId()));
+        return AjaxResult.success(hospitalDeviceService.selectDeviceType(analysis.getUserId()));
     }
 
     /**
@@ -40,7 +41,7 @@ public class HospitalDeviceController {
     @PostMapping("/selectDeviceTypeDetails")
     public AjaxResult selectDeviceTypeDetails(@RequestParam("deviceTypeId") Long deviceTypeId,
                                               @RequestParam("hospitalId")Long hospitalId){
-        return AjaxResult.success(HospitalInfoService.selectDeviceTypeDetails(deviceTypeId,hospitalId));
+        return AjaxResult.success(hospitalDeviceService.selectDeviceTypeDetails(deviceTypeId,hospitalId));
     }
 
     /**
@@ -48,7 +49,7 @@ public class HospitalDeviceController {
      * */
     @PostMapping("/updateDeviceDetails")
     public AjaxResult updateDeviceDetails(@RequestBody DeviceDetailsVo deviceDetailsVo){
-        HospitalInfoService.updateDeviceDetails(deviceDetailsVo);
+        hospitalDeviceService.updateDeviceDetails(deviceDetailsVo);
         return AjaxResult.success();
     }
 
@@ -58,7 +59,13 @@ public class HospitalDeviceController {
     @GetMapping("/selectGoodsOrder")
     public AjaxResult selectGoodsOrder(HttpServletRequest request){
         SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(HospitalInfoService.selectGoodsOrder(analysis.getUserId()));
+        return AjaxResult.success(hospitalDeviceService.selectGoodsOrder(analysis.getUserId()));
+    }
+
+    /**查询商品详细信息*/
+    @PostMapping("/selectGoodsOrderDetails")
+    private AjaxResult selectGoodsOrderDetails(@RequestParam("orderId")Long orderId){
+        return AjaxResult.success(hospitalDeviceService.selectOrderByOrderId(orderId));
     }
 
     /**
@@ -66,7 +73,7 @@ public class HospitalDeviceController {
      * */
     @PostMapping("/selectLeaseOrder")
     public AjaxResult selectLeaseOrder(@RequestParam("hospitalId")Long hospitalId){
-        return AjaxResult.success(HospitalInfoService.selectLeaseOrder(hospitalId));
+        return AjaxResult.success(hospitalDeviceService.selectLeaseOrder(hospitalId));
     }
 
     /**
@@ -74,14 +81,14 @@ public class HospitalDeviceController {
      * */
     @PostMapping("/selectLeaseOrderDetails")
     public AjaxResult selectLeaseOrderDetails(@RequestParam("orderNumber")String orderNumber){
-        return AjaxResult.success(HospitalInfoService.selectLeaseOrderDetails(orderNumber));
+        return AjaxResult.success(hospitalDeviceService.selectLeaseOrderDetails(orderNumber));
     }
 
     /**医院营收统计*/
     @PostMapping("/selectRevenueStatistics")
     public AjaxResult selectRevenueStatistics(@RequestParam("hospitalId")Long hospitalId,
                                               @RequestParam("statistics")int statistics){
-        return AjaxResult.success(HospitalInfoService.selectRevenueStatistics(hospitalId,statistics));
+        return AjaxResult.success(hospitalDeviceService.selectRevenueStatistics(hospitalId,statistics));
     }
 
 }
