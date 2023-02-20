@@ -50,7 +50,7 @@ public class HospitalUserController extends BaseController {
      * 导出医院用户列表
      */
     @PreAuthorize("@ss.hasPermi('system:hospitalUser:export')")
-    @Log(title = "投资人管理", businessType = BusinessType.EXPORT)
+    @Log(title = "医院管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     public void export(HttpServletResponse response, InvestorUser investorUser)
     {
@@ -73,7 +73,7 @@ public class HospitalUserController extends BaseController {
      * 新增医院用户
      */
     @PreAuthorize("@ss.hasPermi('system:hospitalUser:add')")
-    @Log(title = "投资人管理", businessType = BusinessType.INSERT)
+    @Log(title = "医院管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody InvestorUser investorUser)
     {
@@ -84,7 +84,7 @@ public class HospitalUserController extends BaseController {
      * 修改医院用户
      */
     @PreAuthorize("@ss.hasPermi('system:hospitalUser:edit')")
-    @Log(title = "投资人管理", businessType = BusinessType.UPDATE)
+    @Log(title = "医院管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InvestorUser investorUser)
     {
@@ -95,7 +95,7 @@ public class HospitalUserController extends BaseController {
      * 删除医院用户
      */
     @PreAuthorize("@ss.hasPermi('system:hospitalUser:remove')")
-    @Log(title = "投资人管理", businessType = BusinessType.DELETE)
+    @Log(title = "医院管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {
