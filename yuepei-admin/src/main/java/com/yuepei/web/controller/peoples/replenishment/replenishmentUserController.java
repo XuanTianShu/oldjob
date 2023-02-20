@@ -52,10 +52,10 @@ public class replenishmentUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:replenishmentUser:export')")
     @Log(title = "补货管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysUser investorUser)
+    public void export(HttpServletResponse response, InvestorUser investorUser)
     {
-        List<SysUser> list = investorUserService.selectInvestorUserList(investorUser);
-        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
+        List<InvestorUser> list = investorUserService.selectInvestorUserList(investorUser);
+        ExcelUtil<InvestorUser> util = new ExcelUtil<InvestorUser>(InvestorUser.class);
         util.exportExcel(response, list, "补货用户数据");
     }
 

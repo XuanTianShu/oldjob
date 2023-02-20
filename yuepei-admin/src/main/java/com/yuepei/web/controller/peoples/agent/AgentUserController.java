@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
- * 代理用户管理Controller
+ * 代理商用户管理Controller
  *
  * @author ohy
  * @date 2023-02-14
@@ -33,7 +33,7 @@ public class AgentUserController extends BaseController {
     private ISysUserService userService;
 
     /**
-     * 查询代理用户管理列表
+     * 查询医院用户管理列表
      */
     @PreAuthorize("@ss.hasPermi('system:agentUser:list')")
     @GetMapping("/list")
@@ -46,20 +46,20 @@ public class AgentUserController extends BaseController {
     }
 
     /**
-     * 导出代理用户列表
+     * 导出医院用户列表
      */
     @PreAuthorize("@ss.hasPermi('system:agentUser:export')")
-    @Log(title = "代理管理", businessType = BusinessType.EXPORT)
+    @Log(title = "投资人管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, SysUser investorUser)
+    public void export(HttpServletResponse response, InvestorUser investorUser)
     {
-        List<SysUser> list = investorUserService.selectInvestorUserList(investorUser);
-        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
-        util.exportExcel(response, list, "代理用户数据");
+        List<InvestorUser> list = investorUserService.selectInvestorUserList(investorUser);
+        ExcelUtil<InvestorUser> util = new ExcelUtil<InvestorUser>(InvestorUser.class);
+        util.exportExcel(response, list, "医院用户数据");
     }
 
     /**
-     * 获取代理用户详细信息
+     * 获取医院用户详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:agentUser:query')")
     @GetMapping(value = "/{id}")
@@ -69,10 +69,10 @@ public class AgentUserController extends BaseController {
     }
 
     /**
-     * 新增代理用户
+     * 新增医院用户
      */
     @PreAuthorize("@ss.hasPermi('system:agentUser:add')")
-    @Log(title = "代理管理", businessType = BusinessType.INSERT)
+    @Log(title = "投资人管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody InvestorUser investorUser)
     {
@@ -80,10 +80,10 @@ public class AgentUserController extends BaseController {
     }
 
     /**
-     * 修改代理用户
+     * 修改医院用户
      */
     @PreAuthorize("@ss.hasPermi('system:agentUser:edit')")
-    @Log(title = "代理管理", businessType = BusinessType.UPDATE)
+    @Log(title = "投资人管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody InvestorUser investorUser)
     {
@@ -91,10 +91,10 @@ public class AgentUserController extends BaseController {
     }
 
     /**
-     * 删除代理用户
+     * 删除医院用户
      */
     @PreAuthorize("@ss.hasPermi('system:agentUser:remove')")
-    @Log(title = "代理管理", businessType = BusinessType.DELETE)
+    @Log(title = "投资人管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{ids}")
     public AjaxResult remove(@PathVariable Long[] ids)
     {

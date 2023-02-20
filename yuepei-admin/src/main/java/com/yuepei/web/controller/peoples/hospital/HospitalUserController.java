@@ -25,7 +25,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/system/hospitalUser")
-public class hospitalUserController extends BaseController {
+public class HospitalUserController extends BaseController {
 
     @Autowired
     private IInvestorUserService investorUserService;
