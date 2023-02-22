@@ -5,16 +5,13 @@ import com.yuepei.common.core.controller.BaseController;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.common.enums.BusinessType;
-import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.common.utils.poi.ExcelUtil;
 import com.yuepei.system.domain.Discount;
 import com.yuepei.system.service.IDiscountService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 

@@ -3,7 +3,6 @@ package com.yuepei.system.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yuepei.common.annotation.Excel;
 import com.yuepei.common.core.domain.BaseEntity;
-import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -14,15 +13,18 @@ import java.util.Date;
  * 优惠券对象 discount
  *
  * @author ohy
- * @date 2023-02-27
+ * @date 2023-02-21
  */
-@Data
 public class Discount extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
     /** 主键 */
     private Long id;
+
+    /** 医院id */
+    @Excel(name = "医院id")
+    private Long hospitalId;
 
     /** 优惠券名称 */
     @Excel(name = "优惠券名称")
@@ -39,6 +41,10 @@ public class Discount extends BaseEntity
     /** 有效期(代表天数) */
     @Excel(name = "有效期(代表天数)")
     private Long period;
+
+    /** 门槛 */
+    @Excel(name = "门槛")
+    private BigDecimal threshold;
 
     /** 状态(0正常1禁用) */
     @Excel(name = "状态(0正常1禁用)")
@@ -67,10 +73,6 @@ public class Discount extends BaseEntity
     /** 门槛名称 */
     @Excel(name = "门槛名称")
     private String thresholdName;
-
-    /** 医院编号 */
-    @Excel(name = "医院编号")
-    private Long hospitalId;
 
     private String hospitalName;
 

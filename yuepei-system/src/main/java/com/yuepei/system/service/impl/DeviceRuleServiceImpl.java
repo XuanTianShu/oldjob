@@ -20,18 +20,6 @@ public class DeviceRuleServiceImpl implements IDeviceRuleService
     private DeviceRuleMapper deviceRuleMapper;
 
     /**
-     * 查询医院套餐
-     *
-     * @param id 医院套餐主键
-     * @return 医院套餐
-     */
-    @Override
-    public DeviceRule selectDeviceRuleById(Long id)
-    {
-        return deviceRuleMapper.selectDeviceRuleById(id);
-    }
-
-    /**
      * 查询医院套餐列表
      *
      * @param deviceRule 医院套餐

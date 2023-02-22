@@ -12,13 +12,6 @@ import java.util.List;
  */
 public interface DeviceRuleMapper
 {
-    /**
-     * 查询医院套餐
-     *
-     * @param id 医院套餐主键
-     * @return 医院套餐
-     */
-    public DeviceRule selectDeviceRuleById(Long id);
 
     /**
      * 查询医院套餐列表
