@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.DiscountMapper">
+
+    <resultMap type="Discount" id="DiscountResult">
+        <result property="id"    column="id"    />
+        <result property="hospitalId"    column="hospital_id"    />
+        <result property="money"    column="money"    />
+        <result property="threshold"    column="threshold"    />
+        <result property="sentNum"    column="sent_num"    />
+        <result property="unbilledNum"    column="unbilled_num"    />
+        <result property="discountType"    column="discount_type"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="endTime"    column="end_time"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectDiscountVo">
+        select id, hospital_id, money, threshold, sent_num, unbilled_num, discount_type, create_time, end_time, status from discount
+    </sql>
+
+    <select id="selectDiscountList" parameterType="Discount" resultMap="DiscountResult">
+        <include refid="selectDiscountVo"/>
+        <where>
+            <if test="hospitalId != null "> and hospital_id = #{hospitalId}</if>
+            <if test="money != null "> and money = #{money}</if>
+            <if test="threshold != null "> and threshold = #{threshold}</if>
+            <if test="sentNum != null "> and sent_num = #{sentNum}</if>
+            <if test="unbilledNum != null "> and unbilled_num = #{unbilledNum}</if>
+            <if test="discountType != null "> and discount_type = #{discountType}</if>
+            <if test="endTime != null "> and end_time = #{endTime}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectDiscountById" parameterType="Long" resultMap="DiscountResult">
+        <include refid="selectDiscountVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertDiscount" parameterType="Discount" useGeneratedKeys="true" keyProperty="id">
+        insert into discount
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="hospitalId != null">hospital_id,</if>
+            <if test="money != null">money,</if>
+            <if test="threshold != null">threshold,</if>
+            <if test="sentNum != null">sent_num,</if>
+            <if test="unbilledNum != null">unbilled_num,</if>
+            <if test="discountType != null">discount_type,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="endTime != null">end_time,</if>
+            <if test="status != null">status,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="hospitalId != null">#{hospitalId},</if>
+            <if test="money != null">#{money},</if>
+            <if test="threshold != null">#{threshold},</if>
+            <if test="sentNum != null">#{sentNum},</if>
+            <if test="unbilledNum != null">#{unbilledNum},</if>
+            <if test="discountType != null">#{discountType},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="endTime != null">#{endTime},</if>
+            <if test="status != null">#{status},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDiscount" parameterType="Discount">
+        update discount
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="hospitalId != null">hospital_id = #{hospitalId},</if>
+            <if test="money != null">money = #{money},</if>
+            <if test="threshold != null">threshold = #{threshold},</if>
+            <if test="sentNum != null">sent_num = #{sentNum},</if>
+            <if test="unbilledNum != null">unbilled_num = #{unbilledNum},</if>
+            <if test="discountType != null">discount_type = #{discountType},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDiscountById" parameterType="Long">
+        delete from discount where id = #{id}
+    </delete>
+
+    <delete id="deleteDiscountByIds" parameterType="String">
+        delete from discount where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

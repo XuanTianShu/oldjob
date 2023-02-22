@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.DiscountTypeMapper">
+
+    <resultMap type="DiscountType" id="DiscountTypeResult">
+        <result property="id"    column="id"    />
+        <result property="discountName"    column="discount_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectDiscountTypeVo">
+        select id, discount_name, create_time, update_time from discount_type
+    </sql>
+
+    <select id="selectDiscountTypeList" parameterType="DiscountType" resultMap="DiscountTypeResult">
+        <include refid="selectDiscountTypeVo"/>
+        <where>
+            <if test="discountName != null  and discountName != ''"> and discount_name like concat('%', #{discountName}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectDiscountTypeById" parameterType="Long" resultMap="DiscountTypeResult">
+        <include refid="selectDiscountTypeVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertDiscountType" parameterType="DiscountType" useGeneratedKeys="true" keyProperty="id">
+        insert into discount_type
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="discountName != null">discount_name,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="discountName != null">#{discountName},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDiscountType" parameterType="DiscountType">
+        update discount_type
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="discountName != null">discount_name = #{discountName},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDiscountTypeById" parameterType="Long">
+        delete from discount_type where id = #{id}
+    </delete>
+
+    <delete id="deleteDiscountTypeByIds" parameterType="String">
+        delete from discount_type where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

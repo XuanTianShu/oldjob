@@ -53,13 +53,13 @@ public class HospitalRuleController extends BaseController
     }
 
     /**
-     * 获取医院套餐详细信息
+     * 获取该设备套餐详细信息
      */
     @PreAuthorize("@ss.hasPermi('system:rule:query')")
-    @GetMapping(value = "/{id}")
-    public AjaxResult getInfo(@PathVariable("id") Long id)
+    @GetMapping(value = "/{deviceNumber}")
+    public AjaxResult getInfo(@PathVariable("deviceNumber") Long deviceNumber)
     {
-        return AjaxResult.success(deviceRuleService.selectDeviceRuleById(id));
+        return AjaxResult.success(deviceRuleService.selectDeviceRuleByDeviceNumber(deviceNumber));
     }
 
     /**
@@ -75,10 +75,10 @@ public class HospitalRuleController extends BaseController
     }
 
     /**
-     * 新增医院套餐
+     * 新增设备套餐
      */
     @PreAuthorize("@ss.hasPermi('system:rule:add')")
-    @Log(title = "医院套餐", businessType = BusinessType.INSERT)
+    @Log(title = "设备套餐", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody DeviceRule deviceRule)
     {
@@ -86,10 +86,10 @@ public class HospitalRuleController extends BaseController
     }
 
     /**
-     * 修改医院套餐
+     * 修改设备套餐
      */
     @PreAuthorize("@ss.hasPermi('system:rule:edit')")
-    @Log(title = "医院套餐", businessType = BusinessType.UPDATE)
+    @Log(title = "设备套餐", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody DeviceRule deviceRule)
     {

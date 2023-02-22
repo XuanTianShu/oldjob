@@ -11,10 +11,11 @@
         <result property="rule"    column="rule"    />
         <result property="depict"    column="depict"    />
         <result property="hospitalId"    column="hospital_id"    />
+        <result property="deviceNumber"  column="device_number"/>
     </resultMap>
 
     <sql id="selectDeviceRuleVo">
-        select id, device_type_id, title, rule, depict, hospital_id from device_rule
+        select id, device_type_id, title, rule, depict, hospital_id, device_number from device_rule
     </sql>
 
     <select id="selectDeviceRuleList" parameterType="DeviceRule" resultMap="DeviceRuleResult">
@@ -25,16 +26,16 @@
             <if test="rule != null  and rule != ''"> and rule = #{rule}</if>
             <if test="depict != null  and depict != ''"> and depict = #{depict}</if>
             <if test="hospitalId != null "> and hospital_id = #{hospitalId}</if>
+            <if test="deviceNumber != null and deviceNumber != ''"> and device_number = #{deviceNumber}</if>
         </where>
-    </select>
-
-    <select id="selectDeviceRuleById" parameterType="Long" resultMap="DeviceRuleResult">
-        <include refid="selectDeviceRuleVo"/>
-        where id = #{id}
     </select>
     <select id="selectHospitalRule" parameterType="DeviceRule" resultMap="DeviceRuleResult">
         <include refid="selectDeviceRuleVo"></include>
         where hospital_id = #{id}
+    </select>
+    <select id="selectDeviceRuleByDeviceNumber" parameterType="Long" resultMap="DeviceRuleResult">
+        <include refid="selectDeviceRuleVo"/>
+        where device_number = #{deviceNumber}
     </select>
 
     <insert id="insertDeviceRule" parameterType="DeviceRule" useGeneratedKeys="true" keyProperty="id">
@@ -45,6 +46,7 @@
             <if test="rule != null">rule,</if>
             <if test="depict != null">depict,</if>
             <if test="hospitalId != null">hospital_id,</if>
+            <if test="deviceNumber != null and deviceNumber != ''">device_number,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="deviceTypeId != null">#{deviceTypeId},</if>
@@ -52,6 +54,7 @@
             <if test="rule != null">#{rule},</if>
             <if test="depict != null">#{depict},</if>
             <if test="hospitalId != null">#{hospitalId},</if>
+            <if test="deviceNumber != null and deviceNumber != ''">#{deviceNumber},</if>
         </trim>
     </insert>
 
@@ -63,8 +66,9 @@
             <if test="rule != null">rule = #{rule},</if>
             <if test="depict != null">depict = #{depict},</if>
             <if test="hospitalId != null">hospital_id = #{hospitalId},</if>
+            <if test="deviceNumber != null and deviceNumber != ''">device_number = #{deviceNumber},</if>
         </trim>
-        where id = #{id}
+        where device_number = #{deviceNumber}
     </update>
 
     <delete id="deleteDeviceRuleById" parameterType="Long">

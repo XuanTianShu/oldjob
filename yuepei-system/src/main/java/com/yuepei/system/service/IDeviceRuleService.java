@@ -11,13 +11,6 @@ import com.yuepei.system.domain.DeviceRule;
  */
 public interface IDeviceRuleService
 {
-    /**
-     * 查询医院套餐
-     *
-     * @param id 医院套餐主键
-     * @return 医院套餐
-     */
-    public DeviceRule selectDeviceRuleById(Long id);
 
     /**
      * 查询医院套餐列表
@@ -65,4 +58,6 @@ public interface IDeviceRuleService
      * @return
      */
     List<DeviceRule> selectHospitalRule(Long id);
+
+    DeviceRule selectDeviceRuleByDeviceNumber(Long deviceNumber);
 }
