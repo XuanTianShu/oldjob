@@ -219,7 +219,6 @@ public class CallBackServiceImpl implements CallBackService {
             //订单号
             String out_trade_no = (String) parseObject.get("out_trade_no");
             if ("SUCCESS".equals(parseObject.get("trade_state"))) {
-
                 //支付成功  修改订单状态
                 userDepositOrder.setCreateTime(time);
                 userDepositOrder.setOrderNumber(out_trade_no);
@@ -236,8 +235,6 @@ public class CallBackServiceImpl implements CallBackService {
                 userIntegralBalanceDepositVo.setStatus(0);
                 userIntegralBalanceDepositVo.setCreateTime(time);
                 userDepositDetailMapper.insertUserDepositDetail(userIntegralBalanceDepositVo);
-
-
                 //响应接口
                 hashMap.put("code", "SUCCESS");
                 hashMap.put("message", "成功");
@@ -311,7 +308,6 @@ public class CallBackServiceImpl implements CallBackService {
                     userCoupon.setStatus(1);
                     userCoupon.setUserId((Long) cacheMap.get("couponId"));
                     userCouponMapper.updateUserCoupon(userCoupon);
-
                 }
                 //响应接口
                 hashMap.put("code", "SUCCESS");
@@ -329,8 +325,10 @@ public class CallBackServiceImpl implements CallBackService {
         }
     }
 
+    @Transactional
     @Override
     public AjaxResult balancePrepaymentOrder(String openid, long couponId, UserLeaseOrder userLeaseOrder) {
+
         //根据 openId 查用户余额
         SysUser user = userMapper.selectUserByOpenid(openid);
 
@@ -340,6 +338,8 @@ public class CallBackServiceImpl implements CallBackService {
         if(user.getBalance() < price){
             return AjaxResult.error("余额不足");
         }else {
+            user.setBalance(user.getBalance() - price);
+            userMapper.updateUser(user);
             //记录优惠券金额
             userLeaseOrder.setCouponPrice((long) (userCoupon.getDiscountAmount()*100));
             //实付金额
