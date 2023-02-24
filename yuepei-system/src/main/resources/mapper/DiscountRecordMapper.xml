@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.DiscountRecordMapper">
+
+    <resultMap type="DiscountRecord" id="DiscountRecordResult">
+        <result property="id"    column="Id"    />
+        <result property="userid"    column="userId"    />
+        <result property="discountTypeName"    column="discount_type_name"    />
+        <result property="price"    column="price"    />
+        <result property="threshold"    column="threshold"    />
+        <result property="grantTime"    column="grant_time"    />
+    </resultMap>
+
+    <sql id="selectDiscountRecordVo">
+        select Id, userId, discount_type_name, price, threshold, grant_time from discount_record
+    </sql>
+
+    <select id="selectDiscountRecordList" parameterType="DiscountRecord" resultMap="DiscountRecordResult">
+        <include refid="selectDiscountRecordVo"/>
+        <where>
+            <if test="userid != null "> and userId = #{userid}</if>
+            <if test="discountTypeName != null  and discountTypeName != ''"> and discount_type_name like concat('%', #{discountTypeName}, '%')</if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="threshold != null  and threshold != ''"> and threshold = #{threshold}</if>
+            <if test="grantTime != null "> and grant_time = #{grantTime}</if>
+        </where>
+    </select>
+
+    <select id="selectDiscountRecordById" parameterType="Long" resultMap="DiscountRecordResult">
+        <include refid="selectDiscountRecordVo"/>
+        where Id = #{id}
+    </select>
+
+    <insert id="insertDiscountRecord" parameterType="DiscountRecord" useGeneratedKeys="true" keyProperty="id">
+        insert into discount_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userid != null">userId,</if>
+            <if test="discountTypeName != null">discount_type_name,</if>
+            <if test="price != null">price,</if>
+            <if test="threshold != null">threshold,</if>
+            <if test="grantTime != null">grant_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userid != null">#{userid},</if>
+            <if test="discountTypeName != null">#{discountTypeName},</if>
+            <if test="price != null">#{price},</if>
+            <if test="threshold != null">#{threshold},</if>
+            <if test="grantTime != null">#{grantTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDiscountRecord" parameterType="DiscountRecord">
+        update discount_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userid != null">userId = #{userid},</if>
+            <if test="discountTypeName != null">discount_type_name = #{discountTypeName},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="threshold != null">threshold = #{threshold},</if>
+            <if test="grantTime != null">grant_time = #{grantTime},</if>
+        </trim>
+        where Id = #{id}
+    </update>
+
+    <delete id="deleteDiscountRecordById" parameterType="Long">
+        delete from discount_record where Id = #{id}
+    </delete>
+
+    <delete id="deleteDiscountRecordByIds" parameterType="String">
+        delete from discount_record where Id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

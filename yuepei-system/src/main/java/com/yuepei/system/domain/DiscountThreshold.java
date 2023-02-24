@@ -6,21 +6,29 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
- * 优惠券类型对象 discount_type
+ * 门槛类型对象 discount_threshold
  *
  * @author ohy
- * @date 2023-02-22
+ * @date 2023-02-24
  */
-public class DiscountType extends BaseEntity
+public class DiscountThreshold extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
     /** 主键 */
     private Long id;
 
-    /** 类型名称 */
-    @Excel(name = "类型名称")
-    private String discountTypeName;
+    /** 门槛名称 */
+    @Excel(name = "门槛名称")
+    private String thresholdName;
+
+    /** 满 */
+    @Excel(name = "满")
+    private Long full;
+
+    /** 减 */
+    @Excel(name = "减")
+    private Long subtract;
 
     /** 状态 */
     @Excel(name = "状态")
@@ -35,16 +43,33 @@ public class DiscountType extends BaseEntity
     {
         return id;
     }
-    public void setDiscountTypeName(String discountTypeName)
+    public void setThresholdName(String thresholdName)
     {
-        this.discountTypeName = discountTypeName;
+        this.thresholdName = thresholdName;
     }
 
-    public String getDiscountTypeName()
+    public String getThresholdName()
     {
-        return discountTypeName;
+        return thresholdName;
+    }
+    public void setFull(Long full)
+    {
+        this.full = full;
     }
 
+    public Long getFull()
+    {
+        return full;
+    }
+    public void setSubtract(Long subtract)
+    {
+        this.subtract = subtract;
+    }
+
+    public Long getSubtract()
+    {
+        return subtract;
+    }
     public void setStatus(Long status)
     {
         this.status = status;
@@ -59,7 +84,9 @@ public class DiscountType extends BaseEntity
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
                 .append("id", getId())
-                .append("discountTypeName", getDiscountTypeName())
+                .append("thresholdName", getThresholdName())
+                .append("full", getFull())
+                .append("subtract", getSubtract())
                 .append("status", getStatus())
                 .append("createTime", getCreateTime())
                 .append("updateTime", getUpdateTime())

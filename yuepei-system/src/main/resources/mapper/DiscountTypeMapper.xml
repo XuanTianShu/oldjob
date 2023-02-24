@@ -5,37 +5,41 @@
 <mapper namespace="com.yuepei.system.mapper.DiscountTypeMapper">
 
     <resultMap type="DiscountType" id="DiscountTypeResult">
-        <result property="id"    column="id"    />
-        <result property="discountName"    column="discount_name"    />
+        <result property="id"    column="Id"    />
+        <result property="discountTypeName"    column="discount_type_name"    />
+        <result property="status"    column="status"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
     <sql id="selectDiscountTypeVo">
-        select id, discount_name, create_time, update_time from discount_type
+        select Id, discount_type_name, status, create_time, update_time from discount_type
     </sql>
 
     <select id="selectDiscountTypeList" parameterType="DiscountType" resultMap="DiscountTypeResult">
         <include refid="selectDiscountTypeVo"/>
         <where>
-            <if test="discountName != null  and discountName != ''"> and discount_name like concat('%', #{discountName}, '%')</if>
+            <if test="discountTypeName != null  and discountTypeName != ''"> and discount_type_name like concat('%', #{discountTypeName}, '%')</if>
+            <if test="status != null "> and status = #{status}</if>
         </where>
     </select>
 
     <select id="selectDiscountTypeById" parameterType="Long" resultMap="DiscountTypeResult">
         <include refid="selectDiscountTypeVo"/>
-        where id = #{id}
+        where Id = #{id}
     </select>
 
     <insert id="insertDiscountType" parameterType="DiscountType" useGeneratedKeys="true" keyProperty="id">
         insert into discount_type
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="discountName != null">discount_name,</if>
+            <if test="discountTypeName != null">discount_type_name,</if>
+            <if test="status != null">status,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateTime != null">update_time,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="discountName != null">#{discountName},</if>
+            <if test="discountTypeName != null">#{discountTypeName},</if>
+            <if test="status != null">#{status},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
         </trim>
@@ -44,19 +48,20 @@
     <update id="updateDiscountType" parameterType="DiscountType">
         update discount_type
         <trim prefix="SET" suffixOverrides=",">
-            <if test="discountName != null">discount_name = #{discountName},</if>
+            <if test="discountTypeName != null">discount_type_name = #{discountTypeName},</if>
+            <if test="status != null">status = #{status},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
         </trim>
-        where id = #{id}
+        where Id = #{id}
     </update>
 
     <delete id="deleteDiscountTypeById" parameterType="Long">
-        delete from discount_type where id = #{id}
+        delete from discount_type where Id = #{id}
     </delete>
 
     <delete id="deleteDiscountTypeByIds" parameterType="String">
-        delete from discount_type where id in
+        delete from discount_type where Id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>

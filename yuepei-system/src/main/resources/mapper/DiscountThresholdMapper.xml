@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.DiscountThresholdMapper">
+
+    <resultMap type="DiscountThreshold" id="DiscountThresholdResult">
+        <result property="id"    column="Id"    />
+        <result property="thresholdName"    column="threshold_name"    />
+        <result property="full"    column="full"    />
+        <result property="subtract"    column="subtract"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectDiscountThresholdVo">
+        select Id, threshold_name, full, subtract, status, create_time, update_time from discount_threshold
+    </sql>
+
+    <select id="selectDiscountThresholdList" parameterType="DiscountThreshold" resultMap="DiscountThresholdResult">
+        <include refid="selectDiscountThresholdVo"/>
+        <where>
+            <if test="thresholdName != null  and thresholdName != ''"> and threshold_name like concat('%', #{thresholdName}, '%')</if>
+            <if test="full != null "> and full = #{full}</if>
+            <if test="subtract != null "> and subtract = #{subtract}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectDiscountThresholdById" parameterType="Long" resultMap="DiscountThresholdResult">
+        <include refid="selectDiscountThresholdVo"/>
+        where Id = #{id}
+    </select>
+
+    <insert id="insertDiscountThreshold" parameterType="DiscountThreshold" useGeneratedKeys="true" keyProperty="id">
+        insert into discount_threshold
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="thresholdName != null">threshold_name,</if>
+            <if test="full != null">full,</if>
+            <if test="subtract != null">subtract,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="thresholdName != null">#{thresholdName},</if>
+            <if test="full != null">#{full},</if>
+            <if test="subtract != null">#{subtract},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDiscountThreshold" parameterType="DiscountThreshold">
+        update discount_threshold
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="thresholdName != null">threshold_name = #{thresholdName},</if>
+            <if test="full != null">full = #{full},</if>
+            <if test="subtract != null">subtract = #{subtract},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where Id = #{id}
+    </update>
+
+    <delete id="deleteDiscountThresholdById" parameterType="Long">
+        delete from discount_threshold where Id = #{id}
+    </delete>
+
+    <delete id="deleteDiscountThresholdByIds" parameterType="String">
+        delete from discount_threshold where Id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
