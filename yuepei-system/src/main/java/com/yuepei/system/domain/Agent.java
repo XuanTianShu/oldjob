@@ -22,11 +22,6 @@ public class Agent {
     private String agentName;
 
     /**
-     * 代理医院id
-     * */
-    private Long hospitalId;
-
-    /**
      * 创建时间
      * */
     private Date createTime;

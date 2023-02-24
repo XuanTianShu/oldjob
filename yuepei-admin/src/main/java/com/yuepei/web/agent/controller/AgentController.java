@@ -63,10 +63,10 @@ public class AgentController {
     }
 
     /**代理端添加医院    需求修改*/
-    @PostMapping("/addHospitalByAgent")
+    /*@PostMapping("/addHospitalByAgent")
     private AjaxResult addHospitalByAgent(@RequestBody HospitalAgentVo hospitalAgentVo){
         return AjaxResult.success(agentService.insertHospitalByAgent(hospitalAgentVo));
-    }
+    }*/
 
     /**代理端租借订单*/
     @GetMapping("/selectLeaseOrder")
@@ -74,4 +74,11 @@ public class AgentController {
         SysUser analysis = tokenUtils.analysis(request);
         return AjaxResult.success(agentService.selectLeaseOrder(analysis.getUserId()));
     }
+
+    /**故障设备列表*/
+    /*@GetMapping("/selectDeviceFaultList")
+    private AjaxResult selectDeviceFaultList(HttpServletRequest request){
+        SysUser analysis = tokenUtils.analysis(request);
+        return AjaxResult.success(agentService.selectDeviceFaultList(analysis.getUserId()));
+    }*/
 }

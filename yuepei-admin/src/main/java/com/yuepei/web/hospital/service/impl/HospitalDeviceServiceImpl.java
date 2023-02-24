@@ -36,7 +36,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     private UserLeaseOrderMapper userLeaseOrderMapper;
 
     @Override
-    public DeviceType selectDeviceType(Long userId) {
+    public List<DeviceType> selectDeviceType(Long userId) {
         return hospitalDeviceMapper.selectDeviceType(userId);
     }
 

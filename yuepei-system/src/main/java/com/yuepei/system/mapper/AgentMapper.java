@@ -1,6 +1,7 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.Agent;
+import com.yuepei.system.domain.AgentHospital;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -11,5 +12,7 @@ import java.util.List;
  */
 public interface AgentMapper {
 
-    List<Agent> selectAgentByAgentId(@Param("userId") Long userId);
+    List<AgentHospital> selectAgentHospitalByHospital(@Param("agentId") Long agentId);
+
+    Agent selectAgentByAgentId(@Param("userId") Long userId);
 }

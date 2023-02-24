@@ -7,7 +7,7 @@ import lombok.Data;
  * @date 2023/2/17 15:22
  */
 @Data
-public class AgentUser {
+public class AgentHospital {
 
     /**
      * 代理商id
@@ -15,7 +15,7 @@ public class AgentUser {
     private Long agentId;
 
     /**
-     * 用户id
+     * 医院id
      * */
-    private Long userId;
+    private Long hospitalId;
 }

@@ -9,7 +9,7 @@
         left join device d on dt.device_type_id=d.device_type_id
         left join hospital h on d.hospital_id=h.hospital_id
         left join hospital_user hu on h.hospital_id=hu.hospital_id
-        left join sys_user su on hu.user_id=su.user_id
+        left join sys_user su on hu.user_name=su.user_name
     </sql>
 
     <resultMap id="DeviceTypeResult" type="DeviceType">
@@ -84,7 +84,7 @@
     <select id="selectDeviceType" parameterType="DeviceType" resultMap="DeviceTypeResult">
         <include refid="DeviceTypeVo"/>
         where su.user_id=#{userId}
-        group by device_type_name
+        order by device_type_name
     </select>
 
     <select id="selectDeviceTypeDetails" parameterType="Device" resultMap="DeviceTypeDetailsResult">

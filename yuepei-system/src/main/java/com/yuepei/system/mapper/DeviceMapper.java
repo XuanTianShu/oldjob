@@ -1,6 +1,7 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.system.domain.AgentHospital;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.DeviceRule;
 import com.yuepei.system.domain.Hospital;
@@ -94,4 +95,5 @@ public interface DeviceMapper {
     public List<DeviceRule> selectDeviceInfoByDeviceNumber(Long deviceTypeId);
 
     List<Device> selectDeviceByHospitalId(@Param("hospitalId") Long hospitalId);
+
 }

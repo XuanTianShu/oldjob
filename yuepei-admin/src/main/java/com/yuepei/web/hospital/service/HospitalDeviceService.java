@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface HospitalDeviceService {
 
-    DeviceType selectDeviceType(Long userId);
+    List<DeviceType> selectDeviceType(Long userId);
 
     List<DeviceDetailsVo> selectDeviceTypeDetails(Long deviceTypeId, Long hospitalId);
 

@@ -4,26 +4,31 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.AgentMapper">
 
-    <resultMap id="AgentUserResult" type="AgentUser">
+    <resultMap id="AgentUserResult" type="AgentHospital">
         <result property="agentId" column="agent_id"></result>
-        <result property="userId" column="user_id"></result>
+        <result property="hospitalId" column="hospital_id"></result>
     </resultMap>
 
     <resultMap id="AgentResult" type="Agent">
         <result property="agentId" column="agent_id"></result>
         <result property="agentName" column="agent_name"></result>
-        <result property="hospitalId" column="hospital_id"></result>
         <result property="createTime" column="create_time"></result>
         <result property="updateTime" column="update_time"></result>
     </resultMap>
 
     <sql id="selectAgent">
-        select a.agent_id,a.agent_name,a.hospital_id,a.create_time,a.update_time from agent a
-        left join agent_user au on a.agent_id=au.agent_id
+        select distinct a.agent_id from agent a
+        left join agent_hospital ah on ah.agent_id = a.agent_id
+        left join hospital_user hu on hu.hospital_id = ah.hospital_id
+        left join sys_user su on su.user_name = hu.user_name
     </sql>
 
     <select id="selectAgentByAgentId" parameterType="Agent" resultMap="AgentResult">
         <include refid="selectAgent"/>
-        where au.user_id=#{userId}
+        where su.user_id=#{userId}
+    </select>
+
+    <select id="selectAgentHospitalByHospital" parameterType="AgentHospital" resultMap="AgentUserResult">
+        select agent_id,hospital_id from agent_hospital where agent_id=#{agentId}
     </select>
 </mapper>

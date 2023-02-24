@@ -12,7 +12,7 @@ import java.util.List;
  * @date 2023/2/10 10:19
  */
 public interface HospitalDeviceMapper {
-    DeviceType selectDeviceType(@Param("userId") Long userId);
+    List<DeviceType> selectDeviceType(@Param("userId") Long userId);
 
     List<Device> selectDeviceTypeDetails(@Param("deviceTypeId") Long deviceTypeId, @Param("hospitalId")Long hospitalId);
 

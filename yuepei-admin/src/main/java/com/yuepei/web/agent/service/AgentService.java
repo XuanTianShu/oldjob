@@ -17,7 +17,9 @@ public interface AgentService {
 
     List<HospitalManagementVo> selectHospitalAdministration(Long userId);
 
-    String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo);
+//    String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo);
 
     List<UserLeaseOrderVo> selectLeaseOrder(Long userId);
+
+//    List<FaultVo> selectDeviceFaultList(Long userId);
 }

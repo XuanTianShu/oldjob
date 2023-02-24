@@ -11,7 +11,6 @@ import com.yuepei.web.hospital.service.HospitalDeviceService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.method.HandlerMethod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +39,11 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public List<DeviceDetailsVo> selectAgentInfo(Long userId) {
-        List<Agent> agent = agentMapper.selectAgentByAgentId(userId);
+        Agent agent = agentMapper.selectAgentByAgentId(userId);
         List<Device> devices = new ArrayList<>();
-        agent.stream().forEach(map->{
-            List<Device> device = deviceMapper.selectDeviceByHospitalId(map.getHospitalId());
+        List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
+        agentHospitals.stream().forEach(i->{
+            List<Device> device = deviceMapper.selectDeviceByHospitalId(i.getHospitalId());
             devices.addAll(device);
         });
         List<DeviceDetailsVo> deviceDetailsVos = new ArrayList<>();
@@ -98,10 +98,11 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public List<HospitalManagementVo> selectHospitalAdministration(Long userId) {
-        List<Agent> agent = agentMapper.selectAgentByAgentId(userId);
+        Agent agent = agentMapper.selectAgentByAgentId(userId);
         List<Device> devices = new ArrayList<>();
-        agent.stream().forEach(map->{
-            List<Device> device = deviceMapper.selectDeviceByHospitalId(map.getHospitalId());
+        List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
+        agentHospitals.stream().forEach(i->{
+            List<Device> device = deviceMapper.selectDeviceByHospitalId(i.getHospitalId());
             devices.addAll(device);
         });
         List<HospitalManagementVo> hospitalManagementVos = new ArrayList<>();
@@ -120,7 +121,7 @@ public class AgentServiceImpl implements AgentService {
 
 
     /*需求修改*/
-    @Override
+    /*@Override
     public String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo) {
         Hospital hospital = hospitalDeviceMapper.selectHospital(hospitalAgentVo.getHospitalName());
         if (hospital!=null){
@@ -129,18 +130,32 @@ public class AgentServiceImpl implements AgentService {
         hospitalDeviceMapper.insertHospital(hospitalAgentVo.getHospitalName());
 
         return null;
-    }
+    }*/
 
     @Override
     public List<UserLeaseOrderVo> selectLeaseOrder(Long userId) {
-        List<Agent> agents = agentMapper.selectAgentByAgentId(userId);
+        Agent agent = agentMapper.selectAgentByAgentId(userId);
         List<UserLeaseOrderVo> userLeaseOrderList = new ArrayList<>();
-        agents.stream().forEach(map->{
-            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(map.getHospitalId());
+        List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
+        agentHospitals.stream().forEach(i->{
+            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(i.getHospitalId());
             userLeaseOrderList.addAll(userLeaseOrders);
         });
         return userLeaseOrderList;
     }
+
+    /*@Override
+    public List<FaultVo> selectDeviceFaultList(Long userId) {
+        List<Agent> agents = agentMapper.selectAgentByAgentId(userId);
+        List<FaultVo> faultVos = new ArrayList<>();
+        agents.stream().forEach(map->{
+            List<Device> device = deviceMapper.selectDeviceByHospitalId(map.getHospitalId());
+            List<Device> deviceList = device.stream().filter(i -> i.getStatus().equals("1")).collect(Collectors.toList());
+            FaultVo faultVo = new FaultVo();
+
+        });
+        return null;
+    }*/
 
 
 }
