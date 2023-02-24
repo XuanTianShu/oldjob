@@ -26,7 +26,7 @@ import com.yuepei.framework.security.handle.LogoutSuccessHandlerImpl;
  *
  * @author ruoyi
  */
-@EnableGlobalMethodSecurity(prePostEnabled = false, securedEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter
 {
     /**
