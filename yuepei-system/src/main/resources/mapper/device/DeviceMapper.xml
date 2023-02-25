@@ -70,8 +70,7 @@
         where device_number = #{deviceNumber}
     </select>
 
-    <select id="selectDeviceInfoByDeviceNumber" parameterType="Long" resultMap="DeviceRuleResult">
---         select * from device_rule where device_type_id = #{deviceTypeId}
+    <select id="selectDeviceInfoByDeviceNumber" parameterType="String" resultMap="DeviceRuleResult">
         SELECT d.device_id, d.device_type_id, d.device_number,
                d.device_iot_number,d.device_mac,d.device_deposit, d.billing_id,
                d.hospital_id, d.device_qR_code, d.device_address,

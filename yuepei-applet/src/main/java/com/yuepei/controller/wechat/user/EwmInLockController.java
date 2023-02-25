@@ -46,6 +46,7 @@ public class EwmInLockController {
     @GetMapping("/ewmInLock")
     public AjaxResult ewmInLock(String deviceNumber) {
         DeviceVO device = deviceService.selectDeviceInfoByDeviceNumber(deviceNumber);
+        System.out.println(device+"-------------------------");
         if (StringUtils.isNull(device)) {
             return AjaxResult.error("该设备不存在");
         }

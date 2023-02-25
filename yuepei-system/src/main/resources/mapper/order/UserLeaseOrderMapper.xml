@@ -21,6 +21,7 @@
         <result property="status"    column="status"    />
         <result property="playTime"    column="play_time"    />
         <result property="createTime" column="create_time"/>
+        <result property="rule"       column="rule"/>
     </resultMap>
 
     <resultMap id="LeaseOrderResult" type="LeaseOrderVO">
