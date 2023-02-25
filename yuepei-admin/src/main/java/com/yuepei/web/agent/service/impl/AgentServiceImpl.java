@@ -1,18 +1,19 @@
 package com.yuepei.web.agent.service.impl;
 
+import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.vo.*;
-import com.yuepei.system.mapper.AgentMapper;
-import com.yuepei.system.mapper.DeviceMapper;
-import com.yuepei.system.mapper.DeviceTypeMapper;
-import com.yuepei.system.mapper.HospitalDeviceMapper;
+import com.yuepei.system.mapper.*;
 import com.yuepei.web.agent.service.AgentService;
 import com.yuepei.web.hospital.service.HospitalDeviceService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,6 +37,9 @@ public class AgentServiceImpl implements AgentService {
 
     @Autowired
     private HospitalDeviceService hospitalDeviceService;
+
+    @Autowired
+    private SysUserMapper sysUserMapper;
 
     @Override
     public List<DeviceDetailsVo> selectAgentInfo(Long userId) {
@@ -99,38 +103,59 @@ public class AgentServiceImpl implements AgentService {
     @Override
     public List<HospitalManagementVo> selectHospitalAdministration(Long userId) {
         Agent agent = agentMapper.selectAgentByAgentId(userId);
-        List<Device> devices = new ArrayList<>();
         List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
+        List<HospitalManagementVo> hospitalManagementVos = new ArrayList<>();
         agentHospitals.stream().forEach(i->{
             List<Device> device = deviceMapper.selectDeviceByHospitalId(i.getHospitalId());
-            devices.addAll(device);
-        });
-        List<HospitalManagementVo> hospitalManagementVos = new ArrayList<>();
-        devices.stream().forEach(map->{
+            Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(i.getHospitalId());
+            String deviceAddress = hospitalDeviceMapper.selectDeviceByDeviceAddress(i.getHospitalId());
             HospitalManagementVo hospitalManagementVo = new HospitalManagementVo();
-            Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(map.getHospitalId());
-            hospitalManagementVo.setHospitalId(hospital.getHospitalId());
+            hospitalManagementVo.setAgentId(agent.getAgentId());
+            hospitalManagementVo.setHospitalId(i.getHospitalId());
             hospitalManagementVo.setHospitalName(hospital.getHospitalName());
-            hospitalManagementVo.setDeviceAddress(map.getDeviceAddress());
-            List<Device> deviceList = deviceMapper.selectDeviceByHospitalId(hospital.getHospitalId());
-            hospitalManagementVo.setDeviceNum(deviceList.size());
+            hospitalManagementVo.setDeviceNum(device.size());
+            hospitalManagementVo.setDeviceAddress(deviceAddress);
             hospitalManagementVos.add(hospitalManagementVo);
         });
         return hospitalManagementVos;
     }
 
-
-    /*需求修改*/
-    /*@Override
+    @Override
     public String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo) {
-        Hospital hospital = hospitalDeviceMapper.selectHospital(hospitalAgentVo.getHospitalName());
-        if (hospital!=null){
+        AgentHospital agentHospital = agentMapper.selectAgentHospital(hospitalAgentVo.getHospitalId());
+        if (agentHospital!=null){
+            if (agentHospital.getAgentId()==hospitalAgentVo.getAgentId()){
+                return "该医院已被您代理";
+            }
             return "该医院已被其他代理商代理";
         }
-        hospitalDeviceMapper.insertHospital(hospitalAgentVo.getHospitalName());
-
-        return null;
-    }*/
+        //添加代理商和医院关联信息
+        agentMapper.insertAgentHospital(hospitalAgentVo.getAgentId(),hospitalAgentVo.getHospitalId());
+        SysUser sysUser = new SysUser();
+        //添加用户信息
+        sysUser.setUserName(hospitalAgentVo.getAccountNumber());
+        sysUser.setPassword(SecurityUtils.encryptPassword(hospitalAgentVo.getPassword()));
+        sysUser.setNickName(hospitalAgentVo.getContacts());
+        sysUserMapper.insertUser(sysUser);
+        //添加用户和医院关联信息
+        agentMapper.insertHospitalUser(hospitalAgentVo.getHospitalId(),hospitalAgentVo.getAccountNumber());
+        //设备详细信息
+        List<DeviceInfoVo> deviceDetails = hospitalAgentVo.getDeviceDetails();
+        deviceDetails.stream().forEach(map->{
+            Device device = new Device();
+            device.setDeviceFullAddress(map.getDeviceFllor()+"," +
+                    map.getDeviceDepartment()+"," +
+                    map.getDeviceRoom()+"," +
+                    map.getDeviceBed());
+            device.setDeviceAddress(hospitalAgentVo.getHospitalAddress());
+            device.setDeviceTypeId(map.getDeviceTypeId());
+            device.setHospitalId(map.getHospitalId());
+            device.setDeviceNumber(map.getDeviceNumber());
+            device.setCreateTime(new Date());
+            deviceMapper.insertDevice(device);
+        });
+        return "添加成功";
+    }
 
     @Override
     public List<UserLeaseOrderVo> selectLeaseOrder(Long userId) {

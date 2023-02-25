@@ -9,6 +9,9 @@ import lombok.Data;
 @Data
 public class HospitalManagementVo {
 
+    /**代理商id*/
+    private Long agentId;
+
     /**医院id*/
     private Long hospitalId;
 

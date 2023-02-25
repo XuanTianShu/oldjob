@@ -2,12 +2,20 @@ package com.yuepei.system.domain.vo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author zzy
  * @date 2023/2/20 11:27
  */
 @Data
 public class HospitalAgentVo {
+    /**
+     * 代理商id
+     * */
+    private Long agentId;
+    /**医院id*/
+    private Long hospitalId;
     /**医院名称*/
     private String hospitalName;
     /**医院账号*/
@@ -21,5 +29,5 @@ public class HospitalAgentVo {
     /**分成比例*/
     private String divided;
     /**划分名下设备*/
-    private String deviceNumber;
+    private List<DeviceInfoVo> deviceDetails;
 }

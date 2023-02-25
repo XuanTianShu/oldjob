@@ -59,14 +59,14 @@ public class AgentController {
     @GetMapping("/selectHospitalAdministration")
     private AjaxResult selectHospitalAdministration(HttpServletRequest request){
         SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(agentService.selectHospitalAdministration(analysis.getUserId()));
+        return AjaxResult.success(agentService.selectHospitalAdministration(124L));
     }
 
-    /**代理端添加医院    需求修改*/
-    /*@PostMapping("/addHospitalByAgent")
+    /**代理端添加医院*/
+    @PostMapping("/addHospitalByAgent")
     private AjaxResult addHospitalByAgent(@RequestBody HospitalAgentVo hospitalAgentVo){
         return AjaxResult.success(agentService.insertHospitalByAgent(hospitalAgentVo));
-    }*/
+    }
 
     /**代理端租借订单*/
     @GetMapping("/selectLeaseOrder")
