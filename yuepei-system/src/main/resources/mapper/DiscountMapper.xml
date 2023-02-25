@@ -39,6 +39,9 @@
         <include refid="selectDiscountVo"/>
         where id = #{id}
     </select>
+    <select id="checkDiscountSum" resultType="java.lang.Integer">
+        select unbilled_num from discount where id = #{discountId}
+    </select>
 
     <insert id="insertDiscount" parameterType="com.yuepei.system.domain.Discount" useGeneratedKeys="true" keyProperty="id">
         insert into discount

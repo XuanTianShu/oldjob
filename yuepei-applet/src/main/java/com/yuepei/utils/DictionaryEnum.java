@@ -17,8 +17,8 @@ public enum DictionaryEnum {
     LEASE_ORDER(101,"存在进行中或待支付的订单，无法退押金！"),
     CHECK_DEVICE_NUMBER(102,"该设备或MAC地址存在！"),
     CHECK_GOODS_TYPE(103,"该商品类型存在！"),
-    CHECK_GOODS_TYPE_ID(104,"该商品类型已绑定无法删除！");
-
+    CHECK_GOODS_TYPE_ID(104,"该商品类型已绑定无法删除！"),
+    CHECK_DISCOUNT_SUM(105,"该优惠券不足，库存还剩余");
 
     private int code;
 

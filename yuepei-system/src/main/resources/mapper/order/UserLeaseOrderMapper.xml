@@ -105,11 +105,12 @@
         where id = #{id}
     </select>
     <select id="userLeaseOrder" resultMap="UserLeaseOrderResult">
-        select a.*,b.rule from user_lease_order a,device rule b
+        select a.*,b.rule from user_lease_order a,device_rule b
         <where>
             a.openid = #{openid}
             and a.device_number=b.device_number
-            <if test="status != null">and a.status = #{status}</if></where>
+            <if test="status != null">and a.status = #{status}</if>
+        </where>
     </select>
 
     <insert id="insertUserLeaseOrder" parameterType="UserLeaseOrder" useGeneratedKeys="true" keyProperty="id">
