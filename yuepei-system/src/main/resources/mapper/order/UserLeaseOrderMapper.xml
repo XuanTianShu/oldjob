@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.UserLeaseOrderMapper">
 
-    <resultMap type="com.yuepei.system.domain.UserLeaseOrder" id="UserLeaseOrderResult">
+    <resultMap type="UserLeaseOrder" id="UserLeaseOrderResult">
         <result property="id"    column="id"    />
         <result property="openid"    column="openid"    />
         <result property="orderNumber"    column="order_number"    />
@@ -23,7 +23,7 @@
         <result property="createTime" column="create_time"/>
     </resultMap>
 
-    <resultMap id="LeaseOrderResult" type="com.yuepei.system.domain.vo.LeaseOrderVO">
+    <resultMap id="LeaseOrderResult" type="LeaseOrderVO">
         <result property="id" column="id"/>
         <result property="orderNumber" column="order_number"/>
         <result property="createTime" column="create_time"/>
@@ -42,7 +42,6 @@
         <result property="playTime" column="play_time"/>
         <result property="restoreAddress" column="restore_address"/>
         <result property="restoreTime" column="restore_time"/>
-        <result property="outTradeNo" column="out_trade_no"/>
     </resultMap>
 
     <sql id="selectUserLeaseOrderVo">
@@ -61,28 +60,27 @@
         INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
     </sql>
 
-    <select id="leaseOrderList" parameterType="com.yuepei.system.domain.vo.LeaseOrderVO" resultMap="LeaseOrderResult">
+    <select id="leaseOrderList" parameterType="LeaseOrderVO" resultMap="LeaseOrderResult">
         <include refid="selectLeaseOrderVO"/>
-        <where>
-            <if test="openid != null  and openid != ''"> and openid = #{openid}</if>
-            <if test="orderNumber != null  and orderNumber != ''"> and order_number = #{orderNumber}</if>
-            <if test="deviceNumber != null  and deviceNumber != ''"> and device_number = #{deviceNumber}</if>
-            <if test="deviceType != null  and deviceType != ''"> and device_type = #{deviceType}</if>
-            <if test="leaseTime != null "> and lease_time = #{leaseTime}</if>
-            <if test="leaseAddress != null  and leaseAddress != ''"> and lease_address = #{leaseAddress}</if>
-            <if test="restoreTime != null "> and restore_time = #{restoreTime}</if>
-            <if test="restoreAddress != null  and restoreAddress != ''"> and restore_address = #{restoreAddress}</if>
-            <if test="price != null "> and price = #{price}</if>
-            <if test="payType != null  and payType != ''"> and pay_type = #{payType}</if>
-            <if test="netAmount != null  and netAmount != ''"> and net_amount = #{netAmount}</if>
-            <if test="couponPrice != null "> and coupon_price = #{couponPrice}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
-            <if test="playTime != null  and playTime != ''"> and play_time = #{playTime}</if>
-            <if test="outTradeNo != null and outTradeNo != ''"> and out_trade_no = #{outTradeNo}</if>
-        </where>
+<!--        <where>-->
+<!--            <if test="openid != null  and openid != ''"> and openid = #{openid}</if>-->
+<!--            <if test="orderNumber != null  and orderNumber != ''"> and order_number = #{orderNumber}</if>-->
+<!--            <if test="deviceNumber != null  and deviceNumber != ''"> and device_number = #{deviceNumber}</if>-->
+<!--            <if test="deviceType != null  and deviceType != ''"> and device_type = #{deviceType}</if>-->
+<!--            <if test="leaseTime != null "> and lease_time = #{leaseTime}</if>-->
+<!--            <if test="leaseAddress != null  and leaseAddress != ''"> and lease_address = #{leaseAddress}</if>-->
+<!--            <if test="restoreTime != null "> and restore_time = #{restoreTime}</if>-->
+<!--            <if test="restoreAddress != null  and restoreAddress != ''"> and restore_address = #{restoreAddress}</if>-->
+<!--            <if test="price != null "> and price = #{price}</if>-->
+<!--            <if test="payType != null  and payType != ''"> and pay_type = #{payType}</if>-->
+<!--            <if test="netAmount != null  and netAmount != ''"> and net_amount = #{netAmount}</if>-->
+<!--            <if test="couponPrice != null "> and coupon_price = #{couponPrice}</if>-->
+<!--            <if test="status != null  and status != ''"> and status = #{status}</if>-->
+<!--            <if test="playTime != null  and playTime != ''"> and play_time = #{playTime}</if>-->
+<!--        </where>-->
     </select>
 
-    <select id="selectUserLeaseOrderList" parameterType="com.yuepei.system.domain.UserLeaseOrder" resultMap="UserLeaseOrderResult">
+    <select id="selectUserLeaseOrderList" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         <where>
             <if test="openid != null  and openid != ''"> and openid = #{openid}</if>
@@ -99,7 +97,6 @@
             <if test="couponPrice != null "> and coupon_price = #{couponPrice}</if>
             <if test="status != null  and status != ''"> and status = #{status}</if>
             <if test="playTime != null  and playTime != ''"> and play_time = #{playTime}</if>
-            <if test="outTradeNo != null and outTradeNo != ''"> and out_trade_no = #{outTradeNo}</if>
         </where>
     </select>
 
@@ -114,27 +111,8 @@
             <if test="status != null">and status = #{status}</if>
         </where>
     </select>
-    <select id="selectDayOrder" resultType="com.yuepei.system.domain.vo.OrderSumAndMoneyVO">
-        SELECT (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= lease_time AND `status` = 2) AS `todayOrderNum`,
-        (SELECT IFNULL(SUM(net_amount),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= create_time AND `status` = 2) AS todayOrderMoney,
-        (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= lease_time AND `status` = 2) AS `sevenDayOrderNum`,
-        (SELECT IFNULL(SUM(net_amount),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= create_time AND `status` = 2) AS sevenDayOrderMoney,
-        (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= lease_time AND `status` = 2) AS thirtyDayOrderNum,
-        (SELECT IFNULL(SUM(net_amount),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= create_time AND `status` = 2) AS thirtyDayOrderMoney
 
-    </select>
-    <select id="selectConditionOrder" resultType="com.yuepei.system.domain.vo.ConditionOrderVO">
-        SELECT (SELECT IFNULL(SUM(net_amount),0) FROM user_lease_order) AS conditionOrderMoney,
-               (SELECT COUNT(1) FROM user_lease_order) AS conditionOrderNum
-        <where>
-            <if test="deviceNumber != null  and deviceNumber != ''"> and device_number = #{deviceNumber}</if>
-            <if test="payType != null  and payType != ''"> and pay_type = #{payType}</if>
-            <if test="status != null  and status != ''"> and status = #{status}</if>
-            <if test="outTradeNo != null and outTradeNo != ''">out_trade_no = #{outTradeNo},</if>
-        </where>
-    </select>
-
-    <insert id="insertUserLeaseOrder" parameterType="com.yuepei.system.domain.UserLeaseOrder" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertUserLeaseOrder" parameterType="UserLeaseOrder" useGeneratedKeys="true" keyProperty="id">
         insert into user_lease_order
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="openid != null">openid,</if>
@@ -151,8 +129,6 @@
             <if test="couponPrice != null">coupon_price,</if>
             <if test="status != null">status,</if>
             <if test="playTime != null">play_time,</if>
-            <if test="createTime != null">create_time,</if>
-            <if test="outTradeNo != null and outTradeNo != ''">out_trade_no,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="openid != null">#{openid},</if>
@@ -169,12 +145,10 @@
             <if test="couponPrice != null">#{couponPrice},</if>
             <if test="status != null">#{status},</if>
             <if test="playTime != null">#{playTime},</if>
-            <if test="createTime != null">#{createTime},</if>
-            <if test="outTradeNo != null and outTradeNo != ''">#{outTradeNo},</if>
         </trim>
     </insert>
 
-    <update id="updateUserLeaseOrder" parameterType="com.yuepei.system.domain.UserLeaseOrder">
+    <update id="updateUserLeaseOrder" parameterType="UserLeaseOrder">
         update user_lease_order
         <trim prefix="SET" suffixOverrides=",">
             <if test="openid != null">openid = #{openid},</if>
@@ -190,8 +164,6 @@
             <if test="couponPrice != null">coupon_price = #{couponPrice},</if>
             <if test="status != null">status = #{status},</if>
             <if test="playTime != null">play_time = #{playTime},</if>
-            <if test="createTime != null">create_time = #{createTime},</if>
-            <if test="outTradeNo != null and outTradeNo != ''">out_trade_no = #{outTradeNo},</if>
         </trim>
         where id = #{id}
     </update>
@@ -210,8 +182,6 @@
             <if test="couponPrice != null">coupon_price = #{couponPrice},</if>
             <if test="status != null">status = #{status},</if>
             <if test="playTime != null">play_time = #{playTime},</if>
-            <if test="createTime != null">create_time = #{createTime},</if>
-            <if test="outTradeNo != null and outTradeNo != ''">out_trade_no = #{outTradeNo},</if>
         </trim>
         where order_number = #{orderNumber}
     </update>
@@ -226,4 +196,46 @@
             #{id}
         </foreach>
     </delete>
+
+    <select id="selectUserLeaseOrder" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where device_number=#{deviceNumber}
+    </select>
+    <select id="selectLeaseOrderDetails" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where order_number=#{orderNumber}
+    </select>
+    <select id="selectRevenueStatistics" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where device_number=#{deviceNumber}
+        and TO_DAYS(NOW()) - TO_DAYS(lease_time) &lt; 1;
+    </select>
+    <select id="selectRevenueStatistics2" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where device_number=#{deviceNumber}
+        and TO_DAYS(lease_time) = TO_DAYS(NOW());
+    </select>
+    <select id="selectRevenueStatistics3" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where device_number=#{deviceNumber}
+        and DATE_FORMAT(lease_time,'%Y%m') = DATE_FORMAT(CURDATE(),'%Y%m');
+    </select>
+    <select id="selectDayOrder" resultType="com.yuepei.system.domain.vo.OrderSumAndMoneyVO">
+        SELECT (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= lease_time AND `status` = 2) AS `todayOrderNum`,
+               (SELECT IFNULL(SUM(net_amount),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= create_time AND `status` = 2) AS todayOrderMoney,
+               (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= lease_time AND `status` = 2) AS `sevenDayOrderNum`,
+               (SELECT IFNULL(SUM(net_amount),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= create_time AND `status` = 2) AS sevenDayOrderMoney,
+               (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= lease_time AND `status` = 2) AS thirtyDayOrderNum,
+               (SELECT IFNULL(SUM(net_amount),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= create_time AND `status` = 2) AS thirtyDayOrderMoney
+    </select>
+    <select id="selectConditionOrder" resultType="com.yuepei.system.domain.vo.ConditionOrderVO">
+        SELECT (SELECT IFNULL(SUM(net_amount),0) FROM user_lease_order) AS conditionOrderMoney,
+        (SELECT COUNT(1) FROM user_lease_order) AS conditionOrderNum
+        <where>
+            <if test="deviceNumber != null  and deviceNumber != ''"> and device_number = #{deviceNumber}</if>
+            <if test="payType != null  and payType != ''"> and pay_type = #{payType}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="outTradeNo != null and outTradeNo != ''">out_trade_no = #{outTradeNo},</if>
+        </where>
+    </select>
 </mapper>

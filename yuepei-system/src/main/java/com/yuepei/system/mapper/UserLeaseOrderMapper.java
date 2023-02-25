@@ -4,7 +4,9 @@ import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.ConditionOrderVO;
 import com.yuepei.system.domain.vo.LeaseOrderVO;
 import com.yuepei.system.domain.vo.OrderSumAndMoneyVO;
+import com.yuepei.system.domain.vo.UserLeaseOrderVo;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -94,6 +96,16 @@ public interface UserLeaseOrderMapper {
      * @return
      */
     List<UserLeaseOrder> leaseOrderList(LeaseOrderVO leaseOrderVO);
+
+    List<UserLeaseOrderVo> selectUserLeaseOrder(@Param("deviceNumber") String deviceNumber);
+
+    UserLeaseOrder selectLeaseOrderDetails(@Param("orderNumber") String orderNumber);
+
+    List<UserLeaseOrderVo> selectRevenueStatistics(@Param("deviceNumber") String deviceNumber);
+
+    List<UserLeaseOrderVo> selectRevenueStatistics2(@Param("deviceNumber") String deviceNumber);
+
+    List<UserLeaseOrderVo> selectRevenueStatistics3(@Param("deviceNumber") String deviceNumber);
 
     OrderSumAndMoneyVO selectDayOrder();
 

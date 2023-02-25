@@ -113,11 +113,6 @@ public interface DeviceService {
      */
     boolean checkDeviceByHospitalId(Long[] hospitalIds);
 
-    /**
-     * 该设备是否存在
-     * @param device
-     * @return
-     */
     boolean checkDeviceNumber(Device device);
 }
 

@@ -83,11 +83,11 @@ public interface UserDepositOrderMapper {
      */
     public int deleteUserDepositOrderByIds(Long[] ids);
 
-    List<UserDepositOrder> selectUserDepositInfo(@Param("openid") String openid, @Param("status") String status, @Param("depositStatus") String depositStatus);
+    List<UserDepositOrder> selectUserDepositInfo(@Param("openid") String openid, @Param("status") String status,@Param("depositStatus") String depositStatus);
 
     UserDepositOrder selectUserDepositOrderByOrderNumber(String orderNumber);
 
-    int checkLeaseOrder(@Param("orderNumber") String orderNumber);
+    int  checkLeaseOrderByOpenId(@Param("deviceNumber") String deviceNumber);
 
-    int checkLeaseOrderByOpenId(@Param("deviceNumber") String deviceNumber);
+    int checkLeaseOrder(@Param("orderNumber") String orderNumber);
 }

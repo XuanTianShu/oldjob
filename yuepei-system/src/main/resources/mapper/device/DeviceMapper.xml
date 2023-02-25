@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.DeviceMapper">
 
-    <resultMap type="com.yuepei.system.domain.Device" id="DeviceResult">
+    <resultMap type="Device" id="DeviceResult">
         <result property="deviceId"    column="device_id"    />
         <result property="deviceTypeId"    column="device_type_id"    />
         <result property="deviceNumber"    column="device_number"    />
@@ -45,7 +45,7 @@
         select device_id, device_type_id, device_number,device_iot_number,device_mac,device_deposit, billing_id,hospital_id, device_qR_code, device_address, device_full_address,`rows`,heart_time, create_time, status from device
     </sql>
 
-    <select id="selectDeviceList" parameterType="com.yuepei.system.domain.Device" resultMap="DeviceResult">
+    <select id="selectDeviceList" parameterType="Device" resultMap="DeviceResult">
         <include refid="selectDeviceVo"/>
         <where>
             <if test="deviceTypeId !=null"> and device_type_id = #{deviceTypeId}</if>
@@ -70,39 +70,33 @@
         where device_number = #{deviceNumber}
     </select>
 
-    <select id="selectDeviceInfoByDeviceNumber" parameterType="String" resultMap="DeviceRuleResult">
+    <select id="selectDeviceInfoByDeviceNumber" parameterType="Long" resultMap="DeviceRuleResult">
+--         select * from device_rule where device_type_id = #{deviceTypeId}
         SELECT d.device_id, d.device_type_id, d.device_number,
-        d.device_iot_number,d.device_mac,d.device_deposit, d.billing_id,
-        d.hospital_id, d.device_qR_code, d.device_address,
-        d.device_full_address,d.`rows`,d.heart_time,
-        d.`status`,h.hospital_id,h.hospital_name,
-        h.hospital_rule FROM device AS d
+               d.device_iot_number,d.device_mac,d.device_deposit, d.billing_id,
+               d.hospital_id, d.device_qR_code, d.device_address,
+               d.device_full_address,d.`rows`,d.heart_time,
+               d.`status`,h.hospital_id,h.hospital_name,
+               h.hospital_rule FROM device AS d
         INNER JOIN hospital AS h ON d.`hospital_id` = h.hospital_id
         WHERE d.device_number = #{deviceNumber}
     </select>
+
     <select id="checkDeviceByType" resultType="java.lang.Integer">
         select count(1) from device where device_type_id in
         <foreach item="deviceId" collection="array" open="(" separator="," close=")">
             #{deviceId}
         </foreach>
     </select>
+
     <select id="checkDeviceByHospitalId" resultType="java.lang.Integer">
         select count(1) from device where hospital_id in
         <foreach item="deviceId" collection="array" open="(" separator="," close=")">
             #{deviceId}
         </foreach>
     </select>
-    <select id="checkDeviceNumber" resultType="java.lang.Integer">
-        SELECT COUNT(1) FROM device
-        <where>
-            (device_number = #{deviceNumber} OR device_mac = #{deviceMac})
-            <if test="deviceId != null">
-                and device_id != #{deviceId}
-            </if>
-        </where>
-    </select>
 
-    <insert id="insertDevice" parameterType="com.yuepei.system.domain.Device" useGeneratedKeys="true" keyProperty="deviceId">
+    <insert id="insertDevice" parameterType="Device" useGeneratedKeys="true" keyProperty="deviceId">
         insert into device
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="deviceTypeId != null">device_type_id,</if>
@@ -138,7 +132,7 @@
         </trim>
     </insert>
 
-    <update id="updateDevice" parameterType="com.yuepei.system.domain.Device">
+    <update id="updateDevice" parameterType="Device">
         update device
         <trim prefix="SET" suffixOverrides=",">
             <if test="deviceTypeId != null">device_type_id = #{deviceTypeId},</if>
@@ -176,4 +170,18 @@
             #{deviceId}
         </foreach>
     </delete>
+    <select id="checkDeviceNumber" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM device
+        <where>
+            (device_number = #{deviceNumber} OR device_mac = #{deviceMac})
+            <if test="deviceId != null">
+                and device_id != #{deviceId}
+            </if>
+        </where>
+    </select>
+    <select id="selectDeviceByHospitalId" parameterType="device" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        where hospital_id = #{hospitalId}
+    </select>
+
 </mapper>

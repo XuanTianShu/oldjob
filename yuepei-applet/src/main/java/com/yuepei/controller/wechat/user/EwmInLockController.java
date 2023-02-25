@@ -2,19 +2,12 @@ package com.yuepei.controller.wechat.user;
 
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.utils.StringUtils;
-import com.yuepei.system.domain.Device;
-import com.yuepei.system.domain.pojo.DevicePo;
 import com.yuepei.system.domain.vo.DeviceVO;
 import com.yuepei.system.service.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * 　　　　 ┏┓       ┏┓+ +

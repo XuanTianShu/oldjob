@@ -1,12 +1,15 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.system.domain.AgentHospital;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.DeviceRule;
+import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.pojo.DevicePo;
 import com.yuepei.system.domain.vo.DeviceVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -96,5 +99,12 @@ public interface DeviceMapper {
 
     int checkDeviceByHospitalId(Long[] hospitalIds);
 
+    /**
+     * 该设备是否存在
+     * @param device
+     * @return
+     */
     int checkDeviceNumber(Device device);
+
+    List<Device> selectDeviceByHospitalId(Long hospitalId);
 }
