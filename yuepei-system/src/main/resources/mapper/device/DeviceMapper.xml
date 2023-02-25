@@ -97,6 +97,15 @@
             #{deviceId}
         </foreach>
     </select>
+    <select id="checkDeviceNumber" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM device
+        <where>
+            (device_number = #{deviceNumber} OR device_mac = #{deviceMac})
+            <if test="deviceId != null">
+                and device_id != #{deviceId}
+            </if>
+        </where>
+    </select>
 
     <insert id="insertDevice" parameterType="Device" useGeneratedKeys="true" keyProperty="deviceId">
         insert into device

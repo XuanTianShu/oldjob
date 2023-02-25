@@ -85,4 +85,10 @@ public interface HospitalMapper {
     List<HospitalVo> selectTreeOne(@Param("hospitalId") Long hospitalId);
 
     List<HospitalVo> selectTree(Long[] sum);
+    /**
+     * 是否存在该医院
+     * @param hospitalName 医院名称
+     * @return
+     */
+    int checkHospitalName(@Param("hospitalName") String hospitalName, @Param("hospitalId") Long hospitalId);
 }

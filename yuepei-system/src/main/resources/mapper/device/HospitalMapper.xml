@@ -46,6 +46,12 @@
         <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
             #{hospitalId}
         </foreach>
+    <select id="checkHospitalName" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM hospital
+        <where>
+            <if test="hospitalName != null and hospitalName != ''"> and hospital_name = #{hospitalName}</if>
+            <if test="hospitalId != null"> and hospital_id != #{hospitalId}</if>
+        </where>
     </select>
 
     <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
@@ -63,6 +69,11 @@
             <if test="hospitalRule != null">#{hospitalRule},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
+            <if test="hospitalRule != null and hospitalRule != ''">hospital_rule,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="hospitalName != null">#{hospitalName},</if>
+            <if test="hospitalRule != null and hospitalRule != ''">#{hospitalRule},</if>
         </trim>
     </insert>
 
@@ -74,6 +85,7 @@
             <if test="hospitalRule != null">hospital_rule = #{hospitalRule},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="hospitalRule != null and hospitalRule != ''">hospital_rule = #{hospitalRule},</if>
         </trim>
         where hospital_id = #{hospitalId}
     </update>

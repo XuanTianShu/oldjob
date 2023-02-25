@@ -135,6 +135,7 @@
             <if test="couponPrice != null">coupon_price,</if>
             <if test="status != null">status,</if>
             <if test="playTime != null">play_time,</if>
+            <if test="createTime != null">create_time,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="openid != null">#{openid},</if>
@@ -151,6 +152,7 @@
             <if test="couponPrice != null">#{couponPrice},</if>
             <if test="status != null">#{status},</if>
             <if test="playTime != null">#{playTime},</if>
+            <if test="createTime != null">#{createTime},</if>
         </trim>
     </insert>
 
@@ -170,6 +172,7 @@
             <if test="couponPrice != null">coupon_price = #{couponPrice},</if>
             <if test="status != null">status = #{status},</if>
             <if test="playTime != null">play_time = #{playTime},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
         </trim>
         where id = #{id}
     </update>
@@ -188,6 +191,7 @@
             <if test="couponPrice != null">coupon_price = #{couponPrice},</if>
             <if test="status != null">status = #{status},</if>
             <if test="playTime != null">play_time = #{playTime},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
         </trim>
         where order_number = #{orderNumber}
     </update>

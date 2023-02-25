@@ -307,6 +307,7 @@ public class CallBackServiceImpl implements CallBackService {
                     userCoupon.setStatus(1);
                     userCoupon.setUserId((Long) cacheMap.get("couponId"));
                     userCouponMapper.updateUserCoupon(userCoupon);
+
                 }
                 //响应接口
                 hashMap.put("code", "SUCCESS");
