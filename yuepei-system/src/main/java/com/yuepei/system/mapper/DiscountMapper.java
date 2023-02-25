@@ -1,6 +1,7 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.Discount;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -59,4 +60,11 @@ public interface DiscountMapper
      * @return 结果
      */
     public int deleteDiscountByIds(Long[] ids);
+
+    /**
+     * 查询该优惠券库存
+     * @param discountId
+     * @return
+     */
+    int checkDiscountSum(@Param("discountId") Long discountId);
 }

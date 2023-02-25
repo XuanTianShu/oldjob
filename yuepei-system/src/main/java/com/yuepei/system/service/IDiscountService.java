@@ -69,4 +69,11 @@ public interface IDiscountService
      * @return
      */
     AjaxResult updateUserIntegral(Long discountId, SysUser user);
+
+    /**
+     * 查询优惠券库存
+     * @param discountId
+     * @return
+     */
+    int checkDiscountSum(Long discountId);
 }

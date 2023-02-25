@@ -182,4 +182,14 @@ public class DiscountServiceImpl implements IDiscountService
             return AjaxResult.error();
         }
     }
+
+    /**
+     * 查询该优惠券库存
+     * @param discountId
+     * @return
+     */
+    @Override
+    public int checkDiscountSum(Long discountId) {
+        return discountMapper.checkDiscountSum(discountId);
+    }
 }
