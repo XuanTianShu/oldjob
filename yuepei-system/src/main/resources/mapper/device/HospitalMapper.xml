@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.HospitalMapper">
+
+    <resultMap type="Hospital" id="HospitalResult">
+        <result property="hospitalId"    column="hospital_id"    />
+        <result property="hospitalName"    column="hospital_name"    />
+        <result property="hospitalRule" column="hospital_rule"/>
+    </resultMap>
+
+    <sql id="selectHospitalVo">
+        select hospital_id, hospital_name,hospital_rule from hospital
+    </sql>
+
+    <select id="selectHospitalList" parameterType="Hospital" resultMap="HospitalResult">
+        <include refid="selectHospitalVo"/>
+        <where>
+            <if test="hospitalName != null  and hospitalName != ''"> and hospital_name like concat('%', #{hospitalName}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectHospitalByHospitalId" parameterType="Long" resultMap="HospitalResult">
+        <include refid="selectHospitalVo"/>
+        where hospital_id = #{hospitalId}
+    </select>
+    <select id="checkHospitalName" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM hospital
+        <where>
+            <if test="hospitalName != null and hospitalName != ''"> and hospital_name = #{hospitalName}</if>
+            <if test="hospitalId != null"> and hospital_id != #{hospitalId}</if>
+        </where>
+    </select>
+
+    <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
+        insert into hospital
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="hospitalName != null">hospital_name,</if>
+            <if test="hospitalRule != null and hospitalRule != ''">hospital_rule,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="hospitalName != null">#{hospitalName},</if>
+            <if test="hospitalRule != null and hospitalRule != ''">#{hospitalRule},</if>
+        </trim>
+    </insert>
+
+    <update id="updateHospital" parameterType="Hospital">
+        update hospital
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="hospitalName != null">hospital_name = #{hospitalName},</if>
+            <if test="hospitalRule != null and hospitalRule != ''">hospital_rule = #{hospitalRule},</if>
+        </trim>
+        where hospital_id = #{hospitalId}
+    </update>
+
+    <delete id="deleteHospitalByHospitalId" parameterType="Long">
+        delete from hospital where hospital_id = #{hospitalId}
+    </delete>
+
+    <delete id="deleteHospitalByHospitalIds" parameterType="String">
+        delete from hospital where hospital_id in
+        <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
+            #{hospitalId}
+        </foreach>
+    </delete>
+</mapper>

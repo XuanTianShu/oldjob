@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.DeviceRuleMapper">
+
+    <resultMap type="DeviceRule" id="DeviceRuleResult">
+        <result property="id"    column="id"    />
+        <result property="deviceTypeId"    column="device_type_id"    />
+        <result property="title"    column="title"    />
+        <result property="rule"    column="rule"    />
+        <result property="depict"    column="depict"    />
+        <result property="hospitalId"    column="hospital_id"    />
+    </resultMap>
+
+    <sql id="selectDeviceRuleVo">
+        select id, device_type_id, title, rule, depict, hospital_id from device_rule
+    </sql>
+
+    <select id="selectDeviceRuleList" parameterType="DeviceRule" resultMap="DeviceRuleResult">
+        <include refid="selectDeviceRuleVo"/>
+        <where>
+            <if test="deviceTypeId != null "> and device_type_id = #{deviceTypeId}</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="rule != null  and rule != ''"> and rule = #{rule}</if>
+            <if test="depict != null  and depict != ''"> and depict = #{depict}</if>
+            <if test="hospitalId != null "> and hospital_id = #{hospitalId}</if>
+        </where>
+    </select>
+
+    <select id="selectDeviceRuleById" parameterType="Long" resultMap="DeviceRuleResult">
+        <include refid="selectDeviceRuleVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectHospitalRule" parameterType="DeviceRule" resultMap="DeviceRuleResult">
+        <include refid="selectDeviceRuleVo"></include>
+        where hospital_id = #{id}
+    </select>
+
+    <insert id="insertDeviceRule" parameterType="DeviceRule" useGeneratedKeys="true" keyProperty="id">
+        insert into device_rule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceTypeId != null">device_type_id,</if>
+            <if test="title != null">title,</if>
+            <if test="rule != null">rule,</if>
+            <if test="depict != null">depict,</if>
+            <if test="hospitalId != null">hospital_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceTypeId != null">#{deviceTypeId},</if>
+            <if test="title != null">#{title},</if>
+            <if test="rule != null">#{rule},</if>
+            <if test="depict != null">#{depict},</if>
+            <if test="hospitalId != null">#{hospitalId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDeviceRule" parameterType="DeviceRule">
+        update device_rule
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceTypeId != null">device_type_id = #{deviceTypeId},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="rule != null">rule = #{rule},</if>
+            <if test="depict != null">depict = #{depict},</if>
+            <if test="hospitalId != null">hospital_id = #{hospitalId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDeviceRuleById" parameterType="Long">
+        delete from device_rule where id = #{id}
+    </delete>
+
+    <delete id="deleteDeviceRuleByIds" parameterType="String">
+        delete from device_rule where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
