@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.DiscountTypeMapper">
 
-    <resultMap type="DiscountType" id="DiscountTypeResult">
+    <resultMap type="com.yuepei.system.domain.DiscountType" id="DiscountTypeResult">
         <result property="id"    column="Id"    />
         <result property="discountTypeName"    column="discount_type_name"    />
         <result property="status"    column="status"    />
@@ -16,7 +16,7 @@
         select Id, discount_type_name, status, create_time, update_time from discount_type
     </sql>
 
-    <select id="selectDiscountTypeList" parameterType="DiscountType" resultMap="DiscountTypeResult">
+    <select id="selectDiscountTypeList" parameterType="com.yuepei.system.domain.DiscountType" resultMap="DiscountTypeResult">
         <include refid="selectDiscountTypeVo"/>
         <where>
             <if test="discountTypeName != null  and discountTypeName != ''"> and discount_type_name like concat('%', #{discountTypeName}, '%')</if>
@@ -29,7 +29,7 @@
         where Id = #{id}
     </select>
 
-    <insert id="insertDiscountType" parameterType="DiscountType" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertDiscountType" parameterType="com.yuepei.system.domain.DiscountType" useGeneratedKeys="true" keyProperty="id">
         insert into discount_type
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="discountTypeName != null">discount_type_name,</if>
@@ -45,7 +45,7 @@
         </trim>
     </insert>
 
-    <update id="updateDiscountType" parameterType="DiscountType">
+    <update id="updateDiscountType" parameterType="com.yuepei.system.domain.DiscountType">
         update discount_type
         <trim prefix="SET" suffixOverrides=",">
             <if test="discountTypeName != null">discount_type_name = #{discountTypeName},</if>

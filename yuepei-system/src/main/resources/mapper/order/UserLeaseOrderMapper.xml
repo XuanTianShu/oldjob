@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.UserLeaseOrderMapper">
 
-    <resultMap type="UserLeaseOrder" id="UserLeaseOrderResult">
+    <resultMap type="com.yuepei.system.domain.UserLeaseOrder" id="UserLeaseOrderResult">
         <result property="id"    column="id"    />
         <result property="openid"    column="openid"    />
         <result property="orderNumber"    column="order_number"    />
@@ -23,7 +23,7 @@
         <result property="createTime" column="create_time"/>
     </resultMap>
 
-    <resultMap id="LeaseOrderResult" type="LeaseOrderVO">
+    <resultMap id="LeaseOrderResult" type="com.yuepei.system.domain.vo.LeaseOrderVO">
         <result property="id" column="id"/>
         <result property="orderNumber" column="order_number"/>
         <result property="createTime" column="create_time"/>
@@ -61,7 +61,7 @@
         INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
     </sql>
 
-    <select id="leaseOrderList" parameterType="LeaseOrderVO" resultMap="LeaseOrderResult">
+    <select id="leaseOrderList" parameterType="com.yuepei.system.domain.vo.LeaseOrderVO" resultMap="LeaseOrderResult">
         <include refid="selectLeaseOrderVO"/>
         <where>
             <if test="openid != null  and openid != ''"> and openid = #{openid}</if>
@@ -82,7 +82,7 @@
         </where>
     </select>
 
-    <select id="selectUserLeaseOrderList" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+    <select id="selectUserLeaseOrderList" parameterType="com.yuepei.system.domain.UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         <where>
             <if test="openid != null  and openid != ''"> and openid = #{openid}</if>
@@ -114,7 +114,7 @@
             <if test="status != null">and status = #{status}</if>
         </where>
     </select>
-    <select id="selectDayOrder" resultType="OrderSumAndMoneyVO">
+    <select id="selectDayOrder" resultType="com.yuepei.system.domain.vo.OrderSumAndMoneyVO">
         SELECT (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= lease_time AND `status` = 2) AS `todayOrderNum`,
         (SELECT IFNULL(SUM(net_amount),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= create_time AND `status` = 2) AS todayOrderMoney,
         (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= lease_time AND `status` = 2) AS `sevenDayOrderNum`,
@@ -134,7 +134,7 @@
         </where>
     </select>
 
-    <insert id="insertUserLeaseOrder" parameterType="UserLeaseOrder" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertUserLeaseOrder" parameterType="com.yuepei.system.domain.UserLeaseOrder" useGeneratedKeys="true" keyProperty="id">
         insert into user_lease_order
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="openid != null">openid,</if>
@@ -174,7 +174,7 @@
         </trim>
     </insert>
 
-    <update id="updateUserLeaseOrder" parameterType="UserLeaseOrder">
+    <update id="updateUserLeaseOrder" parameterType="com.yuepei.system.domain.UserLeaseOrder">
         update user_lease_order
         <trim prefix="SET" suffixOverrides=",">
             <if test="openid != null">openid = #{openid},</if>

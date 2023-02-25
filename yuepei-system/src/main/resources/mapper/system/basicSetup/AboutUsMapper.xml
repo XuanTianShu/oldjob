@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.AboutUsMapper">
 
-    <resultMap type="AboutUs" id="AboutUsResult">
+    <resultMap type="com.yuepei.system.domain.AboutUs" id="AboutUsResult">
         <result property="aboutUsId"    column="about_us_id"    />
         <result property="aboutUsTitle"    column="about_us_title"    />
         <result property="aboutUsInfo"    column="about_us_info"    />
@@ -15,7 +15,7 @@
         select about_us_id, about_us_title, about_us_info, create_time from about_us
     </sql>
 
-    <select id="selectAboutUsList" parameterType="AboutUs" resultMap="AboutUsResult">
+    <select id="selectAboutUsList" parameterType="com.yuepei.system.domain.AboutUs" resultMap="AboutUsResult">
         <include refid="selectAboutUsVo"/>
         <where>
             <if test="aboutUsTitle != null  and aboutUsTitle != ''"> and about_us_title = #{aboutUsTitle}</if>
@@ -31,7 +31,7 @@
         <include refid="selectAboutUsVo"/>
     </select>
 
-    <insert id="insertAboutUs" parameterType="AboutUs" useGeneratedKeys="true" keyProperty="aboutUsId">
+    <insert id="insertAboutUs" parameterType="com.yuepei.system.domain.AboutUs" useGeneratedKeys="true" keyProperty="aboutUsId">
         insert into about_us
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="aboutUsTitle != null">about_us_title,</if>
@@ -45,7 +45,7 @@
         </trim>
     </insert>
 
-    <update id="updateAboutUs" parameterType="AboutUs">
+    <update id="updateAboutUs" parameterType="com.yuepei.system.domain.AboutUs">
         update about_us
         <trim prefix="SET" suffixOverrides=",">
             <if test="aboutUsTitle != null">about_us_title = #{aboutUsTitle},</if>

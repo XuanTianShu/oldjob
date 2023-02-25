@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.NoteInfoLogMapper">
 
-    <resultMap type="NoteInfoLog" id="NoteInfoLogResult">
+    <resultMap type="com.yuepei.system.domain.NoteInfoLog" id="NoteInfoLogResult">
         <result property="noteLogId"    column="note_log_id"    />
         <result property="noteLogTitle"    column="note_log_title"    />
         <result property="noteLogPhone"    column="note_log_phone"    />
@@ -24,7 +24,7 @@
         select note_log_id, note_log_title, note_log_phone, send_time, send_status, receipt_status, receipt_time, request_method, note_log_name, note_log_role, note_log_url, note_log_ip, error_msg from note_log
     </sql>
 
-    <select id="selectNoteInfoLogList" parameterType="NoteInfoLog" resultMap="NoteInfoLogResult">
+    <select id="selectNoteInfoLogList" parameterType="com.yuepei.system.domain.NoteInfoLog" resultMap="NoteInfoLogResult">
         <include refid="selectNoteInfoLogVo"/>
         <where>
             <if test="noteLogTitle != null  and noteLogTitle != ''"> and note_log_title = #{noteLogTitle}</if>
@@ -47,7 +47,7 @@
         where note_log_id = #{noteLogId}
     </select>
 
-    <insert id="insertNoteInfoLog" parameterType="NoteInfoLog" useGeneratedKeys="true" keyProperty="noteLogId">
+    <insert id="insertNoteInfoLog" parameterType="com.yuepei.system.domain.NoteInfoLog" useGeneratedKeys="true" keyProperty="noteLogId">
         insert into note_log
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="noteLogTitle != null">note_log_title,</if>

@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.CarouselMapper">
 
-    <resultMap type="Carousel" id="CarouselResult">
+    <resultMap type="com.yuepei.system.domain.Carousel" id="CarouselResult">
         <result property="carouselId"    column="carousel_id"    />
         <result property="carouselTop"    column="carousel_top"    />
         <result property="carouselBottom"    column="carousel_bottom"    />
@@ -15,7 +15,7 @@
         select carousel_id, carousel_top, carousel_bottom, create_time from carousel
     </sql>
 
-    <select id="selectCarouselList" parameterType="Carousel" resultMap="CarouselResult">
+    <select id="selectCarouselList" parameterType="com.yuepei.system.domain.Carousel" resultMap="CarouselResult">
         <include refid="selectCarouselVo"/>
         <where>
             <if test="carouselTop != null  and carouselTop != ''"> and carousel_top = #{carouselTop}</if>
@@ -28,7 +28,7 @@
         where carousel_id = #{carouselId}
     </select>
 
-    <insert id="insertCarousel" parameterType="Carousel" useGeneratedKeys="true" keyProperty="carouselId">
+    <insert id="insertCarousel" parameterType="com.yuepei.system.domain.Carousel" useGeneratedKeys="true" keyProperty="carouselId">
         insert into carousel
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="carouselTop != null">carousel_top,</if>
@@ -42,7 +42,7 @@
         </trim>
     </insert>
 
-    <update id="updateCarousel" parameterType="Carousel">
+    <update id="updateCarousel" parameterType="com.yuepei.system.domain.Carousel">
         update carousel
         <trim prefix="SET" suffixOverrides=",">
             <if test="carouselTop != null">carousel_top = #{carouselTop},</if>

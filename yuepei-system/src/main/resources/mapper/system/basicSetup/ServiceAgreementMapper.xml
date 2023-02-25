@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.ServiceAgreementMapper">
 
-    <resultMap type="ServiceAgreement" id="ServiceAgreementResult">
+    <resultMap type="com.yuepei.system.domain.ServiceAgreement" id="ServiceAgreementResult">
         <result property="serviceAgreementId"    column="service_agreement_id"    />
         <result property="serviceAgreementTitle"    column="service_agreement_title"    />
         <result property="serviceAgreementInfo"    column="service_agreement_info"    />
@@ -15,7 +15,7 @@
         select service_agreement_id, service_agreement_title, service_agreement_info, create_time from service_agreement
     </sql>
 
-    <select id="selectServiceAgreementList" parameterType="ServiceAgreement" resultMap="ServiceAgreementResult">
+    <select id="selectServiceAgreementList" parameterType="com.yuepei.system.domain.ServiceAgreement" resultMap="ServiceAgreementResult">
         <include refid="selectServiceAgreementVo"/>
         <where>
             <if test="serviceAgreementTitle != null  and serviceAgreementTitle != ''"> and service_agreement_title = #{serviceAgreementTitle}</if>
@@ -31,7 +31,7 @@
         <include refid="selectServiceAgreementVo"/>
     </select>
 
-    <insert id="insertServiceAgreement" parameterType="ServiceAgreement" useGeneratedKeys="true" keyProperty="serviceAgreementId">
+    <insert id="insertServiceAgreement" parameterType="com.yuepei.system.domain.ServiceAgreement" useGeneratedKeys="true" keyProperty="serviceAgreementId">
         insert into service_agreement
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="serviceAgreementTitle != null">service_agreement_title,</if>
@@ -45,7 +45,7 @@
         </trim>
     </insert>
 
-    <update id="updateServiceAgreement" parameterType="ServiceAgreement">
+    <update id="updateServiceAgreement" parameterType="com.yuepei.system.domain.ServiceAgreement">
         update service_agreement
         <trim prefix="SET" suffixOverrides=",">
             <if test="serviceAgreementTitle != null">service_agreement_title = #{serviceAgreementTitle},</if>

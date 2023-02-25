@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.SysUserFeedbackMapper">
 
-    <resultMap type="SysUserFeedback" id="SysUserFeedback">
+    <resultMap type="com.yuepei.system.domain.SysUserFeedback" id="SysUserFeedback">
         <result property="feedbackId"    column="feedback_id"    />
         <result property="userId"    column="user_id"    />
         <result property="userName"    column="user_name"    />
@@ -17,7 +17,7 @@
         <result property="status"    column="status"    />
     </resultMap>
 
-    <resultMap type="SysUserFeedbackPo" id="SysUserFeedbackResult">
+    <resultMap type="com.yuepei.system.domain.pojo.SysUserFeedbackPo" id="SysUserFeedbackResult">
         <result property="feedbackId"    column="feedback_id"    />
         <result property="userId"    column="user_id"    />
         <result property="feedbackInfo"    column="feedback_info"    />
@@ -27,7 +27,7 @@
         <collection property="sysUser" javaType="sysUser" resultMap="SysUserResult"/>
     </resultMap>
 
-    <resultMap id="SysUserResult" type="SysUser">
+    <resultMap id="SysUserResult" type="com.yuepei.common.core.domain.entity.SysUser">
         <result property="userName"    column="user_name"    />
         <result property="phoneNumber"    column="phone_number"    />
     </resultMap>
@@ -61,7 +61,7 @@
          </where>
     </select>
 
-    <insert id="insertSysUserFeedback" parameterType="SysUserFeedback" useGeneratedKeys="true" keyProperty="feedbackId">
+    <insert id="insertSysUserFeedback" parameterType="com.yuepei.system.domain.SysUserFeedback" useGeneratedKeys="true" keyProperty="feedbackId">
         insert into sys_user_feedback
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="userId != null">user_id,</if>
@@ -87,7 +87,7 @@
         </trim>
     </insert>
 
-    <update id="updateSysUserFeedback" parameterType="SysUserFeedback">
+    <update id="updateSysUserFeedback" parameterType="com.yuepei.system.domain.SysUserFeedback">
         update sys_user_feedback
         <trim prefix="SET" suffixOverrides=",">
             <if test="userId != null">user_id = #{userId},</if>

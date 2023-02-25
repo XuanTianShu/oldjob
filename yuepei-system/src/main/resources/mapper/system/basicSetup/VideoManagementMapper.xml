@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.VideoManagementMapper">
 
-    <resultMap type="VideoManagement" id="VideoManagementResult">
+    <resultMap type="com.yuepei.system.domain.VideoManagement" id="VideoManagementResult">
         <result property="videoId"    column="video_id"    />
         <result property="videoTitle"    column="video_title"    />
         <result property="videoUrl"    column="video_url"    />
@@ -15,7 +15,7 @@
         select video_id, video_title, video_url, create_time from video_management
     </sql>
 
-    <select id="selectVideoManagementList" parameterType="VideoManagement" resultMap="VideoManagementResult">
+    <select id="selectVideoManagementList" parameterType="com.yuepei.system.domain.VideoManagement" resultMap="VideoManagementResult">
         <include refid="selectVideoManagementVo"/>
         <where>
             <if test="videoTitle != null  and videoTitle != ''"> and video_title = #{videoTitle}</if>
@@ -28,7 +28,7 @@
         where video_id = #{videoId}
     </select>
 
-    <insert id="insertVideoManagement" parameterType="VideoManagement">
+    <insert id="insertVideoManagement" parameterType="com.yuepei.system.domain.VideoManagement">
         insert into video_management
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="videoId != null">video_id,</if>
@@ -44,7 +44,7 @@
         </trim>
     </insert>
 
-    <update id="updateVideoManagement" parameterType="VideoManagement">
+    <update id="updateVideoManagement" parameterType="com.yuepei.system.domain.VideoManagement">
         update video_management
         <trim prefix="SET" suffixOverrides=",">
             <if test="videoTitle != null">video_title = #{videoTitle},</if>

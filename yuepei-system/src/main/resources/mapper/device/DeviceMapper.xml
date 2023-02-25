@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.DeviceMapper">
 
-    <resultMap type="Device" id="DeviceResult">
+    <resultMap type="com.yuepei.system.domain.Device" id="DeviceResult">
         <result property="deviceId"    column="device_id"    />
         <result property="deviceTypeId"    column="device_type_id"    />
         <result property="deviceNumber"    column="device_number"    />
@@ -21,7 +21,7 @@
         <result property="deviceMac"    column="device_mac"    />
     </resultMap>
 
-    <resultMap id="DeviceRuleResult" type="DeviceVO">
+    <resultMap id="DeviceRuleResult" type="com.yuepei.system.domain.vo.DeviceVO">
         <result property="deviceId" column="device_id"/>
         <result property="deviceTypeId" column="device_type_id"/>
         <result property="deviceNumber" column="device_number"/>
@@ -45,7 +45,7 @@
         select device_id, device_type_id, device_number,device_iot_number,device_mac,device_deposit, billing_id,hospital_id, device_qR_code, device_address, device_full_address,`rows`,heart_time, create_time, status from device
     </sql>
 
-    <select id="selectDeviceList" parameterType="Device" resultMap="DeviceResult">
+    <select id="selectDeviceList" parameterType="com.yuepei.system.domain.Device" resultMap="DeviceResult">
         <include refid="selectDeviceVo"/>
         <where>
             <if test="deviceTypeId !=null"> and device_type_id = #{deviceTypeId}</if>
@@ -102,7 +102,7 @@
         </where>
     </select>
 
-    <insert id="insertDevice" parameterType="Device" useGeneratedKeys="true" keyProperty="deviceId">
+    <insert id="insertDevice" parameterType="com.yuepei.system.domain.Device" useGeneratedKeys="true" keyProperty="deviceId">
         insert into device
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="deviceTypeId != null">device_type_id,</if>
@@ -138,7 +138,7 @@
         </trim>
     </insert>
 
-    <update id="updateDevice" parameterType="Device">
+    <update id="updateDevice" parameterType="com.yuepei.system.domain.Device">
         update device
         <trim prefix="SET" suffixOverrides=",">
             <if test="deviceTypeId != null">device_type_id = #{deviceTypeId},</if>

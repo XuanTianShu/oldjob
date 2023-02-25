@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.UserCouponMapper">
 
-    <resultMap type="UserCoupon" id="UserCouponResult">
+    <resultMap type="com.yuepei.system.domain.UserCoupon" id="UserCouponResult">
         <result property="id"    column="id"    />
         <result property="userId"    column="user_id"    />
         <result property="title"    column="title"    />
@@ -20,7 +20,7 @@
         select id, user_id, title, use_limit, discount_amount, coupon_start_time, coupon_end_time, coupon_create_time, status from user_coupon
     </sql>
 
-    <select id="selectUserCouponList" parameterType="UserCoupon" resultMap="UserCouponResult">
+    <select id="selectUserCouponList" parameterType="com.yuepei.system.domain.UserCoupon" resultMap="UserCouponResult">
         <include refid="selectUserCouponVo"/>
         <where>
             <if test="userId != null "> and user_id = #{userId}</if>
@@ -46,7 +46,7 @@
         </where>
     </select>
 
-    <insert id="insertUserCoupon" parameterType="UserCoupon" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertUserCoupon" parameterType="com.yuepei.system.domain.UserCoupon" useGeneratedKeys="true" keyProperty="id">
         insert into user_coupon
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="userId != null">user_id,</if>
@@ -70,7 +70,7 @@
         </trim>
     </insert>
 
-    <update id="updateUserCoupon" parameterType="UserCoupon">
+    <update id="updateUserCoupon" parameterType="com.yuepei.system.domain.UserCoupon">
         update user_coupon
         <trim prefix="SET" suffixOverrides=",">
             <if test="userId != null">user_id = #{userId},</if>

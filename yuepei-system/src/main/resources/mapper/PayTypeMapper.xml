@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.PayTypeMapper">
 
-    <resultMap type="PayType" id="PayTypeResult">
+    <resultMap type="com.yuepei.system.domain.PayType" id="PayTypeResult">
         <result property="id"    column="id"    />
         <result property="paySum"    column="pay_sum"    />
         <result property="integral"    column="integral"    />
@@ -14,7 +14,7 @@
         select id, pay_sum, integral from pay_type
     </sql>
 
-    <select id="selectPayTypeList" parameterType="PayType" resultMap="PayTypeResult">
+    <select id="selectPayTypeList" parameterType="com.yuepei.system.domain.PayType" resultMap="PayTypeResult">
         <include refid="selectPayTypeVo"/>
         <where>
             <if test="paySum != null "> and pay_sum = #{paySum}</if>
@@ -30,7 +30,7 @@
         <include refid="selectPayTypeVo"></include>
     </select>
 
-    <insert id="insertPayType" parameterType="PayType" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertPayType" parameterType="com.yuepei.system.domain.PayType" useGeneratedKeys="true" keyProperty="id">
         insert into pay_type
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="paySum != null">pay_sum,</if>
@@ -42,7 +42,7 @@
         </trim>
     </insert>
 
-    <update id="updatePayType" parameterType="PayType">
+    <update id="updatePayType" parameterType="com.yuepei.system.domain.PayType">
         update pay_type
         <trim prefix="SET" suffixOverrides=",">
             <if test="paySum != null">pay_sum = #{paySum},</if>

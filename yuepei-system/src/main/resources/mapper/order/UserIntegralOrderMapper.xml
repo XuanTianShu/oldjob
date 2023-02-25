@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.UserIntegralOrderMapper">
 
-    <resultMap type="UserIntegralBalanceDepositVo" id="UserIntegralOrderResult">
+    <resultMap type="com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo" id="UserIntegralOrderResult">
         <result property="id"    column="id"    />
         <result property="openid"    column="openid"    />
         <result property="sum"    column="sum"    />
@@ -16,7 +16,7 @@
         select id, openid, sum, create_time, status from user_integral_detail
     </sql>
 
-    <select id="selectUserIntegralOrderList" parameterType="UserIntegralBalanceDepositVo" resultMap="UserIntegralOrderResult">
+    <select id="selectUserIntegralOrderList" parameterType="com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo" resultMap="UserIntegralOrderResult">
         <include refid="selectUserIntegralOrderVo"/>
         <where>
             <if test="openid != null "> and openid = #{openid}</if>
@@ -49,7 +49,7 @@
         </where>
     </select>
 
-    <insert id="insertUserIntegralOrder" parameterType="UserIntegralBalanceDepositVo" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertUserIntegralOrder" parameterType="com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo" useGeneratedKeys="true" keyProperty="id">
         insert into user_integral_detail
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="openid != null">openid,</if>

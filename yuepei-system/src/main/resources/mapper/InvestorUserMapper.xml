@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.InvestorUserMapper">
 
-    <resultMap type="InvestorUser" id="InvestorUserResult">
+    <resultMap type="com.yuepei.system.domain.InvestorUser" id="InvestorUserResult">
         <result property="id"    column="id"    />
         <result property="account"    column="account"    />
         <result property="password"    column="password"    />
@@ -20,7 +20,7 @@
         select id, account, password, phone, nick_name, hospital_id, proportion, create_time, update_time from investor_user
     </sql>
 
-    <select id="selectInvestorUserList" parameterType="InvestorUser" resultMap="InvestorUserResult">
+    <select id="selectInvestorUserList" parameterType="com.yuepei.system.domain.InvestorUser" resultMap="InvestorUserResult">
         <include refid="selectInvestorUserVo"/>
         <where>
             <if test="account != null  and account != ''"> and account = #{account}</if>
@@ -37,7 +37,7 @@
         where id = #{id}
     </select>
 
-    <insert id="insertInvestorUser" parameterType="InvestorUser" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertInvestorUser" parameterType="com.yuepei.system.domain.InvestorUser" useGeneratedKeys="true" keyProperty="id">
         insert into investor_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="account != null">account,</if>
@@ -61,7 +61,7 @@
         </trim>
     </insert>
 
-    <update id="updateInvestorUser" parameterType="InvestorUser">
+    <update id="updateInvestorUser" parameterType="com.yuepei.system.domain.InvestorUser">
         update investor_user
         <trim prefix="SET" suffixOverrides=",">
             <if test="account != null">account = #{account},</if>

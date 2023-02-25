@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.DeviceTypeMapper">
 
-    <resultMap type="DeviceType" id="DeviceTypeResult">
+    <resultMap type="com.yuepei.system.domain.DeviceType" id="DeviceTypeResult">
         <result property="deviceTypeId"    column="device_type_id"    />
         <result property="deviceTypeName"    column="device_type_name"    />
     </resultMap>
@@ -13,7 +13,7 @@
         select device_type_id, device_type_name from device_type
     </sql>
 
-    <select id="selectDeviceTypeList" parameterType="DeviceType" resultMap="DeviceTypeResult">
+    <select id="selectDeviceTypeList" parameterType="com.yuepei.system.domain.DeviceType" resultMap="DeviceTypeResult">
         <include refid="selectDeviceTypeVo"/>
         <where>
             <if test="deviceTypeName != null  and deviceTypeName != ''"> and device_type_name like concat('%', #{deviceTypeName}, '%')</if>
@@ -25,7 +25,7 @@
         where device_type_id = #{deviceTypeId}
     </select>
 
-    <insert id="insertDeviceType" parameterType="DeviceType">
+    <insert id="insertDeviceType" parameterType="com.yuepei.system.domain.DeviceType">
         insert into device_type
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="deviceTypeId != null">device_type_id,</if>
@@ -37,7 +37,7 @@
         </trim>
     </insert>
 
-    <update id="updateDeviceType" parameterType="DeviceType">
+    <update id="updateDeviceType" parameterType="com.yuepei.system.domain.DeviceType">
         update device_type
         <trim prefix="SET" suffixOverrides=",">
             <if test="deviceTypeName != null">device_type_name = #{deviceTypeName},</if>

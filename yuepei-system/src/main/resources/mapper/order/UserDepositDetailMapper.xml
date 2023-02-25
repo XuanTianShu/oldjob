@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.UserDepositDetailMapper">
 
-    <resultMap type="UserIntegralBalanceDepositVo" id="UserDepositDetailResult">
+    <resultMap type="com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo" id="UserDepositDetailResult">
         <result property="id"    column="id"    />
         <result property="openid"    column="openid"    />
         <result property="sum"    column="sum"    />
@@ -16,7 +16,7 @@
         select id, openid, sum, create_time, status from user_deposit_detail
     </sql>
 
-    <select id="selectUserDepositDetailList" parameterType="UserIntegralBalanceDepositVo" resultMap="UserDepositDetailResult">
+    <select id="selectUserDepositDetailList" parameterType="com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo" resultMap="UserDepositDetailResult">
         <include refid="selectUserDepositDetailVo"/>
         <where>
             <if test="openid != null  and openid != ''"> and openid = #{openid}</if>
@@ -33,7 +33,7 @@
         </where>
     </select>
 
-    <insert id="insertUserDepositDetail" parameterType="UserIntegralBalanceDepositVo" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertUserDepositDetail" parameterType="com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo" useGeneratedKeys="true" keyProperty="id">
         insert into user_deposit_detail
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="openid != null">openid,</if>
@@ -51,7 +51,7 @@
         </trim>
     </insert>
 
-    <update id="updateUserDepositDetail" parameterType="UserIntegralBalanceDepositVo">
+    <update id="updateUserDepositDetail" parameterType="com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo">
         update user_deposit_detail
         <trim prefix="SET" suffixOverrides=",">
             <if test="openid != null">openid = #{openid},</if>

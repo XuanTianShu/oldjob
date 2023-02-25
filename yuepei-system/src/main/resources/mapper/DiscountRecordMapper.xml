@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.DiscountRecordMapper">
 
-    <resultMap type="DiscountRecord" id="DiscountRecordResult">
+    <resultMap type="com.yuepei.system.domain.DiscountRecord" id="DiscountRecordResult">
         <result property="id"    column="Id"    />
         <result property="userid"    column="userId"    />
         <result property="discountTypeName"    column="discount_type_name"    />
@@ -17,7 +17,7 @@
         select Id, userId, discount_type_name, price, threshold, grant_time from discount_record
     </sql>
 
-    <select id="selectDiscountRecordList" parameterType="DiscountRecord" resultMap="DiscountRecordResult">
+    <select id="selectDiscountRecordList" parameterType="com.yuepei.system.domain.DiscountRecord" resultMap="DiscountRecordResult">
         <include refid="selectDiscountRecordVo"/>
         <where>
             <if test="userid != null "> and userId = #{userid}</if>
@@ -33,7 +33,7 @@
         where Id = #{id}
     </select>
 
-    <insert id="insertDiscountRecord" parameterType="DiscountRecord" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertDiscountRecord" parameterType="com.yuepei.system.domain.DiscountRecord" useGeneratedKeys="true" keyProperty="id">
         insert into discount_record
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="userid != null">userId,</if>
@@ -51,7 +51,7 @@
         </trim>
     </insert>
 
-    <update id="updateDiscountRecord" parameterType="DiscountRecord">
+    <update id="updateDiscountRecord" parameterType="com.yuepei.system.domain.DiscountRecord">
         update discount_record
         <trim prefix="SET" suffixOverrides=",">
             <if test="userid != null">userId = #{userid},</if>

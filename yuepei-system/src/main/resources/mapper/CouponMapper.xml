@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.CouponMapper">
 
-    <resultMap type="Coupon" id="CouponResult">
+    <resultMap type="com.yuepei.system.domain.Coupon" id="CouponResult">
         <result property="id"    column="id"    />
         <result property="title"    column="title"    />
         <result property="useLimit"    column="use_limit"    />
@@ -22,7 +22,7 @@
         select id, title, use_limit, discount_amount, price, validity_days, `describe`, `sum`, in_sum, coupon_type, coupon_create_time from coupon
     </sql>
 
-    <select id="selectCouponList" parameterType="Coupon" resultMap="CouponResult">
+    <select id="selectCouponList" parameterType="com.yuepei.system.domain.Coupon" resultMap="CouponResult">
         <include refid="selectCouponVo"/>
         <where>
             <if test="title != null  and title != ''"> and title = #{title}</if>
@@ -54,7 +54,7 @@
         where user_id = #{userId}
     </select>
 
-    <insert id="insertCoupon" parameterType="Coupon" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertCoupon" parameterType="com.yuepei.system.domain.Coupon" useGeneratedKeys="true" keyProperty="id">
         insert into coupon
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="title != null">title,</if>
@@ -84,7 +84,7 @@
         </trim>
     </insert>
 
-    <update id="updateCoupon" parameterType="Coupon">
+    <update id="updateCoupon" parameterType="com.yuepei.system.domain.Coupon">
         update coupon
         <trim prefix="SET" suffixOverrides=",">
             <if test="title != null">title = #{title},</if>

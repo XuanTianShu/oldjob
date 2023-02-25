@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.DiscountThresholdMapper">
 
-    <resultMap type="DiscountThreshold" id="DiscountThresholdResult">
+    <resultMap type="com.yuepei.system.domain.DiscountThreshold" id="DiscountThresholdResult">
         <result property="id"    column="Id"    />
         <result property="thresholdName"    column="threshold_name"    />
         <result property="full"    column="full"    />
@@ -18,7 +18,7 @@
         select Id, threshold_name, full, subtract, status, create_time, update_time from discount_threshold
     </sql>
 
-    <select id="selectDiscountThresholdList" parameterType="DiscountThreshold" resultMap="DiscountThresholdResult">
+    <select id="selectDiscountThresholdList" parameterType="com.yuepei.system.domain.DiscountThreshold" resultMap="DiscountThresholdResult">
         <include refid="selectDiscountThresholdVo"/>
         <where>
             <if test="thresholdName != null  and thresholdName != ''"> and threshold_name like concat('%', #{thresholdName}, '%')</if>
@@ -33,7 +33,7 @@
         where Id = #{id}
     </select>
 
-    <insert id="insertDiscountThreshold" parameterType="DiscountThreshold" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertDiscountThreshold" parameterType="com.yuepei.system.domain.DiscountThreshold" useGeneratedKeys="true" keyProperty="id">
         insert into discount_threshold
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="thresholdName != null">threshold_name,</if>
@@ -53,7 +53,7 @@
         </trim>
     </insert>
 
-    <update id="updateDiscountThreshold" parameterType="DiscountThreshold">
+    <update id="updateDiscountThreshold" parameterType="com.yuepei.system.domain.DiscountThreshold">
         update discount_threshold
         <trim prefix="SET" suffixOverrides=",">
             <if test="thresholdName != null">threshold_name = #{thresholdName},</if>

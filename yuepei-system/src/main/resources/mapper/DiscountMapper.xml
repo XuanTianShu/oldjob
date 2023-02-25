@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.DiscountMapper">
 
-    <resultMap type="Discount" id="DiscountResult">
+    <resultMap type="com.yuepei.system.domain.Discount" id="DiscountResult">
         <result property="id"    column="id"    />
         <result property="hospitalId"    column="hospital_id"    />
         <result property="money"    column="money"    />
@@ -21,7 +21,7 @@
         select id, hospital_id, money, threshold, sent_num, unbilled_num, discount_type, create_time, end_time, status from discount
     </sql>
 
-    <select id="selectDiscountList" parameterType="Discount" resultMap="DiscountResult">
+    <select id="selectDiscountList" parameterType="com.yuepei.system.domain.Discount" resultMap="DiscountResult">
         <include refid="selectDiscountVo"/>
         <where>
             <if test="hospitalId != null "> and hospital_id = #{hospitalId}</if>
@@ -40,7 +40,7 @@
         where id = #{id}
     </select>
 
-    <insert id="insertDiscount" parameterType="Discount" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertDiscount" parameterType="com.yuepei.system.domain.Discount" useGeneratedKeys="true" keyProperty="id">
         insert into discount
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="hospitalId != null">hospital_id,</if>
@@ -66,7 +66,7 @@
         </trim>
     </insert>
 
-    <update id="updateDiscount" parameterType="Discount">
+    <update id="updateDiscount" parameterType="com.yuepei.system.domain.Discount">
         update discount
         <trim prefix="SET" suffixOverrides=",">
             <if test="hospitalId != null">hospital_id = #{hospitalId},</if>

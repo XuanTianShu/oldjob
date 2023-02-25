@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.UserPayOrderMapper">
 
-    <resultMap type="UserPayOrder" id="UserPayOrderResult">
+    <resultMap type="com.yuepei.system.domain.UserPayOrder" id="UserPayOrderResult">
         <result property="id"    column="id"    />
         <result property="openid"    column="openid"    />
         <result property="outTradeNo"    column="out_trade_no"    />
@@ -18,7 +18,7 @@
         select id, openid, out_trade_no, price, end_time, status, err_msg from user_pay_order
     </sql>
 
-    <select id="selectUserPayOrderList" parameterType="UserPayOrder" resultMap="UserPayOrderResult">
+    <select id="selectUserPayOrderList" parameterType="com.yuepei.system.domain.UserPayOrder" resultMap="UserPayOrderResult">
         <include refid="selectUserPayOrderVo"/>
         <where>
             <if test="openid != null "> and openid = #{openid}</if>
@@ -35,7 +35,7 @@
         where id = #{id}
     </select>
 
-    <insert id="insertUserPayOrder" parameterType="UserPayOrder" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertUserPayOrder" parameterType="com.yuepei.system.domain.UserPayOrder" useGeneratedKeys="true" keyProperty="id">
         insert into user_pay_order
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="openid != null">openid,</if>
@@ -55,7 +55,7 @@
         </trim>
     </insert>
 
-    <update id="updateUserPayOrder" parameterType="UserPayOrder">
+    <update id="updateUserPayOrder" parameterType="com.yuepei.system.domain.UserPayOrder">
         update user_pay_order
         <trim prefix="SET" suffixOverrides=",">
             <if test="openid != null">openid = #{openid},</if>

@@ -78,6 +78,7 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
         }else {
             //修改订单
             userLeaseOrder.setStatus("1");
+            userLeaseOrder.setRestoreTime(new Date());
             return userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
         }
     }

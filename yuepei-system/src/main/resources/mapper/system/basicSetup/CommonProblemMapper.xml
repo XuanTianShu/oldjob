@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.CommonProblemMapper">
 
-    <resultMap type="CommonProblem" id="CommonProblemResult">
+    <resultMap type="com.yuepei.system.domain.CommonProblem" id="CommonProblemResult">
         <result property="commonProblemId"    column="common_problem_id"    />
         <result property="commonProblemTitle"    column="common_problem_title"    />
         <result property="commonProblemSolution"    column="common_problem_solution"    />
@@ -14,7 +14,7 @@
         select common_problem_id, common_problem_title, common_problem_solution from common_problem
     </sql>
 
-    <select id="selectCommonProblemList" parameterType="CommonProblem" resultMap="CommonProblemResult">
+    <select id="selectCommonProblemList" parameterType="com.yuepei.system.domain.CommonProblem" resultMap="CommonProblemResult">
         <include refid="selectCommonProblemVo"/>
         <where>
             <if test="commonProblemTitle != null  and commonProblemTitle != ''"> and common_problem_title = #{commonProblemTitle}</if>
@@ -27,7 +27,7 @@
         where common_problem_id = #{commonProblemId}
     </select>
 
-    <insert id="insertCommonProblem" parameterType="CommonProblem" useGeneratedKeys="true" keyProperty="commonProblemId">
+    <insert id="insertCommonProblem" parameterType="com.yuepei.system.domain.CommonProblem" useGeneratedKeys="true" keyProperty="commonProblemId">
         insert into common_problem
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="commonProblemTitle != null">common_problem_title,</if>
@@ -39,7 +39,7 @@
         </trim>
     </insert>
 
-    <update id="updateCommonProblem" parameterType="CommonProblem">
+    <update id="updateCommonProblem" parameterType="com.yuepei.system.domain.CommonProblem">
         update common_problem
         <trim prefix="SET" suffixOverrides=",">
             <if test="commonProblemTitle != null">common_problem_title = #{commonProblemTitle},</if>

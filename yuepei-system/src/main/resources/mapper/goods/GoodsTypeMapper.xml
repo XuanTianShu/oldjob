@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.GoodsTypeMapper">
 
-    <resultMap type="GoodsType" id="GoodsTypeResult">
+    <resultMap type="com.yuepei.system.domain.GoodsType" id="GoodsTypeResult">
         <result property="goodsTypeId"    column="goods_type_id"    />
         <result property="goodsTypeName"    column="goods_type_name"    />
     </resultMap>
@@ -13,7 +13,7 @@
         select goods_type_id, goods_type_name from goods_type
     </sql>
 
-    <select id="selectGoodsTypeList" parameterType="GoodsType" resultMap="GoodsTypeResult">
+    <select id="selectGoodsTypeList" parameterType="com.yuepei.system.domain.GoodsType" resultMap="GoodsTypeResult">
         <include refid="selectGoodsTypeVo"/>
         <where>
             <if test="goodsTypeName != null  and goodsTypeName != ''"> and goods_type_name like concat('%', #{goodsTypeName}, '%')</if>
@@ -40,7 +40,7 @@
         </foreach>
     </select>
 
-    <insert id="insertGoodsType" parameterType="GoodsType" useGeneratedKeys="true" keyProperty="goodsTypeId">
+    <insert id="insertGoodsType" parameterType="com.yuepei.system.domain.GoodsType" useGeneratedKeys="true" keyProperty="goodsTypeId">
         insert into goods_type
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="goodsTypeName != null">goods_type_name,</if>
@@ -50,7 +50,7 @@
         </trim>
     </insert>
 
-    <update id="updateGoodsType" parameterType="GoodsType">
+    <update id="updateGoodsType" parameterType="com.yuepei.system.domain.GoodsType">
         update goods_type
         <trim prefix="SET" suffixOverrides=",">
             <if test="goodsTypeName != null">goods_type_name = #{goodsTypeName},</if>

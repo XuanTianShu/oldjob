@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.GoodsMapper">
 
-    <resultMap type="Goods" id="GoodsResult">
+    <resultMap type="com.yuepei.system.domain.Goods" id="GoodsResult">
         <result property="goodsId"    column="goods_id"    />
         <result property="goodsTypeId"    column="goods_type_id"    />
         <result property="goodsName"    column="goods_name"    />
@@ -18,7 +18,7 @@
         select goods_id, goods_type_id, goods_name, goods_url, goods_price, goods_all_stock, create_time from goods
     </sql>
 
-    <select id="selectGoodsList" parameterType="Goods" resultMap="GoodsResult">
+    <select id="selectGoodsList" parameterType="com.yuepei.system.domain.Goods" resultMap="GoodsResult">
         <include refid="selectGoodsVo"/>
         <where>
             <if test="goodsTypeId != null "> and goods_type_id = #{goodsTypeId}</if>
@@ -34,7 +34,7 @@
         where goods_id = #{goodsId}
     </select>
 
-    <insert id="insertGoods" parameterType="Goods" useGeneratedKeys="true" keyProperty="goodsId">
+    <insert id="insertGoods" parameterType="com.yuepei.system.domain.Goods" useGeneratedKeys="true" keyProperty="goodsId">
         insert into goods
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="goodsTypeId != null">goods_type_id,</if>
@@ -54,7 +54,7 @@
         </trim>
     </insert>
 
-    <update id="updateGoods" parameterType="Goods">
+    <update id="updateGoods" parameterType="com.yuepei.system.domain.Goods">
         update goods
         <trim prefix="SET" suffixOverrides=",">
             <if test="goodsTypeId != null">goods_type_id = #{goodsTypeId},</if>

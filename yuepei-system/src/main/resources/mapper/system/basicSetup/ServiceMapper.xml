@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.ServicePhoneMapper">
 
-    <resultMap type="ServicePhone" id="ServicePhoneResult">
+    <resultMap type="com.yuepei.system.domain.ServicePhone" id="ServicePhoneResult">
         <result property="serviceId"    column="service_id"    />
         <result property="servicePhone"    column="service_phone"    />
     </resultMap>
@@ -13,7 +13,7 @@
         select service_id, service_phone from service
     </sql>
 
-    <select id="selectServicePhoneList" parameterType="ServicePhone" resultMap="ServicePhoneResult">
+    <select id="selectServicePhoneList" parameterType="com.yuepei.system.domain.ServicePhone" resultMap="ServicePhoneResult">
         <include refid="selectServicePhoneVo"/>
         <where>
             <if test="servicePhone != null  and servicePhone != ''"> and service_phone = #{servicePhone}</if>
@@ -25,7 +25,7 @@
         where service_id = #{serviceId}
     </select>
 
-    <insert id="insertServicePhone" parameterType="ServicePhone" useGeneratedKeys="true" keyProperty="serviceId">
+    <insert id="insertServicePhone" parameterType="com.yuepei.system.domain.ServicePhone" useGeneratedKeys="true" keyProperty="serviceId">
         insert into service
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="servicePhone != null">service_phone,</if>
@@ -35,7 +35,7 @@
         </trim>
     </insert>
 
-    <update id="updateServicePhone" parameterType="ServicePhone">
+    <update id="updateServicePhone" parameterType="com.yuepei.system.domain.ServicePhone">
         update service
         <trim prefix="SET" suffixOverrides=",">
             <if test="servicePhone != null">service_phone = #{servicePhone},</if>
