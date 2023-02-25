@@ -105,10 +105,11 @@
         where id = #{id}
     </select>
     <select id="userLeaseOrder" resultMap="UserLeaseOrderResult">
-        select * from user_lease_order
+        select a.*,b.rule from user_lease_order a,device_rule b
         <where>
-            openid = #{openid}
-            <if test="status != null">and status = #{status}</if>
+            a.openid = #{openid}
+            and a.device_number=b.device_number
+            <if test="status != null">and a.status = #{status}</if>
         </where>
     </select>
 
