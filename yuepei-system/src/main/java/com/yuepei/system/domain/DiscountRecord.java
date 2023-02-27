@@ -27,6 +27,10 @@ public class DiscountRecord extends BaseEntity
     @Excel(name = "发放人")
     private Long issuer;
 
+    /** 发放人 */
+    @Excel(name = "发放人")
+    private Long issuer;
+
     /** 用户id */
     @Excel(name = "用户id")
     private Long userid;
@@ -54,6 +58,10 @@ public class DiscountRecord extends BaseEntity
     /** 1兑换券2优惠券 */
     @Excel(name = "1兑换券2优惠券")
     private Long isJyb;
+
+    /** 状态 */
+    @Excel(name = "状态")
+    private Integer status;
 
     /** 发放时间 */
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -156,6 +164,8 @@ public class DiscountRecord extends BaseEntity
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
                 .append("id", getId())
                 .append("issuer", getIssuer())
+                .append("discountId",getDiscountId())
+                .append("issuer", getIssuer())
                 .append("userid", getUserid())
                 .append("price", getPrice())
                 .append("threshold", getThreshold())
@@ -163,6 +173,7 @@ public class DiscountRecord extends BaseEntity
                 .append("integral", getIntegral())
                 .append("hospitalname", getHospitalname())
                 .append("isJyb", getIsJyb())
+                .append("status",getStatus())
                 .append("grantTime", getGrantTime())
                 .toString();
     }

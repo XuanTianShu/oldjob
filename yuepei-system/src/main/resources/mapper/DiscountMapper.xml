@@ -15,20 +15,25 @@
         <result property="unbilledNum"    column="unbilled_num"    />
         <result property="isJyb"    column="is_jyb"    />
         <result property="isStatus"    column="is_status"    />
+        <result property="isStatus"    column="is_status"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateTime"    column="update_time"    />
         <result property="integral"    column="integral"    />
         <result property="thresholdName"         column="threshold_name"/>
         <result property="hospitalId" column="hospital_id"/>
         <result property="hospitalName" column="hospital_name"/>
+        <result property="updateTime"    column="update_time"    />
     </resultMap>
 
     <sql id="selectDiscountVo">
+        select id, discount_name, money, threshold_id, period, status, sent_num, unbilled_num, is_status, create_time, update_time from discount
         SELECT d.id, d.discount_name, d.money, d.threshold_id, d.period, d.status, dt.`threshold_name`,d.hospital_id,
         d.sent_num, d.unbilled_num, d.is_status, d.create_time,d.integral,d.is_jyb, d.update_time FROM discount AS d
         INNER JOIN `discount_threshold` AS dt ON dt.`Id` = d.`threshold_id`
     </sql>
 
+    <select id="selectDiscountList" parameterType="Discount" resultMap="DiscountResult">
+        <include refid="selectDiscountVo"/>
     <sql id="selectJYBVo">
         SELECT d.id, d.discount_name, d.money, d.threshold_id, d.period, d.status,d.hospital_id,h.`hospital_name`,
                d.sent_num, d.unbilled_num, d.is_status, d.create_time,d.integral,d.is_jyb, d.update_time FROM discount AS d
@@ -43,6 +48,14 @@
             <include refid="selectDiscountVo"/>
         </if>
         <where>
+            <if test="discountName != null  and discountName != ''"> and discount_name like concat('%', #{discountName}, '%')</if>
+            <if test="money != null "> and money = #{money}</if>
+            <if test="thresholdId != null "> and threshold_id = #{thresholdId}</if>
+            <if test="period != null "> and period = #{period}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="sentNum != null "> and sent_num = #{sentNum}</if>
+            <if test="unbilledNum != null "> and unbilled_num = #{unbilledNum}</if>
+            <if test="isStatus != null "> and is_status = #{isStatus}</if>
             <if test="discountName != null  and discountName != ''"> and d.discount_name like concat('%', #{discountName}, '%')</if>
             <if test="money != null "> and d.money = #{money}</if>
             <if test="thresholdId != null "> and d.threshold_id = #{thresholdId}</if>
@@ -59,9 +72,6 @@
     <select id="selectDiscountById" parameterType="Long" resultMap="DiscountResult">
         <include refid="selectDiscountVo"/>
         where d.id = #{id}
-    </select>
-    <select id="checkDiscountSum" resultType="java.lang.Integer">
-        select unbilled_num from discount where id = #{discountId}
     </select>
 
     <insert id="insertDiscount" parameterType="Discount" useGeneratedKeys="true" keyProperty="id">

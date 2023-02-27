@@ -24,6 +24,18 @@
         <result property="grantTime" column="grant_time"/>
         <result property="integral" column="integral"/>
         <result property="isJyb" column="is_jyb"/>
+        <result property="status"       column="status"/>
+        <result property="grantTime"    column="grant_time"    />
+    </resultMap>
+
+    <resultMap id="DiscountRecordVOResult" type="com.yuepei.system.domain.vo.DiscountRecordVO">
+        <result property="sNickName" column="sNickName"/>
+        <result property="hospitalName" column="hospitalName"/>
+        <result property="uNickName" column="uNickName"/>
+        <result property="price" column="price"/>
+        <result property="threshold" column="threshold"/>
+        <result property="status" column="status"/>
+        <result property="grantTime" column="grant_time"/>
     </resultMap>
 
     <sql id="selectDiscountRecordVo">

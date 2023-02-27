@@ -13,7 +13,7 @@ import java.util.Date;
  * 优惠券对象 discount
  *
  * @author ohy
- * @date 2023-02-21
+ * @date 2023-02-27
  */
 public class Discount extends BaseEntity
 {
@@ -22,9 +22,9 @@ public class Discount extends BaseEntity
     /** 主键 */
     private Long id;
 
-    /** 医院id */
-    @Excel(name = "医院id")
-    private Long hospitalId;
+    /** 优惠券名称 */
+    @Excel(name = "优惠券名称")
+    private String discountName;
 
     /** 优惠券名称 */
     @Excel(name = "优惠券名称")
@@ -34,6 +34,17 @@ public class Discount extends BaseEntity
     @Excel(name = "金额")
     private BigDecimal money;
 
+    /** 门槛编号 */
+    @Excel(name = "门槛编号")
+    private Long thresholdId;
+
+    /** 有效期(代表天数) */
+    @Excel(name = "有效期(代表天数)")
+    private Long period;
+
+    /** 状态(0正常1禁用) */
+    @Excel(name = "状态(0正常1禁用)")
+    private Long status;
     /** 门槛编号 */
     @Excel(name = "门槛编号")
     private Long thresholdId;
@@ -58,6 +69,9 @@ public class Discount extends BaseEntity
     @Excel(name = "未发放数量")
     private Long unbilledNum;
 
+    /** 是否为新人优惠券 */
+    @Excel(name = "是否为新人优惠券")
+    private Long isStatus;
     /** 是否为新人优惠券 */
     @Excel(name = "是否为新人优惠券")
     private Long isStatus;
@@ -175,17 +189,21 @@ public class Discount extends BaseEntity
         return unbilledNum;
     }
     public void setIsStatus(Long isStatus)
+    public void setIsStatus(Long isStatus)
     {
         this.isStatus = isStatus;
     }
 
     public Long getIsStatus()
     {
+        this.isStatus = isStatus;
         return isStatus;
     }
 
+    public Long getIsStatus()
     public void setIsJyb(Long isJyb)
     {
+        return isStatus;
         this.isJyb = isJyb;
     }
 
@@ -200,6 +218,9 @@ public class Discount extends BaseEntity
                 .append("id", getId())
                 .append("discountName", getDiscountName())
                 .append("money", getMoney())
+                .append("thresholdId", getThresholdId())
+                .append("period", getPeriod())
+                .append("status", getStatus())
                 .append("isJyb", getIsJyb())
                 .append("thresholdId", getThresholdId())
                 .append("period", getPeriod())
@@ -208,6 +229,7 @@ public class Discount extends BaseEntity
                 .append("integral", getIntegral())
                 .append("thresholdName",getThresholdName())
                 .append("unbilledNum", getUnbilledNum())
+                .append("isStatus", getIsStatus())
                 .append("hospitalId",getHospitalId())
                 .append("isStatus", getIsStatus())
                 .append("createTime", getCreateTime())
