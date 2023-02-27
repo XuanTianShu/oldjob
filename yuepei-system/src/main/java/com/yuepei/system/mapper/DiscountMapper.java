@@ -60,11 +60,4 @@ public interface DiscountMapper
      * @return 结果
      */
     public int deleteDiscountByIds(Long[] ids);
-
-    /**
-     * 查询该优惠券库存
-     * @param discountId
-     * @return
-     */
-    int checkDiscountSum(@Param("discountId") Long discountId);
 }

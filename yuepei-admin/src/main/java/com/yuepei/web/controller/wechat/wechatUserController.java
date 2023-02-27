@@ -9,9 +9,9 @@ import com.yuepei.service.MyBalanceService;
 import com.yuepei.service.MyIntegralService;
 import com.yuepei.system.domain.Discount;
 import com.yuepei.system.domain.DiscountRecord;
+import com.yuepei.system.domain.DiscountThreshold;
 import com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo;
-import com.yuepei.system.service.IDiscountService;
-import com.yuepei.system.service.ISysUserService;
+import com.yuepei.system.service.*;
 import com.yuepei.utils.DictionaryEnum;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +26,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -71,6 +72,15 @@ public class wechatUserController extends BaseController {
     @Autowired
     private IDiscountService discountService;
 
+    @Autowired
+    private IDiscountRecordService discountRecordService;
+
+    @Autowired
+    private IDiscountThresholdService discountThresholdService;
+
+    @Autowired
+    private IUserDiscountService userDiscountService;
+
     /**
      * 获取用户列表
      */
@@ -83,11 +93,21 @@ public class wechatUserController extends BaseController {
         return getDataTable(list);
     }
 
+    /**
+     * 获取用户的积分消费记录
+     * @param userIntegralBalanceDepositVo
+     * @return
+     */
     @GetMapping("/selectIntegralDetailList")
     public AjaxResult selectIntegralDetailList(UserIntegralBalanceDepositVo userIntegralBalanceDepositVo){
         return AjaxResult.success(integralService.selectIntegralDetailList(userIntegralBalanceDepositVo));
     }
 
+    /**
+     * 获取用户的余额消费记录
+     * @param userIntegralBalanceDepositVo
+     * @return
+     */
     @GetMapping("/selectBalanceDetailList")
     public AjaxResult selectBalanceDetailList(UserIntegralBalanceDepositVo userIntegralBalanceDepositVo){
         return AjaxResult.success(balanceService.selectBalanceDetailList(userIntegralBalanceDepositVo));
@@ -102,15 +122,23 @@ public class wechatUserController extends BaseController {
     @Transactional
     @PostMapping("/assignUser")
     public AjaxResult assignUser(Long discountId,Long[] userId) throws ParseException {
-        //获取当前登录用户的id
-        Long userId1 = SecurityUtils.getUserId();
         //查询该优惠券库存数量
-        int b = discountService.checkDiscountSum(discountId);
-        if (b > userId.length){
-//            userService.selectHospitalIdByUserId(userId1);
+        Discount discount = discountService.selectDiscountById(discountId);
+        DiscountThreshold discountThreshold = discountThresholdService.selectDiscountThresholdById(discount.getThresholdId());
+        if (discount.getUnbilledNum() >= userId.length){
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Calendar instance = Calendar.getInstance();
+            String format = simpleDateFormat.format(instance.getTime());
+            instance.add(Calendar.DAY_OF_MONTH,Integer.parseInt(discount.getPeriod().toString()));
+            String s = simpleDateFormat.format(instance.getTime());
+            discountRecordService.sendDiscountRecord(SecurityUtils.getUserId(),userId,discount,discountThreshold,new Date());
+            userDiscountService.sendUserDiscount(userId,discountThreshold,simpleDateFormat.parse(format),simpleDateFormat.parse(s),discount.getMoney());
+            discount.setSentNum(discount.getSentNum()+userId.length);
+            discount.setUnbilledNum(discount.getUnbilledNum()-userId.length);
+            discountService.updateDiscount(discount);
             return AjaxResult.success();
         }else {
-            return AjaxResult.error(DictionaryEnum.CHECK_DISCOUNT_SUM.getCode(), DictionaryEnum.CHECK_DISCOUNT_SUM.getName()+b+"张");
+            return AjaxResult.error(DictionaryEnum.CHECK_DISCOUNT_SUM.getCode(), DictionaryEnum.CHECK_DISCOUNT_SUM.getName()+discount.getUnbilledNum()+"张");
         }
     }
 }

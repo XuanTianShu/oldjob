@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.UserDiscountMapper">
+
+    <resultMap type="UserDiscount" id="UserDiscountResult">
+        <result property="id"    column="Id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="thresholdName"    column="threshold_name"    />
+        <result property="price"    column="price"    />
+        <result property="full"    column="full"    />
+        <result property="expireTime"    column="expire_time"    />
+        <result property="status"    column="status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectUserDiscountVo">
+        select Id, user_id, threshold_name, price, full, expire_time, status, create_time, update_time from user_discount
+    </sql>
+
+    <select id="selectUserDiscountList" parameterType="UserDiscount" resultMap="UserDiscountResult">
+        <include refid="selectUserDiscountVo"/>
+        <where>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="thresholdName != null  and thresholdName != ''"> and threshold_name like concat('%', #{thresholdName}, '%')</if>
+            <if test="price != null "> and price = #{price}</if>
+            <if test="full != null "> and full = #{full}</if>
+            <if test="expireTime != null "> and expire_time = #{expireTime}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+
+    <select id="selectUserDiscountById" parameterType="Long" resultMap="UserDiscountResult">
+        <include refid="selectUserDiscountVo"/>
+        where Id = #{id}
+    </select>
+
+    <insert id="insertUserDiscount" parameterType="UserDiscount" useGeneratedKeys="true" keyProperty="id">
+        insert into user_discount
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="thresholdName != null">threshold_name,</if>
+            <if test="price != null">price,</if>
+            <if test="full != null">full,</if>
+            <if test="expireTime != null">expire_time,</if>
+            <if test="status != null">status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="thresholdName != null">#{thresholdName},</if>
+            <if test="price != null">#{price},</if>
+            <if test="full != null">#{full},</if>
+            <if test="expireTime != null">#{expireTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+    <insert id="sendUserDiscount">
+        insert into user_discount(`user_id`,`threshold_name`,`price`,`full`,`expire_time`,`create_time`) values
+        <foreach item="discountRecord" collection="userId" index="index"  separator=",">
+            (#{discountRecord},#{discountThreshold.thresholdName},#{money},#{discountThreshold.full},#{parse1},#{parse})
+        </foreach>
+    </insert>
+
+    <update id="updateUserDiscount" parameterType="UserDiscount">
+        update user_discount
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="thresholdName != null">threshold_name = #{thresholdName},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="full != null">full = #{full},</if>
+            <if test="expireTime != null">expire_time = #{expireTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where Id = #{id}
+    </update>
+
+    <delete id="deleteUserDiscountById" parameterType="Long">
+        delete from user_discount where Id = #{id}
+    </delete>
+
+    <delete id="deleteUserDiscountByIds" parameterType="String">
+        delete from user_discount where Id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

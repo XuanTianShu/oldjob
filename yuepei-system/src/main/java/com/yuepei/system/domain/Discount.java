@@ -13,7 +13,7 @@ import java.util.Date;
  * 优惠券对象 discount
  *
  * @author ohy
- * @date 2023-02-21
+ * @date 2023-02-27
  */
 public class Discount extends BaseEntity
 {
@@ -22,38 +22,37 @@ public class Discount extends BaseEntity
     /** 主键 */
     private Long id;
 
-    /** 医院id */
-    @Excel(name = "医院id")
-    private Long hospitalId;
+    /** 优惠券名称 */
+    @Excel(name = "优惠券名称")
+    private String discountName;
 
     /** 金额 */
     @Excel(name = "金额")
     private BigDecimal money;
 
-    /** 门槛 */
-    @Excel(name = "门槛")
-    private BigDecimal threshold;
+    /** 门槛编号 */
+    @Excel(name = "门槛编号")
+    private Long thresholdId;
+
+    /** 有效期(代表天数) */
+    @Excel(name = "有效期(代表天数)")
+    private Long period;
+
+    /** 状态(0正常1禁用) */
+    @Excel(name = "状态(0正常1禁用)")
+    private Long status;
 
     /** 发放数量 */
     @Excel(name = "发放数量")
     private Long sentNum;
 
-    /** 未发数量 */
-    @Excel(name = "未发数量")
+    /** 未发放数量 */
+    @Excel(name = "未发放数量")
     private Long unbilledNum;
 
-    /** 类型 */
-    @Excel(name = "类型")
-    private Long discountType;
-
-    /** 到期时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    @Excel(name = "到期时间", width = 30, dateFormat = "yyyy-MM-dd")
-    private Date endTime;
-
-    /** 发放状态 */
-    @Excel(name = "发放状态")
-    private Long status;
+    /** 是否为新人优惠券 */
+    @Excel(name = "是否为新人优惠券")
+    private Long isStatus;
 
     public void setId(Long id)
     {
@@ -64,14 +63,14 @@ public class Discount extends BaseEntity
     {
         return id;
     }
-    public void setHospitalId(Long hospitalId)
+    public void setDiscountName(String discountName)
     {
-        this.hospitalId = hospitalId;
+        this.discountName = discountName;
     }
 
-    public Long getHospitalId()
+    public String getDiscountName()
     {
-        return hospitalId;
+        return discountName;
     }
     public void setMoney(BigDecimal money)
     {
@@ -82,14 +81,32 @@ public class Discount extends BaseEntity
     {
         return money;
     }
-    public void setThreshold(BigDecimal threshold)
+    public void setThresholdId(Long thresholdId)
     {
-        this.threshold = threshold;
+        this.thresholdId = thresholdId;
     }
 
-    public BigDecimal getThreshold()
+    public Long getThresholdId()
     {
-        return threshold;
+        return thresholdId;
+    }
+    public void setPeriod(Long period)
+    {
+        this.period = period;
+    }
+
+    public Long getPeriod()
+    {
+        return period;
+    }
+    public void setStatus(Long status)
+    {
+        this.status = status;
+    }
+
+    public Long getStatus()
+    {
+        return status;
     }
     public void setSentNum(Long sentNum)
     {
@@ -109,47 +126,30 @@ public class Discount extends BaseEntity
     {
         return unbilledNum;
     }
-    public void setDiscountType(Long discountType)
+    public void setIsStatus(Long isStatus)
     {
-        this.discountType = discountType;
+        this.isStatus = isStatus;
     }
 
-    public Long getDiscountType()
+    public Long getIsStatus()
     {
-        return discountType;
-    }
-    public void setEndTime(Date endTime)
-    {
-        this.endTime = endTime;
-    }
-
-    public Date getEndTime()
-    {
-        return endTime;
-    }
-    public void setStatus(Long status)
-    {
-        this.status = status;
-    }
-
-    public Long getStatus()
-    {
-        return status;
+        return isStatus;
     }
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
                 .append("id", getId())
-                .append("hospitalId", getHospitalId())
+                .append("discountName", getDiscountName())
                 .append("money", getMoney())
-                .append("threshold", getThreshold())
+                .append("thresholdId", getThresholdId())
+                .append("period", getPeriod())
+                .append("status", getStatus())
                 .append("sentNum", getSentNum())
                 .append("unbilledNum", getUnbilledNum())
-                .append("discountType", getDiscountType())
+                .append("isStatus", getIsStatus())
                 .append("createTime", getCreateTime())
-                .append("endTime", getEndTime())
-                .append("status", getStatus())
+                .append("updateTime", getUpdateTime())
                 .toString();
     }
 }

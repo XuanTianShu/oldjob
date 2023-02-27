@@ -59,11 +59,4 @@ public interface IDiscountService
      * @return 结果
      */
     public int deleteDiscountById(Long id);
-
-    /**
-     * 查询优惠券库存
-     * @param discountId
-     * @return
-     */
-    int checkDiscountSum(Long discountId);
 }
