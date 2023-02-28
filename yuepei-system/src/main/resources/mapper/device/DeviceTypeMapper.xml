@@ -7,16 +7,18 @@
     <resultMap type="com.yuepei.system.domain.DeviceType" id="DeviceTypeResult">
         <result property="deviceTypeId"    column="device_type_id"    />
         <result property="deviceTypeName"    column="device_type_name"    />
+        <result property="deviceTypeDeposit"    column="device_type_deposit"/>
     </resultMap>
 
     <sql id="selectDeviceTypeVo">
-        select device_type_id, device_type_name from device_type
+        select device_type_id, device_type_name,device_type_deposit from device_type
     </sql>
 
     <select id="selectDeviceTypeList" parameterType="com.yuepei.system.domain.DeviceType" resultMap="DeviceTypeResult">
         <include refid="selectDeviceTypeVo"/>
         <where>
             <if test="deviceTypeName != null  and deviceTypeName != ''"> and device_type_name like concat('%', #{deviceTypeName}, '%')</if>
+            <if test="deviceTypeDeposit != null"> and device_type_deposit = #{deviceTypeDeposit}</if>
         </where>
     </select>
 
@@ -30,10 +32,12 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="deviceTypeId != null">device_type_id,</if>
             <if test="deviceTypeName != null">device_type_name,</if>
+            <if test="deviceTypeDeposit != null">device_type_deposit,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="deviceTypeId != null">#{deviceTypeId},</if>
             <if test="deviceTypeName != null">#{deviceTypeName},</if>
+            <if test="deviceTypeDeposit != null">#{deviceTypeDeposit},</if>
         </trim>
     </insert>
 
@@ -41,6 +45,7 @@
         update device_type
         <trim prefix="SET" suffixOverrides=",">
             <if test="deviceTypeName != null">device_type_name = #{deviceTypeName},</if>
+            <if test="deviceTypeDeposit != null">device_type_deposit = #{deviceTypeDeposit},</if>
         </trim>
         where device_type_id = #{deviceTypeId}
     </update>

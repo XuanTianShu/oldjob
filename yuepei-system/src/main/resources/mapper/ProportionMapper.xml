@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.ProportionMapper">
+
+    <resultMap type="Proportion" id="ProportionResult">
+        <result property="id"    column="Id"    />
+        <result property="proportionHospital"    column="proportion_hospital"    />
+        <result property="proportionPlatform"    column="proportion_platform"    />
+        <result property="proportionAgent"    column="proportion_agent"    />
+        <result property="proportionInvestor"    column="proportion_investor"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectProportionVo">
+        select Id, proportion_hospital, proportion_platform, proportion_agent, proportion_investor, update_time from proportion
+    </sql>
+
+    <select id="selectProportionList" parameterType="Proportion" resultMap="ProportionResult">
+        <include refid="selectProportionVo"/>
+        <where>
+            <if test="id != null "> and Id = #{id}</if>
+            <if test="proportionHospital != null "> and proportion_hospital = #{proportionHospital}</if>
+            <if test="proportionPlatform != null "> and proportion_platform = #{proportionPlatform}</if>
+            <if test="proportionAgent != null "> and proportion_agent = #{proportionAgent}</if>
+            <if test="proportionInvestor != null "> and proportion_investor = #{proportionInvestor}</if>
+        </where>
+    </select>
+
+    <select id="selectProportionById" parameterType="Long" resultMap="ProportionResult">
+        <include refid="selectProportionVo"/>
+        where Id = #{id}
+    </select>
+
+    <insert id="insertProportion" parameterType="Proportion">
+        insert into proportion
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">Id,</if>
+            <if test="proportionHospital != null">proportion_hospital,</if>
+            <if test="proportionPlatform != null">proportion_platform,</if>
+            <if test="proportionAgent != null">proportion_agent,</if>
+            <if test="proportionInvestor != null">proportion_investor,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            <if test="proportionHospital != null">#{proportionHospital},</if>
+            <if test="proportionPlatform != null">#{proportionPlatform},</if>
+            <if test="proportionAgent != null">#{proportionAgent},</if>
+            <if test="proportionInvestor != null">#{proportionInvestor},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateProportion" parameterType="Proportion">
+        update proportion
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="proportionHospital != null">proportion_hospital = #{proportionHospital},</if>
+            <if test="proportionPlatform != null">proportion_platform = #{proportionPlatform},</if>
+            <if test="proportionAgent != null">proportion_agent = #{proportionAgent},</if>
+            <if test="proportionInvestor != null">proportion_investor = #{proportionInvestor},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where Id = #{id}
+    </update>
+
+    <delete id="deleteProportionById" parameterType="Long">
+        delete from proportion where Id = #{id}
+    </delete>
+
+    <delete id="deleteProportionByIds" parameterType="String">
+        delete from proportion where Id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

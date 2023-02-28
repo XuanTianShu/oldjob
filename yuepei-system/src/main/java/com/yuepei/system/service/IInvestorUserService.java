@@ -1,5 +1,6 @@
 package com.yuepei.system.service;
 
+import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.InvestorUser;
 
 import java.util.List;
@@ -26,7 +27,7 @@ public interface IInvestorUserService
      * @param investorUser 投资人管理
      * @return 投资人管理集合
      */
-    public List<InvestorUser> selectInvestorUserList(InvestorUser investorUser);
+    public List<SysUser> selectInvestorUserList(SysUser user);
 
     /**
      * 新增投资人管理

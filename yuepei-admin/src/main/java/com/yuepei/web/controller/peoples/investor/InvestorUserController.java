@@ -6,8 +6,11 @@ import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.common.enums.BusinessType;
+import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.common.utils.poi.ExcelUtil;
+import com.yuepei.framework.web.domain.server.Sys;
 import com.yuepei.system.domain.InvestorUser;
+import com.yuepei.system.mapper.SysUserMapper;
 import com.yuepei.system.service.IInvestorUserService;
 import com.yuepei.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +34,10 @@ public class InvestorUserController extends BaseController
     private IInvestorUserService investorUserService;
 
     @Autowired
-    private ISysUserService userService;
+    private SysUserMapper sysUserMapper;
+
+    @Autowired
+    private ISysUserService sysUserService;
 
     /**
      * 查询投资人管理列表
@@ -42,8 +48,7 @@ public class InvestorUserController extends BaseController
     {
         startPage();
         user.setUserType("03");
-//        List<InvestorUser> list = investorUserService.selectInvestorUserList(investorUser);
-        List<SysUser> list = userService.selectWechatUserList(user);
+        List<SysUser> list = investorUserService.selectInvestorUserList(user);
         return getDataTable(list);
     }
 
@@ -53,10 +58,10 @@ public class InvestorUserController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:investorUser:export')")
     @Log(title = "投资人管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, InvestorUser investorUser)
+    public void export(HttpServletResponse response, SysUser user)
     {
-        List<InvestorUser> list = investorUserService.selectInvestorUserList(investorUser);
-        ExcelUtil<InvestorUser> util = new ExcelUtil<InvestorUser>(InvestorUser.class);
+        List<SysUser> list = investorUserService.selectInvestorUserList(user);
+        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
         util.exportExcel(response, list, "投资人管理数据");
     }
 
@@ -76,9 +81,11 @@ public class InvestorUserController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:investorUser:add')")
     @Log(title = "投资人管理", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody InvestorUser investorUser)
+    public AjaxResult add(@RequestBody SysUser user)
     {
-        return toAjax(investorUserService.insertInvestorUser(investorUser));
+        user.setUserType("03");
+        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
+        return toAjax(sysUserMapper.insertUser(user));
     }
 
     /**

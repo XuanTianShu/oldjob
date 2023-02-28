@@ -16,20 +16,87 @@
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
+    <resultMap type="com.yuepei.common.core.domain.entity.SysUser" id="SysUserResult">
+        <id     property="userId"       column="user_id"      />
+        <result property="deptId"       column="dept_id"      />
+        <result property="userName"     column="user_name"    />
+        <result property="nickName"     column="nick_name"    />
+        <result property="openid"     column="openid"    />
+        <result property="balance"     column="balance"    />
+        <result property="integral"     column="integral"    />
+        <result property="email"        column="email"        />
+        <result property="phoneNumber"  column="phone_number"  />
+        <result property="sex"          column="sex"          />
+        <result property="avatar"       column="avatar"       />
+        <result property="password"     column="password"     />
+        <result property="status"       column="status"       />
+        <result property="delFlag"      column="del_flag"     />
+        <result property="loginIp"      column="login_ip"     />
+        <result property="loginDate"    column="login_date"   />
+        <result property="createBy"     column="create_by"    />
+        <result property="createTime"   column="create_time"  />
+        <result property="updateBy"     column="update_by"    />
+        <result property="updateTime"   column="update_time"  />
+        <result property="remark"       column="remark"       />
+        <result property="userType"		column="user_type"	  />
+        <result property="proportion"   column="proportion"/>
+        <association property="dept"    column="dept_id" javaType="com.yuepei.common.core.domain.entity.SysDept" resultMap="deptResult" />
+        <collection  property="roles"   javaType="java.util.List"           resultMap="RoleResult" />
+    </resultMap>
+
+    <resultMap id="deptResult" type="com.yuepei.common.core.domain.entity.SysDept">
+        <id     property="deptId"    column="dept_id"     />
+        <result property="parentId"  column="parent_id"   />
+        <result property="deptName"  column="dept_name"   />
+        <result property="ancestors" column="ancestors"   />
+        <result property="orderNum"  column="order_num"   />
+        <result property="leader"    column="leader"      />
+        <result property="status"    column="dept_status" />
+    </resultMap>
+
+    <resultMap id="RoleResult" type="com.yuepei.common.core.domain.entity.SysRole">
+        <id     property="roleId"       column="role_id"        />
+        <result property="roleName"     column="role_name"      />
+        <result property="roleKey"      column="role_key"       />
+        <result property="roleSort"     column="role_sort"      />
+        <result property="dataScope"     column="data_scope"    />
+        <result property="status"       column="role_status"    />
+    </resultMap>
+
     <sql id="selectInvestorUserVo">
         select id, account, password, phone, nick_name, hospital_id, proportion, create_time, update_time from investor_user
     </sql>
 
-    <select id="selectInvestorUserList" parameterType="com.yuepei.system.domain.InvestorUser" resultMap="InvestorUserResult">
-        <include refid="selectInvestorUserVo"/>
-        <where>
-            <if test="account != null  and account != ''"> and account = #{account}</if>
-            <if test="password != null  and password != ''"> and password = #{password}</if>
-            <if test="phone != null  and phone != ''"> and phone = #{phone}</if>
-            <if test="nickName != null  and nickName != ''"> and nick_name like concat('%', #{nickName}, '%')</if>
-            <if test="hospitalId != null "> and hospital_id = #{hospitalId}</if>
-            <if test="proportion != null "> and proportion = #{proportion}</if>
-        </where>
+    <select id="selectInvestorUserList" parameterType="com.yuepei.common.core.domain.entity.SysUser" resultMap="SysUserResult">
+        select u.user_id, u.dept_id, u.openid, u.nick_name,u.proportion, u.user_name, u.balance, u.integral, u.email, u.avatar, u.phone_number, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader from sys_user u
+        left join sys_dept d on u.dept_id = d.dept_id
+        where u.del_flag = '0'
+        <if test="userId != null and userId != 0">
+            AND u.user_id = #{userId}
+        </if>
+        <if test="userType != null and userType != ''">
+            and u.user_type = #{userType}
+        </if>
+        <if test="userName != null and userName != ''">
+            AND u.user_name like concat('%', #{userName}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND u.status = #{status}
+        </if>
+        <if test="phoneNumber != null and phoneNumber != ''">
+            AND u.phone_number like concat('%', #{phoneNumber}, '%')
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(u.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(u.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+        </if>
+        <if test="deptId != null and deptId != 0">
+            AND (u.dept_id = #{deptId} OR u.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId}, ancestors) ))
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
     </select>
 
     <select id="selectInvestorUserById" parameterType="Long" resultMap="InvestorUserResult">
