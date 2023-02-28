@@ -50,7 +50,7 @@ public class AgentController {
     /**
      * 查询设备详情
      * */
-    @PostMapping("/selectDeviceDetailsByDeviceNumber")
+    @GetMapping("/selectDeviceDetailsByDeviceNumber")
     private AjaxResult selectDeviceDetailsByDeviceNumber(@RequestParam("deviceNumber")String deviceNumber){
         return AjaxResult.success(agentService.selectDeviceDetailsByDeviceNumber(deviceNumber));
     }
@@ -73,6 +73,14 @@ public class AgentController {
     private AjaxResult selectLeaseOrder(HttpServletRequest request){
         SysUser analysis = tokenUtils.analysis(request);
         return AjaxResult.success(agentService.selectLeaseOrder(analysis.getUserId()));
+    }
+
+    /**开通子账户*/
+    @PostMapping("/insertAgentAccount")
+    private AjaxResult insertAgentAccount(@RequestBody SysUser sysUser,
+                                          HttpServletRequest request){
+        SysUser analysis = tokenUtils.analysis(request);
+        return AjaxResult.success(agentService.insertAgentAccount(sysUser,analysis.getUserId()));
     }
 
     /**故障设备列表*/

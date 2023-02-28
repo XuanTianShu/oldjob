@@ -28,7 +28,7 @@ public class HospitalDeviceController {
     private HospitalDeviceService hospitalDeviceService;
 
     /**根据账号密码登录*/
-    @PostMapping("/loginHospitalPort")
+    @GetMapping("/loginHospitalPort")
     private AjaxResult loginHospitalPort(@RequestParam("userName")String userName,
                                          @RequestParam("password")String password){
         return hospitalDeviceService.loginHospitalPort(userName,password);
@@ -46,10 +46,11 @@ public class HospitalDeviceController {
     /**
      * 查询该医院设备详情
      * */
-    @PostMapping("/selectDeviceTypeDetails")
+    @GetMapping("/selectDeviceTypeDetails")
     public AjaxResult selectDeviceTypeDetails(@RequestParam("deviceTypeId") Long deviceTypeId,
-                                              @RequestParam("hospitalId")Long hospitalId){
-        return AjaxResult.success(hospitalDeviceService.selectDeviceTypeDetails(deviceTypeId,hospitalId));
+                                              HttpServletRequest request){
+        SysUser analysis = tokenUtils.analysis(request);
+        return AjaxResult.success(hospitalDeviceService.selectDeviceTypeDetails(deviceTypeId, analysis.getUserId()));
     }
 
     /**
@@ -71,7 +72,7 @@ public class HospitalDeviceController {
     }
 
     /**查询商品详细信息*/
-    @PostMapping("/selectGoodsOrderDetails")
+    @GetMapping("/selectGoodsOrderDetails")
     private AjaxResult selectGoodsOrderDetails(@RequestParam("orderId")Long orderId){
         return AjaxResult.success(hospitalDeviceService.selectOrderByOrderId(orderId));
     }
@@ -79,21 +80,22 @@ public class HospitalDeviceController {
     /**
      * 陪护床租借订单
      * */
-    @PostMapping("/selectLeaseOrder")
-    public AjaxResult selectLeaseOrder(@RequestParam("hospitalId")Long hospitalId){
-        return AjaxResult.success(hospitalDeviceService.selectLeaseOrder(hospitalId));
+    @GetMapping("/selectLeaseOrder")
+    public AjaxResult selectLeaseOrder(HttpServletRequest request){
+        SysUser analysis = tokenUtils.analysis(request);
+        return AjaxResult.success(hospitalDeviceService.selectLeaseOrder("ohy"));
     }
 
     /**
      * 陪护床租借详情
      * */
-    @PostMapping("/selectLeaseOrderDetails")
+    @GetMapping("/selectLeaseOrderDetails")
     public AjaxResult selectLeaseOrderDetails(@RequestParam("orderNumber")String orderNumber){
         return AjaxResult.success(hospitalDeviceService.selectLeaseOrderDetails(orderNumber));
     }
 
     /**医院营收统计*/
-    @PostMapping("/selectRevenueStatistics")
+    @GetMapping("/selectRevenueStatistics")
     public AjaxResult selectRevenueStatistics(@RequestParam("hospitalId")Long hospitalId,
                                               @RequestParam("statistics")int statistics){
         return AjaxResult.success(hospitalDeviceService.selectRevenueStatistics(hospitalId,statistics));

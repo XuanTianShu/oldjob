@@ -61,6 +61,22 @@ public class SysUser extends BaseEntity
     @Excel(name = "手机号码")
     private String phoneNumber;
 
+    /**联系人*/
+    private String contacts;
+
+    /**所属角色*/
+    private String role;
+
+    /**地区*/
+    private String area;
+
+    /**详细地址*/
+    private String addressDetailed;
+
+    /**父级标识*/
+    private Long parentId;
+
+    /**分成比例*/
     private Long proportion;
 
     /** 用户性别 */

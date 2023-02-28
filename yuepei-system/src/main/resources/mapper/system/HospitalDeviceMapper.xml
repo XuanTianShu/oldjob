@@ -17,6 +17,11 @@
         <result property="deviceTypeName" column="device_type_name"></result>
     </resultMap>
 
+    <resultMap id="HospitalUserResult" type="HospitalUser">
+        <result property="hospitalId" column="hospital_id"></result>
+        <result property="userName" column="user_name"></result>
+    </resultMap>
+
     <sql id="DeviceDetails">
         select COUNT(d.device_type_id),h.hospital_id,h.hospital_name,d.device_number,d.device_full_address from device d
         left join hospital h on d.hospital_id=h.hospital_id
@@ -84,7 +89,7 @@
     <select id="selectDeviceType" parameterType="DeviceType" resultMap="DeviceTypeResult">
         <include refid="DeviceTypeVo"/>
         where su.user_id=#{userId}
-        order by device_type_name
+        group by device_type_name
     </select>
 
     <select id="selectDeviceTypeDetails" parameterType="Device" resultMap="DeviceTypeDetailsResult">
@@ -132,6 +137,10 @@
 
     <select id="selectDeviceByDeviceAddress" resultType="java.lang.String">
         select distinct device_address from device where hospital_id=#{hospitalId}
+    </select>
+
+    <select id="selectHospitalbyUserName" parameterType="HospitalUser" resultMap="HospitalUserResult">
+        select hospital_id,user_name from hospital_user where user_name=#{userName}
     </select>
 
 </mapper>

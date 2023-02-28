@@ -19,7 +19,7 @@ public interface HospitalDeviceService {
 
     List<DeviceType> selectDeviceType(Long userId);
 
-    List<DeviceDetailsVo> selectDeviceTypeDetails(Long deviceTypeId, Long hospitalId);
+    List<DeviceDetailsVo> selectDeviceTypeDetails(Long deviceTypeId, Long userId);
 
     void updateDeviceDetails(DeviceDetailsVo deviceDetailsVo);
 
@@ -27,7 +27,7 @@ public interface HospitalDeviceService {
 
     GoodsOrderVo selectOrderByOrderId(Long orderId);
 
-    List<UserLeaseOrderVo> selectLeaseOrder(Long hospitalId);
+    List<UserLeaseOrderVo> selectLeaseOrder(String userName);
 
     UserLeaseOrderVo selectLeaseOrderDetails(String orderNumber);
 

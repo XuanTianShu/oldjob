@@ -31,4 +31,6 @@ public interface HospitalDeviceMapper {
     List<String> selectLeaseOrder(@Param("hospitalId") Long hospitalId);
 
     String selectDeviceByDeviceAddress(@Param("hospitalId") Long hospitalId);
+
+    HospitalUser selectHospitalbyUserName(@Param("userName") String userName);
 }

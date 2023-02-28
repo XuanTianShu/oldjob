@@ -129,6 +129,10 @@ public class AgentServiceImpl implements AgentService {
             }
             return "该医院已被其他代理商代理";
         }
+        SysUser user = sysUserMapper.selectUserByUserName(hospitalAgentVo.getAccountNumber());
+        if (user!=null){
+            return "该账号已被使用,请重新输入账号";
+        }
         //添加代理商和医院关联信息
         agentMapper.insertAgentHospital(hospitalAgentVo.getAgentId(),hospitalAgentVo.getHospitalId());
         SysUser sysUser = new SysUser();
@@ -163,10 +167,17 @@ public class AgentServiceImpl implements AgentService {
         List<UserLeaseOrderVo> userLeaseOrderList = new ArrayList<>();
         List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
         agentHospitals.stream().forEach(i->{
-            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(i.getHospitalId());
+            SysUser user = sysUserMapper.selectUserById(userId);
+            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(user.getUserName());
             userLeaseOrderList.addAll(userLeaseOrders);
         });
         return userLeaseOrderList;
+    }
+
+    @Override
+    public String insertAgentAccount(SysUser sysUser,Long userId) {
+
+        return null;
     }
 
     /*@Override

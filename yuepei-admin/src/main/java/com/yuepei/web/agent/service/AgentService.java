@@ -1,5 +1,6 @@
 package com.yuepei.web.agent.service;
 
+import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.*;
 
@@ -20,6 +21,8 @@ public interface AgentService {
     String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo);
 
     List<UserLeaseOrderVo> selectLeaseOrder(Long userId);
+
+    String insertAgentAccount(SysUser sysUser,Long userId);
 
 //    List<FaultVo> selectDeviceFaultList(Long userId);
 }
