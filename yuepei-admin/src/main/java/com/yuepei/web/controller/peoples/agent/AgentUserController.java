@@ -51,10 +51,10 @@ public class AgentUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:agentUser:export')")
     @Log(title = "代理管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, InvestorUser investorUser)
+    public void export(HttpServletResponse response, SysUser investorUser)
     {
-        List<InvestorUser> list = investorUserService.selectInvestorUserList(investorUser);
-        ExcelUtil<InvestorUser> util = new ExcelUtil<InvestorUser>(InvestorUser.class);
+        List<SysUser> list = investorUserService.selectInvestorUserList(investorUser);
+        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
         util.exportExcel(response, list, "代理用户数据");
     }
 

@@ -52,10 +52,10 @@ public class HospitalUserController extends BaseController {
     @PreAuthorize("@ss.hasPermi('system:hospitalUser:export')")
     @Log(title = "医院管理", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, InvestorUser investorUser)
+    public void export(HttpServletResponse response, SysUser investorUser)
     {
-        List<InvestorUser> list = investorUserService.selectInvestorUserList(investorUser);
-        ExcelUtil<InvestorUser> util = new ExcelUtil<InvestorUser>(InvestorUser.class);
+        List<SysUser> list = investorUserService.selectInvestorUserList(investorUser);
+        ExcelUtil<SysUser> util = new ExcelUtil<SysUser>(SysUser.class);
         util.exportExcel(response, list, "医院用户数据");
     }
 
