@@ -38,9 +38,6 @@ public class InvestorUserController extends BaseController
     @Autowired
     private SysUserMapper sysUserMapper;
 
-    @Autowired
-    private ISysUserService sysUserService;
-
     /**
      * 查询投资人管理列表
      */

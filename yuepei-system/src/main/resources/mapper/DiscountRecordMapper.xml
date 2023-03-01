@@ -36,6 +36,8 @@
         <result property="threshold" column="threshold"/>
         <result property="status" column="status"/>
         <result property="grantTime" column="grant_time"/>
+        <result property="integral" column="integral"/>
+        <result property="isJyb" column="is_jyb"/>
     </resultMap>
 
     <sql id="selectDiscountRecordVo">

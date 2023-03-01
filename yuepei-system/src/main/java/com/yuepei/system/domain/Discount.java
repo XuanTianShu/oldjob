@@ -116,6 +116,48 @@ public class Discount extends BaseEntity
         return integral;
     }
 
+    /** 1积分兑换券2优惠券 */
+    @Excel(name = "1积分兑换券2优惠券")
+    private Long isJyb;
+
+    /** 积分 */
+    @Excel(name = "积分")
+    private Long integral;
+
+    /** 门槛名称 */
+    @Excel(name = "门槛名称")
+    private String thresholdName;
+
+    /** 医院编号 */
+    @Excel(name = "医院编号")
+    private Long hospitalId;
+
+    public void setHospitalId(Long hospitalId){
+        this.hospitalId = hospitalId;
+    }
+
+    public Long getHospitalId(){
+        return hospitalId;
+    }
+
+    public void setThresholdName(String thresholdName){
+        this.thresholdName = thresholdName;
+    }
+
+    public String getThresholdName(){
+        return thresholdName;
+    }
+
+    public void setIntegral(Long integral)
+    {
+        this.integral = integral;
+    }
+
+    public Long getIntegral()
+    {
+        return integral;
+    }
+
     public void setId(Long id)
     {
         this.id = id;
