@@ -66,17 +66,32 @@ public class MyLeaseOrderController {
 //        return AjaxResult.success(myLeaseOrderService.leaseOrderList(userLeaseOrder));
     }
 
+    /**
+     * 新增租赁订单
+     * @param request
+     * @param rows
+     * @param userLeaseOrder
+     * @return
+     */
     @PostMapping("/insertUserLeaseOrder")
     public AjaxResult insertUserLeaseOrder(HttpServletRequest request, String rows, @RequestBody UserLeaseOrder userLeaseOrder){
         SysUser user = tokenUtils.analysis(request);
         return AjaxResult.success(myLeaseOrderService.insertUserLeaseOrder(user.getOpenid(),rows,userLeaseOrder));
     }
 
+
+    //FIXME 已废弃
     @GetMapping("/checkLeaseOrder")
     public AjaxResult checkLeaseOrder(String deviceNumber) {
         return AjaxResult.success(userDepositOrderMapper.checkLeaseOrderByOpenId(deviceNumber));
     }
 
+    /**
+     * 更新租赁订单
+     * @param request
+     * @param userLeaseOrder
+     * @return
+     */
     @PostMapping("/updateLeaseOrderStatus")
     public AjaxResult updateLeaseOrderStatus(HttpServletRequest request,UserLeaseOrder userLeaseOrder){
         SysUser user = tokenUtils.analysis(request);

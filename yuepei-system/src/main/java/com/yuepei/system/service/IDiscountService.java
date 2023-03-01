@@ -1,5 +1,7 @@
 package com.yuepei.system.service;
 
+import com.yuepei.common.core.domain.AjaxResult;
+import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.Discount;
 
 import java.util.List;
@@ -59,4 +61,12 @@ public interface IDiscountService
      * @return 结果
      */
     public int deleteDiscountById(Long id);
+
+    /**
+     * 用户兑换优惠券
+     * @param discountId 优惠券编号
+     * @param user 用户
+     * @return
+     */
+    AjaxResult updateUserIntegral(Long discountId, SysUser user);
 }

@@ -150,20 +150,17 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
                     hashMap.put("couponPrice",userCoupon.getDiscountAmount() * 100 );
                 }
                 redisCache.setCacheMap(userLeaseOrder.getOrderNumber(),hashMap);
-
-
                 //修改租赁订单状态
-                UserLeaseOrder userOrder = new UserLeaseOrder();
-                userOrder.setOrderNumber(userLeaseOrder.getOrderNumber());
-                userOrder.setStatus(String.valueOf(DictionaryEnum.ORDER_STATUS_2.getCode()));
-                userOrder.setCreateTime(new Date());
+//                UserLeaseOrder userOrder = new UserLeaseOrder();
+//                userOrder.setOrderNumber(userLeaseOrder.getOrderNumber());
+//                userOrder.setCreateTime(new Date());
                 //租借时长
 //                userOrder.setPlayTime();
-                BigDecimal divide = new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100), 2);
+//                BigDecimal divide = new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100), 2);
 //                userOrder.setNetAmount(Long.parseLong(String.valueOf(divide)));
-                userOrder.setNetAmount(Long.parseLong(price.toString()));
-                userOrder.setRestoreTime(new Date());
-                userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userOrder);
+//                userOrder.setNetAmount(Long.parseLong(price.toString()));
+//                userOrder.setRestoreTime(new Date());
+//                userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userOrder);
             }else {
                 return AjaxResult.error(pay.get("message"));
             }

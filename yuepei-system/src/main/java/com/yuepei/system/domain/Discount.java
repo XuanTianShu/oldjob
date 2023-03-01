@@ -54,6 +54,48 @@ public class Discount extends BaseEntity
     @Excel(name = "是否为新人优惠券")
     private Long isStatus;
 
+    /** 1积分兑换券2优惠券 */
+    @Excel(name = "1积分兑换券2优惠券")
+    private Long isJyb;
+
+    /** 积分 */
+    @Excel(name = "积分")
+    private Long integral;
+
+    /** 门槛名称 */
+    @Excel(name = "门槛名称")
+    private String thresholdName;
+
+    /** 医院编号 */
+    @Excel(name = "医院编号")
+    private Long hospitalId;
+
+    public void setHospitalId(Long hospitalId){
+        this.hospitalId = hospitalId;
+    }
+
+    public Long getHospitalId(){
+        return hospitalId;
+    }
+
+    public void setThresholdName(String thresholdName){
+        this.thresholdName = thresholdName;
+    }
+
+    public String getThresholdName(){
+        return thresholdName;
+    }
+
+    public void setIntegral(Long integral)
+    {
+        this.integral = integral;
+    }
+
+    public Long getIntegral()
+    {
+        return integral;
+    }
+
     public void setId(Long id)
     {
         this.id = id;
@@ -136,17 +178,31 @@ public class Discount extends BaseEntity
         return isStatus;
     }
 
+    public void setIsJyb(Long isJyb)
+    {
+        this.isJyb = isJyb;
+    }
+
+    public Long getIsJyb()
+    {
+        return isJyb;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
                 .append("id", getId())
                 .append("discountName", getDiscountName())
                 .append("money", getMoney())
+                .append("isJyb", getIsJyb())
                 .append("thresholdId", getThresholdId())
                 .append("period", getPeriod())
                 .append("status", getStatus())
                 .append("sentNum", getSentNum())
+                .append("integral", getIntegral())
+                .append("thresholdName",getThresholdName())
                 .append("unbilledNum", getUnbilledNum())
+                .append("hospitalId",getHospitalId())
                 .append("isStatus", getIsStatus())
                 .append("createTime", getCreateTime())
                 .append("updateTime", getUpdateTime())

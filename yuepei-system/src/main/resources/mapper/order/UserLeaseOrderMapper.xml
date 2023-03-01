@@ -39,6 +39,7 @@
         <result property="netAmount" column="net_amount"/>
         <result property="leaseTime" column="lease_time"/>
         <result property="nickName" column="nick_name"/>
+        <result property="agentName" column="agentName"/>
         <result property="payType" column="pay_type"/>
         <result property="playTime" column="play_time"/>
         <result property="restoreAddress" column="restore_address"/>
@@ -51,14 +52,17 @@
 
     <sql id="selectLeaseOrderVO">
         SELECT lo.id,u.`nick_name`,d.`device_type_id`, lo.order_number,
-        lo.device_number, lo.device_type, lo.lease_time,
-        lo.lease_address, h.`hospital_name`,
-        lo.restore_time, lo.restore_address, lo.price, lo.pay_type,
-        lo.net_amount, lo.coupon_price, lo.`status`,
-        lo.play_time,lo.create_time FROM user_lease_order AS lo
-        INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`
-        INNER JOIN device AS d ON d.`device_number` = lo.`device_number`
-        INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
+               lo.device_number, lo.device_type, lo.lease_time,
+               lo.lease_address, h.`hospital_name`,
+               lo.restore_time, lo.restore_address, lo.price, lo.pay_type,
+               lo.net_amount, lo.coupon_price, lo.`status`,su.`nick_name` AS agentName,
+               lo.play_time,lo.create_time FROM user_lease_order AS lo
+               INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`
+               INNER JOIN device AS d ON d.`device_number` = lo.`device_number`
+               INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
+               INNER JOIN agent_hospital AS ah ON ah.`hospital_id` = h.`hospital_id`
+               INNER JOIN sys_user AS su ON su.`user_id` = ah.`agent_id`
+        GROUP BY lo.`id`
     </sql>
 
     <select id="leaseOrderList" parameterType="LeaseOrderVO" resultMap="LeaseOrderResult">

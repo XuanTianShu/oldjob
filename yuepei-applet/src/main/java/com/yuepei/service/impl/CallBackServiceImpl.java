@@ -2,7 +2,6 @@ package com.yuepei.service.impl;
 import com.alibaba.fastjson2.JSONObject;
 import com.wechat.pay.contrib.apache.httpclient.util.AesUtil;
 import com.yuepei.common.core.domain.AjaxResult;
-import com.yuepei.common.core.domain.entity.SysDept;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.core.redis.RedisCache;
 import com.yuepei.common.utils.DateUtils;
@@ -294,7 +293,7 @@ public class CallBackServiceImpl implements CallBackService {
                 userLeaseOrder.setNetAmount(price);
                 //付款时间
                 userLeaseOrder.setCreateTime(time);
-                //订单号
+                //支付流水号
                 userLeaseOrder.setOrderNumber(out_trade_no);
                 //支付方式
                 userLeaseOrder.setPayType("1");
