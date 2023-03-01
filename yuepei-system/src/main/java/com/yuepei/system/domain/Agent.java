@@ -21,6 +21,9 @@ public class Agent {
      * */
     private String agentName;
 
+    /**主代理账号*/
+    private String userName;
+
     /**
      * 创建时间
      * */

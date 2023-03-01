@@ -1,13 +1,8 @@
 package com.yuepei.web.hospital.service;
 
 import com.yuepei.common.core.domain.AjaxResult;
-import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.DeviceType;
-import com.yuepei.system.domain.UserLeaseOrder;
-import com.yuepei.system.domain.vo.DeviceDetailsVo;
-import com.yuepei.system.domain.vo.GoodsOrderVo;
-import com.yuepei.system.domain.vo.RevenueStatisticsVo;
-import com.yuepei.system.domain.vo.UserLeaseOrderVo;
+import com.yuepei.system.domain.vo.*;
 
 import java.util.List;
 
@@ -31,7 +26,7 @@ public interface HospitalDeviceService {
 
     UserLeaseOrderVo selectLeaseOrderDetails(String orderNumber);
 
-    List<UserLeaseOrderVo> selectRevenueStatistics(Long hospitalId, int statistics);
+    TotalVo selectRevenueStatistics(String userName, int statistics);
 
     AjaxResult loginHospitalPort(String userName, String password);
 }

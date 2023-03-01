@@ -1,5 +1,6 @@
 package com.yuepei.web.agent.service.impl;
 
+import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.system.domain.*;
@@ -11,7 +12,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -121,10 +121,16 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo) {
+    public String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo,String userName) {
         AgentHospital agentHospital = agentMapper.selectAgentHospital(hospitalAgentVo.getHospitalId());
+        SysUser su = sysUserMapper.selectUserByUserName(userName);
+        Agent agent = agentMapper.selectAgentByUserName(su.getUserName());
+        if (su.getParentId()!=0){
+            SysUser userById = sysUserMapper.selectUserById(su.getParentId());
+            agent = agentMapper.selectAgentByUserName(userById.getUserName());
+        }
         if (agentHospital!=null){
-            if (agentHospital.getAgentId()==hospitalAgentVo.getAgentId()){
+            if (agentHospital.getAgentId()==agent.getAgentId()){
                 return "该医院已被您代理";
             }
             return "该医院已被其他代理商代理";
@@ -134,7 +140,7 @@ public class AgentServiceImpl implements AgentService {
             return "该账号已被使用,请重新输入账号";
         }
         //添加代理商和医院关联信息
-        agentMapper.insertAgentHospital(hospitalAgentVo.getAgentId(),hospitalAgentVo.getHospitalId());
+        agentMapper.insertAgentHospital(agent.getAgentId(),hospitalAgentVo.getHospitalId());
         SysUser sysUser = new SysUser();
         //添加用户信息
         sysUser.setUserName(hospitalAgentVo.getAccountNumber());
@@ -175,7 +181,11 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public String insertAgentAccount(SysUser sysUser,Long userId) {
+    public AjaxResult insertAgentAccount(SysUser sysUser, Long userId) {
+        SysUser user = sysUserMapper.selectUserByUserName(sysUser.getUserName());
+        if (user.getUserName()==sysUser.getUserName()){
+            return AjaxResult.error("该账号已被使用,请重新输入");
+        }
 
         return null;
     }

@@ -1,7 +1,7 @@
 package com.yuepei.web.agent.service;
 
+import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
-import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.*;
 
 import java.util.List;
@@ -18,11 +18,11 @@ public interface AgentService {
 
     List<HospitalManagementVo> selectHospitalAdministration(Long userId);
 
-    String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo);
+    String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo,String userName);
 
     List<UserLeaseOrderVo> selectLeaseOrder(Long userId);
 
-    String insertAgentAccount(SysUser sysUser,Long userId);
+    AjaxResult insertAgentAccount(SysUser sysUser, Long userId);
 
 //    List<FaultVo> selectDeviceFaultList(Long userId);
 }

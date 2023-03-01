@@ -83,7 +83,7 @@ public class HospitalDeviceController {
     @GetMapping("/selectLeaseOrder")
     public AjaxResult selectLeaseOrder(HttpServletRequest request){
         SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(hospitalDeviceService.selectLeaseOrder("ohy"));
+        return AjaxResult.success(hospitalDeviceService.selectLeaseOrder(analysis.getUserName()));
     }
 
     /**
@@ -96,9 +96,10 @@ public class HospitalDeviceController {
 
     /**医院营收统计*/
     @GetMapping("/selectRevenueStatistics")
-    public AjaxResult selectRevenueStatistics(@RequestParam("hospitalId")Long hospitalId,
-                                              @RequestParam("statistics")int statistics){
-        return AjaxResult.success(hospitalDeviceService.selectRevenueStatistics(hospitalId,statistics));
+    public AjaxResult selectRevenueStatistics(@RequestParam("statistics")int statistics,
+                                              HttpServletRequest request){
+        SysUser user = tokenUtils.analysis(request);
+        return AjaxResult.success(hospitalDeviceService.selectRevenueStatistics("ohy", statistics));
     }
 
 }

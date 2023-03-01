@@ -64,8 +64,10 @@ public class AgentController {
 
     /**代理端添加医院*/
     @PostMapping("/addHospitalByAgent")
-    private AjaxResult addHospitalByAgent(@RequestBody HospitalAgentVo hospitalAgentVo){
-        return AjaxResult.success(agentService.insertHospitalByAgent(hospitalAgentVo));
+    private AjaxResult addHospitalByAgent(@RequestBody HospitalAgentVo hospitalAgentVo,
+                                          HttpServletRequest request){
+        SysUser user = tokenUtils.analysis(request);
+        return AjaxResult.success(agentService.insertHospitalByAgent(hospitalAgentVo,user.getUserName()));
     }
 
     /**代理端租借订单*/
