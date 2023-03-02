@@ -1,12 +1,14 @@
 package com.yuepei.web.controller.peoples.investor;
 
 import com.yuepei.common.annotation.Log;
+import com.yuepei.common.constant.UserConstants;
 import com.yuepei.common.core.controller.BaseController;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.common.enums.BusinessType;
 import com.yuepei.common.utils.SecurityUtils;
+import com.yuepei.common.utils.StringUtils;
 import com.yuepei.common.utils.poi.ExcelUtil;
 import com.yuepei.framework.web.domain.server.Sys;
 import com.yuepei.system.domain.InvestorUser;
@@ -34,7 +36,7 @@ public class InvestorUserController extends BaseController
     private IInvestorUserService investorUserService;
 
     @Autowired
-    private SysUserMapper sysUserMapper;
+    private ISysUserService userService;
 
     /**
      * 查询投资人管理列表
@@ -80,9 +82,21 @@ public class InvestorUserController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody SysUser user)
     {
-        user.setUserType("03");
-        user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
-        return toAjax(sysUserMapper.insertUser(user));
+        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user)))
+        {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
+        }
+        else if (StringUtils.isNotEmpty(user.getPhoneNumber())
+                && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
+        {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+        }
+        else if (StringUtils.isNotEmpty(user.getEmail())
+                && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
+        {
+            return AjaxResult.error("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+        }
+        return toAjax(userService.insertUser(user));
     }
 
     /**
@@ -91,9 +105,26 @@ public class InvestorUserController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:investorUser:edit')")
     @Log(title = "投资人管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody InvestorUser investorUser)
+    public AjaxResult edit(@RequestBody SysUser user)
     {
-        return toAjax(investorUserService.updateInvestorUser(investorUser));
+        userService.checkUserAllowed(user);
+        userService.checkUserDataScope(user.getUserId());
+        if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user)))
+        {
+            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
+        }
+        else if (StringUtils.isNotEmpty(user.getPhoneNumber())
+                && UserConstants.NOT_UNIQUE.equals(userService.checkPhoneUnique(user)))
+        {
+            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
+        }
+        else if (StringUtils.isNotEmpty(user.getEmail())
+                && UserConstants.NOT_UNIQUE.equals(userService.checkEmailUnique(user)))
+        {
+            return AjaxResult.error("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+        }
+        user.setUpdateBy(getUsername());
+        return toAjax(userService.updateUser(user));
     }
 
     /**

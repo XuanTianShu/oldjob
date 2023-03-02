@@ -11,6 +11,7 @@ import com.yuepei.common.utils.bean.BeanValidators;
 import com.yuepei.common.utils.qrCode.QrCodeUtil;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.DeviceRule;
+import com.yuepei.system.domain.DeviceType;
 import com.yuepei.system.domain.pojo.DevicePo;
 import com.yuepei.system.domain.vo.DeviceVO;
 import com.yuepei.system.domain.vo.HospitalRuleVO;
@@ -61,6 +62,9 @@ public class DeviceServiceImpl implements DeviceService {
 
     @Autowired
     private DeviceMapper deviceMapper;
+
+    @Autowired
+    private DeviceTypeMapper deviceTypeMapper;
 
 
     @Value("${yuepei.profile}")
@@ -241,8 +245,10 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public DeviceVO selectDeviceInfoByDeviceNumber(String deviceNumber) {
         DeviceVO device = deviceMapper.selectDeviceInfoByDeviceNumber(deviceNumber);
-        List<HospitalRuleVO> deviceRules = JSON.parseArray(device.getHospitalRule(), HospitalRuleVO.class);
-        device.setDeviceRules(deviceRules);
+        if (device.getHospitalRule() != null){
+            List<HospitalRuleVO> deviceRules = JSON.parseArray(device.getHospitalRule(), HospitalRuleVO.class);
+            device.setDeviceRules(deviceRules);
+        }
         return device;
     }
 

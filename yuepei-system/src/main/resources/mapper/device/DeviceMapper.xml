@@ -19,6 +19,7 @@
         <result property="status"    column="status"    />
         <result property="deviceIotNumber"    column="device_iot_number"    />
         <result property="deviceMac"    column="device_mac"    />
+        <result property="investorId" column="investor_id"/>
     </resultMap>
 
     <resultMap id="DeviceRuleResult" type="com.yuepei.system.domain.vo.DeviceVO">
@@ -42,7 +43,9 @@
 
 
     <sql id="selectDeviceVo">
-        select device_id, device_type_id, device_number,device_iot_number,device_mac,device_deposit, billing_id,hospital_id, device_qR_code, device_address, device_full_address,`rows`,heart_time, create_time, status from device
+        select device_id, device_type_id, device_number,device_iot_number,device_mac,
+               device_deposit, billing_id,hospital_id, device_qR_code, device_address,
+               device_full_address,`rows`,heart_time, create_time, status,investor_id from device
     </sql>
 
     <select id="selectDeviceList" parameterType="Device" resultMap="DeviceResult">
@@ -57,6 +60,7 @@
             <if test="deviceFullAddress != null  and deviceFullAddress != ''"> and device_full_address = #{deviceFullAddress}</if>
             <if test="heartTime != null "> and heart_time = #{heartTime}</if>
             <if test="status != null "> and status = #{status}</if>
+            <if test="investorId != null and investorId != ''"> and investor_id = #{investorId}</if>
         </where>
     </select>
 
@@ -77,7 +81,7 @@
                d.device_full_address,d.`rows`,d.heart_time,
                d.`status`,h.hospital_id,h.hospital_name,
                h.hospital_rule FROM device AS d
-        INNER JOIN hospital AS h ON d.`hospital_id` = h.hospital_id
+        left JOIN hospital AS h ON d.`hospital_id` = h.hospital_id
         WHERE d.device_number = #{deviceNumber}
     </select>
 
@@ -112,6 +116,7 @@
             <if test="heartTime != null">heart_time,</if>
             <if test="createTime != null">create_time,</if>
             <if test="status != null">status,</if>
+            <if test="investorId != null">investor_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="deviceTypeId != null">#{deviceTypeId},</if>
@@ -128,6 +133,7 @@
             <if test="heartTime != null">#{heartTime},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="status != null">#{status},</if>
+            <if test="investorId != null">#{investorId},</if>
         </trim>
     </insert>
 
@@ -148,6 +154,7 @@
             <if test="heartTime != null">heart_time = #{heartTime},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="status != null">status = #{status},</if>
+            <if test="investorId != null and investorId != ''">investor_id = #{investorId},</if>
         </trim>
         where device_id = #{deviceId}
     </update>

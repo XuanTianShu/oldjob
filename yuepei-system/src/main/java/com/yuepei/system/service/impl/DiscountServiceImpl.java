@@ -151,7 +151,7 @@ public class DiscountServiceImpl implements IDiscountService
                 BigDecimal bigDecimal = new BigDecimal(discount.getIntegral());
                 userIntegralBalanceDepositVo.setSum(bigDecimal);
                 userIntegralBalanceDepositVo.setCreateTime(new Date());
-                userIntegralBalanceDepositVo.setStatus(1);
+                userIntegralBalanceDepositVo.setStatus(2);
                 userIntegralOrderMapper.insertUserIntegralOrder(userIntegralBalanceDepositVo);
 
                 //添加优惠券到用户卡包

@@ -20,6 +20,7 @@
         <result property="integral"    column="integral"    />
         <result property="thresholdName"         column="threshold_name"/>
         <result property="hospitalId" column="hospital_id"/>
+        <result property="hospitalName" column="hospital_name"/>
     </resultMap>
 
     <sql id="selectDiscountVo">
@@ -29,8 +30,9 @@
     </sql>
 
     <sql id="selectJYBVo">
-        SELECT d.id, d.discount_name, d.money, d.threshold_id, d.period, d.status,d.hospital_id,
+        SELECT d.id, d.discount_name, d.money, d.threshold_id, d.period, d.status,d.hospital_id,h.`hospital_name`,
                d.sent_num, d.unbilled_num, d.is_status, d.create_time,d.integral,d.is_jyb, d.update_time FROM discount AS d
+        INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
     </sql>
 
     <select id="selectDiscountList" parameterType="Discount" resultMap="DiscountResult">

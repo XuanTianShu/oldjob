@@ -12,6 +12,7 @@ import com.yuepei.system.mapper.UserLeaseOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -66,7 +67,11 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
         //创建订单号
         if(userLeaseOrder.getOrderNumber() == null ){
             //创建订单
-            String orderNumber = UUID.randomUUID().toString().replace("-", "");
+//            String orderNumber = UUID.randomUUID().toString().replace("-", "");
+
+            String uuid = String.format("%040d", new BigInteger(UUID.randomUUID().toString().replace("-", ""), 16));
+            String orderNumber = uuid.substring(uuid.length() - 16);
+
             Device device = deviceMapper.selectDeviceByDeviceNumber(userLeaseOrder.getDeviceNumber());
             DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(device.getDeviceTypeId());
             userLeaseOrder.setDeviceType(deviceType.getDeviceTypeName());
