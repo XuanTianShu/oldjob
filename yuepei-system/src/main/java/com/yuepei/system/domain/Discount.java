@@ -3,6 +3,7 @@ package com.yuepei.system.domain;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.yuepei.common.annotation.Excel;
 import com.yuepei.common.core.domain.BaseEntity;
+import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -15,6 +16,7 @@ import java.util.Date;
  * @author ohy
  * @date 2023-02-27
  */
+@Data
 public class Discount extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -131,6 +133,8 @@ public class Discount extends BaseEntity
     /** 医院编号 */
     @Excel(name = "医院编号")
     private Long hospitalId;
+
+    private String hospitalName;
 
     public void setHospitalId(Long hospitalId){
         this.hospitalId = hospitalId;

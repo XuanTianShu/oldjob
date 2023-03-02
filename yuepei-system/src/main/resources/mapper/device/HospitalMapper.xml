@@ -26,6 +26,7 @@
     <select id="selectHospitalList" parameterType="Hospital" resultMap="HospitalResult">
         <include refid="selectHospitalVo"/>
         <where>
+            <if test="hospitalId != null"> and hospital_id = #{hospitalId}</if>
             <if test="hospitalName != null  and hospitalName != ''"> and hospital_name like concat('%', #{hospitalName}, '%')</if>
             <if test="parentId != null "> and parent_id = #{parentId}</if>
             <if test="hospitalRule != null  and hospitalRule != ''"> and hospital_rule = #{hospitalRule}</if>
@@ -51,6 +52,7 @@
         <where>
             <if test="hospitalName != null and hospitalName != ''"> and hospital_name = #{hospitalName}</if>
             <if test="hospitalId != null"> and hospital_id != #{hospitalId}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
         </where>
     </select>
 
@@ -73,6 +75,7 @@
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="hospitalName != null">#{hospitalName},</if>
+            <if test="parentId != null">#{parentId},</if>
             <if test="hospitalRule != null and hospitalRule != ''">#{hospitalRule},</if>
         </trim>
     </insert>
@@ -80,6 +83,7 @@
     <update id="updateHospital" parameterType="Hospital">
         update hospital
         <trim prefix="SET" suffixOverrides=",">
+            <if test="parentId != null">parent_id = #{parentId},</if>
             <if test="hospitalName != null">hospital_name = #{hospitalName},</if>
             <if test="parentId != null">parent_id = #{parentId},</if>
             <if test="hospitalRule != null">hospital_rule = #{hospitalRule},</if>
