@@ -80,4 +80,6 @@ public interface IUserDiscountService
      * @return
      */
     List<UserDiscount> selectMyDiscountByOpenId(String openid,UserDiscount userDiscount);
+
+    List<UserDiscount> selectMyDiscountByOpenId(String openid);
 }
