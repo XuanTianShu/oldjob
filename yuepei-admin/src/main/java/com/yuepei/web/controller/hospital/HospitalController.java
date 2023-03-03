@@ -173,12 +173,6 @@ public class HospitalController extends BaseController {
     @PostMapping
     public AjaxResult add(@RequestBody Hospital hospital)
     {
-        if (hospital.getHospitalName() != null){
-            boolean b = hospitalService.checkHospitalName(hospital.getHospitalName(),null);
-            if (b){
-                return AjaxResult.error(ResultEnum.CODE_58.getMsg());
-            }
-        }
         return toAjax(hospitalService.insertHospital(hospital));
     }
 
@@ -190,12 +184,6 @@ public class HospitalController extends BaseController {
     @PutMapping
     public AjaxResult edit(@RequestBody Hospital hospital)
     {
-        if (hospital.getHospitalName() != null){
-            boolean b = hospitalService.checkHospitalName(hospital.getHospitalName(),hospital.getHospitalId());
-            if (b){
-                return AjaxResult.error(ResultEnum.CODE_61.getMsg());
-            }
-        }
         return toAjax(hospitalService.updateHospital(hospital));
     }
 
@@ -207,10 +195,6 @@ public class HospitalController extends BaseController {
     @DeleteMapping("/{hospitalIds}")
     public AjaxResult remove(@PathVariable Long[] hospitalIds)
     {
-        boolean b = deviceService.checkDeviceByHospitalId(hospitalIds);
-        if (b){
-            return AjaxResult.error(DictionaryEnum.CHECK_TYPE.getName());
-        }
         return toAjax(hospitalService.deleteHospitalByHospitalIds(hospitalIds));
     }
 }

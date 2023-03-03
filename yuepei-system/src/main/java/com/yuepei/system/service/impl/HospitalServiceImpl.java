@@ -1,5 +1,6 @@
 package com.yuepei.system.service.impl;
 
+import com.yuepei.common.utils.DateUtils;
 import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.mapper.HospitalMapper;
 import com.yuepei.system.service.HospitalService;
@@ -76,6 +77,7 @@ public class HospitalServiceImpl implements HospitalService {
     @Override
     public int insertHospital(Hospital hospital)
     {
+        hospital.setCreateTime(DateUtils.getNowDate());
         return hospitalMapper.insertHospital(hospital);
     }
 
@@ -88,6 +90,7 @@ public class HospitalServiceImpl implements HospitalService {
     @Override
     public int updateHospital(Hospital hospital)
     {
+        hospital.setUpdateTime(DateUtils.getNowDate());
         return hospitalMapper.updateHospital(hospital);
     }
 
@@ -113,19 +116,5 @@ public class HospitalServiceImpl implements HospitalService {
     public int deleteHospitalByHospitalId(Long hospitalId)
     {
         return hospitalMapper.deleteHospitalByHospitalId(hospitalId);
-    }
-
-    /**
-     * 是否存在该医院
-     * @param hospitalName 医院名称
-     * @return
-     */
-    @Override
-    public boolean checkHospitalName(String hospitalName,Long hospitalId) {
-        int i = hospitalMapper.checkHospitalName(hospitalName,hospitalId);
-        if (i > 0){
-            return true;
-        }
-        return false;
     }
 }

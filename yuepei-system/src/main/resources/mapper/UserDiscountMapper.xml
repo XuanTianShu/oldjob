@@ -36,6 +36,10 @@
         <include refid="selectUserDiscountVo"/>
         where Id = #{id}
     </select>
+    <select id="selectMyDiscountByOpenId" resultMap="UserDiscountResult">
+        SELECT ud.`Id`,ud.`user_id`,ud.`threshold_name`,ud.`price`,ud.`full`,ud.`expire_time`,ud.`status`,ud.`create_time`,ud.`update_time` FROM
+            `user_discount` AS ud INNER JOIN sys_user AS su ON su.`user_id` = ud.`user_id` WHERE su.`openid` = #{openid}
+    </select>
 
     <insert id="insertUserDiscount" parameterType="UserDiscount" useGeneratedKeys="true" keyProperty="id">
         insert into user_discount

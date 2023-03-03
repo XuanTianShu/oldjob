@@ -4,6 +4,8 @@ import com.yuepei.common.annotation.Excel;
 import com.yuepei.common.core.domain.BaseEntity;
 import com.yuepei.common.core.domain.TreeEntity;
 import lombok.Data;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * 　　　　 ┏┓       ┏┓+ +
@@ -32,17 +34,57 @@ import lombok.Data;
  * @author ：AK
  * @create ：2022/11/8 10:00
  **/
-@Data
 public class Hospital extends TreeEntity {
     private static final long serialVersionUID = 1L;
 
+    /** 主键 */
     private Long hospitalId;
 
+    /** 名称 */
+    @Excel(name = "名称")
     private String hospitalName;
 
+    /**  */
+    @Excel(name = "")
     private String hospitalRule;
 
-    /** 父级id */
-    @Excel(name = "父级id")
-    private Long parentId;
+    public void setHospitalId(Long hospitalId)
+    {
+        this.hospitalId = hospitalId;
+    }
+
+    public Long getHospitalId()
+    {
+        return hospitalId;
+    }
+    public void setHospitalName(String hospitalName)
+    {
+        this.hospitalName = hospitalName;
+    }
+
+    public String getHospitalName()
+    {
+        return hospitalName;
+    }
+    public void setHospitalRule(String hospitalRule)
+    {
+        this.hospitalRule = hospitalRule;
+    }
+
+    public String getHospitalRule()
+    {
+        return hospitalRule;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
+                .append("hospitalId", getHospitalId())
+                .append("hospitalName", getHospitalName())
+                .append("parentId", getParentId())
+                .append("hospitalRule", getHospitalRule())
+                .append("createTime", getCreateTime())
+                .append("updateTime", getUpdateTime())
+                .toString();
+    }
 }

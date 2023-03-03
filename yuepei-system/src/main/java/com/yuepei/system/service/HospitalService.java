@@ -80,11 +80,4 @@ public interface HospitalService {
      * @return 结果
      */
     public int deleteHospitalByHospitalId(Long hospitalId);
-
-    /**
-     * 是否存在该医院
-     * @param hospitalName 医院名称
-     * @return
-     */
-    boolean checkHospitalName(String hospitalName,Long hospitalId);
 }

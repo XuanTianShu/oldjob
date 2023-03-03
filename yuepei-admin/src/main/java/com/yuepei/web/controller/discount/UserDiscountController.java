@@ -3,15 +3,18 @@ package com.yuepei.web.controller.discount;
 import com.yuepei.common.annotation.Log;
 import com.yuepei.common.core.controller.BaseController;
 import com.yuepei.common.core.domain.AjaxResult;
+import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.common.enums.BusinessType;
 import com.yuepei.common.utils.poi.ExcelUtil;
 import com.yuepei.system.domain.UserDiscount;
 import com.yuepei.system.service.IUserDiscountService;
+import com.yuepei.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -27,6 +30,9 @@ public class UserDiscountController extends BaseController
 {
     @Autowired
     private IUserDiscountService userDiscountService;
+    @Autowired
+    private TokenUtils tokenUtils;
+
 
     /**
      * 查询用户卡包列表
@@ -38,6 +44,17 @@ public class UserDiscountController extends BaseController
         startPage();
         List<UserDiscount> list = userDiscountService.selectUserDiscountList(userDiscount);
         return getDataTable(list);
+    }
+
+    /**
+     * 查询用户的卡包
+     * @return
+     */
+    @PostMapping("/selectMyDiscountByOpenId")
+    public TableDataInfo selectMyDiscountByOpenId(HttpServletRequest request){
+        startPage();
+        SysUser user = tokenUtils.analysis(request);
+        return getDataTable(userDiscountService.selectMyDiscountByOpenId(user.getOpenid()));
     }
 
     /**

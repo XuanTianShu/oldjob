@@ -76,4 +76,11 @@ public interface UserDiscountMapper
                           @Param("discountThreshold") DiscountThreshold discountThreshold,
                           @Param("parse") Date parse, @Param("parse1") Date parse1,
                           @Param("money") BigDecimal money);
+
+    /**
+     * 查看用户的卡包
+     * @param openid
+     * @return
+     */
+    List<UserDiscount> selectMyDiscountByOpenId(@Param("openid") String openid);
 }

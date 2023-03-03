@@ -110,4 +110,9 @@ public class UserDiscountServiceImpl implements IUserDiscountService
     public void sendUserDiscount(Long[] userId, DiscountThreshold discountThreshold, Date parse, Date parse1, BigDecimal money) {
         userDiscountMapper.sendUserDiscount(userId,discountThreshold,parse,parse1,money);
     }
+
+    @Override
+    public List<UserDiscount> selectMyDiscountByOpenId(String openid) {
+        return userDiscountMapper.selectMyDiscountByOpenId(openid);
+    }
 }

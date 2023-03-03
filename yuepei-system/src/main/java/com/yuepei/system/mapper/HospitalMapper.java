@@ -80,11 +80,4 @@ public interface HospitalMapper {
      * @return 结果
      */
     public int deleteHospitalByHospitalIds(Long[] hospitalIds);
-
-    /**
-     * 是否存在该医院
-     * @param hospitalName 医院名称
-     * @return
-     */
-    int checkHospitalName(@Param("hospitalName") String hospitalName, @Param("hospitalId") Long hospitalId);
 }
