@@ -41,7 +41,7 @@ public class DeviceDetailsVo {
     /**
      * 设备楼层
      * */
-    private String deviceFllor;
+    private String deviceFloor;
 
     /**
      * 设备科室

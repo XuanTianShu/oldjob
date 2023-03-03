@@ -2,6 +2,7 @@ package com.yuepei.system.domain.vo;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -11,10 +12,10 @@ import java.util.List;
 @Data
 public class TotalVo {
     /**订单总金额*/
-    private Long orderAmount;
+    private BigDecimal orderAmount;
 
     /**分润总金额*/
-    private Long dividendAmount;
+    private BigDecimal dividendAmount;
 
     /**有效订单*/
     private int effectiveOrder;

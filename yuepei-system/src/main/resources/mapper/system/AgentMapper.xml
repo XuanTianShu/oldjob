@@ -45,6 +45,13 @@
         <include refid="selectAgentId"/>
         where user_name = #{userName}
     </select>
+    <select id="selectAgentByHospitalId" parameterType="agentHospital" resultMap="AgentHospitalResult">
+        select hospital_id,agent_id from agent_hospital where hospital_id=#{hospitalId}
+    </select>
+    <select id="selectAgent" parameterType="Agent" resultMap="AgentResult">
+        <include refid="selectAgentId"/>
+        where agent_id=#{agentId}
+    </select>
 
     <insert id="insertAgentHospital" parameterType="agentHospital">
         insert into agent_hospital (agent_id,hospital_id) values (#{agentId},#{hospitalId})

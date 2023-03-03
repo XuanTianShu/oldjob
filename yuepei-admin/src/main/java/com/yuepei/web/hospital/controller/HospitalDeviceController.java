@@ -48,17 +48,29 @@ public class HospitalDeviceController {
      * */
     @GetMapping("/selectDeviceTypeDetails")
     public AjaxResult selectDeviceTypeDetails(@RequestParam("deviceTypeId") Long deviceTypeId,
+                                              @RequestParam(value = "deviceDepartment",required = false,defaultValue = "") String deviceDepartment,
                                               HttpServletRequest request){
         SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(hospitalDeviceService.selectDeviceTypeDetails(deviceTypeId, analysis.getUserId()));
+        return AjaxResult.success(hospitalDeviceService.selectDeviceTypeDetails(deviceTypeId, analysis.getUserId(),deviceDepartment));
+    }
+
+    /**根据医院查询详细地址*/
+    @GetMapping("/selectDeviceAddress")
+    private AjaxResult selectDeviceAddress(@RequestParam("hospitalId")Long hospitalId){
+        return AjaxResult.success(hospitalDeviceService.selectDeviceAddress(hospitalId));
     }
 
     /**
      * 医院端设备详情编辑信息
      * */
-    @PostMapping("/updateDeviceDetails")
-    public AjaxResult updateDeviceDetails(@RequestBody DeviceDetailsVo deviceDetailsVo){
-        hospitalDeviceService.updateDeviceDetails(deviceDetailsVo);
+    @GetMapping("/updateDeviceDetails")
+    public AjaxResult updateDeviceDetails(@RequestParam(value = "floorId",required = false,defaultValue = "")Long floorId,
+                                          @RequestParam(value = "departmentId",required = false,defaultValue = "")Long departmentId,
+                                          @RequestParam(value = "roomId",required = false,defaultValue = "")Long roomId,
+                                          @RequestParam(value = "bedId",required = false,defaultValue = "")Long bedId,
+                                          @RequestParam(value = "deviceNumber",required = false,defaultValue = "")String deviceNumber
+                                          ){
+        hospitalDeviceService.updateDeviceDetails(floorId,departmentId,roomId,bedId,deviceNumber);
         return AjaxResult.success();
     }
 
@@ -77,13 +89,29 @@ public class HospitalDeviceController {
         return AjaxResult.success(hospitalDeviceService.selectOrderByOrderId(orderId));
     }
 
+    /**设备类型下拉框*/
+    @GetMapping("/selectDeviceTypeName")
+    public AjaxResult selectDeviceTypeName(){
+        return AjaxResult.success(hospitalDeviceService.selectDeviceTypeName());
+    }
+
+    /**选择科室下拉框*/
+    @GetMapping("/selectDepartment")
+    public AjaxResult selectDepartment(HttpServletRequest request){
+        SysUser analysis = tokenUtils.analysis(request);
+        return AjaxResult.success(hospitalDeviceService.selectDepartment(analysis.getUserName()));
+    }
+
     /**
      * 陪护床租借订单
      * */
     @GetMapping("/selectLeaseOrder")
-    public AjaxResult selectLeaseOrder(HttpServletRequest request){
+    public AjaxResult selectLeaseOrder(@RequestParam(value = "deviceDepartment",required = false,defaultValue = "") String deviceDepartment,
+                                       @RequestParam(value = "deviceTypeName",required = false,defaultValue = "") String deviceTypeName,
+                                       @RequestParam(value = "orderNumber",required = false,defaultValue = "") String orderNumber,
+                                       HttpServletRequest request){
         SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(hospitalDeviceService.selectLeaseOrder(analysis.getUserName()));
+        return AjaxResult.success(hospitalDeviceService.selectLeaseOrder("ohy",deviceDepartment,deviceTypeName,orderNumber));
     }
 
     /**

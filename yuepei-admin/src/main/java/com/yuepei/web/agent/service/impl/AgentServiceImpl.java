@@ -58,7 +58,7 @@ public class AgentServiceImpl implements AgentService {
             if (!device_full_address.isEmpty()) {
                 String[] split = device_full_address.split(",");
                 for (int j = 0; j < split.length; j++) {
-                    deviceDetailsVo.setDeviceFllor(split[0]);
+                    deviceDetailsVo.setDeviceFloor(split[0]);
                     deviceDetailsVo.setDeviceDepartment(split[1]);
                     deviceDetailsVo.setDeviceRoom(split[2]);
                     deviceDetailsVo.setDeviceBed(split[3]);
@@ -168,13 +168,13 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public List<UserLeaseOrderVo> selectLeaseOrder(Long userId) {
+    public List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String nameOrNumber) {
         Agent agent = agentMapper.selectAgentByAgentId(userId);
         List<UserLeaseOrderVo> userLeaseOrderList = new ArrayList<>();
         List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
         agentHospitals.stream().forEach(i->{
             SysUser user = sysUserMapper.selectUserById(userId);
-            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(user.getUserName());
+            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(user.getUserName(),deviceDepartment,deviceTypeName,nameOrNumber);
             userLeaseOrderList.addAll(userLeaseOrders);
         });
         return userLeaseOrderList;

@@ -2,6 +2,7 @@ package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.vo.DeviceDetailsVo;
+import com.yuepei.system.domain.vo.HospitalVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.parameters.P;
 
@@ -33,4 +34,14 @@ public interface HospitalDeviceMapper {
     String selectDeviceByDeviceAddress(@Param("hospitalId") Long hospitalId);
 
     HospitalUser selectHospitalbyUserName(@Param("userName") String userName);
+
+    DeviceType selectDeviceByType(@Param("deviceType") String deviceType);
+
+    List<Hospital> selectHospitalByParentId(@Param("hospitalId") Long hospitalId);
+
+    Device selectDeviceByTypeNumber(@Param("deviceNumber") String deviceNumber);
+
+    List<Device> selectDeviceByHospitalId(@Param("hospitalId") Long hospitalId);
+
+    List<DeviceType> selectDeviceTypeName();
 }

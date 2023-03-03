@@ -42,4 +42,7 @@ public class DeviceType {
     /** 设备类型名称 */
     private String deviceTypeName;
 
+    /** 设备类型押金*/
+    private Long deviceTypeDeposit;
+
 }

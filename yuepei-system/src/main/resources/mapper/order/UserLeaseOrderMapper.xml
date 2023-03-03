@@ -237,4 +237,9 @@
             <if test="outTradeNo != null and outTradeNo != ''">out_trade_no = #{outTradeNo},</if>
         </where>
     </select>
+    <select id="selectUserLeaseOrderByDeviceNumber" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where status=2
+        and device_number=#{deviceNumber}
+    </select>
 </mapper>

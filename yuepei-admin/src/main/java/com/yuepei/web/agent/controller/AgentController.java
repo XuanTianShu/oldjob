@@ -41,9 +41,14 @@ public class AgentController {
     /**
      * 编辑代理设备信息
      * */
-    @PostMapping("/updateDeviceDetails")
-    private AjaxResult updateDeviceDetails(@RequestBody DeviceDetailsVo deviceDetailsVo){
-        hospitalDeviceService.updateDeviceDetails(deviceDetailsVo);
+    @GetMapping("/updateDeviceDetails")
+    private AjaxResult updateDeviceDetails(@RequestParam(value = "floorId",required = false,defaultValue = "")Long floorId,
+                                           @RequestParam(value = "departmentId",required = false,defaultValue = "")Long departmentId,
+                                           @RequestParam(value = "roomId",required = false,defaultValue = "")Long roomId,
+                                           @RequestParam(value = "bedId",required = false,defaultValue = "")Long bedId,
+                                           @RequestParam(value = "deviceNumber",required = false,defaultValue = "")String deviceNumber
+    ){
+        hospitalDeviceService.updateDeviceDetails(floorId,departmentId,roomId,bedId,deviceNumber);
         return AjaxResult.success();
     }
 
@@ -72,9 +77,12 @@ public class AgentController {
 
     /**代理端租借订单*/
     @GetMapping("/selectLeaseOrder")
-    private AjaxResult selectLeaseOrder(HttpServletRequest request){
+    private AjaxResult selectLeaseOrder(@RequestParam(value = "deviceDepartment",required = false,defaultValue = "") String deviceDepartment,
+                                        @RequestParam(value = "deviceTypeName",required = false,defaultValue = "") String deviceTypeNamue,
+                                        @RequestParam(value = "nameOrNumber",required = false,defaultValue = "") String nameOrNumber,
+                                        HttpServletRequest request){
         SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(agentService.selectLeaseOrder(analysis.getUserId()));
+        return AjaxResult.success(agentService.selectLeaseOrder(analysis.getUserId(),deviceDepartment,deviceTypeNamue,nameOrNumber));
     }
 
     /**开通子账户*/

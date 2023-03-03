@@ -2,6 +2,7 @@ package com.yuepei.system.domain.vo;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -15,10 +16,10 @@ public class OrderVo {
     private String orderNumber;
 
     /** 实付金额 */
-    private Long netAmount;
+    private BigDecimal netAmount;
 
     /**收益金额*/
-    private Long incomeAmount;
+    private BigDecimal incomeAmount;
 
     /**分润比例*/
     private Long dividendRatio;

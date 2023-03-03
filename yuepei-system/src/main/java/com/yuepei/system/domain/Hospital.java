@@ -38,5 +38,7 @@ public class Hospital extends BaseEntity {
 
     private String hospitalName;
 
+    private Long parentId;
+
     private String hospitalRule;
 }

@@ -149,4 +149,6 @@ public interface SysUserMapper
     int updateUserPhoneNumber(@Param("userId") Long userId, @Param("phoneNumber") String phoneNumber);
 
     int updateUserIntegralByOpenid(SysUser user);
+
+    SysUser selectUserByUser(@Param("userName") String userName);
 }

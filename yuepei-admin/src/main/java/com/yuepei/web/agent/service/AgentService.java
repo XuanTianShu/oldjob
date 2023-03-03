@@ -20,7 +20,7 @@ public interface AgentService {
 
     String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo,String userName);
 
-    List<UserLeaseOrderVo> selectLeaseOrder(Long userId);
+    List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String nameOrNumber);
 
     AjaxResult insertAgentAccount(SysUser sysUser, Long userId);
 

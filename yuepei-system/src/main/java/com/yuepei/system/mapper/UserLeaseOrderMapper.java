@@ -3,6 +3,7 @@ package com.yuepei.system.mapper;
 import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.*;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -93,7 +94,7 @@ public interface UserLeaseOrderMapper {
      */
     List<UserLeaseOrder> leaseOrderList(LeaseOrderVO leaseOrderVO);
 
-    List<UserLeaseOrderVo> selectUserLeaseOrder(List<String> deviceNumber);
+    List<UserLeaseOrder> selectUserLeaseOrder(List<String> deviceNumber);
 
     UserLeaseOrder selectLeaseOrderDetails(@Param("orderNumber") String orderNumber);
 
@@ -102,4 +103,6 @@ public interface UserLeaseOrderMapper {
     OrderSumAndMoneyVO selectDayOrder();
 
     ConditionOrderVO selectConditionOrder(LeaseOrderVO leaseOrderVO);
+
+    List<UserLeaseOrder> selectUserLeaseOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber);
 }

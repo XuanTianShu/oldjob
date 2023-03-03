@@ -2,6 +2,7 @@ package com.yuepei.system.domain.vo;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -13,6 +14,21 @@ public class UserLeaseOrderVo {
 
     /** $column.columnComment */
     private Long id;
+
+    /**用户名*/
+    private String nickName;
+
+    /**分成比例*/
+    private Long proportion;
+
+    /**归属代理商*/
+    private String agentName;
+
+    /**归属医院*/
+    private String hospitalName;
+
+    /**租借押金*/
+    private BigDecimal depositNum;
 
     /** 用户唯一标识 */
     private String openid;
