@@ -111,7 +111,7 @@ public class HospitalDeviceController {
                                        @RequestParam(value = "orderNumber",required = false,defaultValue = "") String orderNumber,
                                        HttpServletRequest request){
         SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(hospitalDeviceService.selectLeaseOrder("ohy",deviceDepartment,deviceTypeName,orderNumber));
+        return AjaxResult.success(hospitalDeviceService.selectLeaseOrder(analysis.getUserName(),deviceDepartment,deviceTypeName,orderNumber));
     }
 
     /**
@@ -127,7 +127,7 @@ public class HospitalDeviceController {
     public AjaxResult selectRevenueStatistics(@RequestParam("statistics")int statistics,
                                               HttpServletRequest request){
         SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(hospitalDeviceService.selectRevenueStatistics("ohy", statistics));
+        return AjaxResult.success(hospitalDeviceService.selectRevenueStatistics(user.getUserName(), statistics));
     }
 
 }

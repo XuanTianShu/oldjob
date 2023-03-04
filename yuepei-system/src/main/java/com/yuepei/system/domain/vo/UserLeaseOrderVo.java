@@ -71,4 +71,7 @@ public class UserLeaseOrderVo {
 
     /** 租赁时长 */
     private String playTime;
+
+    /**科室*/
+    private String department;
 }

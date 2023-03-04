@@ -201,52 +201,35 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(userName);
         List<String> numberList = hospitalDeviceMapper.selectLeaseOrder(hospitalUser.getHospitalId());
         List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrder(numberList);
-
-
         List<UserLeaseOrderVo> userLeaseOrderList = userLeaseOrders.stream().map(a -> {
             UserLeaseOrderVo b = new UserLeaseOrderVo();
             BeanUtils.copyProperties(a, b);
             return b;
         }).collect(Collectors.toList());
-
-        /*List<UserLeaseOrderVo> userLeaseOrderVos = new ArrayList<>();
+        userLeaseOrderList.stream().forEach(map->{
+            Device device = hospitalDeviceMapper.selectDeviceByTypeNumber(map.getDeviceNumber());
+            String deviceFullAddress = device.getDeviceFullAddress();
+            if (!deviceFullAddress.isEmpty()) {
+                String[] array = JSON.parseArray(deviceFullAddress).toArray(new String[0]);
+                for (int i = 0; i < array.length; i++) {
+                    Hospital department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
+                    map.setDepartment(department.getHospitalName());
+                }
+            }
+        });
         if (!deviceDepartment.equals("")){
-            List<Device> deviceList = new ArrayList<>();
-            userLeaseOrderList.stream().forEach(map->{
-                Device device = hospitalDeviceMapper.selectDeviceByTypeNumber(map.getDeviceNumber());
-                deviceList.add(device);
-            });
-            List<DeviceDetailsVo> deviceDetailsVoList = new ArrayList<>();
-            deviceList.stream().forEach(map -> {
-                DeviceDetailsVo deviceDetailsVo = new DeviceDetailsVo();
-                String device_full_address = map.getDeviceFullAddress();
-                if (!device_full_address.isEmpty()) {
-                    String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
-                    for (int i = 0; i < array.length; i++) {
-                        Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
-                        deviceDetailsVo.setDeviceDepartment(Department.getHospitalName());
-                    }
-                }
-                deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
-                if (deviceDetailsVo.getDeviceDepartment().equals(deviceDepartment)){
-                    deviceDetailsVoList.add(deviceDetailsVo);
-                }
-            });
-            deviceDetailsVoList.stream().forEach(map->{
-                List<UserLeaseOrderVo> collect = userLeaseOrderList.stream()
-                        .filter(i -> i.getDeviceNumber().equals(map.getDeviceNumber()))
-                        .collect(Collectors.toList());
-                userLeaseOrderVos.addAll(collect);
-            });
+            List<UserLeaseOrderVo> collect = userLeaseOrderList.stream().filter(map -> map.getDepartment().equals(deviceDepartment)).collect(Collectors.toList());
+            userLeaseOrderList.clear();
+            userLeaseOrderList.addAll(collect);
         }if (!deviceTypeName.equals("")){
             List<UserLeaseOrderVo> collect = userLeaseOrderList.stream().filter(map -> map.getDeviceType().equals(deviceTypeName)).collect(Collectors.toList());
-            userLeaseOrderVos.clear();
-            userLeaseOrderVos.addAll(collect);
+            userLeaseOrderList.clear();
+            userLeaseOrderList.addAll(collect);
         }if (!orderNumber.equals("")){
             List<UserLeaseOrderVo> collect = userLeaseOrderList.stream().filter(map -> map.getOrderNumber().equals(orderNumber)).collect(Collectors.toList());
-            userLeaseOrderVos.clear();
-            userLeaseOrderVos.addAll(collect);
-        }*/
+            userLeaseOrderList.clear();
+            userLeaseOrderList.addAll(collect);
+        }
         return userLeaseOrderList;
     }
 
