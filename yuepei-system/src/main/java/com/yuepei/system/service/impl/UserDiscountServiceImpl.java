@@ -112,7 +112,7 @@ public class UserDiscountServiceImpl implements IUserDiscountService
     }
 
     @Override
-    public List<UserDiscount> selectMyDiscountByOpenId(String openid) {
-        return userDiscountMapper.selectMyDiscountByOpenId(openid);
+    public List<UserDiscount> selectMyDiscountByOpenId(String openid,UserDiscount userDiscount) {
+        return userDiscountMapper.selectMyDiscountByOpenId(openid,userDiscount);
     }
 }

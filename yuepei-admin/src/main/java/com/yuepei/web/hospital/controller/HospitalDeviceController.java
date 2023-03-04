@@ -1,7 +1,10 @@
 package com.yuepei.web.hospital.controller;
 
+import com.yuepei.common.constant.Constants;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.common.core.domain.model.LoginBody;
+import com.yuepei.framework.web.service.SysLoginService;
 import com.yuepei.system.domain.vo.DeviceDetailsVo;
 import com.yuepei.system.service.OrderService;
 import com.yuepei.utils.TokenUtils;
@@ -25,6 +28,9 @@ public class HospitalDeviceController {
 
     @Autowired
     private HospitalDeviceService hospitalDeviceService;
+
+    @Autowired
+    private SysLoginService loginService;
 
     /**
     * 查询医院设备类型

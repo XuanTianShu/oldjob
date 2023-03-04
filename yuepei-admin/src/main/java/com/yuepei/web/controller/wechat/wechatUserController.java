@@ -99,8 +99,9 @@ public class wechatUserController extends BaseController {
      * @return
      */
     @GetMapping("/selectIntegralDetailList")
-    public AjaxResult selectIntegralDetailList(UserIntegralBalanceDepositVo userIntegralBalanceDepositVo){
-        return AjaxResult.success(integralService.selectIntegralDetailList(userIntegralBalanceDepositVo));
+    public TableDataInfo selectIntegralDetailList(UserIntegralBalanceDepositVo userIntegralBalanceDepositVo){
+        startPage();
+        return getDataTable(integralService.selectIntegralDetailList(userIntegralBalanceDepositVo));
     }
 
     /**
@@ -109,8 +110,9 @@ public class wechatUserController extends BaseController {
      * @return
      */
     @GetMapping("/selectBalanceDetailList")
-    public AjaxResult selectBalanceDetailList(UserIntegralBalanceDepositVo userIntegralBalanceDepositVo){
-        return AjaxResult.success(balanceService.selectBalanceDetailList(userIntegralBalanceDepositVo));
+    public TableDataInfo selectBalanceDetailList(UserIntegralBalanceDepositVo userIntegralBalanceDepositVo){
+        startPage();
+        return getDataTable(balanceService.selectBalanceDetailList(userIntegralBalanceDepositVo));
     }
 
     /**

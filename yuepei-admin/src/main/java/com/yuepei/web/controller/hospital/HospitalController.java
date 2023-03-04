@@ -173,8 +173,10 @@ public class HospitalController extends BaseController {
     @PostMapping
     public AjaxResult add(@RequestBody Hospital hospital)
     {
+
         return toAjax(hospitalService.insertHospital(hospital));
     }
+
 
     /**
      * 修改医院
@@ -184,6 +186,7 @@ public class HospitalController extends BaseController {
     @PutMapping
     public AjaxResult edit(@RequestBody Hospital hospital)
     {
+
         return toAjax(hospitalService.updateHospital(hospital));
     }
 

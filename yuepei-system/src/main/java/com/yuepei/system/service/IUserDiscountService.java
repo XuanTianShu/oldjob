@@ -73,5 +73,11 @@ public interface IUserDiscountService
      */
     void sendUserDiscount(Long[] userId, DiscountThreshold discountThreshold, Date parse, Date parse1, BigDecimal money);
 
-    List<UserDiscount> selectMyDiscountByOpenId(String openid);
+    /**
+     * 根据状态查看用户卡包
+     * @param openid
+     * @param userDiscount
+     * @return
+     */
+    List<UserDiscount> selectMyDiscountByOpenId(String openid,UserDiscount userDiscount);
 }

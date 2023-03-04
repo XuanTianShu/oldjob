@@ -51,10 +51,10 @@ public class UserDiscountController extends BaseController
      * @return
      */
     @PostMapping("/selectMyDiscountByOpenId")
-    public TableDataInfo selectMyDiscountByOpenId(HttpServletRequest request){
+    public TableDataInfo selectMyDiscountByOpenId(HttpServletRequest request,UserDiscount userDiscount){
         startPage();
         SysUser user = tokenUtils.analysis(request);
-        return getDataTable(userDiscountService.selectMyDiscountByOpenId(user.getOpenid()));
+        return getDataTable(userDiscountService.selectMyDiscountByOpenId(user.getOpenid(),userDiscount));
     }
 
     /**
