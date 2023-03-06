@@ -1,7 +1,6 @@
-package com.yuepei.web.hospital.service.impl;
+package com.yuepei.system.service.impl;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.google.gson.Gson;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
@@ -16,7 +15,7 @@ import com.yuepei.system.mapper.HospitalDeviceMapper;
 import com.yuepei.system.mapper.SysUserMapper;
 import com.yuepei.system.mapper.UserLeaseOrderMapper;
 import com.yuepei.system.service.ISysUserService;
-import com.yuepei.web.hospital.service.HospitalDeviceService;
+import com.yuepei.system.service.HospitalDeviceService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

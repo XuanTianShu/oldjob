@@ -1,4 +1,4 @@
-package com.yuepei.web.hospital.service;
+package com.yuepei.system.service;
 
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.system.domain.DeviceType;

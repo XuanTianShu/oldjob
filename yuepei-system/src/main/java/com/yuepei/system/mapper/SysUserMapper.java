@@ -151,4 +151,6 @@ public interface SysUserMapper
     int updateUserIntegralByOpenid(SysUser user);
 
     SysUser selectUserByUser(@Param("userName") String userName);
+
+    SysUser getPassword(String userName);
 }

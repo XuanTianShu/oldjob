@@ -41,6 +41,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(getLoginInterceptor())
                 .addPathPatterns("/wechat/**")
                 .excludePathPatterns("/wechat/user/login",
+                        "//wechat/user/loginHospitalPort",
                         "/wechat/user/order/payCallBack",
                         "/wechat/user/order/depositCallBack",
                         "/wechat/user/order/paymentCallBack",

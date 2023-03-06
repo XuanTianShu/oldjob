@@ -4,9 +4,9 @@ import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.vo.DeviceDetailsVo;
 import com.yuepei.system.domain.vo.HospitalAgentVo;
+import com.yuepei.system.service.HospitalDeviceService;
 import com.yuepei.utils.TokenUtils;
 import com.yuepei.web.agent.service.AgentService;
-import com.yuepei.web.hospital.service.HospitalDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
