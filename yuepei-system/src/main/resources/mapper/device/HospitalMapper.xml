@@ -13,6 +13,12 @@
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
+    <resultMap type="com.yuepei.system.domain.vo.HospitalVO" id="HospitalResultVO">
+        <result property="hospitalId"    column="hospital_id"    />
+        <result property="hospitalName"    column="hospital_name"    />
+        <result property="parentId"    column="parent_id"    />
+    </resultMap>
+
     <sql id="selectHospitalVo">
         select hospital_id, hospital_name, parent_id, hospital_rule, create_time, update_time from hospital
     </sql>
@@ -29,6 +35,17 @@
     <select id="selectHospitalByHospitalId" parameterType="Long" resultMap="HospitalResult">
         <include refid="selectHospitalVo"/>
         where hospital_id = #{hospitalId}
+    </select>
+    <select id="selectTreeOne" parameterType="Long" resultMap="HospitalResultVO">
+        SELECT hospital_id,hospital_name,parent_id FROM hospital
+        WHERE parent_id = #{hospitalId}
+    </select>
+    <select id="selectTree" parameterType="Long" resultMap="HospitalResultVO">
+        SELECT hospital_id,hospital_name,parent_id FROM hospital
+        WHERE parent_id IN
+        <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
+            #{hospitalId}
+        </foreach>
     </select>
 
     <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">

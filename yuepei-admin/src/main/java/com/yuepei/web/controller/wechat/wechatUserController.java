@@ -1,10 +1,13 @@
 package com.yuepei.web.controller.wechat;
 
+import com.yuepei.common.constant.Constants;
 import com.yuepei.common.core.controller.BaseController;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.common.core.domain.model.LoginBody;
 import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.common.utils.SecurityUtils;
+import com.yuepei.framework.web.service.SysLoginService;
 import com.yuepei.service.MyBalanceService;
 import com.yuepei.service.MyIntegralService;
 import com.yuepei.system.domain.Discount;
@@ -13,14 +16,12 @@ import com.yuepei.system.domain.DiscountThreshold;
 import com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo;
 import com.yuepei.system.service.*;
 import com.yuepei.utils.DictionaryEnum;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

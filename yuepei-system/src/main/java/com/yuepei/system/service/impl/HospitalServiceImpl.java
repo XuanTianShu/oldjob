@@ -1,7 +1,10 @@
 package com.yuepei.system.service.impl;
 
 import com.yuepei.common.utils.DateUtils;
+import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.Hospital;
+import com.yuepei.system.domain.vo.HospitalVO;
+import com.yuepei.system.mapper.DeviceMapper;
 import com.yuepei.system.mapper.HospitalMapper;
 import com.yuepei.system.service.HospitalService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,9 @@ import java.util.Map;
 public class HospitalServiceImpl implements HospitalService {
     @Autowired
     private HospitalMapper hospitalMapper;
+
+    @Autowired
+    private DeviceMapper deviceMapper;
 
     /**
      * 查询医院
@@ -116,5 +122,33 @@ public class HospitalServiceImpl implements HospitalService {
     public int deleteHospitalByHospitalId(Long hospitalId)
     {
         return hospitalMapper.deleteHospitalByHospitalId(hospitalId);
+    }
+
+    @Override
+    public Map<String, Object> queryTreeByDeviceNumber(String deviceNumber) {
+        Device device = deviceMapper.selectDeviceByDeviceNumber(deviceNumber);
+        List<HospitalVO> hospital = hospitalMapper.selectTreeOne(device.getHospitalId());
+        Map<String, Object> objectHashMap = new HashMap<>();
+        Long[] one = new Long[50];
+        Long[] two = new Long[50];
+        Long[] three = new Long[50];
+        Long[] four = new Long[50];
+        objectHashMap.put("hospital_one",hospital);
+        for (int i = 0; i < hospital.size(); i++) {
+            one[i] = hospital.get(i).getHospitalId();
+        }
+        List<HospitalVO> hospitals = hospitalMapper.selectTree(one);
+        objectHashMap.put("hospital_two",hospitals);
+        for (int y = 0; y < hospitals.size(); y++) {
+            two[y] = hospitals.get(y).getHospitalId();
+        }
+        List<HospitalVO> hospitalVOS = hospitalMapper.selectTree(two);
+        objectHashMap.put("hospital_three",hospitalVOS);
+        for (int l = 0; l < hospitalVOS.size(); l++) {
+            three[l] = hospitalVOS.get(l).getHospitalId();
+        }
+        List<HospitalVO> hospitalVOS1 = hospitalMapper.selectTree(three);
+        objectHashMap.put("hospital_four",hospitalVOS1);
+        return objectHashMap;
     }
 }

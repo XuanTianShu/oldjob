@@ -200,4 +200,9 @@ public class HospitalController extends BaseController {
     {
         return toAjax(hospitalService.deleteHospitalByHospitalIds(hospitalIds));
     }
+
+    @GetMapping("/queryTreeByDeviceNumber")
+    public AjaxResult queryTreeByDeviceNumber(String deviceNumber){
+        return AjaxResult.success(hospitalService.queryTreeByDeviceNumber(deviceNumber));
+    }
 }

@@ -245,8 +245,8 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public DeviceVO selectDeviceInfoByDeviceNumber(String deviceNumber) {
         DeviceVO device = deviceMapper.selectDeviceInfoByDeviceNumber(deviceNumber);
-        if (device.getHospitalRule() != null){
-            List<HospitalRuleVO> deviceRules = JSON.parseArray(device.getHospitalRule(), HospitalRuleVO.class);
+        if (device.getRule() != null){
+            List<HospitalRuleVO> deviceRules = JSON.parseArray(device.getRule(), HospitalRuleVO.class);
             device.setDeviceRules(deviceRules);
         }
         return device;

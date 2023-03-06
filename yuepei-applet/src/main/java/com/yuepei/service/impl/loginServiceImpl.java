@@ -118,6 +118,26 @@ public class loginServiceImpl implements LoginService {
         }
     }
 
+    @Override
+    public AjaxResult APPLogin(SysUser sysUser) {
+        AjaxResult ajax = AjaxResult.success();
+        //判断 用户是否存在
+        // 用户验证
+        SysUser sysUserList = userMapper.selectUserByUserName(sysUser.getUserName());
+        if(!StringUtils.isNull(sysUserList)){
+            if ("1".equals(sysUserList.getStatus())){
+                return AjaxResult.error("账号已被封禁");
+            }
+            recordLoginInfo(sysUserList.getUserId());
+            return ajax.put(Constants.TOKEN, tokenUtils.createToken(sysUserList));
+        }else {
+            sysUser.setRoleId(2L);
+            userService.insertUser(sysUser);
+            recordLoginInfo(sysUserList.getUserId());
+            return ajax.put(Constants.TOKEN, tokenUtils.createToken(sysUserList));
+        }
+    }
+
     /**
      * 记录登录信息
      *

@@ -1,6 +1,7 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.Hospital;
+import com.yuepei.system.domain.vo.HospitalVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -80,4 +81,8 @@ public interface HospitalMapper {
      * @return 结果
      */
     public int deleteHospitalByHospitalIds(Long[] hospitalIds);
+
+    List<HospitalVO> selectTreeOne(@Param("hospitalId") Long hospitalId);
+
+    List<HospitalVO> selectTree(Long[] sum);
 }

@@ -80,4 +80,6 @@ public interface HospitalService {
      * @return 结果
      */
     public int deleteHospitalByHospitalId(Long hospitalId);
+
+    Map<String,Object> queryTreeByDeviceNumber(String deviceNumber);
 }

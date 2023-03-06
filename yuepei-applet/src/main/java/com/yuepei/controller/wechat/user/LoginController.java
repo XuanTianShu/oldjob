@@ -3,6 +3,7 @@ import com.yuepei.common.constant.Constants;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.service.LoginService;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,4 +49,9 @@ public class LoginController {
     public AjaxResult wechatLogin(@NotNull String code ,@RequestBody SysUser sysUser){
         return loginService.login(code,sysUser);
     }
+
+//    @PostMapping("/APPLogin")
+//    public AjaxResult APPLogin(@RequestBody SysUser sysUser){
+//        return loginService.APPLogin(sysUser);
+//    }
 }

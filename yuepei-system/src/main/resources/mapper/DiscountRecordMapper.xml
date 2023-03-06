@@ -105,9 +105,9 @@
         </trim>
     </insert>
     <insert id="sendDiscountRecord">
-        insert into discount_record(`issuer`,`userId`,`price`,`threshold`,`grant_time`,`status`) values
+        insert into discount_record(`issuer`,`userId`,`price`,`threshold`,`grant_time`,`status`,is_jyb) values
         <foreach item="discountRecord" collection="userId1" index="index"  separator=",">
-            (#{userId},#{discountRecord},#{discount.money},#{discountThreshold.thresholdName},#{date},#{discount.isStatus})
+            (#{userId},#{discountRecord},#{discount.money},#{discountThreshold.thresholdName},#{date},#{discount.isStatus},#{discount.isJyb})
         </foreach>
     </insert>
 

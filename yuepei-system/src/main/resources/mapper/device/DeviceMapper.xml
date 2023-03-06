@@ -37,8 +37,8 @@
         <result property="rows" column="rows"/>
         <result property="heartTime" column="heart_time"/>
         <result property="status" column="status"/>
-        <result property="hospitalName" column="hospital_name"/>
-        <result property="hospitalRule" column="hospital_rule"/>
+        <result property="rule" column="rule"/>
+        <result property="depict" column="depict"/>
     </resultMap>
 
 
@@ -79,9 +79,8 @@
                d.device_iot_number,d.device_mac,d.device_deposit, d.billing_id,
                d.hospital_id, d.device_qR_code, d.device_address,
                d.device_full_address,d.`rows`,d.heart_time,
-               d.`status`,h.hospital_id,h.hospital_name,
-               h.hospital_rule FROM device AS d
-        left JOIN hospital AS h ON d.`hospital_id` = h.hospital_id
+               d.`status`,dr.`rule`,dr.`depict` FROM device AS d
+        LEFT JOIN device_rule AS dr ON dr.`device_number` = d.`device_number`
         WHERE d.device_number = #{deviceNumber}
     </select>
 

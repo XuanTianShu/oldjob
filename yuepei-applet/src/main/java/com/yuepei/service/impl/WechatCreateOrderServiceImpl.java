@@ -5,16 +5,14 @@ import com.yuepei.common.core.redis.RedisCache;
 import com.yuepei.common.utils.uuid.UUID;
 import com.yuepei.service.MyLeaseOrderService;
 import com.yuepei.service.WechatCreateOrderService;
-import com.yuepei.system.domain.UserCoupon;
-import com.yuepei.system.domain.UserDepositOrder;
-import com.yuepei.system.domain.UserLeaseOrder;
-import com.yuepei.system.domain.UserPayOrder;
+import com.yuepei.system.domain.*;
 import com.yuepei.system.mapper.*;
 import com.yuepei.utils.DictionaryEnum;
 import com.yuepei.utils.WXPayUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -72,6 +70,9 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
     @Autowired
     private UserLeaseOrderMapper userLeaseOrderMapper;
 
+    @Autowired
+    private UserDiscountMapper userDiscountMapper;
+
 
 
     @Override
@@ -126,6 +127,7 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
         return AjaxResult.success(deposit);
     }
 
+    @Transactional
     @Override
     public AjaxResult paymentPrepaymentOrder(String openid,UserLeaseOrder userLeaseOrder,Integer couponId) {
         String notifyUrl = "https://www.yp10000.com/prod-api/wechat/user/order/paymentCallBack";
@@ -136,8 +138,13 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
         }else {
             userCoupon = userCouponMapper.selectUserCouponById(Long.parseLong(couponId.toString()));
             price  = userLeaseOrder.getPrice() - userCoupon.getDiscountAmount()*100;
-//            TODO 修改使用后的优惠卷
-        log.info("优惠卷状态更新成功");
+
+            //修改使用后的优惠卷
+            UserDiscount userDiscount = new UserDiscount();
+            userDiscount.setId(Long.parseLong(String.valueOf(couponId)));
+            userDiscount.setStatus(1L);
+            userDiscountMapper.updateUserDiscount(userDiscount);
+            log.info("优惠卷状态更新成功");
         }
         HashMap<String, String> pay = wxPayUtils.sendPay(openid,price, userLeaseOrder.getOrderNumber(),notifyUrl);
         if (pay != null){

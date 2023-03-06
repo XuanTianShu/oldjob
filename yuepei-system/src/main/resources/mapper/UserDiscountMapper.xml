@@ -36,12 +36,13 @@
         <include refid="selectUserDiscountVo"/>
         where Id = #{id}
     </select>
-    <select id="selectMyDiscountByOpenId" resultMap="UserDiscountResult">
-        SELECT ud.`Id`,ud.`user_id`,ud.`threshold_name`,ud.`price`,ud.`full`,ud.`expire_time`,ud.`status`,ud.`create_time`,ud.`update_time` FROM
+    <select id="selectMyDiscountByOpenId" parameterType="UserDiscount" resultMap="UserDiscountResult">
+        SELECT ud.`Id`,ud.`user_id`,ud.`threshold_name`,ud.`price`,ud.`full`,ud.`expire_time`,
+               ud.`status`,ud.`create_time`,ud.`update_time` FROM
             `user_discount` AS ud INNER JOIN sys_user AS su ON su.`user_id` = ud.`user_id`
             <where>
-                su.`openid` = #{openid}
-                <if test="status != null">
+                and su.openid = #{openid}
+                <if test="userDiscount.status != null">
                     and ud.status = #{userDiscount.status}
                 </if>
             </where>

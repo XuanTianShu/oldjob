@@ -41,9 +41,9 @@ public class DeviceVO extends BaseEntity {
 
     private Long status;
 
-    private String hospitalName;
+    private String rule;
 
-    private String hospitalRule;
+    private String depict;
 
     private List<HospitalRuleVO> deviceRules;
 }
