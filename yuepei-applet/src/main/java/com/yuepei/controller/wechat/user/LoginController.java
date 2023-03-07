@@ -134,7 +134,7 @@ public class LoginController {
      * 查询商品订单
      * */
     @GetMapping("/selectGoodsOrder/{userId}")
-    public AjaxResult selectGoodsOrder(@PathVariable("userId") String userId){
+    public AjaxResult selectGoodsOrder(@PathVariable("userId") Long userId){
         return AjaxResult.success(hospitalDeviceService.selectGoodsOrder(userId));
     }
 
@@ -163,16 +163,17 @@ public class LoginController {
     public AjaxResult selectLeaseOrder(@RequestParam(value = "deviceDepartment",required = false,defaultValue = "") String deviceDepartment,
                                        @RequestParam(value = "deviceTypeName",required = false,defaultValue = "") String deviceTypeName,
                                        @RequestParam(value = "orderNumber",required = false,defaultValue = "") String orderNumber,
-                                       @RequestParam("userName") String userName){
-        return AjaxResult.success(hospitalDeviceService.selectLeaseOrder(userName,deviceDepartment,deviceTypeName,orderNumber));
+                                       @RequestParam("userId") Long userId){
+        return AjaxResult.success(hospitalDeviceService.selectLeaseOrder(userId,deviceDepartment,deviceTypeName,orderNumber));
     }
 
     /**
      * 陪护床租借详情
      * */
     @GetMapping("/selectLeaseOrderDetails")
-    public AjaxResult selectLeaseOrderDetails(@RequestParam("orderNumber")String orderNumber){
-        return AjaxResult.success(hospitalDeviceService.selectLeaseOrderDetails(orderNumber));
+    public AjaxResult selectLeaseOrderDetails(@RequestParam("orderNumber")String orderNumber,
+                                              @RequestParam("userName") Long userId){
+        return AjaxResult.success(hospitalDeviceService.selectLeaseOrderDetails(orderNumber, userId));
     }
 
     /**医院营收统计*/

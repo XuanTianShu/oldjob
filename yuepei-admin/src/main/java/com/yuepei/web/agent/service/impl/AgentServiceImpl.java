@@ -58,10 +58,10 @@ public class AgentServiceImpl implements AgentService {
             if (!device_full_address.isEmpty()) {
                 String[] split = device_full_address.split(",");
                 for (int j = 0; j < split.length; j++) {
-                    deviceDetailsVo.setDeviceFloor(split[0]);
+                    /*deviceDetailsVo.setDeviceFloor(split[0]);
                     deviceDetailsVo.setDeviceDepartment(split[1]);
                     deviceDetailsVo.setDeviceRoom(split[2]);
-                    deviceDetailsVo.setDeviceBed(split[3]);
+                    deviceDetailsVo.setDeviceBed(split[3]);*/
                 }
             }
             deviceDetailsVo.setDeviceFullAddress(device_full_address);
@@ -174,7 +174,7 @@ public class AgentServiceImpl implements AgentService {
         List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
         agentHospitals.stream().forEach(i->{
             SysUser user = sysUserMapper.selectUserById(userId);
-            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(user.getUserName(),deviceDepartment,deviceTypeName,nameOrNumber);
+            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(user.getUserId(),deviceDepartment,deviceTypeName,nameOrNumber);
             userLeaseOrderList.addAll(userLeaseOrders);
         });
         return userLeaseOrderList;

@@ -84,7 +84,7 @@ public class DeviceController extends BaseController {
      * 查询该医院设备详情
      * */
     @GetMapping("/selectDeviceTypeDetails")
-    public AjaxResult selectDeviceTypeDetails(@RequestParam("deviceTypeId") Long deviceTypeId,
+    public AjaxResult selectDeviceTypeDetails(@RequestParam(value = "deviceTypeId",required = false) Long deviceTypeId,
                                               @RequestParam(value = "deviceDepartment",required = false,defaultValue = "") String deviceDepartment,
                                               @RequestParam("userId") Long userId){
         return AjaxResult.success(hospitalDeviceService.selectDeviceTypeDetails(deviceTypeId, userId, deviceDepartment));
@@ -96,10 +96,10 @@ public class DeviceController extends BaseController {
         return AjaxResult.success(hospitalDeviceService.selectDeviceAddress(hospitalId));
     }
 
-/*    @GetMapping("/selectDeviceAddress1/{hospitalId}")
+    @GetMapping("/selectDeviceAddress1/{hospitalId}")
     public AjaxResult selectDeviceAddress1(@PathVariable("hospitalId")Long hospitalId){
         return AjaxResult.success(hospitalDeviceService.selectDeviceAddress1(hospitalId));
-    }*/
+    }
 
     /**
      * 医院端设备详情编辑信息
@@ -119,7 +119,7 @@ public class DeviceController extends BaseController {
      * 查询商品订单
      * */
     @GetMapping("/selectGoodsOrder/{userId}")
-    public AjaxResult selectGoodsOrder(@PathVariable("userId") String userId){
+    public AjaxResult selectGoodsOrder(@PathVariable("userId") Long userId){
         return AjaxResult.success(hospitalDeviceService.selectGoodsOrder(userId));
     }
 
@@ -148,7 +148,7 @@ public class DeviceController extends BaseController {
     public AjaxResult selectLeaseOrder(@RequestParam(value = "deviceDepartment",required = false,defaultValue = "") String deviceDepartment,
                                        @RequestParam(value = "deviceTypeName",required = false,defaultValue = "") String deviceTypeName,
                                        @RequestParam(value = "orderNumber",required = false,defaultValue = "") String orderNumber,
-                                       @RequestParam("userId") String userId){
+                                       @RequestParam("userId") Long userId){
         return AjaxResult.success(hospitalDeviceService.selectLeaseOrder(userId,deviceDepartment,deviceTypeName,orderNumber));
     }
 
@@ -156,8 +156,9 @@ public class DeviceController extends BaseController {
      * 陪护床租借详情
      * */
     @GetMapping("/selectLeaseOrderDetails")
-    public AjaxResult selectLeaseOrderDetails(@RequestParam("orderNumber")String orderNumber){
-        return AjaxResult.success(hospitalDeviceService.selectLeaseOrderDetails(orderNumber));
+    public AjaxResult selectLeaseOrderDetails(@RequestParam(value = "orderNumber",required = false) String orderNumber,
+                                              @RequestParam("userId") Long userId){
+        return AjaxResult.success(hospitalDeviceService.selectLeaseOrderDetails(orderNumber,userId));
     }
 
     /**医院营收统计*/
@@ -167,6 +168,11 @@ public class DeviceController extends BaseController {
         return AjaxResult.success(hospitalDeviceService.selectRevenueStatistics(userName, statistics));
     }
 
+    /**首页*/
+    @GetMapping("/indexPage/{userId}")
+    public AjaxResult indexPage(@PathVariable("userId") Long userId){
+        return AjaxResult.success(hospitalDeviceService.indexPage(userId));
+    }
     //修改接口路径
 
     /**
