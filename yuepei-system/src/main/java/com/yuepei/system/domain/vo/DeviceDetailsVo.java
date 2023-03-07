@@ -41,20 +41,20 @@ public class DeviceDetailsVo {
     /**
      * 设备楼层
      * */
-    private String deviceFloor;
+    private Long deviceFloor;
 
     /**
      * 设备科室
      * */
-    private String deviceDepartment;
+    private Long deviceDepartment;
 
     /**
      * 设备房间
      * */
-    private String deviceRoom;
+    private Long deviceRoom;
 
     /**
      * 设备床位号
      * */
-    private String deviceBed;
+    private Long deviceBed;
 }

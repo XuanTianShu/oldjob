@@ -77,10 +77,10 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                     Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
                     Hospital deviceRoom = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[2]));
                     Hospital deviceBed = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[3]));
-                    deviceDetailsVo.setDeviceFloor(deviceFllor.getHospitalName());
-                    deviceDetailsVo.setDeviceDepartment(Department.getHospitalName());
-                    deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalName());
-                    deviceDetailsVo.setDeviceBed(deviceBed.getHospitalName());
+                    deviceDetailsVo.setDeviceFloor(deviceFllor.getHospitalId());
+                    deviceDetailsVo.setDeviceDepartment(Department.getHospitalId());
+                    deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
+                    deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
                 }
                 deviceDetailsVo.setDeviceFullAddress(device_full_address);
                 deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
@@ -103,7 +103,12 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             deviceStatisticsVo.setDeviceDetailsVoList(deviceDetailsVos);
             return deviceStatisticsVo;
         }else {
-            List<DeviceDetailsVo> collect = deviceDetailsVos.stream().filter(map -> map.getDeviceDepartment().equals(deviceDepartment)).collect(Collectors.toList());
+            List<Hospital> hospital = hospitalDeviceMapper.selectHospitalByDepartment(deviceDepartment);
+            List<DeviceDetailsVo> collect = new ArrayList<>();
+            hospital.stream().forEach(map->{
+                List<DeviceDetailsVo> deviceDetailsVos1 = deviceDetailsVos.stream().filter(i -> i.getDeviceDepartment().equals(map.getHospitalId())).collect(Collectors.toList());
+                collect.addAll(deviceDetailsVos1);
+            });
             collect.stream().forEach(map->{
                 List<UserLeaseOrder> userLeaseOrder = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
                 BigDecimal bigDecimal = new BigDecimal(0);
@@ -135,8 +140,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     }
 
     @Override
-    public List<GoodsOrderVo> selectGoodsOrder(String userId) {
-        List<GoodsOrder> goodsOrders = hospitalDeviceMapper.selectGoodsOrder(Long.parseLong(String.valueOf(userId)));
+    public List<GoodsOrderVo> selectGoodsOrder(Long userId) {
+        List<GoodsOrder> goodsOrders = hospitalDeviceMapper.selectGoodsOrder(userId);
         List<GoodsOrderVo> goodsOrderVos = new ArrayList<>();
         goodsOrders.stream().forEach(map -> {
             GoodsOrderVo orderVo = new GoodsOrderVo();
@@ -197,8 +202,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     }
 
     @Override
-    public List<UserLeaseOrderVo> selectLeaseOrder(String userId,String deviceDepartment,String deviceTypeName,String orderNumber) {
-        SysUser sysUser = sysUserMapper.selectUserById(Long.parseLong(String.valueOf(userId)));
+    public List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String orderNumber) {
+        SysUser sysUser = sysUserMapper.selectUserById(userId);
         HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
         List<String> numberList = hospitalDeviceMapper.selectLeaseOrder(hospitalUser.getHospitalId());
         List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrder(numberList);
@@ -235,21 +240,22 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     }
 
     @Override
-    public UserLeaseOrderVo selectLeaseOrderDetails(String orderNumber) {
+    public UserLeaseOrderVo selectLeaseOrderDetails(String orderNumber, Long userId) {
+        SysUser sysUser1 = sysUserMapper.selectUserById(userId);
         UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectLeaseOrderDetails(orderNumber);
         SysUser sysUser = sysUserMapper.selectUserByOpenid(userLeaseOrder.getOpenid());
-        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
+        Device device = hospitalDeviceMapper.selectDeviceByTypeNumber(userLeaseOrder.getDeviceNumber());
         //获取医院信息
-        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(hospitalUser.getHospitalId());
+        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(device.getHospitalId());
         //获取代理商信息
-        AgentHospital agentHospital = agentMapper.selectAgentByHospitalId(hospitalUser.getHospitalId());
+        AgentHospital agentHospital = agentMapper.selectAgentByHospitalId(device.getHospitalId());
         //获取设备类型押金
         DeviceType devicetype = hospitalDeviceMapper.selectDeviceByType(userLeaseOrder.getDeviceType());
         Agent agent = agentMapper.selectAgent(agentHospital.getAgentId());
         UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
         BeanUtils.copyProperties(userLeaseOrder, userLeaseOrderVo);
         userLeaseOrderVo.setNickName(sysUser.getNickName());
-        userLeaseOrderVo.setProportion(sysUser.getProportion());
+        userLeaseOrderVo.setProportion(sysUser1.getProportion());
         userLeaseOrderVo.setAgentName(agent.getAgentName());
         userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
         BigDecimal deviceTypeDeposit = new BigDecimal(String.valueOf(devicetype.getDeviceTypeDeposit()));
@@ -462,20 +468,59 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         return mapList;
     }
 
-/*    @Override
-    public Map<String,List<Object>> selectDeviceAddress1(Long hospitalId) {
-        Map<String,List<Object>> listMap = new HashMap<>();
+    @Override
+    public Map<String,List<HospitalVo>> selectDeviceAddress1(Long hospitalId) {
+        Map<String,List<HospitalVo>> listMap = new HashMap<>();
         List<Hospital> hospitals = hospitalDeviceMapper.selectHospitalByParentId(hospitalId);
-        List<HospitalVo> hospitalVos = hospitals.stream().map(a -> {HospitalVo d = new HospitalVo();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
-        Map<String, Object> one = new HashMap<>();
-        one.put("hospital_four",hospitalVos);
-        hospitalVos.stream().forEach(map->{
-            List<Hospital> hospitals1 = hospitalDeviceMapper.selectHospitalByParentId(map.getHospitalId());
-            List<HospitalVo> hospitalVos1 = hospitals1.stream().map(a -> {HospitalVo d = new HospitalVo();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
-            Map<String, Object> two = new HashMap<>();
-            two.put("hospital_two",hospitalVos1);
+        List<HospitalVo> hospitalOne = hospitals.stream().map(a -> {HospitalVo d = new HospitalVo();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
+        List<HospitalVo> hospitalTwo = new ArrayList<>();
+        List<HospitalVo> hospitalThree = new ArrayList<>();
+        List<HospitalVo> hospitalFour = new ArrayList<>();
+        hospitalOne.stream().forEach(map->{
+            List<Hospital> hospital = hospitalDeviceMapper.selectHospitalByParentId(map.getHospitalId());
+            List<HospitalVo> hospitalVo = hospital.stream().map(a -> {HospitalVo d = new HospitalVo();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
+            hospitalTwo.addAll(hospitalVo);
         });
+        hospitalTwo.stream().forEach(map->{
+            List<Hospital> hospital = hospitalDeviceMapper.selectHospitalByParentId(map.getHospitalId());
+            List<HospitalVo> hospitalVo = hospital.stream().map(a -> {HospitalVo d = new HospitalVo();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
+            hospitalThree.addAll(hospitalVo);
+        });
+        hospitalThree.stream().forEach(map->{
+            List<Hospital> hospital = hospitalDeviceMapper.selectHospitalByParentId(map.getHospitalId());
+            List<HospitalVo> hospitalVo = hospital.stream().map(a -> {HospitalVo d = new HospitalVo();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
+            hospitalFour.addAll(hospitalVo);
+        });
+        listMap.put("hospital_one",hospitalOne);
+        listMap.put("hospital_two",hospitalTwo);
+        listMap.put("hospital_three",hospitalThree);
+        listMap.put("hospital_four",hospitalFour);
         return listMap;
-    }*/
+    }
+
+    @Override
+    public IndexVo indexPage(Long userId) {
+        SysUser sysUser = sysUserMapper.selectUserById(userId);
+        IndexVo indexVo = new IndexVo();
+        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
+        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(hospitalUser.getHospitalId());
+        List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(hospitalUser.getHospitalId());
+        List<UserLeaseOrderVo> userLeaseOrderVos = new ArrayList<>();
+        deviceList.stream().forEach(map->{
+            List<UserLeaseOrder> userLeaseOrder = hospitalDeviceMapper.selectLeaseOrderByDeviceNumber(map.getDeviceNumber());
+            userLeaseOrder.stream().forEach(i->{
+                UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
+                BeanUtils.copyProperties(i,userLeaseOrderVo);
+                userLeaseOrderVo.setNetAmount(new BigDecimal(i.getNetAmount()));
+                userLeaseOrderVos.add(userLeaseOrderVo);
+            });
+        });
+        BigDecimal decimal = userLeaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        indexVo.setDeviceAmount(decimal);
+        indexVo.setHospitalName(hospital.getHospitalName());
+        indexVo.setSum(deviceList.size());
+        indexVo.setProportion(sysUser.getProportion());
+        return indexVo;
+    }
 
 }

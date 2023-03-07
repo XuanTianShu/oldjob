@@ -2,7 +2,6 @@ package com.yuepei.system.service;
 
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.system.domain.DeviceType;
-import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.vo.*;
 
 import java.util.List;
@@ -20,13 +19,13 @@ public interface HospitalDeviceService {
 
     void updateDeviceDetails(Long floorId,Long departmentId,Long roomId,Long bedId,String deviceNumber);
 
-    List<GoodsOrderVo> selectGoodsOrder(String userId);
+    List<GoodsOrderVo> selectGoodsOrder(Long userId);
 
     GoodsOrderVo selectOrderByOrderId(Long orderId);
 
-    List<UserLeaseOrderVo> selectLeaseOrder(String userId,String deviceDepartment,String deviceTypeName,String orderNumber);
+    List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String orderNumber);
 
-    UserLeaseOrderVo selectLeaseOrderDetails(String orderNumber);
+    UserLeaseOrderVo selectLeaseOrderDetails(String orderNumber, Long userId);
 
     TotalVo selectRevenueStatistics(String userName, int statistics);
 
@@ -40,4 +39,7 @@ public interface HospitalDeviceService {
 
     List<String> selectDeviceTypeName();
 
+    Map<String,List<HospitalVo>> selectDeviceAddress1(Long hospitalId);
+
+    IndexVo indexPage(Long userId);
 }
