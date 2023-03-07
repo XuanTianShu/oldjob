@@ -82,10 +82,4 @@ public interface HospitalService {
     public int deleteHospitalByHospitalId(Long hospitalId);
 
     Map<String,Object> queryTreeByDeviceNumber(String deviceNumber);
-    /**
-     * 是否存在该医院
-     * @param hospitalName 医院名称
-     * @return
-     */
-    boolean checkHospitalName(String hospitalName,Long hospitalId);
 }

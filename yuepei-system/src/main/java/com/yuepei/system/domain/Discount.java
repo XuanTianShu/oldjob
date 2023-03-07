@@ -28,10 +28,6 @@ public class Discount extends BaseEntity
     @Excel(name = "优惠券名称")
     private String discountName;
 
-    /** 优惠券名称 */
-    @Excel(name = "优惠券名称")
-    private String discountName;
-
     /** 金额 */
     @Excel(name = "金额")
     private BigDecimal money;
@@ -47,21 +43,10 @@ public class Discount extends BaseEntity
     /** 状态(0正常1禁用) */
     @Excel(name = "状态(0正常1禁用)")
     private Long status;
-    /** 门槛编号 */
-    @Excel(name = "门槛编号")
-    private Long thresholdId;
-
-    /** 有效期(代表天数) */
-    @Excel(name = "有效期(代表天数)")
-    private Long period;
 
     /** 门槛 */
     @Excel(name = "门槛")
     private BigDecimal threshold;
-
-    /** 状态(0正常1禁用) */
-    @Excel(name = "状态(0正常1禁用)")
-    private Long status;
 
     /** 发放数量 */
     @Excel(name = "发放数量")
@@ -74,9 +59,6 @@ public class Discount extends BaseEntity
     /** 是否为新人优惠券 */
     @Excel(name = "是否为新人优惠券")
     private Long isStatus;
-    /** 是否为新人优惠券 */
-    @Excel(name = "是否为新人优惠券")
-    private Long isStatus;
 
     /** 1积分兑换券2优惠券 */
     @Excel(name = "1积分兑换券2优惠券")
@@ -91,50 +73,10 @@ public class Discount extends BaseEntity
     private String thresholdName;
 
     private String hospitalName;
-
-    public void setHospitalId(Long hospitalId){
-        this.hospitalId = hospitalId;
-    }
-
-    public Long getHospitalId(){
-        return hospitalId;
-    }
-
-    public void setThresholdName(String thresholdName){
-        this.thresholdName = thresholdName;
-    }
-
-    public String getThresholdName(){
-        return thresholdName;
-    }
-
-    public void setIntegral(Long integral)
-    {
-        this.integral = integral;
-    }
-
-    public Long getIntegral()
-    {
-        return integral;
-    }
-
-    /** 1积分兑换券2优惠券 */
-    @Excel(name = "1积分兑换券2优惠券")
-    private Long isJyb;
-
-    /** 积分 */
-    @Excel(name = "积分")
-    private Long integral;
-
-    /** 门槛名称 */
-    @Excel(name = "门槛名称")
-    private String thresholdName;
 
     /** 医院编号 */
     @Excel(name = "医院编号")
     private Long hospitalId;
-
-    private String hospitalName;
 
     public void setHospitalId(Long hospitalId){
         this.hospitalId = hospitalId;
@@ -235,7 +177,6 @@ public class Discount extends BaseEntity
         return unbilledNum;
     }
     public void setIsStatus(Long isStatus)
-    public void setIsStatus(Long isStatus)
     {
         this.isStatus = isStatus;
     }
@@ -245,11 +186,8 @@ public class Discount extends BaseEntity
         this.isStatus = isStatus;
         return isStatus;
     }
-
-    public Long getIsStatus()
     public void setIsJyb(Long isJyb)
     {
-        return isStatus;
         this.isJyb = isJyb;
     }
 

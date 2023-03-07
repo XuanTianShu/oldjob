@@ -19,7 +19,6 @@ public enum DictionaryEnum {
     CHECK_GOODS_TYPE(103,"该商品类型存在！"),
     CHECK_GOODS_TYPE_ID(104,"该商品类型已绑定无法删除！"),
     CHECK_DISCOUNT_SUM(105,"该优惠券不足，库存还剩余");
-    CHECK_GOODS_TYPE_ID(104,"该商品类型已绑定无法删除！");
 
 
     private int code;

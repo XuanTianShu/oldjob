@@ -188,8 +188,8 @@ public class DiscountServiceImpl implements IDiscountService
      * @param discountId
      * @return
      */
-    @Override
-    public int checkDiscountSum(Long discountId) {
-        return discountMapper.checkDiscountSum(discountId);
-    }
+//    @Override
+//    public int checkDiscountSum(Long discountId) {
+//        return discountMapper.checkDiscountSum(discountId);
+//    }
 }

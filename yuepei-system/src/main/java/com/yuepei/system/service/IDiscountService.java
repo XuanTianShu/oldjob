@@ -75,5 +75,5 @@ public interface IDiscountService
      * @param discountId
      * @return
      */
-    int checkDiscountSum(Long discountId);
+//    int checkDiscountSum(Long discountId);
 }

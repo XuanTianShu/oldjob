@@ -426,28 +426,28 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     public List<Map<String,Object>> selectDeviceAddress(Long hospitalId) {
         List<Map<String,Object>> mapList = new ArrayList<>();
         List<Hospital> hospitals = hospitalDeviceMapper.selectHospitalByParentId(hospitalId);
-        List<HospitalVo> hospitalVos = hospitals.stream().map(a -> {HospitalVo d = new HospitalVo();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
+        List<HospitalVO> hospitalVos = hospitals.stream().map(a -> {HospitalVO d = new HospitalVO();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
         hospitalVos.stream().forEach(map->{
             Map<String,Object> Map1 = new HashMap<>();
             Map1.put("floor",map);
             mapList.add(Map1);
             List<Map<String,Object>> mapList1 = new ArrayList<>();
             List<Hospital> hospitals1 = hospitalDeviceMapper.selectHospitalByParentId(map.getHospitalId());
-            List<HospitalVo> hospitalVos1 = hospitals1.stream().map(a -> {HospitalVo d = new HospitalVo();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
+            List<HospitalVO> hospitalVos1 = hospitals1.stream().map(a -> {HospitalVO d = new HospitalVO();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
             hospitalVos1.stream().forEach(map1->{
                 Map<String,Object> Map2 = new HashMap<>();
                 Map2.put("department",map1);
                 mapList1.add(Map2);
                 List<Map<String,Object>> mapList2 = new ArrayList<>();
                 List<Hospital> hospitals2 = hospitalDeviceMapper.selectHospitalByParentId(map1.getHospitalId());
-                List<HospitalVo> hospitalVos2 = hospitals2.stream().map(a -> {HospitalVo d = new HospitalVo();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
+                List<HospitalVO> hospitalVos2 = hospitals2.stream().map(a -> {HospitalVO d = new HospitalVO();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
                 hospitalVos2.stream().forEach(map2-> {
                     Map<String, Object> Map3 = new HashMap<>();
                     Map3.put("room", map2);
                     mapList2.add(Map3);
                     List<Map<String, Object>> mapList3 = new ArrayList<>();
                     List<Hospital> hospitals3 = hospitalDeviceMapper.selectHospitalByParentId(map2.getHospitalId());
-                    List<HospitalVo> hospitalVos3 = hospitals3.stream().map(a -> {HospitalVo d = new HospitalVo();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
+                    List<HospitalVO> hospitalVos3 = hospitals3.stream().map(a -> {HospitalVO d = new HospitalVO();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
                     hospitalVos3.stream().forEach(map3->{
                         Map<String, Object> Map4 = new HashMap<>();
                         Map4.put("bed", map3);

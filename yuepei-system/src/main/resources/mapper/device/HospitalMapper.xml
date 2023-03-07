@@ -13,13 +13,10 @@
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
-    <resultMap type="com.yuepei.system.domain.vo.HospitalVo" id="HospitalResultVO">
+    <resultMap type="com.yuepei.system.domain.vo.HospitalVO" id="HospitalResultVO">
         <result property="hospitalId"    column="hospital_id"    />
         <result property="hospitalName"    column="hospital_name"    />
         <result property="parentId"    column="parent_id"    />
-        <result property="hospitalRule"    column="hospital_rule"    />
-        <result property="createTime"    column="create_time"    />
-        <result property="updateTime"    column="update_time"    />
     </resultMap>
 
     <sql id="selectHospitalVo">
@@ -50,6 +47,7 @@
         <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
             #{hospitalId}
         </foreach>
+    </select>
     <select id="checkHospitalName" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM hospital
         <where>

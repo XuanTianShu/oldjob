@@ -2,7 +2,6 @@ package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.vo.DeviceDetailsVo;
-import com.yuepei.system.domain.vo.HospitalVo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.security.core.parameters.P;
 

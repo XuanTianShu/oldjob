@@ -81,5 +81,5 @@ public interface IUserDiscountService
      */
     List<UserDiscount> selectMyDiscountByOpenId(String openid,UserDiscount userDiscount);
 
-    List<UserDiscount> selectMyDiscountByOpenId(String openid);
+//    List<UserDiscount> selectMyDiscountByOpenId(String openid);
 }
