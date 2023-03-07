@@ -148,5 +148,5 @@ wechat:
   mchId: 1636476318
   mchKey: JSYPjiangsuyuepeipeihuchuang1234
   mchSerialNo: 60429C8DE59522973013086A09AEA5759275B9F7
-#  privateKeyPath: D:\WXCertUtil\cert\apiclient_key.pem
-  privateKeyPath: /home/Yuepei_Nursingbed/privateKeyPath/WXCertUtil/cert/apiclient_key.pem
+  privateKeyPath: D:\WXCertUtil\cert\apiclient_key.pem
+#  privateKeyPath: /home/Yuepei_Nursingbed/privateKeyPath/WXCertUtil/cert/apiclient_key.pem

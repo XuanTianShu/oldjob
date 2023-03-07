@@ -76,23 +76,16 @@
     </select>
 
     <select id="selectDeviceInfoByDeviceNumber" parameterType="String" resultMap="DeviceRuleResult">
---         SELECT d.device_id, d.device_type_id, d.device_number,
---                d.device_iot_number,d.device_mac,d.device_deposit, d.billing_id,
---                d.hospital_id, d.device_qR_code, d.device_address,
---                d.device_full_address,d.`rows`,d.heart_time,
---                d.`status`,dr.`rule`,dr.`depict` FROM device AS d
---         LEFT JOIN device_rule AS dr ON dr.`device_number` = d.`device_number`
---         WHERE d.device_number = #{deviceNumber}
 SELECT d.device_id, d.device_type_id, d.device_number,
        d.device_iot_number,d.device_mac,d.device_deposit, d.billing_id,
        d.hospital_id, d.device_qR_code, d.device_address,
        d.device_full_address,d.`rows`,d.heart_time,
        d.`status`,dr.`rule`,dr.`depict`,(
-           SELECT COUNT(1) FROM user_lease_order AS ulo INNER JOIN
-                                device AS d ON d.`device_number` = ulo.device_number
-           WHERE d.`device_number` = #{deviceNumber}) AS `exists` FROM device AS d
-                                                                LEFT JOIN device_rule AS dr ON dr.`device_number` = d.`device_number`
-WHERE d.device_number = #{deviceNumber}
+       SELECT COUNT(1) FROM user_lease_order AS ulo INNER JOIN
+                device AS d ON d.`device_number` = ulo.device_number
+        WHERE d.`device_number` = #{deviceNumber}) AS `exists` FROM device AS d
+       LEFT JOIN device_rule AS dr ON dr.`device_number` = d.`device_number`
+        WHERE d.device_number = #{deviceNumber}
     </select>
 
     <select id="checkDeviceByType" resultType="java.lang.Integer">
