@@ -1,18 +1,16 @@
 package com.yuepei.system.domain.vo;
 
-import com.yuepei.common.annotation.Excel;
 import lombok.Data;
 
+/**
+ * @author zzy
+ * @date 2023/3/2 17:06
+ */
 @Data
-public class HospitalVO {
-
-    /** 主键 */
+public class HospitalVo {
     private Long hospitalId;
 
-    /** 主键 */
-    private Long parentId;
-
-    /** 名称 */
-    @Excel(name = "名称")
     private String hospitalName;
+
+    private Long parentId;
 }
