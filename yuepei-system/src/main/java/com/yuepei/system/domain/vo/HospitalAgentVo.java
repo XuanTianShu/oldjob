@@ -10,10 +10,6 @@ import java.util.List;
  */
 @Data
 public class HospitalAgentVo {
-    /**
-     * 代理商id
-     * */
-    private Long agentId;
     /**医院id*/
     private Long hospitalId;
     /**医院名称*/

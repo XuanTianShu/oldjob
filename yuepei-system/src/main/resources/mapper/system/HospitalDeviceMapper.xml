@@ -15,6 +15,12 @@
     <resultMap id="DeviceTypeResult" type="DeviceType">
         <result property="deviceTypeId" column="device_type_id"></result>
         <result property="deviceTypeName" column="device_type_name"></result>
+        <result property="deviceTypeDeposit" column="device_type_deposit"></result>
+    </resultMap>
+
+    <resultMap id="HospitalUserResult" type="HospitalUser">
+        <result property="hospitalId" column="hospital_id"></result>
+        <result property="userName" column="user_name"></result>
     </resultMap>
 
     <sql id="DeviceDetails">
@@ -40,9 +46,14 @@
         <result property="status" column="status"></result>
     </resultMap>
 
+    <sql id="selectDevice">
+        select device_id,device_number,device_mac,device_iot_number,device_type_id,hospital_id,device_deposit,billing_id,investor_id,device_qR_code,device_address,device_full_address,rows,heart_time,create_time,status from device
+    </sql>
+
     <resultMap id="HospitalResult" type="Hospital">
         <result property="hospitalId" column="hospital_id"></result>
         <result property="hospitalName" column="hospital_name"></result>
+        <result property="parentId" column="parent_id"></result>
         <result property="createTime" column="create_time"></result>
         <result property="updateTime" column="update_time"></result>
     </resultMap>
@@ -84,7 +95,7 @@
     <select id="selectDeviceType" parameterType="DeviceType" resultMap="DeviceTypeResult">
         <include refid="DeviceTypeVo"/>
         where su.user_id=#{userId}
-        order by device_type_name
+        group by device_type_name
     </select>
 
     <select id="selectDeviceTypeDetails" parameterType="Device" resultMap="DeviceTypeDetailsResult">
@@ -132,6 +143,27 @@
 
     <select id="selectDeviceByDeviceAddress" resultType="java.lang.String">
         select distinct device_address from device where hospital_id=#{hospitalId}
+    </select>
+
+    <select id="selectHospitalbyUserName" parameterType="HospitalUser" resultMap="HospitalUserResult">
+        select hospital_id,user_name from hospital_user where user_name=#{userName}
+    </select>
+    <select id="selectDeviceByType" parameterType="DeviceType" resultMap="DeviceTypeResult">
+        select device_type_id,device_type_name,device_type_deposit from device_type where device_type_name=#{deviceType}
+    </select>
+    <select id="selectHospitalByParentId" parameterType="Hospital" resultMap="HospitalResult">
+        select hospital_id,hospital_name,parent_id from hospital where parent_id=#{hospitalId}
+    </select>
+    <select id="selectDeviceByTypeNumber" parameterType="Device" resultMap="DeviceTypeDetailsResult">
+        <include refid="selectDevice"/>
+        where device_number = #{deviceNumber}
+    </select>
+    <select id="selectDeviceByHospitalId" parameterType="Device" resultMap="DeviceTypeDetailsResult">
+        <include refid="selectDevice"/>
+        where hospital_id = #{hospitalId}
+    </select>
+    <select id="selectDeviceTypeName" parameterType="DeviceType" resultMap="DeviceTypeResult">
+        select device_type_id,device_type_name from device_type
     </select>
 
 </mapper>

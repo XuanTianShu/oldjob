@@ -2,17 +2,33 @@ package com.yuepei.system.domain.vo;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
  * @author zzy
- * @date 2023/2/15 15:37
+ * @date 2023/3/1 14:30
  */
 @Data
 public class UserLeaseOrderVo {
 
     /** $column.columnComment */
     private Long id;
+
+    /**用户名*/
+    private String nickName;
+
+    /**分成比例*/
+    private Long proportion;
+
+    /**归属代理商*/
+    private String agentName;
+
+    /**归属医院*/
+    private String hospitalName;
+
+    /**租借押金*/
+    private BigDecimal depositNum;
 
     /** 用户唯一标识 */
     private String openid;
@@ -55,4 +71,7 @@ public class UserLeaseOrderVo {
 
     /** 租赁时长 */
     private String playTime;
+
+    /**科室*/
+    private String department;
 }

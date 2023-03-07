@@ -1,17 +1,17 @@
 package com.yuepei.web.agent.service.impl;
 
+import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.vo.*;
 import com.yuepei.system.mapper.*;
+import com.yuepei.system.service.HospitalDeviceService;
 import com.yuepei.web.agent.service.AgentService;
-import com.yuepei.web.hospital.service.HospitalDeviceService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -58,7 +58,7 @@ public class AgentServiceImpl implements AgentService {
             if (!device_full_address.isEmpty()) {
                 String[] split = device_full_address.split(",");
                 for (int j = 0; j < split.length; j++) {
-                    deviceDetailsVo.setDeviceFllor(split[0]);
+                    deviceDetailsVo.setDeviceFloor(split[0]);
                     deviceDetailsVo.setDeviceDepartment(split[1]);
                     deviceDetailsVo.setDeviceRoom(split[2]);
                     deviceDetailsVo.setDeviceBed(split[3]);
@@ -121,16 +121,26 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo) {
+    public String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo,String userName) {
         AgentHospital agentHospital = agentMapper.selectAgentHospital(hospitalAgentVo.getHospitalId());
+        SysUser su = sysUserMapper.selectUserByUserName(userName);
+        Agent agent = agentMapper.selectAgentByUserName(su.getUserName());
+        if (su.getParentId()!=0){
+            SysUser userById = sysUserMapper.selectUserById(su.getParentId());
+            agent = agentMapper.selectAgentByUserName(userById.getUserName());
+        }
         if (agentHospital!=null){
-            if (agentHospital.getAgentId()==hospitalAgentVo.getAgentId()){
+            if (agentHospital.getAgentId()==agent.getAgentId()){
                 return "该医院已被您代理";
             }
             return "该医院已被其他代理商代理";
         }
+        SysUser user = sysUserMapper.selectUserByUserName(hospitalAgentVo.getAccountNumber());
+        if (user!=null){
+            return "该账号已被使用,请重新输入账号";
+        }
         //添加代理商和医院关联信息
-        agentMapper.insertAgentHospital(hospitalAgentVo.getAgentId(),hospitalAgentVo.getHospitalId());
+        agentMapper.insertAgentHospital(agent.getAgentId(),hospitalAgentVo.getHospitalId());
         SysUser sysUser = new SysUser();
         //添加用户信息
         sysUser.setUserName(hospitalAgentVo.getAccountNumber());
@@ -158,15 +168,26 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public List<UserLeaseOrderVo> selectLeaseOrder(Long userId) {
+    public List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String nameOrNumber) {
         Agent agent = agentMapper.selectAgentByAgentId(userId);
         List<UserLeaseOrderVo> userLeaseOrderList = new ArrayList<>();
         List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
         agentHospitals.stream().forEach(i->{
-            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(i.getHospitalId());
+            SysUser user = sysUserMapper.selectUserById(userId);
+            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(user.getUserName(),deviceDepartment,deviceTypeName,nameOrNumber);
             userLeaseOrderList.addAll(userLeaseOrders);
         });
         return userLeaseOrderList;
+    }
+
+    @Override
+    public AjaxResult insertAgentAccount(SysUser sysUser, Long userId) {
+        SysUser user = sysUserMapper.selectUserByUserName(sysUser.getUserName());
+        if (user.getUserName()==sysUser.getUserName()){
+            return AjaxResult.error("该账号已被使用,请重新输入");
+        }
+
+        return null;
     }
 
     /*@Override

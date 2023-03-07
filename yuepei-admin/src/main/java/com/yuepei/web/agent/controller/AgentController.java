@@ -4,9 +4,9 @@ import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.vo.DeviceDetailsVo;
 import com.yuepei.system.domain.vo.HospitalAgentVo;
+import com.yuepei.system.service.HospitalDeviceService;
 import com.yuepei.utils.TokenUtils;
 import com.yuepei.web.agent.service.AgentService;
-import com.yuepei.web.hospital.service.HospitalDeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,16 +41,21 @@ public class AgentController {
     /**
      * 编辑代理设备信息
      * */
-    @PostMapping("/updateDeviceDetails")
-    private AjaxResult updateDeviceDetails(@RequestBody DeviceDetailsVo deviceDetailsVo){
-        hospitalDeviceService.updateDeviceDetails(deviceDetailsVo);
+    @GetMapping("/updateDeviceDetails")
+    private AjaxResult updateDeviceDetails(@RequestParam(value = "floorId",required = false,defaultValue = "")Long floorId,
+                                           @RequestParam(value = "departmentId",required = false,defaultValue = "")Long departmentId,
+                                           @RequestParam(value = "roomId",required = false,defaultValue = "")Long roomId,
+                                           @RequestParam(value = "bedId",required = false,defaultValue = "")Long bedId,
+                                           @RequestParam(value = "deviceNumber",required = false,defaultValue = "")String deviceNumber
+    ){
+        hospitalDeviceService.updateDeviceDetails(floorId,departmentId,roomId,bedId,deviceNumber);
         return AjaxResult.success();
     }
 
     /**
      * 查询设备详情
      * */
-    @PostMapping("/selectDeviceDetailsByDeviceNumber")
+    @GetMapping("/selectDeviceDetailsByDeviceNumber")
     private AjaxResult selectDeviceDetailsByDeviceNumber(@RequestParam("deviceNumber")String deviceNumber){
         return AjaxResult.success(agentService.selectDeviceDetailsByDeviceNumber(deviceNumber));
     }
@@ -64,15 +69,28 @@ public class AgentController {
 
     /**代理端添加医院*/
     @PostMapping("/addHospitalByAgent")
-    private AjaxResult addHospitalByAgent(@RequestBody HospitalAgentVo hospitalAgentVo){
-        return AjaxResult.success(agentService.insertHospitalByAgent(hospitalAgentVo));
+    private AjaxResult addHospitalByAgent(@RequestBody HospitalAgentVo hospitalAgentVo,
+                                          HttpServletRequest request){
+        SysUser user = tokenUtils.analysis(request);
+        return AjaxResult.success(agentService.insertHospitalByAgent(hospitalAgentVo,user.getUserName()));
     }
 
     /**代理端租借订单*/
     @GetMapping("/selectLeaseOrder")
-    private AjaxResult selectLeaseOrder(HttpServletRequest request){
+    private AjaxResult selectLeaseOrder(@RequestParam(value = "deviceDepartment",required = false,defaultValue = "") String deviceDepartment,
+                                        @RequestParam(value = "deviceTypeName",required = false,defaultValue = "") String deviceTypeNamue,
+                                        @RequestParam(value = "nameOrNumber",required = false,defaultValue = "") String nameOrNumber,
+                                        HttpServletRequest request){
         SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(agentService.selectLeaseOrder(analysis.getUserId()));
+        return AjaxResult.success(agentService.selectLeaseOrder(analysis.getUserId(),deviceDepartment,deviceTypeNamue,nameOrNumber));
+    }
+
+    /**开通子账户*/
+    @PostMapping("/insertAgentAccount")
+    private AjaxResult insertAgentAccount(@RequestBody SysUser sysUser,
+                                          HttpServletRequest request){
+        SysUser analysis = tokenUtils.analysis(request);
+        return AjaxResult.success(agentService.insertAgentAccount(sysUser,analysis.getUserId()));
     }
 
     /**故障设备列表*/

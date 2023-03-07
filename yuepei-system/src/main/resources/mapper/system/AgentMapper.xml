@@ -12,6 +12,7 @@
     <resultMap id="AgentResult" type="Agent">
         <result property="agentId" column="agent_id"></result>
         <result property="agentName" column="agent_name"></result>
+        <result property="userName" column="user_name"></result>
         <result property="createTime" column="create_time"></result>
         <result property="updateTime" column="update_time"></result>
     </resultMap>
@@ -21,6 +22,10 @@
         left join agent_hospital ah on ah.agent_id = a.agent_id
         left join hospital_user hu on hu.hospital_id = ah.hospital_id
         left join sys_user su on su.user_name = hu.user_name
+    </sql>
+
+    <sql id="selectAgentId">
+        select agent_id,agent_name,user_name,create_time,update_time from agent
     </sql>
 
     <select id="selectAgentByAgentId" parameterType="Agent" resultMap="AgentResult">
@@ -34,6 +39,18 @@
 
     <select id="selectAgentHospital" parameterType="AgentHospital" resultMap="AgentHospitalResult">
         select agent_id,hospital_id from agent_hospital where hospital_id=#{hospitalId}
+    </select>
+
+    <select id="selectAgentByUserName" parameterType="Agent" resultMap="AgentResult">
+        <include refid="selectAgentId"/>
+        where user_name = #{userName}
+    </select>
+    <select id="selectAgentByHospitalId" parameterType="agentHospital" resultMap="AgentHospitalResult">
+        select hospital_id,agent_id from agent_hospital where hospital_id=#{hospitalId}
+    </select>
+    <select id="selectAgent" parameterType="Agent" resultMap="AgentResult">
+        <include refid="selectAgentId"/>
+        where agent_id=#{agentId}
     </select>
 
     <insert id="insertAgentHospital" parameterType="agentHospital">
