@@ -3,7 +3,7 @@ package com.yuepei.system.service.impl;
 import com.yuepei.common.utils.DateUtils;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.Hospital;
-import com.yuepei.system.domain.vo.HospitalVO;
+import com.yuepei.system.domain.vo.HospitalVo;
 import com.yuepei.system.mapper.DeviceMapper;
 import com.yuepei.system.mapper.HospitalMapper;
 import com.yuepei.system.service.HospitalService;
@@ -127,7 +127,7 @@ public class HospitalServiceImpl implements HospitalService {
     @Override
     public Map<String, Object> queryTreeByDeviceNumber(String deviceNumber) {
         Device device = deviceMapper.selectDeviceByDeviceNumber(deviceNumber);
-        List<HospitalVO> hospital = hospitalMapper.selectTreeOne(device.getHospitalId());
+        List<HospitalVo> hospital = hospitalMapper.selectTreeOne(device.getHospitalId());
         Map<String, Object> objectHashMap = new HashMap<>();
         Long[] one = new Long[50];
         Long[] two = new Long[50];
@@ -137,17 +137,17 @@ public class HospitalServiceImpl implements HospitalService {
         for (int i = 0; i < hospital.size(); i++) {
             one[i] = hospital.get(i).getHospitalId();
         }
-        List<HospitalVO> hospitals = hospitalMapper.selectTree(one);
+        List<HospitalVo> hospitals = hospitalMapper.selectTree(one);
         objectHashMap.put("hospital_two",hospitals);
         for (int y = 0; y < hospitals.size(); y++) {
             two[y] = hospitals.get(y).getHospitalId();
         }
-        List<HospitalVO> hospitalVOS = hospitalMapper.selectTree(two);
+        List<HospitalVo> hospitalVOS = hospitalMapper.selectTree(two);
         objectHashMap.put("hospital_three",hospitalVOS);
         for (int l = 0; l < hospitalVOS.size(); l++) {
             three[l] = hospitalVOS.get(l).getHospitalId();
         }
-        List<HospitalVO> hospitalVOS1 = hospitalMapper.selectTree(three);
+        List<HospitalVo> hospitalVOS1 = hospitalMapper.selectTree(three);
         objectHashMap.put("hospital_four",hospitalVOS1);
         return objectHashMap;
     }

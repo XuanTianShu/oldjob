@@ -252,7 +252,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         userLeaseOrderVo.setProportion(sysUser.getProportion());
         userLeaseOrderVo.setAgentName(agent.getAgentName());
         userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
-        BigDecimal deviceTypeDeposit = new BigDecimal(devicetype.getDeviceTypeDeposit());
+        BigDecimal deviceTypeDeposit = new BigDecimal(String.valueOf(devicetype.getDeviceTypeDeposit()));
         userLeaseOrderVo.setDepositNum(deviceTypeDeposit);
         return userLeaseOrderVo;
     }

@@ -13,7 +13,7 @@
         <result property="updateTime"    column="update_time"    />
     </resultMap>
 
-    <resultMap type="com.yuepei.system.domain.vo.HospitalVO" id="HospitalResultVO">
+    <resultMap type="com.yuepei.system.domain.vo.HospitalVo" id="HospitalResultVO">
         <result property="hospitalId"    column="hospital_id"    />
         <result property="hospitalName"    column="hospital_name"    />
         <result property="parentId"    column="parent_id"    />
