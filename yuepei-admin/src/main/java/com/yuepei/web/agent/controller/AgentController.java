@@ -59,7 +59,7 @@ public class AgentController {
     @GetMapping("/selectHospitalAdministration")
     private AjaxResult selectHospitalAdministration(HttpServletRequest request){
         SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(agentService.selectHospitalAdministration(124L));
+        return AjaxResult.success(agentService.selectHospitalAdministration(analysis.getUserId()));
     }
 
     /**代理端添加医院*/
