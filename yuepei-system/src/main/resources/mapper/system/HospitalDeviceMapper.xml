@@ -12,6 +12,29 @@
         left join sys_user su on hu.user_name=su.user_name
     </sql>
 
+    <resultMap type="UserLeaseOrder" id="UserLeaseOrderResult">
+        <result property="id"    column="id"    />
+        <result property="openid"    column="openid"    />
+        <result property="orderNumber"    column="order_number"    />
+        <result property="deviceNumber"    column="device_number"    />
+        <result property="deviceType"    column="device_type"    />
+        <result property="leaseTime"    column="lease_time"    />
+        <result property="leaseAddress"    column="lease_address"    />
+        <result property="restoreTime"    column="restore_time"    />
+        <result property="restoreAddress"    column="restore_address"    />
+        <result property="price"    column="price"    />
+        <result property="payType"    column="pay_type"    />
+        <result property="netAmount"    column="net_amount"    />
+        <result property="couponPrice"    column="coupon_price"    />
+        <result property="status"    column="status"    />
+        <result property="playTime"    column="play_time"    />
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectUserLeaseOrderVo">
+        select id, openid, order_number, device_number, device_type, lease_time, lease_address, restore_time, restore_address, price, pay_type, net_amount, coupon_price, status, play_time,create_time from user_lease_order
+    </sql>
+
     <resultMap id="DeviceTypeResult" type="DeviceType">
         <result property="deviceTypeId" column="device_type_id"></result>
         <result property="deviceTypeName" column="device_type_name"></result>
@@ -164,6 +187,13 @@
     </select>
     <select id="selectDeviceTypeName" parameterType="DeviceType" resultMap="DeviceTypeResult">
         select device_type_id,device_type_name from device_type
+    </select>
+    <select id="selectLeaseOrderByDeviceNumber" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where device_number = #{deviceNumber}
+    </select>
+    <select id="selectHospitalByDepartment" parameterType="Hospital" resultMap="HospitalResult">
+        select hospital_id,hospital_name from hospital where hospital_name=#{deviceDepartment}
     </select>
 
 </mapper>
