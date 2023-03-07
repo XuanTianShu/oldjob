@@ -20,11 +20,11 @@ public interface HospitalDeviceService {
 
     void updateDeviceDetails(Long floorId,Long departmentId,Long roomId,Long bedId,String deviceNumber);
 
-    List<GoodsOrderVo> selectGoodsOrder(Long userId);
+    List<GoodsOrderVo> selectGoodsOrder(String userId);
 
     GoodsOrderVo selectOrderByOrderId(Long orderId);
 
-    List<UserLeaseOrderVo> selectLeaseOrder(String userName,String deviceDepartment,String deviceTypeName,String orderNumber);
+    List<UserLeaseOrderVo> selectLeaseOrder(String userId,String deviceDepartment,String deviceTypeName,String orderNumber);
 
     UserLeaseOrderVo selectLeaseOrderDetails(String orderNumber);
 
@@ -34,7 +34,9 @@ public interface HospitalDeviceService {
 
     List<Map<String,Object>> selectDeviceAddress(Long hospitalId);
 
-    List<String> selectDepartment(String userName);
+//    Map<String,List<Object>> selectDeviceAddress1(Long hospitalId);
+
+    List<String> selectDepartment(Long userId);
 
     List<String> selectDeviceTypeName();
 

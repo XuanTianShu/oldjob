@@ -134,7 +134,7 @@ public class LoginController {
      * 查询商品订单
      * */
     @GetMapping("/selectGoodsOrder/{userId}")
-    public AjaxResult selectGoodsOrder(@PathVariable("userId") Long userId){
+    public AjaxResult selectGoodsOrder(@PathVariable("userId") String userId){
         return AjaxResult.success(hospitalDeviceService.selectGoodsOrder(userId));
     }
 
@@ -151,9 +151,9 @@ public class LoginController {
     }
 
     /**选择科室下拉框*/
-    @GetMapping("/selectDepartment/{userName}")
-    public AjaxResult selectDepartment(@PathVariable("userName") String userName){
-        return AjaxResult.success(hospitalDeviceService.selectDepartment(userName));
+    @GetMapping("/selectDepartment/{userId}")
+    public AjaxResult selectDepartment(@PathVariable("userId") Long userId){
+        return AjaxResult.success(hospitalDeviceService.selectDepartment(userId));
     }
 
     /**

@@ -135,8 +135,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     }
 
     @Override
-    public List<GoodsOrderVo> selectGoodsOrder(Long userId) {
-        List<GoodsOrder> goodsOrders = hospitalDeviceMapper.selectGoodsOrder(userId);
+    public List<GoodsOrderVo> selectGoodsOrder(String userId) {
+        List<GoodsOrder> goodsOrders = hospitalDeviceMapper.selectGoodsOrder(Long.parseLong(String.valueOf(userId)));
         List<GoodsOrderVo> goodsOrderVos = new ArrayList<>();
         goodsOrders.stream().forEach(map -> {
             GoodsOrderVo orderVo = new GoodsOrderVo();
@@ -167,8 +167,9 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     }
 
     @Override
-    public List<String> selectDepartment(String userName) {
-        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(userName);
+    public List<String> selectDepartment(Long userId) {
+        SysUser sysUser = sysUserMapper.selectUserById(userId);
+        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
         List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(hospitalUser.getHospitalId());
         List<String> deviceDepartment = new ArrayList<>();
         deviceList.stream().forEach(map -> {
@@ -196,8 +197,9 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     }
 
     @Override
-    public List<UserLeaseOrderVo> selectLeaseOrder(String userName,String deviceDepartment,String deviceTypeName,String orderNumber) {
-        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(userName);
+    public List<UserLeaseOrderVo> selectLeaseOrder(String userId,String deviceDepartment,String deviceTypeName,String orderNumber) {
+        SysUser sysUser = sysUserMapper.selectUserById(Long.parseLong(String.valueOf(userId)));
+        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
         List<String> numberList = hospitalDeviceMapper.selectLeaseOrder(hospitalUser.getHospitalId());
         List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrder(numberList);
         List<UserLeaseOrderVo> userLeaseOrderList = userLeaseOrders.stream().map(a -> {
@@ -460,5 +462,20 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         return mapList;
     }
 
+/*    @Override
+    public Map<String,List<Object>> selectDeviceAddress1(Long hospitalId) {
+        Map<String,List<Object>> listMap = new HashMap<>();
+        List<Hospital> hospitals = hospitalDeviceMapper.selectHospitalByParentId(hospitalId);
+        List<HospitalVo> hospitalVos = hospitals.stream().map(a -> {HospitalVo d = new HospitalVo();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
+        Map<String, Object> one = new HashMap<>();
+        one.put("hospital_four",hospitalVos);
+        hospitalVos.stream().forEach(map->{
+            List<Hospital> hospitals1 = hospitalDeviceMapper.selectHospitalByParentId(map.getHospitalId());
+            List<HospitalVo> hospitalVos1 = hospitals1.stream().map(a -> {HospitalVo d = new HospitalVo();BeanUtils.copyProperties(a, d);return d;}).collect(Collectors.toList());
+            Map<String, Object> two = new HashMap<>();
+            two.put("hospital_two",hospitalVos1);
+        });
+        return listMap;
+    }*/
 
 }
