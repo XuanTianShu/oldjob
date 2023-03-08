@@ -72,16 +72,14 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             String device_full_address = map.getDeviceFullAddress();
             if (!device_full_address.isEmpty()) {
                 String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
-                for (int i = 0; i < array.length; i++) {
-                    Hospital deviceFllor = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[0]));
-                    Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
-                    Hospital deviceRoom = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[2]));
-                    Hospital deviceBed = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[3]));
-                    deviceDetailsVo.setDeviceFloor(deviceFllor.getHospitalId());
-                    deviceDetailsVo.setDeviceDepartment(Department.getHospitalId());
-                    deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
-                    deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
-                }
+                Hospital deviceFloor = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[0]));
+                Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
+                Hospital deviceRoom = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[2]));
+                Hospital deviceBed = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[3]));
+                deviceDetailsVo.setDeviceFloor(deviceFloor.getHospitalId());
+                deviceDetailsVo.setDeviceDepartment(Department.getHospitalId());
+                deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
+                deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
                 deviceDetailsVo.setDeviceFullAddress(device_full_address);
                 deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
                 deviceDetailsVo.setStatus(map.getStatus());
@@ -300,8 +298,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 BigDecimal decimal = new BigDecimal(map.getNetAmount());
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(sysUser.getProportion());
-                BigDecimal totalFee = new BigDecimal(sysUser.getProportion()/100);
-                orderVo.setIncomeAmount(decimal.multiply(totalFee));
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -332,8 +329,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 BigDecimal decimal = new BigDecimal(map.getNetAmount());
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(sysUser.getProportion());
-                BigDecimal totalFee = new BigDecimal(sysUser.getProportion()/100);
-                orderVo.setIncomeAmount(decimal.multiply(totalFee));
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -374,8 +370,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 BigDecimal decimal = new BigDecimal(map.getNetAmount());
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(sysUser.getProportion());
-                BigDecimal totalFee = new BigDecimal(sysUser.getProportion()/100);
-                orderVo.setIncomeAmount(decimal.multiply(totalFee));
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -392,8 +387,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 BigDecimal decimal = new BigDecimal(map.getNetAmount());
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(sysUser.getProportion());
-                BigDecimal totalFee = new BigDecimal(sysUser.getProportion()/100);
-                orderVo.setIncomeAmount(decimal.multiply(totalFee));
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());

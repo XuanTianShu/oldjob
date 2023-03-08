@@ -28,6 +28,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="remark"       column="remark"       />
 		<result property="userType"		column="user_type"	  />
 		<result property="proportion"   column="proportion"/>
+		<result property="parentId"   column="parent_id"/>
         <association property="dept"    column="dept_id" javaType="com.yuepei.common.core.domain.entity.SysDept" resultMap="deptResult" />
         <collection  property="roles"   javaType="java.util.List"           resultMap="RoleResult" />
     </resultMap>
@@ -52,7 +53,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
 	<sql id="selectUserVo">
-        select u.user_id, u.dept_id, u.user_name, u.balance, u.openid, u.integral, u.nick_name, u.email, u.avatar, u.phone_number, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,u.user_type,
+        select u.user_id, u.dept_id, u.user_name, u.balance, u.openid, u.integral, u.nick_name, u.email, u.avatar, u.phone_number, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,u.user_type,u.proportion,u.parent_id,
         d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.status as dept_status,
         r.role_id, r.role_name, r.role_key,u.proportion, r.role_sort, r.data_scope, r.status as role_status
         from sys_user u
@@ -296,5 +297,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			sys_user su
 		WHERE
 			su.user_name = #{userName};
+	</select>
+	<select id="selectUserByHospital" parameterType="SysUser" resultMap="SysUserResult">
+		select user_id, dept_id, user_name, balance, openid, integral, nick_name, email, avatar, phone_number, password, sex, status, del_flag, login_ip, login_date, create_by, create_time, remark,user_type,proportion,parent_id
+		from sys_user
+		where user_name=#{userName}
+		and user_type='04'
 	</select>
 </mapper>

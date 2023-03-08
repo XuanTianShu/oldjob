@@ -153,4 +153,6 @@ public interface SysUserMapper
     SysUser selectUserByUser(@Param("userName") String userName);
 
     SysUser getPassword(String userName);
+
+    SysUser selectUserByHospital(@Param("userName") String userName);
 }

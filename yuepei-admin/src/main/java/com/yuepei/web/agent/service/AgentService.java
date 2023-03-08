@@ -12,13 +12,15 @@ import java.util.List;
  */
 public interface AgentService {
 
-    List<DeviceDetailsVo> selectAgentInfo(Long userId);
+    DeviceManageVo selectAgentInfo(Long userId,Long utilizationRate);
 
     DeviceWorkStatusVo selectDeviceDetailsByDeviceNumber(String deviceNumber);
 
-    List<HospitalManagementVo> selectHospitalAdministration(Long userId);
+    DeviceManageVo selectHospitalAdministration(Long userId, Long hospitalId, Long utilizationRate);
 
-    String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo,String userName);
+    String selectProportion(Long userId);
+
+    String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo,Long userId);
 
     List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String nameOrNumber);
 

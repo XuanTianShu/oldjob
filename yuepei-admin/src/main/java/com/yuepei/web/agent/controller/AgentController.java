@@ -33,9 +33,9 @@ public class AgentController {
      * 查询代理设备信息
      * */
     @GetMapping("/selectAgentInfo")
-    private AjaxResult selectAgentInfo(HttpServletRequest request){
-        SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(agentService.selectAgentInfo(analysis.getUserId()));
+    private AjaxResult selectAgentInfo(@RequestParam(value = "userId")Long userId,
+                                       @RequestParam(value = "utilizationRate",required = false,defaultValue = "")Long utilizationRate){
+        return AjaxResult.success(agentService.selectAgentInfo(userId,utilizationRate));
     }
 
     /**
@@ -62,17 +62,23 @@ public class AgentController {
 
     /**代理端医院管理*/
     @GetMapping("/selectHospitalAdministration")
-    private AjaxResult selectHospitalAdministration(HttpServletRequest request){
-        SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(agentService.selectHospitalAdministration(analysis.getUserId()));
+    private AjaxResult selectHospitalAdministration(@RequestParam(value = "userId")Long userId,
+                                                    @RequestParam(value = "hospitalId",required = false,defaultValue = "")Long hospitalId,
+                                                    @RequestParam(value = "utilizationRate",required = false,defaultValue = "")Long utilizationRate){
+        return AjaxResult.success(agentService.selectHospitalAdministration(userId,hospitalId,utilizationRate));
+    }
+
+    /**查询可分配分成比例*/
+    @GetMapping("/selectProportion/{userId}")
+    private AjaxResult selectProportion(@PathVariable(value = "userId")Long userId){
+        return AjaxResult.success(agentService.selectProportion(userId));
     }
 
     /**代理端添加医院*/
     @PostMapping("/addHospitalByAgent")
     private AjaxResult addHospitalByAgent(@RequestBody HospitalAgentVo hospitalAgentVo,
-                                          HttpServletRequest request){
-        SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(agentService.insertHospitalByAgent(hospitalAgentVo,user.getUserName()));
+                                          @RequestParam(value = "userId")Long userId){
+        return AjaxResult.success(agentService.insertHospitalByAgent(hospitalAgentVo,userId));
     }
 
     /**代理端租借订单*/

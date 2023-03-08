@@ -23,7 +23,7 @@ public class HospitalAgentVo {
     /**联系人*/
     private String contacts;
     /**分成比例*/
-    private String divided;
+    private Long divided;
     /**划分名下设备*/
     private List<DeviceInfoVo> deviceDetails;
 }

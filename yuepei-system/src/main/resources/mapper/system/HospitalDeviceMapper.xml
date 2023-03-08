@@ -164,10 +164,6 @@
         select device_number from device where hospital_id = #{hospitalId}
     </select>
 
-    <select id="selectDeviceByDeviceAddress" resultType="java.lang.String">
-        select distinct device_address from device where hospital_id=#{hospitalId}
-    </select>
-
     <select id="selectHospitalbyUserName" parameterType="HospitalUser" resultMap="HospitalUserResult">
         select hospital_id,user_name from hospital_user where user_name=#{userName}
     </select>
@@ -195,5 +191,12 @@
     <select id="selectHospitalByDepartment" parameterType="Hospital" resultMap="HospitalResult">
         select hospital_id,hospital_name from hospital where hospital_name=#{deviceDepartment}
     </select>
+    <select id="selectHospitalByHospitalUserName" parameterType="HospitalUser" resultMap="HospitalUserResult">
+        select hospital_id,user_name from hospital_user where hospital_id=#{hospitalId}
+    </select>
+    <select id="selectHospitalByHospitalId" parameterType="Hospital" resultMap="HospitalResult">
+        select hospital_id,user_name from hospital_user where hospital_name=#{hospitalName}
+    </select>
+
 
 </mapper>
