@@ -133,6 +133,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where u.user_name = #{userName} and u.del_flag = '0'
 	</select>
 
+	<select id="selectUserByUser" parameterType="String" resultMap="SysUserResult">
+		<include refid="selectUserVo"/>
+		where u.user_name = #{userName} and u.del_flag = '0' and (user_type='03' or user_type='04' or user_type='05')
+	</select>
+
 	<select id="selectUserByOpenid" parameterType="string" resultMap="SysUserResult">
 		<include refid="selectUserVo"/>
 		where u.openid = #{openid} and u.del_flag = '0'
@@ -190,8 +195,17 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<!-- 数据范围过滤 -->
 		${params.dataScope}
 	</select>
+	<select id="getPassword" resultType="com.yuepei.common.core.domain.entity.SysUser">
+		SELECT
+			su.user_id,
+			su.`PASSWORD`
+		FROM
+			sys_user su
+		WHERE
+			su.user_name = #{userName};
+	</select>
 
-    <insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
+	<insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
  		insert into sys_user(
  			<if test="userId != null and userId != 0">user_id,</if>
  			<if test="deptId != null and deptId != 0">dept_id,</if>

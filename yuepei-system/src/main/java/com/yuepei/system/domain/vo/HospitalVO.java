@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class HospitalVO {
-
     /** 主键 */
     private Long hospitalId;
 
