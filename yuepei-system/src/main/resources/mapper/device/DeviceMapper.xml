@@ -183,5 +183,8 @@
         <include refid="selectDeviceVo"/>
         where hospital_id = #{hospitalId}
     </select>
+    <select id="selectDeviceAll" parameterType="device" resultMap="DeviceResult">
+        select device_id, device_type_id, device_number,device_iot_number,device_mac,device_deposit, billing_id,hospital_id, device_qR_code, device_address, device_full_address,`rows`,heart_time, create_time, status from device
+    </select>
 
 </mapper>

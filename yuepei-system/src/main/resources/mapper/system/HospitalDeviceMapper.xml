@@ -197,6 +197,9 @@
     <select id="selectHospitalByHospitalId" parameterType="Hospital" resultMap="HospitalResult">
         select hospital_id,user_name from hospital_user where hospital_name=#{hospitalName}
     </select>
+    <select id="selectHospitalList" parameterType="Hospital" resultMap="HospitalResult">
+        select hospital_id,hospital_name from hospital where parent_id=0
+    </select>
 
 
 </mapper>

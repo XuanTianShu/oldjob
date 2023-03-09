@@ -105,4 +105,6 @@ public interface UserLeaseOrderMapper {
     ConditionOrderVO selectConditionOrder(LeaseOrderVO leaseOrderVO);
 
     List<UserLeaseOrder> selectUserLeaseOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber);
+
+    UserLeaseOrder selectUseDevice(@Param("deviceNumber")String deviceNumber);
 }

@@ -27,4 +27,6 @@ public interface AgentMapper {
     AgentHospital selectAgentByHospitalId(@Param("hospitalId") Long hospitalId);
 
     Agent selectAgent(@Param("agentId") Long agentId);
+
+    void insertAgent(Agent agent);
 }

@@ -2,6 +2,7 @@ package com.yuepei.system.service;
 
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.system.domain.DeviceType;
+import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.vo.*;
 
 import java.util.List;
@@ -33,8 +34,6 @@ public interface HospitalDeviceService {
 
     List<Map<String,Object>> selectDeviceAddress(Long hospitalId);
 
-//    Map<String,List<Object>> selectDeviceAddress1(Long hospitalId);
-
     List<String> selectDepartment(Long userId);
 
     List<String> selectDeviceTypeName();
@@ -42,4 +41,6 @@ public interface HospitalDeviceService {
     Map<String,List<HospitalVo>> selectDeviceAddress1(Long hospitalId);
 
     IndexVo indexPage(Long userId);
+
+    List<Hospital> selectHospitalList();
 }

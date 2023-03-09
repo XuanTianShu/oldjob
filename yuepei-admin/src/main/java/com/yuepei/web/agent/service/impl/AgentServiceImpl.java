@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -162,18 +163,20 @@ public class AgentServiceImpl implements AgentService {
                 }
             });
         });
-        if (hospitalId!=null){
-            List<HospitalManagementVo> collect = hospitalManagementVos.stream().filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
-            hospitalManagementVos.clear();
-            hospitalManagementVos.addAll(collect);
-        }
+        List<HospitalManagementVo> managementVos = hospitalManagementVos.stream().distinct().collect(Collectors.toList());
         List<Device> devices = new ArrayList<>();
-        hospitalManagementVos.stream().forEach(map->{
+        managementVos.stream().forEach(map->{
             List<Device> deviceNumber = hospitalDeviceMapper.selectDeviceByHospitalId(map.getHospitalId());
             devices.addAll(deviceNumber);
         });
+        List<Device> list = devices.stream().distinct().collect(Collectors.toList());
+        if (hospitalId!=null){
+            List<HospitalManagementVo> collect = managementVos.stream().filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
+            managementVos.clear();
+            managementVos.addAll(collect);
+        }
         BigDecimal decimal = new BigDecimal(0);
-        devices.stream().forEach(map->{
+        list.stream().forEach(map->{
             List<UserLeaseOrderVo> userLeaseOrderVos = new ArrayList<>();
             List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
             userLeaseOrderList.stream().forEach(i->{
@@ -184,9 +187,11 @@ public class AgentServiceImpl implements AgentService {
             BigDecimal reduce = userLeaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
             decimal.add(reduce);
         });
+        deviceManageVo.setHospitalSum(agentHospitals.size());
+        deviceManageVo.setDeviceSum(list.size());
         deviceManageVo.setDeviceAmount(decimal);
         deviceManageVo.setUtilizationRate(null);
-        deviceManageVo.setHospitalManagementVos(hospitalManagementVos);
+        deviceManageVo.setHospitalManagementVos(managementVos);
         return deviceManageVo;
     }
 
@@ -222,20 +227,6 @@ public class AgentServiceImpl implements AgentService {
         AgentHospital agentHospital = agentMapper.selectAgentHospital(hospitalAgentVo.getHospitalId());
         SysUser su = sysUserMapper.selectUserById(userId);
         Agent agent = agentMapper.selectAgentByUserName(su.getUserName());
-        if (String.valueOf(su.getParentId()).equals("0")){
-            SysUser userById = sysUserMapper.selectUserById(su.getParentId());
-            agent = agentMapper.selectAgentByUserName(userById.getUserName());
-            HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(userById.getUserName());
-            List<HospitalUser> hospitalUsers = hospitalDeviceMapper.selectHospitalByHospitalUserName(hospitalUser.getHospitalId());
-            List<SysUser> sysUsers = new ArrayList<>();
-            hospitalUsers.stream().forEach(map->{
-                SysUser sysUser = sysUserMapper.selectUserByHospital(map.getUserName());
-                sysUsers.add(sysUser);
-            });
-            if (sysUsers.size()==2){
-                return "您只能添加两个子代理";
-            }
-        }
         if (agentHospital!=null){
             if (agentHospital.getAgentId()==agent.getAgentId()){
                 return "该医院已被您代理";
@@ -259,48 +250,133 @@ public class AgentServiceImpl implements AgentService {
         //添加用户和医院关联信息
         agentMapper.insertHospitalUser(hospitalAgentVo.getHospitalId(),hospitalAgentVo.getAccountNumber());
         //设备详细信息
-        List<DeviceInfoVo> deviceDetails = hospitalAgentVo.getDeviceDetails();
-        deviceDetails.stream().forEach(map->{
-            Device device = new Device();
-            List<Long> fullAddress = new ArrayList<>();
-            fullAddress.add(map.getDeviceFloor());
-            fullAddress.add(map.getDeviceDepartment());
-            fullAddress.add(map.getDeviceRoom());
-            fullAddress.add(map.getDeviceBed());
-            Gson gson = new Gson();
-            String deviceFullAddress = gson.toJson(fullAddress);
-            device.setDeviceFullAddress(deviceFullAddress);
-            device.setDeviceAddress(hospitalAgentVo.getHospitalAddress());
-            device.setDeviceTypeId(map.getDeviceTypeId());
-            device.setHospitalId(map.getHospitalId());
-            device.setDeviceNumber(map.getDeviceNumber());
-            device.setCreateTime(new Date());
-            deviceMapper.insertDevice(device);
-        });
+        String deviceNumber = hospitalAgentVo.getDeviceNumber();
+        String[] device = deviceNumber.split(",");
+        for (String s : device) {
+            Device devices = deviceMapper.selectDeviceByDeviceNumber(s);
+            if (devices.getHospitalId()!=null){
+                return  "设备编号为:"+s+"已被使用,请重新输入";
+            }
+            devices.setHospitalId(hospitalAgentVo.getHospitalId());
+            deviceMapper.updateDevice(devices);
+        }
         return "添加成功";
     }
 
     @Override
     public List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String nameOrNumber) {
-        Agent agent = agentMapper.selectAgentByAgentId(userId);
-        List<UserLeaseOrderVo> userLeaseOrderList = new ArrayList<>();
-        List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
-        agentHospitals.stream().forEach(i->{
-            SysUser user = sysUserMapper.selectUserById(userId);
-            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(user.getUserId(),deviceDepartment,deviceTypeName,nameOrNumber);
-            userLeaseOrderList.addAll(userLeaseOrders);
-        });
-        return userLeaseOrderList;
+        List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(userId,deviceDepartment,deviceTypeName,nameOrNumber);
+        return userLeaseOrders;
     }
 
     @Override
-    public AjaxResult insertAgentAccount(SysUser sysUser, Long userId) {
-        SysUser user = sysUserMapper.selectUserByUserName(sysUser.getUserName());
-        if (user.getUserName()==sysUser.getUserName()){
-            return AjaxResult.error("该账号已被使用,请重新输入");
-        }
+    public Agent selectAgentByUser(Long userId){
+        SysUser user = sysUserMapper.selectUserById(userId);
+        Agent agent = agentMapper.selectAgentByUserName(user.getUserName());
+        return agent;
+    }
 
-        return null;
+    @Override
+    public String insertAgentAccount(SubAccountVo subAccountVo, Long userId) {
+        List<SysUser> user = sysUserMapper.selectUserByParentId(userId);
+        if (user.size()>=2){
+            return "您只能添加两个子账户";
+        }
+        SysUser SysUser = sysUserMapper.selectUserById(userId);
+        Agent agent = agentMapper.selectAgentByUserName(SysUser.getUserName());
+        SysUser sysUser = new SysUser();
+        sysUser.setUserName(subAccountVo.getUserName());
+        sysUser.setPassword(SecurityUtils.encryptPassword(subAccountVo.getPassword()));
+        sysUser.setPhoneNumber(subAccountVo.getNumber());
+        sysUser.setRole(subAccountVo.getRole());
+        sysUser.setProportion(subAccountVo.getProportion());
+        sysUser.setArea(subAccountVo.getArea());
+        sysUser.setAddressDetailed(subAccountVo.getAddress());
+        sysUser.setContacts(subAccountVo.getContacts());
+        sysUser.setUserType("05");
+        sysUser.setParentId(userId);
+        sysUser.setNickName("代理商用户");
+        sysUserMapper.insertUser(sysUser);
+        Agent agent1 = new Agent();
+        agent1.setAgentName(agent.getAgentName());
+        agent1.setUserName(subAccountVo.getUserName());
+        agent1.setCreateTime(new Date());
+        agent1.setUpdateTime(new Date());
+        agentMapper.insertAgent(agent1);
+        return "添加成功";
+    }
+
+    @Override
+    public List<SubAccountManageVo> selectSubAccount(Long userId) {
+        List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
+        List<SubAccountManageVo> subAccountManageVoList = new ArrayList<>();
+        sysUsers.stream().forEach(map->{
+            SubAccountManageVo subAccountManageVo = new SubAccountManageVo();
+            Agent agent = agentMapper.selectAgentByUserName(map.getUserName());
+            List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
+            subAccountManageVo.setProportion(map.getProportion());
+            subAccountManageVo.setAgentName(agent.getAgentName());
+            subAccountManageVo.setHospitalSum(agentHospitals.size());
+            if (agentHospitals.size()==0){
+                subAccountManageVo.setDeviceSum(0);
+            }
+            agentHospitals.stream().forEach(i->{
+                List<Device> deviceList = deviceMapper.selectDeviceByHospitalId(i.getHospitalId());
+                subAccountManageVo.setDeviceSum(deviceList.size());
+            });
+            subAccountManageVoList.add(subAccountManageVo);
+        });
+
+        return subAccountManageVoList;
+    }
+
+    @Override
+    public AgentDeviceVo selectAgentByDevice(Long userId) {
+        AgentDeviceVo agentDeviceVo = new AgentDeviceVo();
+        SysUser sysUser = sysUserMapper.selectUserById(userId);
+        if (sysUser.getParentId()!=0){
+            //该账号为子代理
+            List<DeviceType> deviceType = hospitalDeviceMapper.selectDeviceType(sysUser.getUserId());
+            Agent agent = agentMapper.selectAgentByUserName(sysUser.getUserName());
+            List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
+            agentDeviceVo.setHospitalSum(agentHospitals.size());
+            if (agentHospitals.size()==0){
+                agentDeviceVo.setDeviceSum(0);
+                agentDeviceVo.setUseDeviceSum(0);
+            }
+            List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
+            List<Device> deviceList = new ArrayList<>();
+            agentHospitals.stream().forEach(i->{
+                List<Device> devices = deviceMapper.selectDeviceByHospitalId(i.getHospitalId());
+                deviceList.addAll(devices);
+                deviceList.stream().forEach(map->{
+                    UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectUseDevice(map.getDeviceNumber());
+                    userLeaseOrderList.add(userLeaseOrder);
+                });
+            });
+            agentDeviceVo.setDeviceSum(deviceList.size());
+            agentDeviceVo.setUseDeviceSum(userLeaseOrderList.size());
+            agentDeviceVo.setDeviceTypes(deviceType);
+            return agentDeviceVo;
+        }else {
+            //该账号为主代理
+            agentDeviceVo.setDeviceSum(0);
+            agentDeviceVo.setHospitalSum(0);
+            agentDeviceVo.setUseDeviceSum(0);
+            return agentDeviceVo;
+        }
+    }
+
+    @Override
+    public List<String> selectDeviceList() {
+        List<String> deviceNumber = new ArrayList<>();
+        List<Device> devices = deviceMapper.selectDeviceAll();
+        for (Device device : devices) {
+            if (device.getHospitalId()==null){
+                deviceNumber.add(device.getDeviceNumber());
+            }
+        }
+        return deviceNumber;
     }
 
     /*@Override

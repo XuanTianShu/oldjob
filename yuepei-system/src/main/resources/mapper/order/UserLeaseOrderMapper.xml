@@ -242,4 +242,7 @@
         where status=2
         and device_number=#{deviceNumber}
     </select>
+    <select id="selectUseDevice" resultType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        select distinct device_number from user_lease_order where device_number=#{deviceNumber} and status=0
+    </select>
 </mapper>

@@ -51,4 +51,5 @@ public interface HospitalDeviceMapper {
 
     Hospital selectHospitalByHospitalId(@Param("hospitalName")String hospitalName);
 
+    List<Hospital> selectHospitalList();
 }

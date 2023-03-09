@@ -2,6 +2,10 @@ package com.yuepei.web.agent.service;
 
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.system.domain.Agent;
+import com.yuepei.system.domain.Device;
+import com.yuepei.system.domain.DeviceType;
+import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.vo.*;
 
 import java.util.List;
@@ -24,7 +28,15 @@ public interface AgentService {
 
     List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String nameOrNumber);
 
-    AjaxResult insertAgentAccount(SysUser sysUser, Long userId);
+    Agent selectAgentByUser(Long userId);
+
+    String insertAgentAccount(SubAccountVo subAccountVo, Long userId);
+
+    List<SubAccountManageVo> selectSubAccount(Long userId);
+
+    AgentDeviceVo selectAgentByDevice(Long userId);
+
+    List<String> selectDeviceList();
 
 //    List<FaultVo> selectDeviceFaultList(Long userId);
 }

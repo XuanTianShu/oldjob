@@ -4,6 +4,7 @@ import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.vo.DeviceDetailsVo;
 import com.yuepei.system.domain.vo.HospitalAgentVo;
+import com.yuepei.system.domain.vo.SubAccountVo;
 import com.yuepei.system.service.HospitalDeviceService;
 import com.yuepei.utils.TokenUtils;
 import com.yuepei.web.agent.service.AgentService;
@@ -46,8 +47,7 @@ public class AgentController {
                                            @RequestParam(value = "departmentId",required = false,defaultValue = "")Long departmentId,
                                            @RequestParam(value = "roomId",required = false,defaultValue = "")Long roomId,
                                            @RequestParam(value = "bedId",required = false,defaultValue = "")Long bedId,
-                                           @RequestParam(value = "deviceNumber",required = false,defaultValue = "")String deviceNumber
-    ){
+                                           @RequestParam(value = "deviceNumber",required = false,defaultValue = "")String deviceNumber){
         hospitalDeviceService.updateDeviceDetails(floorId,departmentId,roomId,bedId,deviceNumber);
         return AjaxResult.success();
     }
@@ -74,6 +74,18 @@ public class AgentController {
         return AjaxResult.success(agentService.selectProportion(userId));
     }
 
+    /**医院下拉框*/
+    @GetMapping("/selectHospitalList")
+    private AjaxResult selectHospitalList(){
+        return AjaxResult.success(hospitalDeviceService.selectHospitalList());
+    }
+
+    /**设备下拉框*/
+    @GetMapping("/selectDeviceList")
+    private AjaxResult selectDeviceList(){
+        return AjaxResult.success(agentService.selectDeviceList());
+    }
+
     /**代理端添加医院*/
     @PostMapping("/addHospitalByAgent")
     private AjaxResult addHospitalByAgent(@RequestBody HospitalAgentVo hospitalAgentVo,
@@ -86,19 +98,34 @@ public class AgentController {
     private AjaxResult selectLeaseOrder(@RequestParam(value = "deviceDepartment",required = false,defaultValue = "") String deviceDepartment,
                                         @RequestParam(value = "deviceTypeName",required = false,defaultValue = "") String deviceTypeNamue,
                                         @RequestParam(value = "nameOrNumber",required = false,defaultValue = "") String nameOrNumber,
-                                        HttpServletRequest request){
-        SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(agentService.selectLeaseOrder(analysis.getUserId(),deviceDepartment,deviceTypeNamue,nameOrNumber));
+                                        @RequestParam(value = "userId") Long userId){
+        return AjaxResult.success(agentService.selectLeaseOrder(userId,deviceDepartment,deviceTypeNamue,nameOrNumber));
+    }
+
+    /**查询当前用户是哪个代理商*/
+    @GetMapping("/selectAgentByUser/{userId}")
+    private AjaxResult selectAgentByUser(@PathVariable(value = "userId")Long userId){
+        return AjaxResult.success(agentService.selectAgentByUser(userId));
     }
 
     /**开通子账户*/
     @PostMapping("/insertAgentAccount")
-    private AjaxResult insertAgentAccount(@RequestBody SysUser sysUser,
-                                          HttpServletRequest request){
-        SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(agentService.insertAgentAccount(sysUser,analysis.getUserId()));
+    private AjaxResult insertAgentAccount(@RequestBody SubAccountVo subAccountVo,
+                                          @RequestParam(value = "userId") Long userId){
+        return AjaxResult.success(agentService.insertAgentAccount(subAccountVo,userId));
     }
 
+    /**子账户管理列表*/
+    @GetMapping("/selectSubAccount/{userId}")
+    private AjaxResult selectSubAccount(@PathVariable(value = "userId")Long userId){
+        return AjaxResult.success(agentService.selectSubAccount(userId));
+    }
+
+    /**代理端-设备管理*/
+    @GetMapping("/selectAgentByDevice/{userId}")
+    private AjaxResult selectAgentByDevice(@PathVariable(value = "userId")Long userId){
+        return AjaxResult.success(agentService.selectAgentByDevice(userId));
+    }
     /**故障设备列表*/
     /*@GetMapping("/selectDeviceFaultList")
     private AjaxResult selectDeviceFaultList(HttpServletRequest request){

@@ -517,4 +517,9 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         return indexVo;
     }
 
+    @Override
+    public List<Hospital> selectHospitalList() {
+        return hospitalDeviceMapper.selectHospitalList();
+    }
+
 }

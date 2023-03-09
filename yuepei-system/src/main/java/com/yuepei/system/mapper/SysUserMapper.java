@@ -155,4 +155,6 @@ public interface SysUserMapper
     SysUser getPassword(String userName);
 
     SysUser selectUserByHospital(@Param("userName") String userName);
+
+    List<SysUser> selectUserByParentId(@Param("userId") Long userId);
 }

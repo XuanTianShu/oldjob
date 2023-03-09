@@ -211,6 +211,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="status != null and status != ''">status,</if>
  			<if test="createBy != null and createBy != ''">create_by,</if>
  			<if test="remark != null and remark != ''">remark,</if>
+ 			<if test="userType != null and userType != ''">user_type,</if>
+ 			<if test="proportion != null and proportion != ''">proportion,</if>
+ 			<if test="contacts != null and contacts != ''">contacts,</if>
+ 			<if test="role != null and role != ''">role,</if>
+ 			<if test="area != null and area != ''">area,</if>
+ 			<if test="addressDetailed != null and addressDetailed != ''">address_detailed,</if>
+ 			<if test="parentId != null and parentId != ''">parent_id,</if>
  			create_time
  		)values(
  			<if test="userId != null and userId != ''">#{userId},</if>
@@ -226,6 +233,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="status != null and status != ''">#{status},</if>
  			<if test="createBy != null and createBy != ''">#{createBy},</if>
  			<if test="remark != null and remark != ''">#{remark},</if>
+			<if test="userType != null and userType != ''">#{userType},</if>
+			<if test="proportion != null and proportion != ''">#{proportion},</if>
+			<if test="contacts != null and contacts != ''">#{contacts},</if>
+			<if test="role != null and role != ''">#{role},</if>
+			<if test="area != null and area != ''">#{area},</if>
+			<if test="addressDetailed != null and addressDetailed != ''">#{addressDetailed},</if>
+			<if test="parentId != null and parentId != ''">#{parentId},</if>
  			sysdate()
  		)
 	</insert>
@@ -303,5 +317,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from sys_user
 		where user_name=#{userName}
 		and user_type='04'
+	</select>
+    <select id="selectUserByParentId" parameterType="SysUser" resultMap="SysUserResult">
+		select user_id, dept_id, user_name, balance, openid, integral, nick_name, email, avatar, phone_number, password, sex, status, del_flag, login_ip, login_date, create_by, create_time, remark,user_type,proportion,parent_id
+		from sys_user
+		where parent_id=#{userId}
 	</select>
 </mapper>

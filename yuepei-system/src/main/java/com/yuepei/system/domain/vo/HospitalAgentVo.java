@@ -25,5 +25,5 @@ public class HospitalAgentVo {
     /**分成比例*/
     private Long divided;
     /**划分名下设备*/
-    private List<DeviceInfoVo> deviceDetails;
+    private String deviceNumber;
 }

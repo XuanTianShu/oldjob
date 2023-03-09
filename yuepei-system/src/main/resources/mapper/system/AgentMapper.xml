@@ -60,4 +60,7 @@
     <insert id="insertHospitalUser" parameterType="HospitalUser">
         insert into hospital_user(hospital_id,user_name)values (#{hospitalId},#{accountNumber})
     </insert>
+    <insert id="insertAgent" parameterType="Agent">
+        insert into agent (agent_name,user_name,create_time,update_time) values (#{agentName},#{userName},#{createTime},#{updateTime})
+    </insert>
 </mapper>
