@@ -90,4 +90,6 @@ public class UserLeaseOrder extends BaseEntity {
     private String rule;
 
     private String outTradeNo;
+
+    private Long choose;
 }

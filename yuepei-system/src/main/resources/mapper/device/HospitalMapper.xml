@@ -65,17 +65,6 @@
             <if test="hospitalRule != null">hospital_rule,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateTime != null">update_time,</if>
-            <if test="hospitalRule != null">hospital_rule,</if>
-            <if test="createTime != null">create_time,</if>
-            <if test="updateTime != null">update_time,</if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="hospitalName != null">#{hospitalName},</if>
-            <if test="parentId != null">#{parentId},</if>
-            <if test="hospitalRule != null">#{hospitalRule},</if>
-            <if test="createTime != null">#{createTime},</if>
-            <if test="updateTime != null">#{updateTime},</if>
-            <if test="hospitalRule != null and hospitalRule != ''">hospital_rule,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="hospitalName != null">#{hospitalName},</if>

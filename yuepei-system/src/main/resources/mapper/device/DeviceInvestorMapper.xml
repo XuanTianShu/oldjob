@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yuepei.system.mapper.DeviceInvestorMapper">
+    <resultMap id="deviceInvestorQuery" type="com.yuepei.system.domain.DeviceInvestor">
+        <result property="investorId" column="investor_id"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="id" column="Id"/>
+    </resultMap>
+    <insert id="insert" parameterType="String">
+        insert into device_investor(`investor_id`,`device_number`) values
+        <foreach item="discountRecord" collection="toArray" index="index"  separator=",">
+            (#{discountRecord},#{deviceNumber})
+        </foreach>
+    </insert>
+
+    <delete id="delByInvestorId" parameterType="String">
+        delete from device_investor where investor_id in
+        <foreach item="deviceId" collection="toArray" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+        and device_number = #{deviceNumber}
+    </delete>
+</mapper>

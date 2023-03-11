@@ -2,6 +2,7 @@ package com.yuepei.controller.wechat.user;
 import com.yuepei.common.constant.Constants;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.common.core.domain.model.LoginBody;
 import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.service.LoginService;
 import com.yuepei.system.mapper.SysUserMapper;
@@ -67,7 +68,7 @@ public class LoginController {
     @GetMapping("/loginHospitalPort")
     private AjaxResult loginHospitalPort(@RequestParam("userName")String userName,
                                          @RequestParam("password")String password){
-        AjaxResult ajax = new AjaxResult();
+        AjaxResult ajax = AjaxResult.success();
         //得到用户密码
         SysUser users = sysUserMapper.getPassword(userName);
         if(users==null||"".equals(users)){

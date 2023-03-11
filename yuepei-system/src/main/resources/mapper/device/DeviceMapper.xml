@@ -20,6 +20,8 @@
         <result property="deviceIotNumber"    column="device_iot_number"    />
         <result property="deviceMac"    column="device_mac"    />
         <result property="investorId" column="investor_id"/>
+        <result property="electric" column="electric"/>
+        <result property="electricEarly" column="electric_early"/>
     </resultMap>
 
     <resultMap id="DeviceRuleResult" type="com.yuepei.system.domain.vo.DeviceVO">
@@ -46,7 +48,7 @@
     <sql id="selectDeviceVo">
         select device_id, device_type_id, device_number,device_iot_number,device_mac,
                device_deposit, billing_id,hospital_id, device_qR_code, device_address,
-               device_full_address,`rows`,heart_time, create_time, status,investor_id from device
+               device_full_address,`rows`,heart_time, create_time, status,investor_id,electric,electric_early from device
     </sql>
 
     <select id="selectDeviceList" parameterType="Device" resultMap="DeviceResult">
@@ -129,6 +131,8 @@ SELECT d.device_id, d.device_type_id, d.device_number,
             <if test="createTime != null">create_time,</if>
             <if test="status != null">status,</if>
             <if test="investorId != null">investor_id,</if>
+            <if test="electric != null">electric,</if>
+            <if test="electricEarly != null">electric_early,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="deviceTypeId != null">#{deviceTypeId},</if>
@@ -146,6 +150,8 @@ SELECT d.device_id, d.device_type_id, d.device_number,
             <if test="createTime != null">#{createTime},</if>
             <if test="status != null">#{status},</if>
             <if test="investorId != null">#{investorId},</if>
+            <if test="electric != null">#{electric},</if>
+            <if test="electricEarly != null">#{electricEarly},</if>
         </trim>
     </insert>
 
@@ -167,6 +173,8 @@ SELECT d.device_id, d.device_type_id, d.device_number,
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="status != null">status = #{status},</if>
             <if test="investorId != null and investorId != ''">investor_id = #{investorId},</if>
+            <if test="electric != null">electric = #{electric},</if>
+            <if test="electricEarly != null">electric_early = #{electricEarly},</if>
         </trim>
         where device_id = #{deviceId}
     </update>

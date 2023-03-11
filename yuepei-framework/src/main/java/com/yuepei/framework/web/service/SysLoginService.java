@@ -140,4 +140,6 @@ public class SysLoginService
         sysUser.setLoginDate(DateUtils.getNowDate());
         userService.updateUserProfile(sysUser);
     }
+
+
 }
