@@ -22,6 +22,8 @@
         <result property="playTime"    column="play_time"    />
         <result property="createTime" column="create_time"/>
         <result property="rule"       column="rule"/>
+        <result property="choose" column="choose"/>
+        <result property="child" column="child"/>
     </resultMap>
 
     <resultMap id="LeaseOrderResult" type="LeaseOrderVO">
@@ -47,13 +49,15 @@
     </resultMap>
 
     <sql id="selectUserLeaseOrderVo">
-        select id, openid, order_number, device_number, device_type, lease_time, lease_address, restore_time, restore_address, price, pay_type, net_amount, coupon_price, status, play_time,create_time from user_lease_order
+        select id, openid, order_number, device_number, device_type, lease_time,
+               lease_address, restore_time, restore_address, price, pay_type,
+               net_amount, coupon_price, status, play_time,create_time,child,choose from user_lease_order
     </sql>
 
     <sql id="selectLeaseOrderVO">
         SELECT lo.id,u.`nick_name`,d.`device_type_id`, lo.order_number,
                lo.device_number, lo.device_type, lo.lease_time,
-               lo.lease_address, h.`hospital_name`,
+               lo.lease_address, h.`hospital_name`,lo.choose,lo.child,
                lo.restore_time, lo.restore_address, lo.price, lo.pay_type,
                lo.net_amount, lo.coupon_price, lo.`status`,su.`nick_name` AS agentName,
                lo.play_time,lo.create_time FROM user_lease_order AS lo
@@ -62,7 +66,6 @@
                INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
                INNER JOIN agent_hospital AS ah ON ah.`hospital_id` = h.`hospital_id`
                INNER JOIN sys_user AS su ON su.`user_id` = ah.`agent_id`
-
     </sql>
 
     <select id="leaseOrderList" parameterType="LeaseOrderVO" resultMap="LeaseOrderResult">
@@ -131,6 +134,7 @@
             <if test="playTime != null">play_time,</if>
             <if test="createTime != null">create_time,</if>
             <if test="choose != null">choose,</if>
+            <if test="child != null">child,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="openid != null">#{openid},</if>
@@ -149,6 +153,7 @@
             <if test="playTime != null">#{playTime},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="choose != null">#{choose},</if>
+            <if test="child != null">#{child},</if>
         </trim>
     </insert>
 
@@ -169,6 +174,8 @@
             <if test="status != null">status = #{status},</if>
             <if test="playTime != null">play_time = #{playTime},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="child != null">child = #{child},</if>
+            <if test="choose != null">choose = #{choose},</if>
         </trim>
         where id = #{id}
     </update>
@@ -188,6 +195,8 @@
             <if test="status != null">status = #{status},</if>
             <if test="playTime != null">play_time = #{playTime},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="child != null">child = #{child},</if>
+            <if test="choose != null">choose = #{choose},</if>
         </trim>
         where order_number = #{orderNumber}
     </update>
