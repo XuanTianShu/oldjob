@@ -98,27 +98,24 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 });
                 deviceStatisticsVo.setDeviceAmount(bigDecimal);
             });
-            deviceStatisticsVo.setDeviceDetailsVoList(deviceDetailsVos);
-            return deviceStatisticsVo;
-        }else {
-            List<Hospital> hospital = hospitalDeviceMapper.selectHospitalByDepartment(deviceDepartment);
-            List<DeviceDetailsVo> collect = new ArrayList<>();
-            hospital.stream().forEach(map->{
-                List<DeviceDetailsVo> deviceDetailsVos1 = deviceDetailsVos.stream().filter(i -> i.getDeviceDepartment().equals(map.getHospitalId())).collect(Collectors.toList());
-                collect.addAll(deviceDetailsVos1);
-            });
-            collect.stream().forEach(map->{
-                List<UserLeaseOrder> userLeaseOrder = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
-                BigDecimal bigDecimal = new BigDecimal(0);
-                userLeaseOrder.stream().forEach(i->{
-                    BigDecimal decimal = new BigDecimal(i.getNetAmount());
-                    bigDecimal.add(decimal);
-                });
-                deviceStatisticsVo.setDeviceAmount(bigDecimal);
-            });
-            deviceStatisticsVo.setDeviceDetailsVoList(collect);
-            return deviceStatisticsVo;
         }
+        List<Hospital> hospital = hospitalDeviceMapper.selectHospitalByDepartment(deviceDepartment);
+        List<DeviceDetailsVo> collect = new ArrayList<>();
+        hospital.stream().forEach(map->{
+            List<DeviceDetailsVo> deviceDetailsVos1 = deviceDetailsVos.stream().filter(i -> i.getDeviceDepartment().equals(map.getHospitalId())).collect(Collectors.toList());
+            collect.addAll(deviceDetailsVos1);
+        });
+        collect.stream().forEach(map->{
+            List<UserLeaseOrder> userLeaseOrder = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
+            BigDecimal bigDecimal = new BigDecimal(0);
+            userLeaseOrder.stream().forEach(i->{
+                BigDecimal decimal = new BigDecimal(i.getNetAmount());
+                bigDecimal.add(decimal);
+            });
+            deviceStatisticsVo.setDeviceAmount(bigDecimal);
+        });
+        deviceStatisticsVo.setDeviceDetailsVoList(collect);
+        return deviceStatisticsVo;
     }
 
     @Override

@@ -170,26 +170,34 @@ public class AgentServiceImpl implements AgentService {
             devices.addAll(deviceNumber);
         });
         List<Device> list = devices.stream().distinct().collect(Collectors.toList());
-        if (hospitalId!=null){
-            List<HospitalManagementVo> collect = managementVos.stream().filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
-            managementVos.clear();
-            managementVos.addAll(collect);
-        }
         BigDecimal decimal = new BigDecimal(0);
         list.stream().forEach(map->{
             List<UserLeaseOrderVo> userLeaseOrderVos = new ArrayList<>();
             List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
             userLeaseOrderList.stream().forEach(i->{
-                UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
-                BeanUtils.copyProperties(i,userLeaseOrderVo);
-                userLeaseOrderVo.setNetAmount(new BigDecimal(i.getNetAmount()));
+                BigDecimal bigDecimal = new BigDecimal(i.getNetAmount());
+                decimal.add(bigDecimal);
             });
-            BigDecimal reduce = userLeaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-            decimal.add(reduce);
         });
+        deviceManageVo.setDeviceAmount(decimal);
+        if (hospitalId!=null){
+            List<HospitalManagementVo> collect = managementVos.stream().filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
+            managementVos.clear();
+            managementVos.addAll(collect);
+            BigDecimal decimal1 = new BigDecimal(0);
+            list.stream().forEach(map->{
+                List<UserLeaseOrderVo> userLeaseOrderVos = new ArrayList<>();
+                List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
+                userLeaseOrderList.stream().forEach(i->{
+                    BigDecimal bigDecimal = new BigDecimal(i.getNetAmount());
+                    decimal1.add(bigDecimal);
+                });
+            });
+
+            deviceManageVo.setDeviceAmount(decimal);
+        }
         deviceManageVo.setHospitalSum(agentHospitals.size());
         deviceManageVo.setDeviceSum(list.size());
-        deviceManageVo.setDeviceAmount(decimal);
         deviceManageVo.setUtilizationRate(null);
         deviceManageVo.setHospitalManagementVos(managementVos);
         return deviceManageVo;
@@ -265,8 +273,20 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String nameOrNumber) {
-        List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(userId,deviceDepartment,deviceTypeName,nameOrNumber);
-        return userLeaseOrders;
+        SysUser sysUser = sysUserMapper.selectUserById(userId);
+        List<UserLeaseOrderVo> userLeaseOrderVoList = new ArrayList<>();
+        if (sysUser.getParentId()!=0){
+            List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(userId,deviceDepartment,deviceTypeName,nameOrNumber);
+            userLeaseOrderVoList.addAll(userLeaseOrders);
+        }else {
+            List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
+            sysUsers.add(sysUser);
+            sysUsers.stream().forEach(map->{
+                List<UserLeaseOrderVo> userLeaseOrders = hospitalDeviceService.selectLeaseOrder(map.getUserId(),deviceDepartment,deviceTypeName,nameOrNumber);
+                userLeaseOrderVoList.addAll(userLeaseOrders);
+            });
+        }
+        return userLeaseOrderVoList;
     }
 
     @Override
@@ -326,7 +346,6 @@ public class AgentServiceImpl implements AgentService {
             });
             subAccountManageVoList.add(subAccountManageVo);
         });
-
         return subAccountManageVoList;
     }
 
@@ -339,30 +358,56 @@ public class AgentServiceImpl implements AgentService {
             List<DeviceType> deviceType = hospitalDeviceMapper.selectDeviceType(sysUser.getUserId());
             Agent agent = agentMapper.selectAgentByUserName(sysUser.getUserName());
             List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
-            agentDeviceVo.setHospitalSum(agentHospitals.size());
-            if (agentHospitals.size()==0){
-                agentDeviceVo.setDeviceSum(0);
-                agentDeviceVo.setUseDeviceSum(0);
-            }
-            List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
             List<Device> deviceList = new ArrayList<>();
-            agentHospitals.stream().forEach(i->{
-                List<Device> devices = deviceMapper.selectDeviceByHospitalId(i.getHospitalId());
-                deviceList.addAll(devices);
-                deviceList.stream().forEach(map->{
-                    UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectUseDevice(map.getDeviceNumber());
-                    userLeaseOrderList.add(userLeaseOrder);
+            List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
+            agentDeviceVo.setHospitalSum(agentHospitals.size());
+            if (agentHospitals.size()!=0){
+                agentHospitals.stream().forEach(i->{
+                    List<Device> devices = deviceMapper.selectDeviceByHospitalId(i.getHospitalId());
+                    deviceList.addAll(devices);
+                    deviceList.stream().forEach(map->{
+                        UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectUseDevice(map.getDeviceNumber());
+                        userLeaseOrderList.add(userLeaseOrder);
+                    });
                 });
-            });
+            }
+            agentDeviceVo.setHospitalSum(agentHospitals.size());
             agentDeviceVo.setDeviceSum(deviceList.size());
             agentDeviceVo.setUseDeviceSum(userLeaseOrderList.size());
             agentDeviceVo.setDeviceTypes(deviceType);
             return agentDeviceVo;
         }else {
             //该账号为主代理
-            agentDeviceVo.setDeviceSum(0);
-            agentDeviceVo.setHospitalSum(0);
-            agentDeviceVo.setUseDeviceSum(0);
+            List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
+            sysUsers.add(sysUser);
+            List<DeviceType> deviceTypes = new ArrayList<>();
+            List<Device> deviceList = new ArrayList<>();
+            List<AgentHospital> agentHospitalList = new ArrayList<>();
+            List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
+            sysUsers.stream().forEach(map->{
+                List<DeviceType> deviceType = hospitalDeviceMapper.selectDeviceType(map.getUserId());
+                deviceTypes.addAll(deviceType);
+                Agent agent = agentMapper.selectAgentByUserName(map.getUserName());
+                List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
+                agentHospitalList.addAll(agentHospitals);
+                if (agentHospitals.size()!=0){
+                    agentHospitals.stream().forEach(i->{
+                        List<Device> devices = deviceMapper.selectDeviceByHospitalId(i.getHospitalId());
+                        deviceList.addAll(devices);
+                        deviceList.stream().forEach(j->{
+                            UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectUseDevice(j.getDeviceNumber());
+                            if (userLeaseOrder!=null){
+                                userLeaseOrderList.add(userLeaseOrder);
+                            }
+                        });
+                    });
+                }
+            });
+            List<UserLeaseOrder> collect = userLeaseOrderList.stream().distinct().collect(Collectors.toList());
+            agentDeviceVo.setHospitalSum(agentHospitalList.size());
+            agentDeviceVo.setDeviceSum(deviceList.size());
+            agentDeviceVo.setUseDeviceSum(collect.size());
+            agentDeviceVo.setDeviceTypes(deviceTypes);
             return agentDeviceVo;
         }
     }
@@ -377,6 +422,241 @@ public class AgentServiceImpl implements AgentService {
             }
         }
         return deviceNumber;
+    }
+
+    @Override
+    public DeviceStatisticsVo selectDeviceTypeDetails(Long userId, Long deviceTypeId, Long hospitalId, String deviceDepartment, Long utilizationRate) {
+        DeviceStatisticsVo deviceStatisticsVo = new DeviceStatisticsVo();
+        List<DeviceDetailsVo> deviceDetailsVoList = new ArrayList<>();
+        SysUser sysUser = sysUserMapper.selectUserById(userId);
+        if (sysUser.getParentId() != 0) {
+            //该账号为子代理
+            Agent agent = agentMapper.selectAgentByUserName(sysUser.getUserName());
+            List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
+            List<Device> deviceList = new ArrayList<>();
+            if (agentHospitals.size() != 0){
+                agentHospitals.stream().forEach(i ->{
+                    //获取子代理账号所有设别
+                    List<Device> devices = deviceMapper.selectDeviceByHospitalId(i.getHospitalId());
+                    deviceList.addAll(devices);
+                });
+            }
+            deviceList.stream().forEach(map->{
+                DeviceDetailsVo deviceDetailsVo = new DeviceDetailsVo();
+                DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
+                Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(map.getHospitalId());
+                String device_full_address = map.getDeviceFullAddress();
+                String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
+                Hospital deviceFloor = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[0]));
+                Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
+                Hospital deviceRoom = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[2]));
+                Hospital deviceBed = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[3]));
+                deviceDetailsVo.setDeviceTypeId(map.getDeviceTypeId());
+                deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
+                deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
+                deviceDetailsVo.setStatus(map.getStatus());
+                deviceDetailsVo.setAgentId(agent.getAgentId());
+                deviceDetailsVo.setAgentName(agent.getAgentName());
+                deviceDetailsVo.setHospitalId(map.getHospitalId());
+                deviceDetailsVo.setHospitalName(hospital.getHospitalName());
+                deviceDetailsVo.setDeviceFloor(deviceFloor.getHospitalId());
+                deviceDetailsVo.setDeviceDepartment(Department.getHospitalId());
+                deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
+                deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
+                deviceDetailsVoList.add(deviceDetailsVo);
+            });
+            BigDecimal decimal = new BigDecimal(0);
+            deviceDetailsVoList.stream().forEach(map->{
+                List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
+                userLeaseOrderList.stream().forEach(i->{
+                    BigDecimal bigDecimal = new BigDecimal(i.getNetAmount());
+                    decimal.add(bigDecimal);
+                });
+            });
+            deviceStatisticsVo.setDeviceAmount(decimal);
+            //根据设备类型筛选
+            if (deviceTypeId!=null){
+                List<DeviceDetailsVo> collect = deviceDetailsVoList.stream().filter(map -> map.getDeviceTypeId().equals(deviceTypeId)).collect(Collectors.toList());
+                deviceDetailsVoList.clear();
+                deviceDetailsVoList.addAll(collect);
+                BigDecimal decimal1 = new BigDecimal(0);
+                deviceDetailsVoList.stream().forEach(map->{
+                    List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
+                    userLeaseOrderList.stream().forEach(i->{
+                        BigDecimal bigDecimal = new BigDecimal(i.getNetAmount());
+                        decimal1.add(bigDecimal);
+                    });
+                });
+                deviceStatisticsVo.setDeviceAmount(decimal);
+            }
+            //根据医院筛选
+            if (hospitalId!=null){
+                List<DeviceDetailsVo> collect = deviceDetailsVoList.stream().filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
+                deviceDetailsVoList.clear();
+                deviceDetailsVoList.addAll(collect);
+                BigDecimal decimal1 = new BigDecimal(0);
+                deviceDetailsVoList.stream().forEach(map->{
+                    List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
+                    userLeaseOrderList.stream().forEach(i->{
+                        BigDecimal bigDecimal = new BigDecimal(i.getNetAmount());
+                        decimal1.add(bigDecimal);
+                    });
+                });
+                deviceStatisticsVo.setDeviceAmount(decimal);
+            }
+            //根据科室筛选
+            if (deviceDepartment!=null){
+                List<DeviceDetailsVo> collect = deviceDetailsVoList.stream().filter(map -> map.getDeviceDepartment().equals(deviceDepartment)).collect(Collectors.toList());
+                deviceDetailsVoList.clear();
+                deviceDetailsVoList.addAll(collect);
+                BigDecimal decimal1 = new BigDecimal(0);
+                deviceDetailsVoList.stream().forEach(map->{
+                    List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
+                    userLeaseOrderList.stream().forEach(i->{
+                        BigDecimal bigDecimal = new BigDecimal(i.getNetAmount());
+                        decimal1.add(bigDecimal);
+                    });
+                });
+                deviceStatisticsVo.setDeviceAmount(decimal);
+            }
+            //根据使用率筛选
+            /*if (utilizationRate!=null){
+
+            }*/
+            deviceStatisticsVo.setDeviceDetailsVoList(deviceDetailsVoList);
+            return deviceStatisticsVo;
+        } else {
+            //该账号为主代理
+            List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
+            sysUsers.add(sysUser);
+            List<Device> deviceList = new ArrayList<>();
+            sysUsers.stream().forEach(map -> {
+                Agent agent = agentMapper.selectAgentByUserName(map.getUserName());
+                List<AgentHospital> agentHospitals = agentMapper.selectAgentHospitalByHospital(agent.getAgentId());
+                if (agentHospitals.size() != 0) {
+                    agentHospitals.stream().forEach(i -> {
+                        //获取主代理及子代理的素有设备
+                        List<Device> devices = deviceMapper.selectDeviceByHospitalId(i.getHospitalId());
+                        deviceList.addAll(devices);
+                    });
+                }
+                deviceList.stream().forEach(i->{
+                    DeviceDetailsVo deviceDetailsVo = new DeviceDetailsVo();
+                    DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(i.getDeviceTypeId());
+                    Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(i.getHospitalId());
+                    String device_full_address = i.getDeviceFullAddress();
+                    String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
+                    Hospital deviceFloor = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[0]));
+                    Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
+                    Hospital deviceRoom = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[2]));
+                    Hospital deviceBed = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[3]));
+                    deviceDetailsVo.setDeviceTypeId(i.getDeviceTypeId());
+                    deviceDetailsVo.setDeviceNumber(i.getDeviceNumber());
+                    deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
+                    deviceDetailsVo.setStatus(i.getStatus());
+                    deviceDetailsVo.setAgentId(agent.getAgentId());
+                    deviceDetailsVo.setAgentName(agent.getAgentName());
+                    deviceDetailsVo.setHospitalId(i.getHospitalId());
+                    deviceDetailsVo.setHospitalName(hospital.getHospitalName());
+                    deviceDetailsVo.setDeviceFloor(deviceFloor.getHospitalId());
+                    deviceDetailsVo.setDeviceDepartment(Department.getHospitalId());
+                    deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
+                    deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
+                    deviceDetailsVoList.add(deviceDetailsVo);
+                });
+            });
+            BigDecimal decimal = new BigDecimal(0);
+            deviceDetailsVoList.stream().forEach(map->{
+                List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
+                userLeaseOrderList.stream().forEach(i->{
+                    BigDecimal bigDecimal = new BigDecimal(i.getNetAmount());
+                    decimal.add(bigDecimal);
+                });
+            });
+            deviceStatisticsVo.setDeviceAmount(decimal);
+            //根据设备类型筛选
+            if (deviceTypeId!=null){
+                List<DeviceDetailsVo> collect = deviceDetailsVoList.stream().filter(map -> map.getDeviceTypeId().equals(deviceTypeId)).collect(Collectors.toList());
+                deviceDetailsVoList.clear();
+                deviceDetailsVoList.addAll(collect);
+                BigDecimal decimal1 = new BigDecimal(0);
+                deviceDetailsVoList.stream().forEach(map->{
+                    List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
+                    userLeaseOrderList.stream().forEach(i->{
+                        BigDecimal bigDecimal = new BigDecimal(i.getNetAmount());
+                        decimal1.add(bigDecimal);
+                    });
+                });
+                deviceStatisticsVo.setDeviceAmount(decimal);
+            }
+            //根据医院筛选
+            if (hospitalId!=null){
+                List<DeviceDetailsVo> collect = deviceDetailsVoList.stream().filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
+                deviceDetailsVoList.clear();
+                deviceDetailsVoList.addAll(collect);
+                BigDecimal decimal1 = new BigDecimal(0);
+                deviceDetailsVoList.stream().forEach(map->{
+                    List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
+                    userLeaseOrderList.stream().forEach(i->{
+                        BigDecimal bigDecimal = new BigDecimal(i.getNetAmount());
+                        decimal1.add(bigDecimal);
+                    });
+                });
+                deviceStatisticsVo.setDeviceAmount(decimal);
+            }
+            //根据科室筛选
+            if (deviceDepartment!=null){
+                List<DeviceDetailsVo> collect = deviceDetailsVoList.stream().filter(map -> map.getDeviceDepartment().equals(deviceDepartment)).collect(Collectors.toList());
+                deviceDetailsVoList.clear();
+                deviceDetailsVoList.addAll(collect);
+                BigDecimal decimal1 = new BigDecimal(0);
+                deviceDetailsVoList.stream().forEach(map->{
+                    List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
+                    userLeaseOrderList.stream().forEach(i->{
+                        BigDecimal bigDecimal = new BigDecimal(i.getNetAmount());
+                        decimal1.add(bigDecimal);
+                    });
+                });
+                deviceStatisticsVo.setDeviceAmount(decimal);
+            }
+            //根据使用率筛选
+            /*if (utilizationRate!=null){
+
+            }*/
+            deviceStatisticsVo.setDeviceDetailsVoList(deviceDetailsVoList);
+            return deviceStatisticsVo;
+        }
+    }
+
+    @Override
+    public TotalVo selectAgentRevenueStatistics(int statistics, Long userId) {
+        SysUser sysUser = sysUserMapper.selectUserById(userId);
+        TotalVo totalVo = new TotalVo();
+        if (sysUser.getParentId() != 0){
+            TotalVo total = hospitalDeviceService.selectRevenueStatistics(sysUser.getUserName(), statistics);
+            BeanUtils.copyProperties(total,totalVo);
+        }else {
+            List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
+            sysUsers.add(sysUser);
+            List<OrderVo> orderVo = new ArrayList<>();
+            BigDecimal orderAmount = new BigDecimal(0);
+            BigDecimal dividendAmount = new BigDecimal(0);
+            List<Integer> effectiveOrder = new ArrayList<>();
+            sysUsers.stream().forEach(map->{
+                TotalVo total = hospitalDeviceService.selectRevenueStatistics(sysUser.getUserName(), statistics);
+                orderVo.addAll(total.getOrderVos());
+                totalVo.setOrderAmount(orderAmount.add(total.getOrderAmount()));
+                totalVo.setDividendAmount(dividendAmount.add(total.getDividendAmount()));
+                effectiveOrder.add(total.getEffectiveOrder());
+            });
+            int sum = 0;
+            for (Integer integer : effectiveOrder) {
+                sum+=integer;
+            }
+            totalVo.setEffectiveOrder(sum);
+            totalVo.setOrderVos(orderVo);
+        }
+        return totalVo;
     }
 
     /*@Override

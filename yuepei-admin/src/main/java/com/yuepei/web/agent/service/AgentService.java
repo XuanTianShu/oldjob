@@ -38,5 +38,9 @@ public interface AgentService {
 
     List<String> selectDeviceList();
 
+    DeviceStatisticsVo selectDeviceTypeDetails(Long userId, Long deviceTypeId, Long hospitalId, String deviceDepartment, Long utilizationRate);
+
+    TotalVo selectAgentRevenueStatistics(int statistics, Long userId);
+
 //    List<FaultVo> selectDeviceFaultList(Long userId);
 }
