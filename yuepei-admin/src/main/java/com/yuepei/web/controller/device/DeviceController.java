@@ -130,9 +130,9 @@ public class DeviceController extends BaseController {
     }
 
     /**设备类型下拉框*/
-    @GetMapping("/selectDeviceTypeName")
-    public AjaxResult selectDeviceTypeName(){
-        return AjaxResult.success(hospitalDeviceService.selectDeviceTypeName());
+    @GetMapping("/selectDeviceTypeName/{userId}")
+    public AjaxResult selectDeviceTypeName(@PathVariable("userId") Long userId){
+        return AjaxResult.success(hospitalDeviceService.selectDeviceTypeName(userId));
     }
 
     /**选择科室下拉框*/
@@ -172,6 +172,18 @@ public class DeviceController extends BaseController {
     @GetMapping("/indexPage/{userId}")
     public AjaxResult indexPage(@PathVariable("userId") Long userId){
         return AjaxResult.success(hospitalDeviceService.indexPage(userId));
+    }
+
+    /**个人资料*/
+    @GetMapping("/selectPersonalData/{userId}")
+    public AjaxResult selectPersonalData(@PathVariable("userId")Long userId){
+        return AjaxResult.success(hospitalDeviceService.selectPersonalData(userId));
+    }
+
+    /**个人中心*/
+    @GetMapping("/selectPersonalCenter/{userId}")
+    public AjaxResult selectPersonalCenter(@PathVariable("userId")Long userId){
+        return AjaxResult.success(hospitalDeviceService.selectPersonalCenter(userId));
     }
     //修改接口路径
 

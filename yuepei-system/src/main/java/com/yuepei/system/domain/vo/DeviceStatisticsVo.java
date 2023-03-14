@@ -11,6 +11,9 @@ import java.util.List;
  */
 @Data
 public class DeviceStatisticsVo {
+    /**医院名称*/
+    private String hospitalName;
+
     /**设备收益*/
     private BigDecimal deviceAmount;
 

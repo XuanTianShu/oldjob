@@ -145,9 +145,9 @@ public class LoginController {
     }
 
     /**设备类型下拉框*/
-    @GetMapping("/selectDeviceTypeName")
-    public AjaxResult selectDeviceTypeName(){
-        return AjaxResult.success(hospitalDeviceService.selectDeviceTypeName());
+    @GetMapping("/selectDeviceTypeName/{userId}")
+    public AjaxResult selectDeviceTypeName(@PathVariable("userId") Long userId){
+        return AjaxResult.success(hospitalDeviceService.selectDeviceTypeName(userId));
     }
 
     /**选择科室下拉框*/

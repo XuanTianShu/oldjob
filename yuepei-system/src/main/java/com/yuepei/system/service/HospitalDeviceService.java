@@ -1,6 +1,7 @@
 package com.yuepei.system.service;
 
 import com.yuepei.common.core.domain.AjaxResult;
+import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.DeviceType;
 import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.vo.*;
@@ -36,11 +37,15 @@ public interface HospitalDeviceService {
 
     List<String> selectDepartment(Long userId);
 
-    List<String> selectDeviceTypeName();
+    List<String> selectDeviceTypeName(Long userId);
 
     Map<String,List<HospitalVo>> selectDeviceAddress1(Long hospitalId);
 
     IndexVo indexPage(Long userId);
 
     List<Hospital> selectHospitalList();
+
+    SysUser selectPersonalData(Long userId);
+
+    PersonalCenterVo selectPersonalCenter(Long userId);
 }

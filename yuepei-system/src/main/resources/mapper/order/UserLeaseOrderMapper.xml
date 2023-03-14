@@ -19,6 +19,7 @@
         <result property="netAmount"    column="net_amount"    />
         <result property="couponPrice"    column="coupon_price"    />
         <result property="status"    column="status"    />
+        <result property="deposit"    column="deposit"    />
         <result property="playTime"    column="play_time"    />
         <result property="createTime" column="create_time"/>
     </resultMap>
@@ -45,7 +46,7 @@
     </resultMap>
 
     <sql id="selectUserLeaseOrderVo">
-        select id, openid, order_number, device_number, device_type, lease_time, lease_address, restore_time, restore_address, price, pay_type, net_amount, coupon_price, status, play_time,create_time from user_lease_order
+        select id, openid, order_number, device_number, device_type, lease_time, lease_address, restore_time, restore_address, price, pay_type, net_amount, deposit, coupon_price, status, play_time,create_time from user_lease_order
     </sql>
 
     <sql id="selectLeaseOrderVO">

@@ -88,4 +88,6 @@ public class UserLeaseOrder extends BaseEntity {
 
     /** 计费规则 */
     private String rule;
+
+    private Long deposit;
 }
