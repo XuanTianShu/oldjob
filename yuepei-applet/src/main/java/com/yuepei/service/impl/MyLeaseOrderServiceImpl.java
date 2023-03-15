@@ -11,7 +11,9 @@ import com.yuepei.system.mapper.DeviceTypeMapper;
 import com.yuepei.system.mapper.UserLeaseOrderMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
@@ -60,8 +62,10 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
         return userLeaseOrderMapper.userLeaseOrder(openid,status);
     }
 
+    @Transactional
     @Override
     public int insertUserLeaseOrder(String openid, String rows, UserLeaseOrder userLeaseOrder) {
+        System.out.println(openid+"----------------"+rows+"--------------------------"+userLeaseOrder.getDeviceNumber());
         //修改 格子柜状态
         deviceMapper.updateDeviceByDeviceNumber(rows,userLeaseOrder.getDeviceNumber());
         //创建订单号
@@ -79,8 +83,11 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
             userLeaseOrder.setOrderNumber(orderNumber);
             userLeaseOrder.setOpenid(openid);
             userLeaseOrder.setStatus("0");
+            System.out.println(new BigDecimal(String.valueOf(deviceType.getDeviceTypeDeposit())).longValue()+"------------------------------");
+            userLeaseOrder.setDeposit(new BigDecimal(String.valueOf(deviceType.getDeviceTypeDeposit())).longValue());
             return userLeaseOrderMapper.insertUserLeaseOrder(userLeaseOrder);
         }else {
+            System.out.println("还床");
             //修改订单
             userLeaseOrder.setStatus("1");
             userLeaseOrder.setRestoreTime(new Date());

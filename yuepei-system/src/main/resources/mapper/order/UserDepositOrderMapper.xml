@@ -18,7 +18,8 @@
     </resultMap>
 
     <sql id="selectUserDepositOrderVo">
-        select id, openid, order_number, device_number, deposit_num, device_status, deposit_status, status, create_time, update_time from user_deposit_order
+        select id, openid, order_number, device_number, deposit_num, device_status,
+               deposit_status, status, create_time, update_time from user_deposit_order
     </sql>
 
     <select id="selectUserDepositOrderList" parameterType="com.yuepei.system.domain.UserDepositOrder" resultMap="UserDepositOrderResult">
@@ -101,6 +102,9 @@
             </if>
             <if test="depositStatus != null and status != null">
                 and openid = #{openid} and status = #{status} and deposit_status = #{depositStatus}
+            </if>
+            <if test="depositStatus == null and status == null">
+                and openid = #{openid}
             </if>
         </where>
         order by create_time desc

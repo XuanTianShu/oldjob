@@ -106,6 +106,7 @@ public class UserRefundServiceImpl implements UserRefundService {
         payMap.put("notify_url","https://www.yp10000.com/prod-api/wechat/user/refund/userRefundCallBack");
         Amount amount = new Amount();
 //        long l = new BigDecimal(userDepositOrder.getDepositNum()).multiply(BigDecimal.valueOf(100)).longValue();
+        System.out.println(userDepositOrder.getDepositNum()+"--------------原订单金额");
         amount.setTotal(userDepositOrder.getDepositNum());
         amount.setRefund(userDepositOrder.getDepositNum());
         amount.setCurrency("CNY");
@@ -144,6 +145,7 @@ public class UserRefundServiceImpl implements UserRefundService {
         return null;
     }
 
+    @Transactional
     @Override
     public HashMap<String, String> userRefundCallBack(HttpServletRequest request) throws GeneralSecurityException {
         System.out.println("退款");

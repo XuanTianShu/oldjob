@@ -89,6 +89,7 @@ public class WechatCreateOrderController {
     @PostMapping("/depositPrepaymentOrder")
     public AjaxResult depositPrepaymentOrder(HttpServletRequest request,Long price,String deviceNumber){
         SysUser user = tokenUtils.analysis(request);
+        System.out.println("支付押金");
         return createOrderService.depositPrepaymentOrder(user.getUserId(),price,deviceNumber);
     }
 
@@ -100,6 +101,7 @@ public class WechatCreateOrderController {
      */
     @PostMapping("/depositCallBack")
     public HashMap<String, String> depositCallBack(HttpServletRequest request) throws GeneralSecurityException {
+        System.out.println("押金回调");
         return callBackService.depositCallBack(request);
     }
 

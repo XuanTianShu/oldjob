@@ -2,6 +2,7 @@ package com.yuepei.system.service.impl;
 
 import com.yuepei.common.utils.DateUtils;
 import com.yuepei.system.domain.DiscountThreshold;
+import com.yuepei.system.domain.UserCoupon;
 import com.yuepei.system.domain.UserDiscount;
 import com.yuepei.system.mapper.UserDiscountMapper;
 import com.yuepei.system.service.IUserDiscountService;
@@ -10,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户卡包Service业务层处理
@@ -112,7 +115,7 @@ public class UserDiscountServiceImpl implements IUserDiscountService
     }
 
     @Override
-    public List<UserDiscount> selectMyDiscountByOpenId(String openid,UserDiscount userDiscount) {
-        return userDiscountMapper.selectMyDiscountByOpenId(openid,userDiscount);
+    public List<UserDiscount> selectMyDiscountByOpenId(String openid, UserDiscount userDiscount) {
+        return userDiscountMapper.selectMyDiscountByOpenId(openid, userDiscount);
     }
 }

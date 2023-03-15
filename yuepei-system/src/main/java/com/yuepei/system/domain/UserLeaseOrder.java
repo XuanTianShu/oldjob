@@ -91,7 +91,17 @@ public class UserLeaseOrder extends BaseEntity {
 
     private String outTradeNo;
 
+    private Long deposit;
+
     private Long choose;
 
     private String child;
+
+    private Long investorProportion;
+
+    private Long hospitalProportion;
+
+    private Long agentProportion;
+
+    private Long platformProportion;
 }

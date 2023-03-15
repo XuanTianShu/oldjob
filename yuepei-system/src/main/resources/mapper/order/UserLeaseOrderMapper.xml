@@ -24,6 +24,10 @@
         <result property="rule"       column="rule"/>
         <result property="choose" column="choose"/>
         <result property="child" column="child"/>
+        <result property="investorProportion" column="investorProportion"/>
+        <result property="agentProportion" column="agentProportion"/>
+        <result property="hospitalProportion" column="hospitalProportion"/>
+        <result property="platformProportion" column="platformProportion"/>
     </resultMap>
 
     <resultMap id="LeaseOrderResult" type="LeaseOrderVO">
@@ -46,12 +50,20 @@
         <result property="playTime" column="play_time"/>
         <result property="restoreAddress" column="restore_address"/>
         <result property="restoreTime" column="restore_time"/>
+        <result property="choose" column="choose"/>
+        <result property="child" column="child"/>
+        <result property="investorProportion" column="investorProportion"/>
+        <result property="agentProportion" column="agentProportion"/>
+        <result property="hospitalProportion" column="hospitalProportion"/>
+        <result property="platformProportion" column="platformProportion"/>
     </resultMap>
 
     <sql id="selectUserLeaseOrderVo">
         select id, openid, order_number, device_number, device_type, lease_time,
                lease_address, restore_time, restore_address, price, pay_type,
-               net_amount, coupon_price, status, play_time,create_time,child,choose from user_lease_order
+               net_amount, coupon_price, status, play_time,create_time,child,choose,investorProportion,
+               agentProportion,hospitalProportion,platformProportion
+        from user_lease_order
     </sql>
 
     <sql id="selectLeaseOrderVO">
@@ -60,7 +72,8 @@
                lo.lease_address, h.`hospital_name`,lo.choose,lo.child,
                lo.restore_time, lo.restore_address, lo.price, lo.pay_type,
                lo.net_amount, lo.coupon_price, lo.`status`,su.`nick_name` AS agentName,
-               lo.play_time,lo.create_time FROM user_lease_order AS lo
+               lo.play_time,lo.create_time,lo.investorProportion,lo.agentProportion
+               ,lo.hospitalProportion,lo.platformProportion FROM user_lease_order AS lo
                INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`
                INNER JOIN device AS d ON d.`device_number` = lo.`device_number`
                INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
@@ -71,13 +84,13 @@
     <select id="leaseOrderList" parameterType="LeaseOrderVO" resultMap="LeaseOrderResult">
         <include refid="selectLeaseOrderVO"/>
         <where>
-            <if test="orderNumber != null  and orderNumber != ''"> and order_number = #{orderNumber}</if>
-            <if test="deviceNumber != null  and deviceNumber != ''"> and device_number = #{deviceNumber}</if>
-            <if test="deviceType != null  and deviceType != ''"> and device_type = #{deviceType}</if>
-            <if test="leaseTime != null "> and lease_time = #{leaseTime}</if>
+            <if test="orderNumber != null  and orderNumber != ''"> and lo.order_number = #{orderNumber}</if>
+            <if test="deviceNumber != null  and deviceNumber != ''"> and lo.device_number = #{deviceNumber}</if>
+            <if test="deviceType != null  and deviceType != ''"> and lo.device_type = #{deviceType}</if>
+            <if test="leaseTime != null "> and lo.lease_time = #{leaseTime}</if>
             <if test="payType != null  and payType != ''"> and lo.pay_type = #{payType}</if>
             <if test="status != null  and status != ''"> and lo.status = #{status}</if>
-            <if test="playTime != null  and playTime != ''"> and play_time = #{playTime}</if>
+            <if test="playTime != null  and playTime != ''"> and lo.play_time = #{playTime}</if>
         </where>
         GROUP BY lo.`id` ORDER BY lo.lease_time DESC
     </select>
@@ -135,6 +148,10 @@
             <if test="createTime != null">create_time,</if>
             <if test="choose != null">choose,</if>
             <if test="child != null">child,</if>
+            <if test="investorProportion != null">investorProportion,</if>
+            <if test="agentProportion != null">agentProportion,</if>
+            <if test="hospitalProportion != null">hospitalProportion,</if>
+            <if test="platformProportion != null">platformProportion,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="openid != null">#{openid},</if>
@@ -154,6 +171,10 @@
             <if test="createTime != null">#{createTime},</if>
             <if test="choose != null">#{choose},</if>
             <if test="child != null">#{child},</if>
+            <if test="investorProportion != null">#{investorProportion},</if>
+            <if test="agentProportion != null">#{agentProportion},</if>
+            <if test="hospitalProportion != null">#{hospitalProportion},</if>
+            <if test="platformProportion != null">#{platformProportion},</if>
         </trim>
     </insert>
 
@@ -176,6 +197,10 @@
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="child != null">child = #{child},</if>
             <if test="choose != null">choose = #{choose},</if>
+            <if test="investorProportion != null">investorProportion = #{investorProportion},</if>
+            <if test="hospitalProportion != null">hospitalProportion = #{hospitalProportion},</if>
+            <if test="agentProportion != null">agentProportion = #{agentProportion},</if>
+            <if test="platformProportion != null">platformProportion = #{platformProportion},</if>
         </trim>
         where id = #{id}
     </update>
@@ -197,6 +222,10 @@
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="child != null">child = #{child},</if>
             <if test="choose != null">choose = #{choose},</if>
+            <if test="investorProportion != null">investorProportion = #{investorProportion},</if>
+            <if test="hospitalProportion != null">hospitalProportion = #{hospitalProportion},</if>
+            <if test="agentProportion != null">agentProportion = #{agentProportion},</if>
+            <if test="platformProportion != null">platformProportion = #{platformProportion},</if>
         </trim>
         where order_number = #{orderNumber}
     </update>

@@ -1,5 +1,6 @@
 package com.yuepei.system.service;
 
+import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.Hospital;
 
 import java.util.List;
@@ -81,5 +82,5 @@ public interface HospitalService {
      */
     public int deleteHospitalByHospitalId(Long hospitalId);
 
-    Map<String,Object> queryTreeByDeviceNumber(String deviceNumber);
+    Map<String,Object> queryTreeByDeviceNumber(Device device);
 }

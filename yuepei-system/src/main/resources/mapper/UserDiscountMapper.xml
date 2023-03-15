@@ -14,6 +14,19 @@
         <result property="status"    column="status"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateTime"    column="update_time"    />
+        <result property="type" column="type"/>
+    </resultMap>
+
+    <resultMap id="UserCouponResult" type="UserCoupon">
+        <result property="id" column="id"/>
+        <result property="status" column="status"/>
+        <result property="userId" column="user_id"/>
+        <result property="title" column="title"/>
+        <result property="couponCreateTime" column="coupon_create_time"/>
+        <result property="couponEndTime" column="coupon_end_time"/>
+        <result property="couponStartTime" column="coupon_start_time"/>
+        <result property="discountAmount" column="discount_amount"/>
+        <result property="useLimit" column="user_limit"/>
     </resultMap>
 
     <sql id="selectUserDiscountVo">
@@ -37,15 +50,26 @@
         where Id = #{id}
     </select>
     <select id="selectMyDiscountByOpenId" parameterType="UserDiscount" resultMap="UserDiscountResult">
-        SELECT ud.`Id`,ud.`user_id`,ud.`threshold_name`,ud.`price`,ud.`full`,ud.`expire_time`,
-               ud.`status`,ud.`create_time`,ud.`update_time` FROM
-            `user_discount` AS ud INNER JOIN sys_user AS su ON su.`user_id` = ud.`user_id`
-            <where>
-                and su.openid = #{openid}
-                <if test="userDiscount.status != null">
-                    and ud.status = #{userDiscount.status}
-                </if>
-            </where>
+        SELECT ud.`Id`,ud.`user_id`,ud.`threshold_name`,ud.`price`,ud.`full`,ud.`create_time`,
+        ud.`expire_time`,
+        ud.`status`,ud.`type` FROM
+        `user_discount` AS ud INNER JOIN sys_user AS su ON su.`user_id` = ud.`user_id`
+        <where>
+            and su.openid = #{openid}
+            <if test="userDiscount.status != null">
+                and ud.status = #{userDiscount.status}
+            </if>
+        </where>
+        UNION ALL
+        SELECT uc.id,uc.user_id,uc.title,uc.discount_amount,uc.use_limit,uc.coupon_start_time,
+        uc.coupon_end_time,uc.status,uc.type FROM `user_coupon` AS uc
+        INNER JOIN sys_user AS su ON su.`user_id` = uc.`user_id`
+        <where>
+            and su.openid = #{openid}
+            <if test="userDiscount.status != null">
+                and uc.status = #{userDiscount.status}
+            </if>
+        </where>
     </select>
 
     <insert id="insertUserDiscount" parameterType="UserDiscount" useGeneratedKeys="true" keyProperty="id">

@@ -47,6 +47,8 @@ user:
     maxRetryCount: 5
     # 密码锁定时间（默认10分钟）
     lockTime: 10
+  ##优惠券过期前缀
+  discount: discount_
 
 # Spring配置
 spring:
@@ -148,5 +150,7 @@ wechat:
   mchId: 1636476318
   mchKey: JSYPjiangsuyuepeipeihuchuang1234
   mchSerialNo: 60429C8DE59522973013086A09AEA5759275B9F7
-  privateKeyPath: D:\WXCertUtil\cert\apiclient_key.pem
-#  privateKeyPath: /home/Yuepei_Nursingbed/privateKeyPath/WXCertUtil/cert/apiclient_key.pem
+#  privateKeyPath: D:\WXCertUtil\cert\apiclient_key.pem
+  privateKeyPath: /home/Yuepei_Nursingbed/privateKeyPath/WXCertUtil/cert/apiclient_key.pem
+
+

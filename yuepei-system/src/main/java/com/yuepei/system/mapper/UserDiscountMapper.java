@@ -1,6 +1,7 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.DiscountThreshold;
+import com.yuepei.system.domain.UserCoupon;
 import com.yuepei.system.domain.UserDiscount;
 import org.apache.ibatis.annotations.Param;
 

@@ -98,6 +98,7 @@ public class CallBackServiceImpl implements CallBackService {
     private HashMap<String, String> hashMap = new HashMap<>();
 
 
+    @Transactional
     @Override
     public HashMap<String, String> payCallBack(HttpServletRequest request) throws GeneralSecurityException {
         HashMap params = requestUtils.requestParams(request);
@@ -191,6 +192,7 @@ public class CallBackServiceImpl implements CallBackService {
         }
     }
 
+    @Transactional
     @Override
     public HashMap<String, String> depositCallBack(HttpServletRequest request) throws GeneralSecurityException {
         HashMap params = requestUtils.requestParams(request);
@@ -218,6 +220,7 @@ public class CallBackServiceImpl implements CallBackService {
             //订单号
             String out_trade_no = (String) parseObject.get("out_trade_no");
             if ("SUCCESS".equals(parseObject.get("trade_state"))) {
+                System.out.println("-----------------------0-------------------------");
                 //支付成功  修改订单状态
                 userDepositOrder.setCreateTime(time);
                 userDepositOrder.setOrderNumber(out_trade_no);
@@ -228,12 +231,14 @@ public class CallBackServiceImpl implements CallBackService {
                 Object amount = parseObject.get("amount");
                 JSONObject jsonObject1 = JSONObject.parseObject(amount.toString());
                 Object price = jsonObject1.get("payer_total");
+                System.out.println("-----------------------1-------------------------");
                 //记录用户押金详细
                 userIntegralBalanceDepositVo.setOpenid(openid.toString());
-                userIntegralBalanceDepositVo.setSum((BigDecimal) price);
+                userIntegralBalanceDepositVo.setSum(new BigDecimal(price.toString()));
                 userIntegralBalanceDepositVo.setStatus(0);
-                userIntegralBalanceDepositVo.setCreateTime(time);
+                userIntegralBalanceDepositVo.setCreateTime(new Date());
                 userDepositDetailMapper.insertUserDepositDetail(userIntegralBalanceDepositVo);
+                System.out.println("-----------------------------2--------------------------------");
                 //响应接口
                 hashMap.put("code", "SUCCESS");
                 hashMap.put("message", "成功");
@@ -254,6 +259,7 @@ public class CallBackServiceImpl implements CallBackService {
         }
     }
 
+    @Transactional
     @Override
     public HashMap<String, String> paymentCallBack(HttpServletRequest request) throws GeneralSecurityException {
         HashMap params = requestUtils.requestParams(request);
