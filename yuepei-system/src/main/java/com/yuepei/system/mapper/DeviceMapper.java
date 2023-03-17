@@ -108,5 +108,5 @@ public interface DeviceMapper {
 
     List<Device> selectDeviceByHospitalId(Long hospitalId);
 
-    List<Device> selectDeviceAll();
+    List<Device> selectDeviceByDeviceNumberList(List<String> device);
 }

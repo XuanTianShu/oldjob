@@ -207,7 +207,8 @@
         </foreach>
     </select>
     <select id="selectLeaseOrderDetails" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
-        <include refid="selectUserLeaseOrderVo"/>
+        select id, openid, order_number, device_number, device_type, lease_time, lease_address, restore_time, restore_address, IFNULL(price,0) as price, IFNULL(pay_type,0) as pay_type, IFNULL(net_amount,0) as net_amount, deposit, coupon_price, status, play_time,create_time
+        from user_lease_order
         where order_number=#{orderNumber}
     </select>
 
@@ -245,5 +246,9 @@
     </select>
     <select id="selectUseDevice" resultType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         select distinct device_number from user_lease_order where device_number=#{deviceNumber} and status=0
+    </select>
+    <select id="selectUserLeaseOrderByOrderNumber" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where CONCAT(IFNULL(order_number,''),IFNULL(device_number,'')) LIKE concat('%',#{orderNumber},'%')
     </select>
 </mapper>

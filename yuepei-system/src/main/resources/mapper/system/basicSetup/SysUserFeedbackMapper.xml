@@ -61,6 +61,19 @@
          </where>
     </select>
 
+    <sql id="selectDeviceFaultListVo">
+        select feedback_id,user_id,user_name,phone_number,device_number,feedback_type,feedback_info,feedback_url,feedback_time,status from sys_user_feedback
+    </sql>
+
+    <select id="selectDeviceFaultList" parameterType="SysUserFeedback" resultMap="SysUserFeedback">
+        <include refid="selectDeviceFaultListVo"/>
+        <where>
+            device_number=#{deviceNumber}
+        </where>
+        <if test="status!=null">
+            and status=#{status}
+        </if>
+    </select>
     <insert id="insertSysUserFeedback" parameterType="com.yuepei.system.domain.SysUserFeedback" useGeneratedKeys="true" keyProperty="feedbackId">
         insert into sys_user_feedback
         <trim prefix="(" suffix=")" suffixOverrides=",">

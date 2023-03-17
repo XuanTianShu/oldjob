@@ -8,6 +8,8 @@ import lombok.Data;
  */
 @Data
 public class SubAccountVo {
+    /**当前账号id*/
+    private Long userId;
     /**用户账号*/
     private String userName;
     /**用户密码*/

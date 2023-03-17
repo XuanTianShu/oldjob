@@ -6,6 +6,7 @@ import com.yuepei.common.core.domain.entity.SysRole;
 import org.apache.ibatis.annotations.Param;
 import com.yuepei.common.core.domain.entity.SysUser;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.security.core.parameters.P;
 
 /**
  * 用户表 数据层

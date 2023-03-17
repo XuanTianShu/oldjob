@@ -43,7 +43,7 @@ public interface HospitalDeviceService {
 
     IndexVo indexPage(Long userId);
 
-    List<Hospital> selectHospitalList();
+
 
     SysUser selectPersonalData(Long userId);
 

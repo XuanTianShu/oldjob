@@ -107,4 +107,6 @@ public interface UserLeaseOrderMapper {
     List<UserLeaseOrder> selectUserLeaseOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber);
 
     UserLeaseOrder selectUseDevice(@Param("deviceNumber")String deviceNumber);
+
+    List<UserLeaseOrder> selectUserLeaseOrderByOrderNumber(String orderNumber);
 }

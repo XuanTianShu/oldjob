@@ -52,4 +52,6 @@ public interface HospitalDeviceMapper {
     Hospital selectHospitalByHospitalId(@Param("hospitalName")String hospitalName);
 
     List<Hospital> selectHospitalList();
+
+    List<Device> selectDeviceByHospitalIdLike(@Param("hospitalId") Long hospitalId,@Param("numberOrAddress") String numberOrAddress);
 }

@@ -1,6 +1,8 @@
 package com.yuepei.system.service.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.google.gson.Gson;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
@@ -10,10 +12,7 @@ import com.yuepei.common.utils.ServletUtils;
 import com.yuepei.common.utils.ip.IpUtils;
 import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.vo.*;
-import com.yuepei.system.mapper.AgentMapper;
-import com.yuepei.system.mapper.HospitalDeviceMapper;
-import com.yuepei.system.mapper.SysUserMapper;
-import com.yuepei.system.mapper.UserLeaseOrderMapper;
+import com.yuepei.system.mapper.*;
 import com.yuepei.system.service.ISysUserService;
 import com.yuepei.system.service.HospitalDeviceService;
 import org.springframework.beans.BeanUtils;
@@ -46,6 +45,9 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     private SysUserMapper sysUserMapper;
 
     @Autowired
+    private DeviceTypeMapper deviceTypeMapper;
+
+    @Autowired
     private ISysUserService sysUserService;
 
     @Autowired
@@ -53,7 +55,16 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
 
     @Override
     public List<DeviceType> selectDeviceType(Long userId) {
-        return hospitalDeviceMapper.selectDeviceType(userId);
+        List<DeviceType> deviceTypes = new ArrayList<>();
+        SysUser sysUser = sysUserMapper.selectUserById(userId);
+        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
+        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(hospitalUser.getHospitalId());
+        List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(hospital.getHospitalId());
+        deviceList.stream().forEach(map->{
+            DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
+            deviceTypes.add(deviceType);
+        });
+        return deviceTypes;
     }
 
     @Override
@@ -82,6 +93,12 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
                 deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
                 deviceDetailsVo.setDeviceFullAddress(device_full_address);
+                deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
+                deviceDetailsVo.setStatus(map.getStatus());
+                deviceDetailsVo.setHospitalId(hospital.getHospitalId());
+                deviceDetailsVo.setHospitalName(hospital.getHospitalName());
+                deviceDetailsVos.add(deviceDetailsVo);
+            }else {
                 deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
                 deviceDetailsVo.setStatus(map.getStatus());
                 deviceDetailsVo.setHospitalId(hospital.getHospitalId());
@@ -180,6 +197,9 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     public List<String> selectDepartment(Long userId) {
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
+        if (hospitalUser==null){
+            return null;
+        }
         List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(hospitalUser.getHospitalId());
         List<String> deviceDepartment = new ArrayList<>();
         deviceList.stream().forEach(map -> {
@@ -208,22 +228,37 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     public List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String orderNumber) {
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
+        if (hospitalUser==null){
+            return null;
+        }
         List<String> numberList = hospitalDeviceMapper.selectLeaseOrder(hospitalUser.getHospitalId());
-        List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrder(numberList);
-        List<UserLeaseOrderVo> userLeaseOrderList = userLeaseOrders.stream().map(a -> {
+        List<UserLeaseOrder> leaseOrders = new ArrayList<>();
+        if (!orderNumber.equals("")){
+            List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(orderNumber);
+            numberList.stream().forEach(map->{
+                List<UserLeaseOrder> collect = userLeaseOrders.stream().filter(i -> i.getDeviceNumber().equals(map)).collect(Collectors.toList());
+                leaseOrders.addAll(collect);
+            });
+        }else {
+
+            List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrder(numberList);
+            leaseOrders.addAll(userLeaseOrders);
+        }
+        List<UserLeaseOrderVo> userLeaseOrderList = leaseOrders.stream().map(a -> {
             UserLeaseOrderVo b = new UserLeaseOrderVo();
             BeanUtils.copyProperties(a, b);
             return b;
         }).collect(Collectors.toList());
+        if (leaseOrders==null){
+            return userLeaseOrderList;
+        }
         userLeaseOrderList.stream().forEach(map->{
             Device device = hospitalDeviceMapper.selectDeviceByTypeNumber(map.getDeviceNumber());
             String deviceFullAddress = device.getDeviceFullAddress();
             if (!deviceFullAddress.isEmpty()) {
                 String[] array = JSON.parseArray(deviceFullAddress).toArray(new String[0]);
-                for (int i = 0; i < array.length; i++) {
-                    Hospital department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
-                    map.setDepartment(department.getHospitalName());
-                }
+                Hospital department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
+                map.setDepartment(department.getHospitalName());
             }
         });
         if (!deviceDepartment.equals("")){
@@ -234,10 +269,6 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             List<UserLeaseOrderVo> collect = userLeaseOrderList.stream().filter(map -> map.getDeviceType().equals(deviceTypeName)).collect(Collectors.toList());
             userLeaseOrderList.clear();
             userLeaseOrderList.addAll(collect);
-        }if (!orderNumber.equals("")){
-            List<UserLeaseOrderVo> collect = userLeaseOrderList.stream().filter(map -> map.getOrderNumber().equals(orderNumber)).collect(Collectors.toList());
-            userLeaseOrderList.clear();
-            userLeaseOrderList.addAll(collect);
         }
         return userLeaseOrderList;
     }
@@ -246,7 +277,6 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     public UserLeaseOrderVo selectLeaseOrderDetails(String orderNumber, Long userId) {
         SysUser sysUser1 = sysUserMapper.selectUserById(userId);
         UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectLeaseOrderDetails(orderNumber);
-        SysUser sysUser = sysUserMapper.selectUserByOpenid(userLeaseOrder.getOpenid());
         Device device = hospitalDeviceMapper.selectDeviceByTypeNumber(userLeaseOrder.getDeviceNumber());
         //获取医院信息
         Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(device.getHospitalId());
@@ -255,12 +285,168 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         Agent agent = agentMapper.selectAgent(agentHospital.getAgentId());
         UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
         BeanUtils.copyProperties(userLeaseOrder, userLeaseOrderVo);
-        userLeaseOrderVo.setNickName(sysUser.getNickName());
+        userLeaseOrderVo.setUserName(sysUser1.getUserName());
         userLeaseOrderVo.setProportion(sysUser1.getProportion());
         userLeaseOrderVo.setAgentName(agent.getAgentName());
         userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
-        BigDecimal deviceTypeDeposit = new BigDecimal(userLeaseOrder.getDeposit());
-        userLeaseOrderVo.setDepositNum(deviceTypeDeposit);
+        if (userLeaseOrder.getStatus().equals("0")){
+            Long date = new Date().getTime();
+            Long lease = userLeaseOrderVo.getLeaseTime().getTime();
+            //已使用时长、使用时长
+            Long time = new Date(date - lease).getTime();
+            Long day = time/1000/60/60/24;
+            Long hour = time/1000/60/60%24;
+            Long minute = time/1000/60%60;
+            Long second = time/1000%60;
+            if (day==0){
+                if (hour==0){
+                    if (minute==0){
+                        userLeaseOrderVo.setPlayTime(second+"秒");
+                    }else {
+                        userLeaseOrderVo.setPlayTime(minute+"分钟"+second+"秒");
+                    }
+                }else {
+                    userLeaseOrderVo.setPlayTime(hour+"小时"+minute+"分钟"+second+"秒");
+                }
+            }else {
+                userLeaseOrderVo.setPlayTime(day+"天"+hour+"小时"+minute+"分钟"+second+"秒");
+            }
+            Date leaseTime = userLeaseOrderVo.getLeaseTime();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            String format = dateFormat.format(leaseTime);
+            String hospitalRule = hospital.getHospitalRule();
+            JSONArray jsonArray = JSON.parseArray(hospitalRule);
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String startTime = (String) jsonObject.get("startTime");
+                String endTime = (String) jsonObject.get("endTime");
+                try {
+                    Date parse = dateFormat.parse(format);
+                    Date start = dateFormat.parse(startTime);
+                    Date end = dateFormat.parse(endTime);
+                    if (start.compareTo(parse)==1&&end.compareTo(parse)==-1){
+                        String price = (String) jsonObject.get("price");
+                        userLeaseOrderVo.setEstimateAmount(new BigDecimal(price));
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+            userLeaseOrderVo.setContent(device.getContent());
+            userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
+            userLeaseOrderVo.setLeaseTime(userLeaseOrder.getLeaseTime());
+            userLeaseOrderVo.setLeaseAddress(userLeaseOrder.getLeaseAddress());
+            userLeaseOrderVo.setOrderNumber(userLeaseOrder.getOrderNumber());
+        }
+        if (userLeaseOrder.getStatus().equals("1")){
+            Date leaseTime = userLeaseOrderVo.getLeaseTime();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            String format = dateFormat.format(leaseTime);
+            String hospitalRule = hospital.getHospitalRule();
+            JSONArray jsonArray = JSON.parseArray(hospitalRule);
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String startTime = (String) jsonObject.get("startTime");
+                String endTime = (String) jsonObject.get("endTime");
+                try {
+                    Date parse = dateFormat.parse(format);
+                    Date start = dateFormat.parse(startTime);
+                    Date end = dateFormat.parse(endTime);
+                    if (start.compareTo(parse)==1&&end.compareTo(parse)==-1){
+                        String price = (String) jsonObject.get("price");
+                        userLeaseOrderVo.setEstimateAmount(new BigDecimal(price));
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+            Long restoreTime = userLeaseOrderVo.getRestoreTime().getTime();
+            Long leaseTimeTime = leaseTime.getTime();
+            Long time = new Date(restoreTime - leaseTimeTime).getTime();
+            Long day = time/1000/60/60/24;
+            Long hour = time/1000/60/60%24;
+            Long minute = time/1000/60%60;
+            Long second = time/1000%60;
+            if (day==0){
+                if (hour==0){
+                    if (minute==0){
+                        userLeaseOrderVo.setPlayTime(second+"秒");
+                    }else {
+                        userLeaseOrderVo.setPlayTime(minute+"分钟"+second+"秒");
+                    }
+                }else {
+                    userLeaseOrderVo.setPlayTime(hour+"小时"+minute+"分钟"+second+"秒");
+                }
+            }else {
+                userLeaseOrderVo.setPlayTime(day+"天"+hour+"小时"+minute+"分钟"+second+"秒");
+            }
+            userLeaseOrderVo.setPrice(new BigDecimal(userLeaseOrder.getPrice()));
+            userLeaseOrderVo.setContent(device.getContent());
+            userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
+            userLeaseOrderVo.setCouponPrice(userLeaseOrder.getCouponPrice());
+            userLeaseOrderVo.setLeaseTime(userLeaseOrder.getLeaseTime());
+            userLeaseOrderVo.setLeaseAddress(userLeaseOrder.getLeaseAddress());
+            userLeaseOrderVo.setRestoreTime(userLeaseOrder.getRestoreTime());
+            userLeaseOrderVo.setRestoreAddress(userLeaseOrder.getRestoreAddress());
+            userLeaseOrderVo.setOrderNumber(userLeaseOrder.getOrderNumber());
+            userLeaseOrderVo.setStatus(userLeaseOrder.getStatus());
+            userLeaseOrderVo.setNetAmount(new BigDecimal(userLeaseOrder.getNetAmount()));
+        }
+        if (userLeaseOrder.getStatus().equals("2")){
+            Date leaseTime = userLeaseOrderVo.getLeaseTime();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            String format = dateFormat.format(leaseTime);
+            String hospitalRule = hospital.getHospitalRule();
+            JSONArray jsonArray = JSON.parseArray(hospitalRule);
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String startTime = (String) jsonObject.get("startTime");
+                String endTime = (String) jsonObject.get("endTime");
+                try {
+                    Date parse = dateFormat.parse(format);
+                    Date start = dateFormat.parse(startTime);
+                    Date end = dateFormat.parse(endTime);
+                    if (start.compareTo(parse)==1&&end.compareTo(parse)==-1){
+                        String price = (String) jsonObject.get("price");
+                        userLeaseOrderVo.setEstimateAmount(new BigDecimal(price));
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+            Long restoreTime = userLeaseOrderVo.getRestoreTime().getTime();
+            Long leaseTimeTime = leaseTime.getTime();
+            Long time = new Date(restoreTime - leaseTimeTime).getTime();
+            Long day = time/1000/60/60/24;
+            Long hour = time/1000/60/60%24;
+            Long minute = time/1000/60%60;
+            Long second = time/1000%60;
+            if (day==0){
+                if (hour==0){
+                    if (minute==0){
+                        userLeaseOrderVo.setPlayTime(second+"秒");
+                    }else {
+                        userLeaseOrderVo.setPlayTime(minute+"分钟"+second+"秒");
+                    }
+                }else {
+                    userLeaseOrderVo.setPlayTime(hour+"小时"+minute+"分钟"+second+"秒");
+                }
+            }else {
+                userLeaseOrderVo.setPlayTime(day+"天"+hour+"小时"+minute+"分钟"+second+"秒");
+            }
+            userLeaseOrderVo.setPrice(new BigDecimal(userLeaseOrder.getPrice()));
+            userLeaseOrderVo.setContent(device.getContent());
+            userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
+            userLeaseOrderVo.setCouponPrice(userLeaseOrder.getCouponPrice());
+            userLeaseOrderVo.setLeaseTime(userLeaseOrder.getLeaseTime());
+            userLeaseOrderVo.setLeaseAddress(userLeaseOrder.getLeaseAddress());
+            userLeaseOrderVo.setRestoreTime(userLeaseOrder.getRestoreTime());
+            userLeaseOrderVo.setRestoreAddress(userLeaseOrder.getRestoreAddress());
+            userLeaseOrderVo.setOrderNumber(userLeaseOrder.getOrderNumber());
+            userLeaseOrderVo.setPayType(userLeaseOrder.getPayType());
+            userLeaseOrderVo.setStatus(userLeaseOrder.getStatus());
+            userLeaseOrderVo.setNetAmount(new BigDecimal(userLeaseOrder.getNetAmount()));
+        }
         return userLeaseOrderVo;
     }
 
@@ -520,10 +706,6 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         return indexVo;
     }
 
-    @Override
-    public List<Hospital> selectHospitalList() {
-        return hospitalDeviceMapper.selectHospitalList();
-    }
 
     @Override
     public SysUser selectPersonalData(Long userId) {

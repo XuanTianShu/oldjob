@@ -3,16 +3,15 @@ package com.yuepei.web.controller.device;
 import com.yuepei.common.annotation.Log;
 import com.yuepei.common.core.controller.BaseController;
 import com.yuepei.common.core.domain.AjaxResult;
-import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.common.enums.BusinessType;
-import com.yuepei.common.enums.OperatorType;
-import com.yuepei.common.utils.StringUtils;
 import com.yuepei.common.utils.poi.ExcelUtil;
 import com.yuepei.system.domain.Device;
-import com.yuepei.system.domain.vo.DeviceVO;
+import com.yuepei.system.mapper.CarouselMapper;
+import com.yuepei.system.mapper.InstructionsMapper;
 import com.yuepei.system.service.DeviceService;
 import com.yuepei.system.service.HospitalDeviceService;
+import com.yuepei.system.service.ServicePhoneService;
 import com.yuepei.utils.DictionaryEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -59,6 +57,16 @@ public class DeviceController extends BaseController {
 
     @Autowired
     private HospitalDeviceService hospitalDeviceService;
+
+    @Autowired
+    private ServicePhoneService servicePhoneService;
+
+    @Autowired
+    private InstructionsMapper instructionsMapper;
+
+    @Autowired
+    private CarouselMapper carouselMapper;
+
 
     //修改接口路径
 
@@ -184,6 +192,24 @@ public class DeviceController extends BaseController {
     @GetMapping("/selectPersonalCenter/{userId}")
     public AjaxResult selectPersonalCenter(@PathVariable("userId")Long userId){
         return AjaxResult.success(hospitalDeviceService.selectPersonalCenter(userId));
+    }
+
+    /**客服热线*/
+    @GetMapping("/contactUsList")
+    public AjaxResult contactUsList(){
+        return AjaxResult.success(servicePhoneService.selectServicePhoneList(null));
+    }
+
+    /**使用说明*/
+    @GetMapping("/selectInstructionsList")
+    public AjaxResult selectInstructions(){
+        return AjaxResult.success(instructionsMapper.selectInstructionsList(null));
+    }
+
+    /**轮播图*/
+    @GetMapping("/selectCarouselList")
+    public AjaxResult selectCarouselList(){
+        return AjaxResult.success(carouselMapper.selectCarouselList(null));
     }
     //修改接口路径
 
