@@ -42,6 +42,7 @@
         <result property="deviceTypeId" column="device_type_id"/>
         <result property="hospitalName" column="hospital_name"/>
         <result property="leaseAddress" column="lease_address"/>
+        <result property="phoneNumber" column="phone_number"/>
         <result property="netAmount" column="net_amount"/>
         <result property="leaseTime" column="lease_time"/>
         <result property="nickName" column="nick_name"/>
@@ -67,7 +68,7 @@
     </sql>
 
     <sql id="selectLeaseOrderVO">
-        SELECT lo.id,u.`nick_name`,d.`device_type_id`, lo.order_number,
+        SELECT lo.id,u.`nick_name`,u.`phone_number`,d.`device_type_id`, lo.order_number,
                lo.device_number, lo.device_type, lo.lease_time,
                lo.lease_address, h.`hospital_name`,lo.choose,lo.child,
                lo.restore_time, lo.restore_address, lo.price, lo.pay_type,
@@ -295,5 +296,13 @@
         <include refid="selectUserLeaseOrderVo"/>
         where status=2
         and device_number=#{deviceNumber}
+    </select>
+    <select id="checkDeposit" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM user_deposit_order
+        WHERE device_number = #{deviceNumber} and deposit_status = 0 and `status` = 1 and openid = #{openid}
+    </select>
+    <select id="selectUserOrderByDeviceNumber" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM user_lease_order WHERE device_number = #{deviceNumber} and
+            openid = #{openid} and status != 2
     </select>
 </mapper>

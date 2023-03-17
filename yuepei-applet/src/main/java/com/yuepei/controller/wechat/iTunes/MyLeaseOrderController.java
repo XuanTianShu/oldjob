@@ -59,6 +59,7 @@ public class MyLeaseOrderController {
     @GetMapping("/userLeaseOrder")
     public AjaxResult userLeaseOrder(HttpServletRequest request,Integer status){
         SysUser user = tokenUtils.analysis(request);
+//        return AjaxResult.success(myLeaseOrderService.userLeaseOrder("oc0od5fazQUUOnkUbxreEkeYopfI",status));
         return AjaxResult.success(myLeaseOrderService.userLeaseOrder(user.getOpenid(),status));
 //        UserLeaseOrder userLeaseOrder = new UserLeaseOrder();
 //        userLeaseOrder.setOpenid(user.getOpenid());

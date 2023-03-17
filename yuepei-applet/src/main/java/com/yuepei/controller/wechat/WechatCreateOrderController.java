@@ -116,6 +116,7 @@ public class WechatCreateOrderController {
     @PostMapping("/paymentPrepaymentOrder")
     public AjaxResult paymentPrepaymentOrder(HttpServletRequest request,@RequestBody UserLeaseOrder userLeaseOrder, Integer couponId){
         SysUser user = tokenUtils.analysis(request);
+        System.out.println(couponId+"----------------------------------"+userLeaseOrder.getPrice());
         return createOrderService.paymentPrepaymentOrder(user.getOpenid(),userLeaseOrder,couponId);
     }
 

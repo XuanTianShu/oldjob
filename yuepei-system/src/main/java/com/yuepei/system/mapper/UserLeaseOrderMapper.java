@@ -105,4 +105,8 @@ public interface UserLeaseOrderMapper {
     ConditionOrderVO selectConditionOrder(LeaseOrderVO leaseOrderVO);
 
     List<UserLeaseOrder> selectUserLeaseOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber);
+
+    int checkDeposit(@Param("openid") String openid, @Param("deviceNumber") String deviceNumber);
+
+    int selectUserOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber, @Param("openid") String openid);
 }

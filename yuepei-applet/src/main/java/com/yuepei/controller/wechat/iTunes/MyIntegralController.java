@@ -52,9 +52,11 @@ public class MyIntegralController {
     private MyIntegralService integralService;
 
     @GetMapping("/selectIntegralList")
-    public AjaxResult integralList(HttpServletRequest request,Integer status){
+    public AjaxResult integralList(HttpServletRequest request,UserIntegralBalanceDepositVo userIntegralBalanceDepositVo){
         SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(integralService.integralList(user.getOpenid(),status));
+        return AjaxResult.success(integralService.integralList(user.getOpenid(),userIntegralBalanceDepositVo));
+//        return AjaxResult.success(integralService.integralList("oc0od5efCnYrfiuqEmMj3gfNXdPg",status));
+
     }
 
 }

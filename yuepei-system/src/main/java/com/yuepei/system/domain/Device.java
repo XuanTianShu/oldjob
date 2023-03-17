@@ -102,6 +102,8 @@ public class Device extends BaseEntity {
     @Excel(name = "预警值")
     private Long electricEarly;
 
+    private String content;
+
     private String investorId;
 
     private List<DeviceRule> deviceRules;

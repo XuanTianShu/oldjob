@@ -33,7 +33,7 @@ import java.util.List;
  **/
 public interface MyIntegralService {
 
-    List<UserIntegralBalanceDepositVo> integralList(String openid, Integer status);
+    List<UserIntegralBalanceDepositVo> integralList(String openid, UserIntegralBalanceDepositVo userIntegralBalanceDepositVo);
 
     List<UserIntegralBalanceDepositVo> selectIntegralDetailList(UserIntegralBalanceDepositVo userIntegralBalanceDepositVo);
 }

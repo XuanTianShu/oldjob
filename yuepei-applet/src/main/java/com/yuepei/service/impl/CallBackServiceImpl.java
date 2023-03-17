@@ -342,7 +342,9 @@ public class CallBackServiceImpl implements CallBackService {
 
         //根据优惠券 id 查优惠券金额
         UserCoupon userCoupon = userCouponMapper.selectUserCouponById(couponId);
-        Long price  = userLeaseOrder.getPrice() - userCoupon.getDiscountAmount() * 100;
+        BigDecimal bigDecimal = new BigDecimal(userCoupon.getDiscountAmount());
+        BigDecimal subtract = userLeaseOrder.getPrice().subtract(bigDecimal);
+        Long price  =  subtract.multiply(new BigDecimal(100)).longValue();
         if(user.getBalance() < price){
             return AjaxResult.error("余额不足");
         }else {

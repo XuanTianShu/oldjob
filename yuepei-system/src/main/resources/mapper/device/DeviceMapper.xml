@@ -60,18 +60,19 @@
         <result property="electricEarly" column="electric_early"/>
         <result property="agentName" column="agentName"/>
         <result property="hospitalName" column="hospitalName"/>
+        <result property="content" column="content"/>
     </resultMap>
 
 
     <sql id="selectDeviceVo">
         select device_id, device_type_id, device_number,device_iot_number,device_mac,
-               device_deposit, billing_id,hospital_id, device_qR_code, device_address,
+               device_deposit, billing_id,hospital_id, device_qR_code, device_address,content,
     device_full_address,`rows`,heart_time, create_time, status,investor_id,electric,electric_early from device
     </sql>
 
     <select id="selectDeviceList" parameterType="Device" resultMap="DeviceByPersonnelResult">
         SELECT d.device_id, d.device_type_id, d.device_number,d.device_iot_number,d.device_mac,
-        d.device_deposit, d.billing_id,d.hospital_id, d.device_qR_code, d.device_address,
+        d.device_deposit, d.billing_id,d.hospital_id, d.device_qR_code, d.device_address,d.content,
         d.device_full_address,d.`rows`,d.heart_time, d.create_time, d.status,d.investor_id,
         d.electric,d.electric_early,IFNULL(su.`nick_name`,'无') AS agentName,
         IFNULL(s.`nick_name`,'无') AS hospitalName FROM device AS d
@@ -156,6 +157,7 @@
             <if test="investorId != null">investor_id,</if>
             <if test="electric != null">electric,</if>
             <if test="electricEarly != null">electric_early,</if>
+            <if test="content != null">content,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="deviceTypeId != null">#{deviceTypeId},</if>
@@ -175,6 +177,7 @@
             <if test="investorId != null">#{investorId},</if>
             <if test="electric != null">#{electric},</if>
             <if test="electricEarly != null">#{electricEarly},</if>
+            <if test="content != null">#{content},</if>
         </trim>
     </insert>
 
@@ -198,6 +201,7 @@
             <if test="investorId != null and investorId != ''">investor_id = #{investorId},</if>
             <if test="electric != null">electric = #{electric},</if>
             <if test="electricEarly != null">electric_early = #{electricEarly},</if>
+            <if test="content != null">content = #{content},</if>
         </trim>
         where device_id = #{deviceId}
     </update>

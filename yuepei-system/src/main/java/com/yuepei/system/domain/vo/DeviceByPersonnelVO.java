@@ -63,4 +63,6 @@ public class DeviceByPersonnelVO extends BaseController {
     private String agentName;
 
     private String hospitalName;
+
+    private String content;
 }

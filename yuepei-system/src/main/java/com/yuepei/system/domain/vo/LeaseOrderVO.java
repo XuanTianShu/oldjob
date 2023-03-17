@@ -82,4 +82,6 @@ public class LeaseOrderVO extends BaseEntity {
 
     private String child;
 
+    private String phoneNumber;
+
 }

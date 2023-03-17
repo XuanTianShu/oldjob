@@ -87,6 +87,9 @@ public class VideoManagementController extends BaseController {
     @PostMapping
     public AjaxResult add(@RequestBody VideoManagement videoManagement)
     {
+//        String substring = videoManagement.getVideoUrl().substring(0, videoManagement.getVideoUrl().indexOf("//"));
+
+//        videoManagement.getVideoUrl().substring()
         return toAjax(videoManagementService.insertVideoManagement(videoManagement));
     }
 

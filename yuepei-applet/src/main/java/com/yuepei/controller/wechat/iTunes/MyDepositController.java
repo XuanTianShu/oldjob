@@ -56,7 +56,6 @@ public class MyDepositController {
     @GetMapping("/selectUserDepositInfo")
     public AjaxResult selectUserDepositInfo(HttpServletRequest request,String status,String depositStatus){
         SysUser user = tokenUtils.analysis(request);
-        System.out.println(status+"======="+depositStatus+"=========="+user.getOpenid());
         return AjaxResult.success(depositService.selectUserDepositInfo(user.getOpenid(),status,depositStatus));
     }
 
