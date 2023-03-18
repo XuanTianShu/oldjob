@@ -2,7 +2,9 @@ package com.yuepei.web.agent.controller;
 
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.system.domain.SysUserFeedback;
 import com.yuepei.system.domain.vo.DeviceDetailsVo;
+import com.yuepei.system.domain.vo.FeedbackInfoVo;
 import com.yuepei.system.domain.vo.HospitalAgentVo;
 import com.yuepei.system.domain.vo.SubAccountVo;
 import com.yuepei.system.service.HospitalDeviceService;
@@ -183,5 +185,17 @@ public class AgentController {
                                                 @RequestParam(value = "status",required = false)Integer status,
                                                 @RequestParam("feedbackId")Long feedbackId){
         return AjaxResult.success(agentService.selectDeviceFaultDetails(userId,status,feedbackId));
+    }
+
+    /**代理端-故障详情-待维修-填写维修记录*/
+    @GetMapping("/writeMaintenanceRecords")
+    private AjaxResult writeMaintenanceRecords(@RequestBody FeedbackInfoVo feedback){
+        return AjaxResult.success(agentService.writeMaintenanceRecords(feedback));
+    }
+
+    /**代理端-故障详情-维修完成*/
+    @GetMapping("/feedbackRepairCompleted/{feedbackId}")
+    private AjaxResult feedbackRepairCompleted(@PathVariable("feedbackId")Long feedbackId){
+        return AjaxResult.success(agentService.feedbackRepairCompleted(feedbackId));
     }
 }

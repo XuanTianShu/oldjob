@@ -11,6 +11,7 @@ import java.util.List;
  */
 @Data
 public class DeviceManageVo {
+    private String hospitalName;
     private Integer hospitalSum;
     private Integer deviceSum;
     private Long utilizationRate;

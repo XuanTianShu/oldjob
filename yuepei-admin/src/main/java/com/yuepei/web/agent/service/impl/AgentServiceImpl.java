@@ -2,9 +2,12 @@ package com.yuepei.web.agent.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.TypeReference;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.system.domain.*;
+import com.yuepei.system.domain.pojo.SysUserFeedbackPo;
 import com.yuepei.system.domain.vo.*;
 import com.yuepei.system.mapper.*;
 import com.yuepei.system.service.HospitalDeviceService;
@@ -100,6 +103,8 @@ public class AgentServiceImpl implements AgentService {
             List<DeviceDetailsVo> collect = deviceDetailsVos.stream().filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
             deviceDetailsVos.clear();
             deviceDetailsVos.addAll(collect);
+            Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(hospitalId);
+            manageVo.setHospitalName(hospital.getHospitalName());
         }
         BigDecimal decimal = new BigDecimal(0);
         List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
@@ -384,8 +389,10 @@ public class AgentServiceImpl implements AgentService {
             }else {
                 sysUsers.add(sysUser);
                 sysUsers.stream().forEach(map->{
-                    List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(userId, deviceDepartment, deviceTypeName, nameOrNumber);
-                    userLeaseOrderVoList.addAll(userLeaseOrderVos);
+                    List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(map.getUserId(), deviceDepartment, deviceTypeName, nameOrNumber);
+                    if (userLeaseOrderVos!=null){
+                        userLeaseOrderVoList.addAll(userLeaseOrderVos);
+                    }
                 });
             }
         }
@@ -1101,10 +1108,12 @@ public class AgentServiceImpl implements AgentService {
             BeanUtils.copyProperties(map,feedbackInfoVo);
             String feedbackUrl = map.getFeedbackUrl();
             Device device = hospitalDeviceMapper.selectDeviceByTypeNumber(map.getDeviceNumber());
-            JSONArray array = JSONArray.parse(feedbackUrl);
-            for (int i = 0; i < array.size(); i++) {
-                array.get(i);
-                feedback.add(String.valueOf(array.get(i)));
+            List<List<String>> lists = JSON.parseObject(feedbackUrl, new TypeReference<List<List<String>>>() {
+            });
+            for (List<String> list : lists) {
+                for (String s : list) {
+                    feedback.add(s);
+                }
             }
             feedbackInfoVo.setDeviceAddress(device.getDeviceAddress());
             feedbackInfoVo.setFeedbackUrl(feedback);
@@ -1135,9 +1144,12 @@ public class AgentServiceImpl implements AgentService {
             BeanUtils.copyProperties(map,feedbackInfoVo);
             String feedbackUrl = map.getFeedbackUrl();
             Device device = hospitalDeviceMapper.selectDeviceByTypeNumber(map.getDeviceNumber());
-            JSONArray array = JSONArray.parse(feedbackUrl);
-            for (Object url : array) {
-                feedback.add(String.valueOf(url));
+            List<List<String>> lists = JSON.parseObject(feedbackUrl, new TypeReference<List<List<String>>>() {
+            });
+            for (List<String> list : lists) {
+                for (String s : list) {
+                    feedback.add(s);
+                }
             }
             feedbackInfoVo.setDeviceAddress(device.getDeviceAddress());
             feedbackInfoVo.setFeedbackUrl(feedback);
@@ -1145,5 +1157,26 @@ public class AgentServiceImpl implements AgentService {
         });
         List<FeedbackInfoVo> collect = feedbackInfoVoList.stream().filter(map -> map.getFeedbackId().equals(feedbackId)).collect(Collectors.toList());
         return collect;
+    }
+
+    @Override
+    public int writeMaintenanceRecords(FeedbackInfoVo feedback) {
+        SysUserFeedback sysUserFeedback = sysUserFeedbackMapper.selectSysUserFeedbackById(feedback.getFeedbackId());
+        sysUserFeedback.setFeedbackDescribe(feedback.getFeedbackDescribe());
+        sysUserFeedback.setDevicePicture(feedback.getDevicePicture());
+        sysUserFeedback.setStatus(1);
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("YYYY-MM-DD HH:mm:ss");
+        String time = format.format(date);
+        sysUserFeedback.setFeedbackTime(time);
+        return sysUserFeedbackMapper.updateSysUserFeedback(sysUserFeedback);
+    }
+
+    @Override
+    public FeedbackInfoVo feedbackRepairCompleted(Long feedbackId) {
+        SysUserFeedback sysUserFeedback = sysUserFeedbackMapper.selectSysUserFeedbackById(feedbackId);
+        FeedbackInfoVo feedbackInfoVo = new FeedbackInfoVo();
+        BeanUtils.copyProperties(sysUserFeedback,feedbackInfoVo);
+        return feedbackInfoVo;
     }
 }

@@ -2,10 +2,7 @@ package com.yuepei.web.agent.service;
 
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
-import com.yuepei.system.domain.Agent;
-import com.yuepei.system.domain.Device;
-import com.yuepei.system.domain.DeviceType;
-import com.yuepei.system.domain.Hospital;
+import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.vo.*;
 
 import java.util.List;
@@ -49,4 +46,8 @@ public interface AgentService {
     List<FeedbackInfoVo> selectDeviceFaultList(Long userId,Integer status,String numberOrAddress);
 
     List<FeedbackInfoVo> selectDeviceFaultDetails(Long userId, Integer status, Long feedbackId);
+
+    int writeMaintenanceRecords(FeedbackInfoVo feedback);
+
+    FeedbackInfoVo feedbackRepairCompleted(Long feedbackId);
 }
