@@ -49,7 +49,7 @@ public class VideoManagementController extends BaseController {
     /**
      * 查询视频管理列表
      */
-    @PreAuthorize("@ss.hasPermi('system:management:list')")
+//    @PreAuthorize("@ss.hasPermi('system:management:list')")
     @GetMapping("/list")
     public TableDataInfo list(VideoManagement videoManagement)
     {
@@ -61,7 +61,7 @@ public class VideoManagementController extends BaseController {
     /**
      * 获取视频管理详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:management:query')")
+//    @PreAuthorize("@ss.hasPermi('system:management:query')")
     @GetMapping(value = "/{videoId}")
     public AjaxResult getInfo(@PathVariable("videoId") Long videoId)
     {
@@ -71,32 +71,35 @@ public class VideoManagementController extends BaseController {
     /**
      * 修改视频管理
      */
-    @PreAuthorize("@ss.hasPermi('system:management:edit')")
+//    @PreAuthorize("@ss.hasPermi('system:management:edit')")
     @Log(title = "视频管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody VideoManagement videoManagement)
     {
+        int i = videoManagement.getVideoUrl().indexOf("//");
+        String substring = videoManagement.getVideoUrl().substring(i + 2);
+        videoManagement.setVideoUrl("https://"+substring);
         return toAjax(videoManagementService.updateVideoManagement(videoManagement));
     }
 
     /**
      * 新增视频管理
      */
-    @PreAuthorize("@ss.hasPermi('system:management:add')")
+//    @PreAuthorize("@ss.hasPermi('system:management:add')")
     @Log(title = "视频管理", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody VideoManagement videoManagement)
     {
-//        String substring = videoManagement.getVideoUrl().substring(0, videoManagement.getVideoUrl().indexOf("//"));
-
-//        videoManagement.getVideoUrl().substring()
+        int i = videoManagement.getVideoUrl().indexOf("//");
+        String substring = videoManagement.getVideoUrl().substring(i + 2);
+        videoManagement.setVideoUrl("https://"+substring);
         return toAjax(videoManagementService.insertVideoManagement(videoManagement));
     }
 
     /**
      * 删除视频管理
      */
-    @PreAuthorize("@ss.hasPermi('system:management:remove')")
+//    @PreAuthorize("@ss.hasPermi('system:management:remove')")
     @Log(title = "视频管理", businessType = BusinessType.DELETE)
     @DeleteMapping("/{videoIds}")
     public AjaxResult remove(@PathVariable Long[] videoIds)

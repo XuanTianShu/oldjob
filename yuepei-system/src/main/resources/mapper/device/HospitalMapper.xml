@@ -9,6 +9,7 @@
         <result property="hospitalName"    column="hospital_name"    />
         <result property="parentId"    column="parent_id"    />
         <result property="hospitalRule"    column="hospital_rule"    />
+        <result property="proportion" column="proportion"/>
         <result property="createTime"    column="create_time"    />
         <result property="updateTime"    column="update_time"    />
     </resultMap>
@@ -20,7 +21,7 @@
     </resultMap>
 
     <sql id="selectHospitalVo">
-        select hospital_id, hospital_name, parent_id, hospital_rule, create_time, update_time from hospital
+        select hospital_id, hospital_name, parent_id, hospital_rule, create_time,proportion, update_time from hospital
     </sql>
 
     <select id="selectHospitalList" parameterType="Hospital" resultMap="HospitalResult">
@@ -38,11 +39,11 @@
         where hospital_id = #{hospitalId}
     </select>
     <select id="selectTreeOne" parameterType="Long" resultMap="HospitalResultVO">
-        SELECT hospital_id,hospital_name,parent_id FROM hospital
+        SELECT hospital_id,hospital_name,parent_id,proportion FROM hospital
         WHERE parent_id = #{hospitalId}
     </select>
     <select id="selectTree" parameterType="Long" resultMap="HospitalResultVO">
-        SELECT hospital_id,hospital_name,parent_id FROM hospital
+        SELECT hospital_id,hospital_name,parent_id,proportion FROM hospital
         WHERE parent_id IN
         <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
             #{hospitalId}
@@ -65,6 +66,7 @@
             <if test="hospitalRule != null">hospital_rule,</if>
             <if test="createTime != null">create_time,</if>
             <if test="updateTime != null">update_time,</if>
+            <if test="proportion != null">proportion,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="hospitalName != null">#{hospitalName},</if>
@@ -72,6 +74,7 @@
             <if test="hospitalRule != null">#{hospitalRule},</if>
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
+            <if test="proportion != null">#{proportion},</if>
         </trim>
     </insert>
 
@@ -85,6 +88,7 @@
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="hospitalRule != null and hospitalRule != ''">hospital_rule = #{hospitalRule},</if>
+            <if test="proportion != null">proportion = #{proportion},</if>
         </trim>
         where hospital_id = #{hospitalId}
     </update>

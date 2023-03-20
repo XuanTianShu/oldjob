@@ -33,7 +33,7 @@
         SELECT Id,openid,`sum`,create_time,`status` FROM user_balance_detail
         <where>
             openid = #{openid}
-            <if test="status != null">
+            <if test="userIntegralBalanceDepositVo.status != null">
                 and status = #{userIntegralBalanceDepositVo.status}
             </if>
         </where>

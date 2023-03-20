@@ -117,8 +117,8 @@ public class SysUserFeedbackServiceImpl implements ISysUserFeedbackService {
     }
 
     @Override
-    public List<SysUserFeedback> selectFaultFeedbackList(Long userId ,Long status) {
-        return sysUserFeedbackMapper.selectFaultFeedbackList(userId,status);
+    public List<SysUserFeedback> selectFaultFeedbackList(Long userId ,Long status,String deviceNumber) {
+        return sysUserFeedbackMapper.selectFaultFeedbackList(userId,status,deviceNumber);
     }
 
 }

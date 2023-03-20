@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yuepei.investor.mapper.AppletInvestorMapper">
+
+    <resultMap id="InvestorHospitalResult" type="com.yuepei.investor.domain.vo.InvestorHospitalVO">
+        <result property="hospitalId" column="hospital_id"/>
+        <result property="hospitalName" column="hospital_name"/>
+    </resultMap>
+
+    <resultMap id="OrderResult" type="com.yuepei.investor.domain.vo.InvestorOrderVO">
+        <result property="orderNumber" column="order_number"/>
+        <result property="hospitalName" column="hospitalN_name"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="netAmount" column="netAmount"/>
+    </resultMap>
+
+    <resultMap id="RevenueResult" type="com.yuepei.investor.domain.vo.InvestorRevenueVO">
+        <result property="orderCount" column="orderCount"/>
+        <result property="revenue" column="revenue"/>
+    </resultMap>
+
+    <select id="selectHospitalByInvestorId" resultMap="InvestorHospitalResult">
+        SELECT hospital_id,hospital_name
+        FROM hospital WHERE hospital_id IN(
+        SELECT DISTINCT(hospital_id) FROM device
+        WHERE device_number IN(
+        SELECT device_number FROM device_investor
+        WHERE investor_id = #{userId}))
+    </select>
+
+    <select id="selectDeviceCountByInvestorId" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM device AS d
+        LEFT JOIN hospital AS h ON
+        d.`hospital_id` = h.`hospital_id`
+        <where>
+            <if test="hospitalId != null">
+                d.`hospital_id` = #{hospitalId}
+            </if>
+            AND d.device_number IN(
+            SELECT device_number FROM device_investor
+            WHERE investor_id = #{userId})
+        </where>
+    </select>
+
+    <select id="selectDeviceEarningsByInvestorId" resultType="java.math.BigDecimal">
+        SELECT SUM(ulo.price) FROM device AS d
+        LEFT JOIN hospital AS h
+        ON h.`hospital_id` = d.`hospital_id`
+        INNER JOIN user_lease_order AS ulo
+        ON ulo.device_number = d.`device_number`
+        <where>
+            <if test="hospitalId != null">
+                d.`hospital_id` = #{hospitalId}
+            </if>
+            AND d.`device_number`
+            IN(SELECT device_number FROM device_investor
+            WHERE investor_id = #{userId})
+        </where>
+    </select>
+
+    <select id="yesterdayRevenue" resultMap="RevenueResult">
+        SELECT IFNULL(SUM(ulo.price),0.00) AS revenue,
+        COUNT(1) AS orderCount FROM user_lease_order AS ulo
+        INNER JOIN device AS d ON d.`device_number` = ulo.device_number
+        <where>
+            and TO_DAYS(NOW()) - TO_DAYS(FROM_UNIXTIME(ulo.create_time)) = 1
+            <if test="hospitalId != null">
+                AND d.`hospital_id` = #{hospitalId}
+            </if>
+            AND ulo.device_number IN(
+            SELECT device_number FROM device_investor WHERE investor_id = #{userId})
+        </where>
+    </select>
+
+    <select id="yesterdayRevenueList" resultMap="OrderResult">
+        SELECT ulo.order_number,d.`device_number`,h.`hospital_name`,
+        IFNULL(ulo.net_amount,0.00) AS netAmount
+        FROM user_lease_order AS ulo
+        INNER JOIN device AS d ON d.`device_number` = ulo.device_number
+        INNER JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
+        <where>
+            and TO_DAYS(NOW()) - TO_DAYS(FROM_UNIXTIME(ulo.create_time)) = 1
+            <if test="hospitalId != null">
+                AND d.`hospital_id` = #{hospitalId}
+            </if>
+            AND ulo.device_number IN(
+            SELECT device_number FROM device_investor WHERE investor_id = #{userId})
+        </where>
+    </select>
+
+    <select id="todayRevenue" resultMap="RevenueResult">
+        SELECT IFNULL(SUM(ulo.price),0.00) AS revenue,
+        COUNT(1) AS orderCount FROM user_lease_order AS ulo
+        INNER JOIN device AS d ON d.`device_number` = ulo.device_number
+        <where>
+            and TO_DAYS(ulo.create_time) = TO_DAYS(NOW())
+            <if test="hospitalId != null">
+                AND d.`hospital_id` = #{hospitalId}
+            </if>
+            AND ulo.device_number IN(
+            SELECT device_number FROM device_investor WHERE investor_id = #{userId})
+        </where>
+    </select>
+
+    <select id="todayRevenueList" resultMap="OrderResult">
+        SELECT ulo.order_number,d.`device_number`,h.`hospital_name`,
+        IFNULL(ulo.net_amount,0.00) AS netAmount FROM user_lease_order AS ulo
+        INNER JOIN device AS d ON d.`device_number` = ulo.device_number
+        INNER JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
+        <where>
+            and TO_DAYS(ulo.create_time) = TO_DAYS(NOW())
+            <if test="hospitalId != null">
+                AND d.`hospital_id` = #{hospitalId}
+            </if>
+            AND ulo.device_number IN(
+            SELECT device_number FROM device_investor WHERE investor_id = #{userId})
+        </where>
+    </select>
+
+    <select id="monthRevenue" resultMap="RevenueResult">
+        SELECT IFNULL(SUM(ulo.price),0.00) AS monthRevenue,
+        COUNT(1) AS monthOrder FROM user_lease_order AS ulo
+        INNER JOIN device AS d ON d.`device_number` = ulo.device_number
+        <where>
+            and DATE_FORMAT(ulo.create_time, '%Y%m' ) = DATE_FORMAT( CURDATE( ) ,'%Y%m' )
+            <if test="hospitalId != null">
+                AND d.`hospital_id` = #{hospitalId}
+            </if>
+            AND ulo.device_number IN(
+            SELECT device_number FROM device_investor WHERE investor_id = #{userId})
+        </where>
+    </select>
+
+    <select id="monthRevenueList" resultMap="OrderResult">
+        SELECT ulo.order_number,d.`device_number`,h.`hospital_name`,
+        IFNULL(ulo.net_amount,0.00) AS netAmount FROM user_lease_order AS ulo
+        INNER JOIN device AS d ON d.`device_number` = ulo.device_number
+        INNER JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
+        <where>
+            and DATE_FORMAT( ulo.create_time, '%Y%m' ) = DATE_FORMAT( CURDATE( ) ,'%Y%m' )
+            <if test="hospitalId != null">
+                AND d.`hospital_id` = #{hospitalId}
+            </if>
+            AND ulo.device_number IN(
+            SELECT device_number FROM device_investor WHERE investor_id = #{userId})
+        </where>
+    </select>
+
+    <select id="accumulativeRevenue" resultMap="RevenueResult">
+        SELECT IFNULL(SUM(ulo.price),0.00) AS accumulativeRevenue,
+        COUNT(1) AS accumulativeOrder FROM user_lease_order AS ulo
+        INNER JOIN device AS d ON d.`device_number` = ulo.device_number
+        <where>
+            and ulo.`status` = 3
+            <if test="hospitalId != null">
+                AND d.`hospital_id` = #{hospitalId}
+            </if>
+            AND ulo.device_number IN(
+            SELECT device_number FROM device_investor WHERE investor_id = #{userId})
+        </where>
+    </select>
+
+    <select id="accumulativeRevenueList" resultMap="OrderResult">
+        SELECT ulo.order_number,d.`device_number`,h.`hospital_name`,
+        IFNULL(ulo.net_amount,0.00) AS netAmount FROM user_lease_order AS ulo
+        INNER JOIN device AS d ON d.`device_number` = ulo.device_number
+        INNER JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
+        <where>
+            and ulo.`status` = 3
+            <if test="hospitalId != null">
+                AND d.`hospital_id` = #{hospitalId}
+            </if>
+            AND ulo.device_number IN(
+            SELECT device_number FROM device_investor WHERE investor_id = #{userId})
+        </where>
+    </select>
+</mapper>

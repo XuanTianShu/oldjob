@@ -102,7 +102,7 @@ public class DeviceRuleServiceImpl implements IDeviceRuleService
     }
 
     @Override
-    public DeviceRule selectDeviceRuleByDeviceNumber(Long deviceNumber) {
+    public DeviceRule selectDeviceRuleByDeviceNumber(String deviceNumber) {
         return deviceRuleMapper.selectDeviceRuleByDeviceNumber(deviceNumber);
     }
 }

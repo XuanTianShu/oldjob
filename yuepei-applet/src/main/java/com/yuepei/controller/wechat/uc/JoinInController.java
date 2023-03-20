@@ -12,32 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * 　　　　 ┏┓       ┏┓+ +
- * 　　　　┏┛┻━━━━━━━┛┻┓ + +
- * 　　　　┃　　　　　　 ┃
- * 　　　　┃　　　━　　　┃ ++ + + +
- * 　　　 █████━█████  ┃+
- * 　　　　┃　　　　　　 ┃ +
- * 　　　　┃　　　┻　　　┃
- * 　　　　┃　　　　　　 ┃ + +
- * 　　　　┗━━┓　　　 ┏━┛
- * 　　　　　　┃　　  ┃
- * 　　　　　　┃　　  ┃ + + + +
- * 　　　　　　┃　　　┃　Code is far away from bug with the animal protection
- * 　　　　　　┃　　　┃ + 　　　　         神兽保佑,代码永无bug
- * 　　　　　　┃　　　┃
- * 　　　　　　┃　　　┃　　+
- * 　　　　　　┃　 　 ┗━━━┓ + +
- * 　　　　　　┃ 　　　　　┣-┓
- * 　　　　　　┃ 　　　　　┏-┛
- * 　　　　　　┗┓┓┏━━━┳┓┏┛ + + + +
- * 　　　　　　 ┃┫┫　 ┃┫┫
- * 　　　　　　 ┗┻┛　 ┗┻┛+ + + +
- * *********************************************************
- *
- * @author ：AK
- * @create ：2022/12/20 15:17
- **/
+ * 加盟列表
+ */
 @RestController
 @RequestMapping("/wechat/user/join")
 public class JoinInController {

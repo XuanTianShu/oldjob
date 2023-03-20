@@ -186,7 +186,7 @@ public class UserRefundServiceImpl implements UserRefundService {
                 userIntegralBalanceDepositVo.setOpenid(userDepositOrder.getOpenid());
                 userIntegralBalanceDepositVo.setStatus(1);
                 //有问题
-                userIntegralBalanceDepositVo.setSum(new BigDecimal(price.toString()));
+                userIntegralBalanceDepositVo.setSum(new BigDecimal(price.toString()).divide(new BigDecimal(100)));
 
                 userIntegralBalanceDepositVo.setCreateTime(DateUtils.getNowDate());
                 userDepositDetailMapper.insertUserDepositDetail(userIntegralBalanceDepositVo);

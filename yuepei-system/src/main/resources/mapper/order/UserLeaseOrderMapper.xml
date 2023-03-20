@@ -227,6 +227,7 @@
             <if test="hospitalProportion != null">hospitalProportion = #{hospitalProportion},</if>
             <if test="agentProportion != null">agentProportion = #{agentProportion},</if>
             <if test="platformProportion != null">platformProportion = #{platformProportion},</if>
+            <if test="depositNumber != null">depositNumber = #{depositNumber}</if>
         </trim>
         where order_number = #{orderNumber}
     </update>
@@ -297,12 +298,17 @@
         where status=2
         and device_number=#{deviceNumber}
     </select>
-    <select id="checkDeposit" resultType="java.lang.Integer">
-        SELECT COUNT(1) FROM user_deposit_order
-        WHERE device_number = #{deviceNumber} and deposit_status = 0 and `status` = 1 and openid = #{openid}
-    </select>
     <select id="selectUserOrderByDeviceNumber" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM user_lease_order WHERE device_number = #{deviceNumber} and
             openid = #{openid} and status != 2
+    </select>
+    <select id="selectUserDepositList" resultType="java.lang.String">
+        SELECT order_number FROM user_deposit_order
+        WHERE device_number = #{deviceNumber} AND deposit_status = 0
+          AND `status` = 1 AND openid = #{openid}
+    </select>
+    <select id="selectUSerLeaseOrderDeposit" resultType="java.lang.String">
+        SELECT deposit_number FROM user_lease_order
+        WHERE openid = #{openid} AND device_number = #{deviceNumber}
     </select>
 </mapper>

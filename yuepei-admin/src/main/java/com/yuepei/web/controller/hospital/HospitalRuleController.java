@@ -57,7 +57,7 @@ public class HospitalRuleController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:rule:query')")
     @GetMapping(value = "/{deviceNumber}")
-    public AjaxResult getInfo(@PathVariable("deviceNumber") Long deviceNumber)
+    public AjaxResult getInfo(@PathVariable("deviceNumber") String deviceNumber)
     {
         return AjaxResult.success(deviceRuleService.selectDeviceRuleByDeviceNumber(deviceNumber));
     }

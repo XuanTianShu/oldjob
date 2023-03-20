@@ -91,7 +91,7 @@ public interface DeviceMapper {
 
     public Device selectDeviceByDeviceNumber(String deviceNumber);
 
-    public int updateDeviceByDeviceNumber(@Param("rows") String rows, @Param("deviceNumber") String deviceNumber);
+    public int updateDeviceByDeviceNumber(@Param("rows") String rows, @Param("deviceNumber") String deviceNumber, @Param("status") Integer status);
 
     public DeviceVO selectDeviceInfoByDeviceNumber(@Param("deviceNumber") String deviceNumber);
 

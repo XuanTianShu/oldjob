@@ -12,32 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * 　　　　 ┏┓       ┏┓+ +
- * 　　　　┏┛┻━━━━━━━┛┻┓ + +
- * 　　　　┃　　　　　　 ┃
- * 　　　　┃　　　━　　　┃ ++ + + +
- * 　　　 █████━█████  ┃+
- * 　　　　┃　　　　　　 ┃ +
- * 　　　　┃　　　┻　　　┃
- * 　　　　┃　　　　　　 ┃ + +
- * 　　　　┗━━┓　　　 ┏━┛
- * 　　　　　　┃　　  ┃
- * 　　　　　　┃　　  ┃ + + + +
- * 　　　　　　┃　　　┃　Code is far away from bug with the animal protection
- * 　　　　　　┃　　　┃ + 　　　　         神兽保佑,代码永无bug
- * 　　　　　　┃　　　┃
- * 　　　　　　┃　　　┃　　+
- * 　　　　　　┃　 　 ┗━━━┓ + +
- * 　　　　　　┃ 　　　　　┣-┓
- * 　　　　　　┃ 　　　　　┏-┛
- * 　　　　　　┗┓┓┏━━━┳┓┏┛ + + + +
- * 　　　　　　 ┃┫┫　 ┃┫┫
- * 　　　　　　 ┗┻┛　 ┗┻┛+ + + +
- * *********************************************************
- *
- * @author ：AK
- * @create ：2022/12/16 14:52
- **/
+ * 我的卡包
+ */
 @RestController
 @RequestMapping("/wechat/user/coupon")
 public class MyCouponController {

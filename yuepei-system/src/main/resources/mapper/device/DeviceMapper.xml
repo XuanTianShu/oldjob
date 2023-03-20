@@ -85,9 +85,8 @@
             <if test="deviceNumber != null "> and d.device_number = #{deviceNumber}</if>
             <if test="hospitalId != null "> and d.hospital_id = #{hospitalId}</if>
             <if test="status != null "> and d.status = #{status}</if>
-            and d.device_number IN(
+            and d.device_number IN(SELECT device_number FROM device_investor)
         </where>
-        SELECT device_number FROM device_investor)
     </select>
 
     <select id="selectDeviceByDeviceId" parameterType="Long" resultMap="DeviceResult">
@@ -209,6 +208,7 @@
         update device
         <trim prefix="SET" suffixOverrides=",">
             <if test=" rows!= null ">`rows` = #{rows},</if>
+            <if test="status != null">`status` = #{status}</if>
         </trim>
         where device_number = #{deviceNumber}
     </update>

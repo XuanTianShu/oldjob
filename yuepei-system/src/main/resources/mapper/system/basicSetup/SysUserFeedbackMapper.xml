@@ -15,6 +15,7 @@
         <result property="feedbackUrl"    column="feedback_url"    />
         <result property="feedbackTime"    column="feedback_time"    />
         <result property="status"    column="status"    />
+        <result property="deviceAddress" column="device_address"/>
     </resultMap>
 
     <resultMap type="com.yuepei.system.domain.pojo.SysUserFeedbackPo" id="SysUserFeedbackResult">
@@ -44,6 +45,7 @@
         <where>
             <if test="status != null "> and suf.status = #{status}</if>
         </where>
+        order by feedback_time desc
     </select>
 
     <select id="selectSysUserFeedbackByFeedbackId" parameterType="Long" resultMap="SysUserFeedbackResult">
@@ -52,11 +54,17 @@
     </select>
 
     <select id="selectFaultFeedbackList" parameterType="Long" resultMap="SysUserFeedback">
-        select * from sys_user_feedback
+        SELECT suf.feedback_id,suf.user_id,suf.user_name,suf.phone_number,suf.device_number,suf.feedback_type,suf.feedback_info,suf.feedback_url,
+        suf.feedback_time,suf.`status`,ifnull(d.`device_address`,'无') as device_address
+        FROM `sys_user_feedback` AS suf
+        left JOIN device AS d ON d.`device_number` = suf.`device_number`
          <where>
-             user_id = #{userId}
+             suf.user_id = #{userId}
              <if test="status != null and status != '' ">
-                 and status = #{status}
+                 and suf.status = #{status}
+             </if>
+             <if test="deviceNumber != null and deviceNumber != ''">
+                 and (d.device_number like concat('%',#{deviceNumber},'%') or d.device_address like concat('%',#{deviceNumber},'%'))
              </if>
          </where>
     </select>

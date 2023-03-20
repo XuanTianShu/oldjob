@@ -19,6 +19,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 /**
  * 　　　　 ┏┓       ┏┓+ +
@@ -63,15 +64,23 @@ public class EwmInLockController {
     @GetMapping("/ewmInLock")
     public AjaxResult ewmInLock(String deviceNumber, HttpServletRequest request) {
         SysUser analysis = tokenUtils.analysis(request);
-        System.out.println(analysis.getOpenid()+"------------------------");
         DeviceVO device = deviceService.selectDeviceInfoByDeviceNumber(deviceNumber);
-        int i = userLeaseOrderMapper.checkDeposit(analysis.getOpenid(),deviceNumber);
-        System.out.println(i+"=========================");
-        device.setDepositStatus(i > 0 ? 1:0);
-
-        System.out.println(device.getDepositStatus()+"-----------------");
         if (StringUtils.isNull(device)) {
             return AjaxResult.error("该设备不存在");
+        }
+        List<String> depositList = userLeaseOrderMapper.selectUserDepositList(analysis.getOpenid(),deviceNumber);
+        List<String> uSerLeaseOrderDeposit = userLeaseOrderMapper.selectUSerLeaseOrderDeposit(analysis.getOpenid(),deviceNumber);
+        if (depositList.size() != 0 && uSerLeaseOrderDeposit.size() != 0){
+            for (String s : uSerLeaseOrderDeposit) {
+                for (int k = depositList.size() - 1; k >= 0; k--) {
+                    if (s.equals(depositList.get(k))) {
+                        depositList.remove(k);
+                    }
+                }
+            }
+            device.setDepositList(depositList);
+        }else if (uSerLeaseOrderDeposit.size() == 0){
+            device.setDepositList(depositList);
         }
         return AjaxResult.success(device);
     }

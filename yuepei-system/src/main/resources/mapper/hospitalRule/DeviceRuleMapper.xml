@@ -33,7 +33,7 @@
         <include refid="selectDeviceRuleVo"></include>
         where hospital_id = #{id}
     </select>
-    <select id="selectDeviceRuleByDeviceNumber" parameterType="Long" resultMap="DeviceRuleResult">
+    <select id="selectDeviceRuleByDeviceNumber" parameterType="String" resultMap="DeviceRuleResult">
         <include refid="selectDeviceRuleVo"/>
         where device_number = #{deviceNumber}
     </select>

@@ -13,32 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * 　　　　 ┏┓       ┏┓+ +
- * 　　　　┏┛┻━━━━━━━┛┻┓ + +
- * 　　　　┃　　　　　　 ┃
- * 　　　　┃　　　━　　　┃ ++ + + +
- * 　　　 █████━█████  ┃+
- * 　　　　┃　　　　　　 ┃ +
- * 　　　　┃　　　┻　　　┃
- * 　　　　┃　　　　　　 ┃ + +
- * 　　　　┗━━┓　　　 ┏━┛
- * 　　　　　　┃　　  ┃
- * 　　　　　　┃　　  ┃ + + + +
- * 　　　　　　┃　　　┃　Code is far away from bug with the animal protection
- * 　　　　　　┃　　　┃ + 　　　　         神兽保佑,代码永无bug
- * 　　　　　　┃　　　┃
- * 　　　　　　┃　　　┃　　+
- * 　　　　　　┃　 　 ┗━━━┓ + +
- * 　　　　　　┃ 　　　　　┣-┓
- * 　　　　　　┃ 　　　　　┏-┛
- * 　　　　　　┗┓┓┏━━━┳┓┏┛ + + + +
- * 　　　　　　 ┃┫┫　 ┃┫┫
- * 　　　　　　 ┗┻┛　 ┗┻┛+ + + +
- * *********************************************************
- *
- * @author ：AK
- * @create ：2023/1/7 15:47
- **/
+ * 我的余额
+ */
 @RestController
 @RequestMapping("/wechat/user/balance")
 public class MyBalanceController {

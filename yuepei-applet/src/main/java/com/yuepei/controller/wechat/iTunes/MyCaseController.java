@@ -6,40 +6,13 @@ import com.yuepei.system.domain.UserCase;
 import com.yuepei.mapper.UserCaseMapper;
 import com.yuepei.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * 　　　　 ┏┓       ┏┓+ +
- * 　　　　┏┛┻━━━━━━━┛┻┓ + +
- * 　　　　┃　　　　　　 ┃
- * 　　　　┃　　　━　　　┃ ++ + + +
- * 　　　 █████━█████  ┃+
- * 　　　　┃　　　　　　 ┃ +
- * 　　　　┃　　　┻　　　┃
- * 　　　　┃　　　　　　 ┃ + +
- * 　　　　┗━━┓　　　 ┏━┛
- * 　　　　　　┃　　  ┃
- * 　　　　　　┃　　  ┃ + + + +
- * 　　　　　　┃　　　┃　Code is far away from bug with the animal protection
- * 　　　　　　┃　　　┃ + 　　　　         神兽保佑,代码永无bug
- * 　　　　　　┃　　　┃
- * 　　　　　　┃　　　┃　　+
- * 　　　　　　┃　 　 ┗━━━┓ + +
- * 　　　　　　┃ 　　　　　┣-┓
- * 　　　　　　┃ 　　　　　┏-┛
- * 　　　　　　┗┓┓┏━━━┳┓┏┛ + + + +
- * 　　　　　　 ┃┫┫　 ┃┫┫
- * 　　　　　　 ┗┻┛　 ┗┻┛+ + + +
- * *********************************************************
- *
- * @author ：AK
- * @create ：2023/1/12 18:46
- **/
+ * 我的病例
+ */
 @RestController
 @RequestMapping("/wechat/user/case")
 public class MyCaseController {
@@ -59,5 +32,11 @@ public class MyCaseController {
         }else {
             return AjaxResult.success(userCaseMapper.updateUserCase(userCase));
         }
+    }
+
+    @GetMapping("/selectUserCaseByUserId")
+    public AjaxResult selectUserCaseByUserId(HttpServletRequest request){
+        SysUser user = tokenUtils.analysis(request);
+        return AjaxResult.success(userCaseMapper.selectUserCaseByUserId(user.getUserId()));
     }
 }

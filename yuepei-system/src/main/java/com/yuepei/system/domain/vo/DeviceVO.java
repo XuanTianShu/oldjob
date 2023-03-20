@@ -48,9 +48,9 @@ public class DeviceVO extends BaseEntity {
 
     private String hospitalName;
 
-    private Integer depositStatus;
-
     private List<HospitalRuleVO> deviceRules;
+
+    private List<String> depositList;
 
     private Integer exists;
 }

@@ -77,7 +77,7 @@ public class MyLeaseOrderController {
     @PostMapping("/insertUserLeaseOrder")
     public AjaxResult insertUserLeaseOrder(HttpServletRequest request, String rows, @RequestBody UserLeaseOrder userLeaseOrder){
         SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(myLeaseOrderService.insertUserLeaseOrder(user.getOpenid(),rows,userLeaseOrder));
+        return myLeaseOrderService.insertUserLeaseOrder(user.getOpenid(),rows,userLeaseOrder);
     }
 
 

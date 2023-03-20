@@ -144,7 +144,7 @@ public class CallBackServiceImpl implements CallBackService {
                 userBalanceDetail.setOpenid(openid.toString());
                 BigDecimal divide1 = new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100), 2);
 //                userBalanceDetail.setSum(new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100),2));
-                userBalanceDetail.setSum(new BigDecimal(price.toString()));
+                userBalanceDetail.setSum(new BigDecimal(price.toString()).divide(new BigDecimal(100)));
                 userBalanceDetail.setStatus(0);
                 userBalanceDetail.setCreateTime(DateUtils.getNowDate());
                 userBalanceDetailMapper.insertUserBalanceDetail(userBalanceDetail);
@@ -234,7 +234,8 @@ public class CallBackServiceImpl implements CallBackService {
                 System.out.println("-----------------------1-------------------------");
                 //记录用户押金详细
                 userIntegralBalanceDepositVo.setOpenid(openid.toString());
-                userIntegralBalanceDepositVo.setSum(new BigDecimal(price.toString()));
+//                userIntegralBalanceDepositVo.setSum(new BigDecimal(price.toString()));
+                userIntegralBalanceDepositVo.setSum(new BigDecimal(price.toString()).divide(new BigDecimal(100)));
                 userIntegralBalanceDepositVo.setStatus(0);
                 userIntegralBalanceDepositVo.setCreateTime(new Date());
                 userDepositDetailMapper.insertUserDepositDetail(userIntegralBalanceDepositVo);
@@ -307,6 +308,7 @@ public class CallBackServiceImpl implements CallBackService {
                 userLeaseOrder.setPayType("1");
                 //修改状态
                 userLeaseOrder.setStatus("2");
+                userLeaseOrder.setDepositNumber("0");
                 //修改用户租赁信息
                 userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
                 if(cacheMap.get("couponId")!=null ||cacheMap.get("couponId")!= ""){
@@ -344,14 +346,14 @@ public class CallBackServiceImpl implements CallBackService {
         UserCoupon userCoupon = userCouponMapper.selectUserCouponById(couponId);
         BigDecimal bigDecimal = new BigDecimal(userCoupon.getDiscountAmount());
         BigDecimal subtract = userLeaseOrder.getPrice().subtract(bigDecimal);
-        Long price  =  subtract.multiply(new BigDecimal(100)).longValue();
-        if(user.getBalance() < price){
+        Long price  =  subtract.longValue();
+        if(user.getBalance() < userCoupon.getDiscountAmount()){
             return AjaxResult.error("余额不足");
         }else {
             user.setBalance(user.getBalance() - price);
             userMapper.updateUser(user);
             //记录优惠券金额
-            userLeaseOrder.setCouponPrice((long) (userCoupon.getDiscountAmount()*100));
+            userLeaseOrder.setCouponPrice((long) (userCoupon.getDiscountAmount()));
             //实付金额
             userLeaseOrder.setNetAmount(price);
             //付款时间
