@@ -111,4 +111,8 @@ public interface UserLeaseOrderMapper {
     List<String> selectUserDepositList(@Param("openid") String openid, @Param("deviceNumber") String deviceNumber);
 
     List<String> selectUSerLeaseOrderDeposit(@Param("openid") String openid, @Param("deviceNumber") String deviceNumber);
+
+    UserLeaseOrder selectUseDevice(@Param("deviceNumber")String deviceNumber);
+
+    List<UserLeaseOrder> selectUserLeaseOrderByOrderNumber(String orderNumber);
 }

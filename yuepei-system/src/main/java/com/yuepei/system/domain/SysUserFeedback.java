@@ -65,5 +65,11 @@ public class SysUserFeedback extends BaseEntity {
     /** 意见反馈状态 */
     private Integer status;
 
+    /**意见反馈描述*/
+    private String feedbackDescribe;
+
+    /**设备图片*/
+    private String devicePicture;
+
     private String deviceAddress;
 }

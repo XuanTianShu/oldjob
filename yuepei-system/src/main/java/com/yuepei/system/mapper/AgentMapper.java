@@ -14,8 +14,6 @@ public interface AgentMapper {
 
     List<AgentHospital> selectAgentHospitalByHospital(@Param("agentId") Long agentId);
 
-    Agent selectAgentByAgentId(@Param("userId") Long userId);
-
     AgentHospital selectAgentHospital(@Param("hospitalId") Long hospitalId);
 
     void insertAgentHospital(@Param("agentId") Long agentId,@Param("hospitalId") Long hospitalId);
@@ -27,4 +25,6 @@ public interface AgentMapper {
     AgentHospital selectAgentByHospitalId(@Param("hospitalId") Long hospitalId);
 
     Agent selectAgent(@Param("agentId") Long agentId);
+
+    void insertAgent(Agent agent);
 }

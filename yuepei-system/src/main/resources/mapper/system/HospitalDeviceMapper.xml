@@ -5,7 +5,7 @@
 <mapper namespace="com.yuepei.system.mapper.HospitalDeviceMapper">
 
     <sql id="DeviceTypeVo">
-        select dt.device_type_id ,dt.device_type_name from device_type dt
+        select dt.device_type_name from device_type dt
         left join device d on dt.device_type_id=d.device_type_id
         left join hospital h on d.hospital_id=h.hospital_id
         left join hospital_user hu on h.hospital_id=hu.hospital_id
@@ -67,10 +67,11 @@
         <result property="heartTime" column="heart_time"></result>
         <result property="createTime" column="create_time"></result>
         <result property="status" column="status"></result>
+        <result property="content" column="content"></result>
     </resultMap>
 
     <sql id="selectDevice">
-        select device_id,device_number,device_mac,device_iot_number,device_type_id,hospital_id,device_deposit,billing_id,investor_id,device_qR_code,device_address,device_full_address,rows,heart_time,create_time,status from device
+        select device_id,device_number,device_mac,device_iot_number,device_type_id,hospital_id,device_deposit,billing_id,investor_id,device_qR_code,device_address,device_full_address,rows,heart_time,create_time,status,content from device
     </sql>
 
     <resultMap id="HospitalResult" type="Hospital">
@@ -79,6 +80,7 @@
         <result property="parentId" column="parent_id"></result>
         <result property="createTime" column="create_time"></result>
         <result property="updateTime" column="update_time"></result>
+        <result property="hospitalRule" column="hospital_rule"></result>
     </resultMap>
 
     <resultMap id="GoodsOrderResult" type="GoodsOrder">
@@ -118,7 +120,7 @@
     <select id="selectDeviceType" parameterType="DeviceType" resultMap="DeviceTypeResult">
         <include refid="DeviceTypeVo"/>
         where su.user_id=#{userId}
-        group by device_type_name
+        group by dt.device_type_name
     </select>
 
     <select id="selectDeviceTypeDetails" parameterType="Device" resultMap="DeviceTypeDetailsResult">
@@ -129,7 +131,7 @@
     </select>
 
     <select id="selectHospitalByHospitalName" parameterType="Hospital" resultMap="HospitalResult">
-        select hospital_id,hospital_name from hospital where hospital_id=#{hospitalId}
+        select hospital_id,hospital_name,hospital_rule from hospital where hospital_id=#{hospitalId}
     </select>
 
     <update id="updateDeviceDetails" parameterType="Device">
@@ -164,10 +166,6 @@
         select device_number from device where hospital_id = #{hospitalId}
     </select>
 
-    <select id="selectDeviceByDeviceAddress" resultType="java.lang.String">
-        select distinct device_address from device where hospital_id=#{hospitalId}
-    </select>
-
     <select id="selectHospitalbyUserName" parameterType="HospitalUser" resultMap="HospitalUserResult">
         select hospital_id,user_name from hospital_user where user_name=#{userName}
     </select>
@@ -195,5 +193,20 @@
     <select id="selectHospitalByDepartment" parameterType="Hospital" resultMap="HospitalResult">
         select hospital_id,hospital_name from hospital where hospital_name=#{deviceDepartment}
     </select>
+    <select id="selectHospitalByHospitalUserName" parameterType="HospitalUser" resultMap="HospitalUserResult">
+        select hospital_id,user_name from hospital_user where hospital_id=#{hospitalId}
+    </select>
+    <select id="selectHospitalByHospitalId" parameterType="Hospital" resultMap="HospitalResult">
+        select hospital_id,user_name from hospital_user where hospital_name=#{hospitalName}
+    </select>
+    <select id="selectHospitalList" parameterType="Hospital" resultMap="HospitalResult">
+        select hospital_id,hospital_name from hospital where parent_id=0
+    </select>
+    <select id="selectDeviceByHospitalIdLike" parameterType="Device" resultMap="DeviceTypeDetailsResult">
+        <include refid="selectDevice"/>
+        where hospital_id = #{hospitalId}
+        and (device_number=#{numberOrAddress} or device_address=#{numberOrAddress})
+    </select>
+
 
 </mapper>

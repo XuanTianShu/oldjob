@@ -16,7 +16,7 @@ public class UserLeaseOrderVo {
     private Long id;
 
     /**用户名*/
-    private String nickName;
+    private String userName;
 
     /**分成比例*/
     private Long proportion;
@@ -71,6 +71,12 @@ public class UserLeaseOrderVo {
 
     /** 租赁时长 */
     private String playTime;
+
+    /**计费规则*/
+    private String content;
+
+    /**预估金额&套餐费用*/
+    private BigDecimal estimateAmount;
 
     /**科室*/
     private String department;

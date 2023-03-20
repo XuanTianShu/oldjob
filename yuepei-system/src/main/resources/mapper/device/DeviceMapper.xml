@@ -227,5 +227,12 @@
         <include refid="selectDeviceVo"/>
         where hospital_id = #{hospitalId}
     </select>
+    <select id="selectDeviceByDeviceNumberList" parameterType="device" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        where device_number in
+        <foreach item="deviceNumber" collection="list" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </select>
 
 </mapper>

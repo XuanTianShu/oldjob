@@ -115,6 +115,7 @@ public class loginServiceImpl implements LoginService {
             sysUser.setOpenid(openid);
             sysUser.setRoleId(2L);
             userService.insertUser(sysUser);
+            //TODO 发放新人优惠券
             SysUser sysUser1 = userMapper.selectUserByOpenid(openid);
             recordLoginInfo(sysUser1.getUserId());
             return ajax.put(Constants.TOKEN, tokenUtils.createToken(sysUser1));

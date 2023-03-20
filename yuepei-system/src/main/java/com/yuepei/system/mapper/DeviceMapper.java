@@ -107,4 +107,6 @@ public interface DeviceMapper {
     int checkDeviceNumber(Device device);
 
     List<Device> selectDeviceByHospitalId(Long hospitalId);
+
+    List<Device> selectDeviceByDeviceNumberList(List<String> device);
 }

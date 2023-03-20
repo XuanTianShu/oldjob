@@ -15,6 +15,8 @@
         <result property="feedbackUrl"    column="feedback_url"    />
         <result property="feedbackTime"    column="feedback_time"    />
         <result property="status"    column="status"    />
+        <result property="feedbackDescribe"    column="feedback_describe"    />
+        <result property="devicePicture"    column="device_picture"    />
         <result property="deviceAddress" column="device_address"/>
     </resultMap>
 
@@ -69,6 +71,20 @@
          </where>
     </select>
 
+    <sql id="selectDeviceFaultListVo">
+        select feedback_id,user_id,user_name,phone_number,device_number,feedback_type,feedback_info,feedback_url,feedback_time,status,feedback_describe,device_picture from sys_user_feedback
+    </sql>
+
+    <select id="selectDeviceFaultList" parameterType="SysUserFeedback" resultMap="SysUserFeedback">
+        <include refid="selectDeviceFaultListVo"/>
+        <where>
+            device_number=#{deviceNumber}
+        </where>
+        <if test="status!=null">
+            and status=#{status}
+        </if>
+    </select>
+
     <insert id="insertSysUserFeedback" parameterType="com.yuepei.system.domain.SysUserFeedback" useGeneratedKeys="true" keyProperty="feedbackId">
         insert into sys_user_feedback
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -117,4 +133,9 @@
             #{feedbackId}
         </foreach>
     </delete>
+
+    <select id="selectSysUserFeedbackById" parameterType="SysUserFeedback" resultMap="SysUserFeedback">
+        <include refid="selectDeviceFaultListVo"/>
+        where feedback_id=#{feedbackId}
+    </select>
 </mapper>

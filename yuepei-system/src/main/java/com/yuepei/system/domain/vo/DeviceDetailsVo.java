@@ -57,4 +57,10 @@ public class DeviceDetailsVo {
      * 设备床位号
      * */
     private Long deviceBed;
+
+    /**代理商id*/
+    private Long agentId;
+
+    /**代理商*/
+    private String agentName;
 }

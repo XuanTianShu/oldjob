@@ -6,6 +6,7 @@ import com.yuepei.common.core.domain.entity.SysRole;
 import org.apache.ibatis.annotations.Param;
 import com.yuepei.common.core.domain.entity.SysUser;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.security.core.parameters.P;
 
 /**
  * 用户表 数据层
@@ -153,6 +154,10 @@ public interface SysUserMapper
     SysUser selectUserByUser(@Param("userName") String userName);
 
     SysUser getPassword(String userName);
+
+    SysUser selectUserByHospital(@Param("userName") String userName);
+
+    List<SysUser> selectUserByParentId(@Param("userId") Long userId);
 
     int checkUserOldPhoneNumber(@Param("oldPhoneNumber") String oldPhoneNumber, @Param("userId") Long userId);
 }

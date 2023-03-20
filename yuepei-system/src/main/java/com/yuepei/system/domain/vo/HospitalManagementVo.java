@@ -9,9 +9,6 @@ import lombok.Data;
 @Data
 public class HospitalManagementVo {
 
-    /**代理商id*/
-    private Long agentId;
-
     /**医院id*/
     private Long hospitalId;
 
@@ -23,4 +20,6 @@ public class HospitalManagementVo {
 
     /**设备地址*/
     private String deviceAddress;
+
+    private Long proportion;
 }

@@ -2,6 +2,7 @@ package com.yuepei.web.agent.service;
 
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.vo.*;
 
 import java.util.List;
@@ -12,17 +13,41 @@ import java.util.List;
  */
 public interface AgentService {
 
-    List<DeviceDetailsVo> selectAgentInfo(Long userId);
+    DeviceManageVo selectAgentInfo(Long userId,Long hospitalId,Long utilizationRate);
 
     DeviceWorkStatusVo selectDeviceDetailsByDeviceNumber(String deviceNumber);
 
-    List<HospitalManagementVo> selectHospitalAdministration(Long userId);
+    DeviceManageVo selectHospitalAdministration(Long userId, Long hospitalId, Long utilizationRate);
 
-    String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo,String userName);
+    String selectProportion(Long userId);
+
+    String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo);
 
     List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String nameOrNumber);
 
-    AjaxResult insertAgentAccount(SysUser sysUser, Long userId);
+    Agent selectAgentByUser(Long userId);
 
-//    List<FaultVo> selectDeviceFaultList(Long userId);
+    String insertAgentAccount(SubAccountVo subAccountVo);
+
+    List<SubAccountManageVo> selectSubAccount(Long userId);
+
+    AgentDeviceVo selectAgentByDevice(Long userId);
+
+    List<DeviceType> selectDeviceList(Long userId);
+
+    DeviceStatisticsVo selectDeviceTypeDetails(Long userId, Long deviceTypeId, Long hospitalId, String deviceDepartment, Long utilizationRate);
+
+    TotalVo selectAgentRevenueStatistics(int statistics, Long userId);
+
+    List<String> selectDepartment(Long userId);
+
+    List<Hospital> selectHospitalList(Long userId);
+
+    List<FeedbackInfoVo> selectDeviceFaultList(Long userId,Integer status,String numberOrAddress);
+
+    List<FeedbackInfoVo> selectDeviceFaultDetails(Long userId, Integer status, Long feedbackId);
+
+    int writeMaintenanceRecords(FeedbackInfoVo feedback);
+
+    FeedbackInfoVo feedbackRepairCompleted(Long feedbackId);
 }

@@ -10,6 +10,8 @@ import java.util.List;
  */
 @Data
 public class HospitalAgentVo {
+    /**用户id*/
+    private Long userId;
     /**医院id*/
     private Long hospitalId;
     /**医院名称*/
@@ -23,7 +25,7 @@ public class HospitalAgentVo {
     /**联系人*/
     private String contacts;
     /**分成比例*/
-    private String divided;
+    private Long divided;
     /**划分名下设备*/
-    private List<DeviceInfoVo> deviceDetails;
+    private String deviceNumber;
 }
