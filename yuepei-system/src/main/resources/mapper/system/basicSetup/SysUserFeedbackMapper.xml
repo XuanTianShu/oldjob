@@ -114,6 +114,18 @@
         </trim>
         where feedback_id = #{feedbackId}
     </update>
+    <update id="updateSysUserFeedbackById" parameterType="com.yuepei.system.domain.SysUserFeedback">
+        update sys_user_feedback
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="feedbackInfo != null">feedback_info = #{feedbackInfo},</if>
+            <if test="feedbackUrl != null">feedback_url = #{feedbackUrl},</if>
+            <if test="feedbackTime != null">feedback_time = #{feedbackTime},</if>
+            <if test="feedbackDescribe != null">feedback_describe = #{feedbackDescribe},</if>
+            <if test="devicePicture != null">device_picture = #{devicePicture},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where feedback_id = #{feedbackId}
+    </update>
 
     <delete id="deleteSysUserFeedbackByFeedbackId" parameterType="Long">
         delete from sys_user_feedback where feedback_id = #{feedbackId}
@@ -129,5 +141,10 @@
     <select id="selectSysUserFeedbackById" parameterType="SysUserFeedback" resultMap="SysUserFeedback">
         <include refid="selectDeviceFaultListVo"/>
         where feedback_id=#{feedbackId}
+    </select>
+    <select id="selectSysUserFeedbackByUserId" parameterType="SysUserFeedback" resultMap="SysUserFeedback">
+        <include refid="selectDeviceFaultListVo"/>
+        where user_id=#{userId}
+        and feedback_type = '2'
     </select>
 </mapper>

@@ -126,8 +126,14 @@
     <select id="selectDeviceTypeDetails" parameterType="Device" resultMap="DeviceTypeDetailsResult">
         select hospital_id,device_number,device_full_address,status
         from device
-        where device_type_id=#{deviceTypeId}
-        and hospital_id=#{hospitalId}
+        <where>
+            <if test="deviceTypeId!=null and deviceTypeId!='0'">
+                and device_type_id=#{deviceTypeId}
+            </if>
+            <if test="hospitalId!=null and hospitalId!='0'">
+                and hospital_id=#{hospitalId}
+            </if>
+        </where>
     </select>
 
     <select id="selectHospitalByHospitalName" parameterType="Hospital" resultMap="HospitalResult">

@@ -19,13 +19,13 @@ public interface AgentService {
 
     DeviceManageVo selectHospitalAdministration(Long userId, Long hospitalId, Long utilizationRate);
 
-    String selectProportion(Long userId);
+    Long selectProportion(Long userId);
 
     String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo);
 
     List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String nameOrNumber);
 
-    Agent selectAgentByUser(Long userId);
+    String selectAgentByUser(Long userId);
 
     String insertAgentAccount(SubAccountVo subAccountVo);
 
@@ -41,7 +41,7 @@ public interface AgentService {
 
     List<String> selectDepartment(Long userId);
 
-    List<Hospital> selectHospitalList(Long userId);
+    List<Hospital> selectHospitalList();
 
     List<FeedbackInfoVo> selectDeviceFaultList(Long userId,Integer status,String numberOrAddress);
 
@@ -50,4 +50,12 @@ public interface AgentService {
     int writeMaintenanceRecords(FeedbackInfoVo feedback);
 
     FeedbackInfoVo feedbackRepairCompleted(Long feedbackId);
+
+    int uploadsFile(FeedbackInfoVo feedbackInfoVo);
+
+    List<FeedbackInfoVo> selectUploadsFileList(Long userId);
+
+    FeedbackInfoVo selectUploadsFileListDetails(Long feedbackId);
+
+    List<Hospital> selectAgentHospitalList(Long userId);
 }

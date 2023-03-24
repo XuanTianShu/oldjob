@@ -11,6 +11,9 @@ import java.util.List;
 @Data
 public class FeedbackInfoVo {
 
+    /**用户id*/
+    private Long userId;
+
     /** 意见反馈id */
     private Long feedbackId;
 
@@ -39,5 +42,5 @@ public class FeedbackInfoVo {
     private String feedbackDescribe;
 
     /**设备图片*/
-    private String devicePicture;
+    private List<String> devicePicture;
 }
