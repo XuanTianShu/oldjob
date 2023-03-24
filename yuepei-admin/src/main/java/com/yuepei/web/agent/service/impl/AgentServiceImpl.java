@@ -1282,7 +1282,7 @@ public class AgentServiceImpl implements AgentService {
         String string = JSON.toJSONString(lists);
         feedback.setFeedbackUrl(string);
         feedback.setFeedbackTime(DateUtils.getTime());
-        feedback.setFeedbackType("2");
+        feedback.setFeedbackType("3");
         feedback.setStatus(0);
         return sysUserFeedbackMapper.insertSysUserFeedback(feedback);
     }
