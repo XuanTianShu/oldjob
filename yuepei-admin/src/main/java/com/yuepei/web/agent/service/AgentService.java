@@ -58,4 +58,6 @@ public interface AgentService {
     FeedbackInfoVo selectUploadsFileListDetails(Long feedbackId);
 
     List<Hospital> selectAgentHospitalList(Long userId);
+
+    List<Device> selectDeviceNumberList(Long userId);
 }

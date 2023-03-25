@@ -96,4 +96,6 @@ public class Device extends BaseEntity {
     private List<DeviceRule> deviceRules;
 
     private String content;
+
+    private Long userId;
 }

@@ -19,6 +19,7 @@
         <result property="status"    column="status"    />
         <result property="deviceIotNumber"    column="device_iot_number"    />
         <result property="deviceMac"    column="device_mac"    />
+        <result property="userId"    column="user_id"    />
     </resultMap>
 
     <resultMap id="DeviceRuleResult" type="com.yuepei.system.domain.vo.DeviceVO">
@@ -42,7 +43,7 @@
 
 
     <sql id="selectDeviceVo">
-        select device_id, device_type_id, device_number,device_iot_number,device_mac,device_deposit, billing_id,hospital_id, device_qR_code, device_address, device_full_address,`rows`,heart_time, create_time, status from device
+        select device_id, device_type_id, device_number,device_iot_number,device_mac,device_deposit, billing_id,hospital_id, device_qR_code, device_address, device_full_address,`rows`,heart_time, create_time,user_id,status from device
     </sql>
 
     <select id="selectDeviceList" parameterType="Device" resultMap="DeviceResult">
@@ -159,6 +160,13 @@
         </trim>
         where device_number = #{deviceNumber}
     </update>
+    <update id="updateDeviceList" parameterType="Device">
+        update device set device_address=#{hospitalAddress},user_id=#{userId},hospital_id=#{hospitalId}
+        where device_number in
+        <foreach collection="deviceNumber" item="deviceNumber" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </update>
 
     <delete id="deleteDeviceByDeviceId" parameterType="Long">
         delete from device where device_id = #{deviceId}
@@ -189,6 +197,10 @@
         <foreach item="deviceNumber" collection="list" open="(" separator="," close=")">
             #{deviceNumber}
         </foreach>
+    </select>
+    <select id="selectDeviceByUserId" parameterType="device" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        where user_id=#{userId}
     </select>
 
 </mapper>

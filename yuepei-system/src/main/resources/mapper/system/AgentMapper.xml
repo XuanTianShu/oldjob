@@ -4,23 +4,4 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.AgentMapper">
 
-    <resultMap id="AgentHospitalResult" type="AgentHospital">
-        <result property="agentId" column="agent_id"></result>
-        <result property="hospitalId" column="hospital_id"></result>
-    </resultMap>
-
-    <select id="selectAgentHospitalByHospital" parameterType="AgentHospital" resultMap="AgentHospitalResult">
-        select agent_id,hospital_id from agent_hospital where agent_id=#{userId}
-    </select>
-
-    <select id="selectAgentHospital" parameterType="AgentHospital" resultMap="AgentHospitalResult">
-        select agent_id,hospital_id from agent_hospital where hospital_id=#{hospitalId}
-    </select>
-    <select id="selectAgentByHospitalId" parameterType="agentHospital" resultMap="AgentHospitalResult">
-        select hospital_id,agent_id from agent_hospital where hospital_id=#{hospitalId}
-    </select>
-
-    <insert id="insertAgentHospital" parameterType="agentHospital">
-        insert into agent_hospital (agent_id,hospital_id) values (#{agentId},#{hospitalId})
-    </insert>
 </mapper>

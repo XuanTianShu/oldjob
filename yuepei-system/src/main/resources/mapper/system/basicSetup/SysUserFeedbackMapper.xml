@@ -145,6 +145,6 @@
     <select id="selectSysUserFeedbackByUserId" parameterType="SysUserFeedback" resultMap="SysUserFeedback">
         <include refid="selectDeviceFaultListVo"/>
         where user_id=#{userId}
-        and feedback_type = '2'
+        and feedback_type = '3'
     </select>
 </mapper>

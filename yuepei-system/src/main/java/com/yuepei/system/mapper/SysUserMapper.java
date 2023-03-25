@@ -151,11 +151,11 @@ public interface SysUserMapper
 
     int updateUserIntegralByOpenid(SysUser user);
 
-    SysUser selectUserByUser(@Param("userName") String userName);
-
     SysUser getPassword(String userName);
 
     SysUser selectUserByHospital(@Param("userName") String userName);
 
     List<SysUser> selectUserByParentId(@Param("userId") Long userId);
+
+    void insertSysUser(SysUser user1);
 }

@@ -11,6 +11,13 @@
         left join hospital_user hu on h.hospital_id=hu.hospital_id
         left join sys_user su on hu.user_name=su.user_name
     </sql>
+    <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
+        insert into hospital(hospital_name,parent_id)
+        values (#{hospitalName},#{parentId})
+    </insert>
+    <insert id="insertHospitalUser" parameterType="HospitalUser">
+        insert into hospital_user (hospital_id,user_id) values (#{hospitalId},#{userId})
+    </insert>
 
     <resultMap type="UserLeaseOrder" id="UserLeaseOrderResult">
         <result property="id"    column="id"    />
@@ -83,6 +90,10 @@
         <result property="hospitalRule" column="hospital_rule"></result>
     </resultMap>
 
+    <sql id="selectHospital">
+        select hospital_id,hospital_name,parent_id,create_time,update_time,hospital_rule from hospital
+    </sql>
+
     <resultMap id="GoodsOrderResult" type="GoodsOrder">
         <result property="orderId" column="order_id"></result>
         <result property="userId" column="user_id"></result>
@@ -137,7 +148,8 @@
     </select>
 
     <select id="selectHospitalByHospitalName" parameterType="Hospital" resultMap="HospitalResult">
-        select hospital_id,hospital_name,hospital_rule from hospital where hospital_id=#{hospitalId}
+        <include refid="selectHospital"/>
+        where hospital_id=#{hospitalId}
     </select>
 
     <update id="updateDeviceDetails" parameterType="Device">
@@ -169,7 +181,7 @@
     </select>
 
     <select id="selectLeaseOrder" resultType="java.lang.String">
-        select device_number from device where hospital_id = #{hospitalId}
+        select device_number from device where user_id = #{userId}
     </select>
 
     <select id="selectHospitalbyUserName" parameterType="HospitalUser" resultMap="HospitalUserResult">
@@ -203,14 +215,15 @@
         select hospital_id,user_name from hospital_user where hospital_id=#{hospitalId}
     </select>
     <select id="selectHospitalByHospitalId" parameterType="Hospital" resultMap="HospitalResult">
-        select hospital_id,user_name from hospital_user where hospital_name=#{hospitalName}
+        <include refid="selectHospital"/>
+        where hospital_name=#{hospitalName}
     </select>
     <select id="selectHospitalList" parameterType="Hospital" resultMap="HospitalResult">
         select hospital_id,hospital_name from hospital where parent_id=0
     </select>
     <select id="selectDeviceByHospitalIdLike" parameterType="Device" resultMap="DeviceTypeDetailsResult">
         <include refid="selectDevice"/>
-        where hospital_id = #{hospitalId}
+        where user_id = #{userId}
         and (device_number=#{numberOrAddress} or device_address=#{numberOrAddress})
     </select>
 

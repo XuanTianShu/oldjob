@@ -103,6 +103,12 @@ public class AgentController {
         return AjaxResult.success(agentService.selectDeviceList(userId));
     }
 
+    /**设备编号下拉框*/
+    @GetMapping("/selectDeviceNumberList/{userId}")
+    private AjaxResult selectDeviceNumberList(@PathVariable(value = "userId")Long userId){
+        return AjaxResult.success(agentService.selectDeviceNumberList(userId));
+    }
+
     /**代理端-添加医院*/
     @PostMapping("/addHospitalByAgent")
     private AjaxResult addHospitalByAgent(@RequestBody HospitalAgentVo hospitalAgentVo){
