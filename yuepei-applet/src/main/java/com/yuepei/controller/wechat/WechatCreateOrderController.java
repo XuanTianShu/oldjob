@@ -153,35 +153,7 @@ public class WechatCreateOrderController {
 
 
     @PostMapping("/bluetoothCallback")
-    public AjaxResult bluetoothCallback(HttpServletRequest request) throws IOException {
-//        BufferedReader bufferedReader = request.getReader();
-//        String str,wholeStr = "";
-//        while ((str = bufferedReader.readLine()) != null) {
-//            wholeStr += str;
-//        }
-//        System.out.println(wholeStr+"-------------------------");
-
-
-//        Map<String, String> result = new HashMap<>(16);
-//        log.info("请求方式GET/POST等:============={}", request.getMethod());
-//        log.info("getRequestURL:============={}", request.getRequestURL());
-//         获取URL的传参
-//        Enumeration<String> params = request.getParameterNames();
-//        while (params.hasMoreElements()) {
-//            String paraName = params.nextElement();
-//            log.info("paraName:============={}", paraName);
-//            String[] paraValues = request.getParameterValues(paraName);
-//            log.info("paraValues:============={}", paraValues);
-//            result.put(paraName, paraValues.length == 1 ? paraValues[0] : paraValues[paraValues.length - 1]);
-//        }
-        // 获取body的传参
-//        Map<String, String> map = new HashMap<>(16);
-
-//        result.putAll(map);
-//        log.info("数据上报:============={}", result);
-//        SortedMap<String, String> sort = new TreeMap<>(result);
-//        log.info("sort:============={}", sort);
-
+    public AjaxResult bluetoothCallback(HttpServletRequest request) {
         return callBackService.bluetoothCallback(request);
     }
 

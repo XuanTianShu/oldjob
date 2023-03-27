@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.common.utils.DateUtils;
 import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.pojo.SysUserFeedbackPo;
@@ -1209,7 +1210,7 @@ public class AgentServiceImpl implements AgentService {
         String string = JSON.toJSONString(lists);
         sysUserFeedback.setDevicePicture(string);
         sysUserFeedback.setStatus(1);
-        sysUserFeedback.setFeedbackTime(DateUtils.getDate());
+        sysUserFeedback.setFeedbackTime(new Date());
         return sysUserFeedbackMapper.updateSysUserFeedbackById(sysUserFeedback);
     }
 
@@ -1245,7 +1246,7 @@ public class AgentServiceImpl implements AgentService {
         });
         String string = JSON.toJSONString(lists);
         feedback.setFeedbackUrl(string);
-        feedback.setFeedbackTime(DateUtils.getTime());
+        feedback.setFeedbackTime(new Date());
         feedback.setFeedbackType("3");
         feedback.setStatus(0);
         return sysUserFeedbackMapper.insertSysUserFeedback(feedback);

@@ -392,7 +392,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrderVo.setRestoreAddress(userLeaseOrder.getRestoreAddress());
             userLeaseOrderVo.setOrderNumber(userLeaseOrder.getOrderNumber());
             userLeaseOrderVo.setStatus(userLeaseOrder.getStatus());
-            userLeaseOrderVo.setNetAmount(new BigDecimal(userLeaseOrder.getNetAmount()));
+            userLeaseOrderVo.setNetAmount(new BigDecimal(String.valueOf(userLeaseOrder.getNetAmount())));
         }
         if (userLeaseOrder.getStatus().equals("2")){
             Date leaseTime = userLeaseOrderVo.getLeaseTime();
@@ -436,7 +436,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             }else {
                 userLeaseOrderVo.setPlayTime(day+"天"+hour+"小时"+minute+"分钟"+second+"秒");
             }
-            userLeaseOrderVo.setPrice(new BigDecimal(userLeaseOrder.getPrice()));
+            userLeaseOrderVo.setPrice(new BigDecimal(String.valueOf(userLeaseOrder.getPrice())));
             userLeaseOrderVo.setContent(device.getContent());
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
             userLeaseOrderVo.setCouponPrice(userLeaseOrder.getCouponPrice());
@@ -447,7 +447,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrderVo.setOrderNumber(userLeaseOrder.getOrderNumber());
             userLeaseOrderVo.setPayType(userLeaseOrder.getPayType());
             userLeaseOrderVo.setStatus(userLeaseOrder.getStatus());
-            userLeaseOrderVo.setNetAmount(new BigDecimal(userLeaseOrder.getNetAmount()));
+            userLeaseOrderVo.setNetAmount(new BigDecimal(String.valueOf(userLeaseOrder.getNetAmount())));
         }
         return userLeaseOrderVo;
     }
@@ -486,7 +486,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrders.stream().forEach(map->{
                 OrderVo orderVo = new OrderVo();
                 orderVo.setOrderNumber(map.getOrderNumber());
-                BigDecimal decimal = new BigDecimal(map.getNetAmount());
+                BigDecimal decimal = new BigDecimal(String.valueOf(map.getNetAmount()));
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(sysUser.getProportion());
                 orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
@@ -517,7 +517,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrders.stream().forEach(map->{
                 OrderVo orderVo = new OrderVo();
                 orderVo.setOrderNumber(map.getOrderNumber());
-                BigDecimal decimal = new BigDecimal(map.getNetAmount());
+                BigDecimal decimal = new BigDecimal(String.valueOf(map.getNetAmount()));
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(sysUser.getProportion());
                 orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
@@ -558,7 +558,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrders.stream().forEach(map->{
                 OrderVo orderVo = new OrderVo();
                 orderVo.setOrderNumber(map.getOrderNumber());
-                BigDecimal decimal = new BigDecimal(map.getNetAmount());
+                BigDecimal decimal = new BigDecimal(String.valueOf(map.getNetAmount()));
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(sysUser.getProportion());
                 orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
@@ -575,7 +575,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrderList.stream().forEach(map->{
                 OrderVo orderVo = new OrderVo();
                 orderVo.setOrderNumber(map.getOrderNumber());
-                BigDecimal decimal = new BigDecimal(map.getNetAmount());
+                BigDecimal decimal = new BigDecimal(String.valueOf(map.getNetAmount()));
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(sysUser.getProportion());
                 orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
@@ -696,7 +696,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrder.stream().forEach(i->{
                 UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
                 BeanUtils.copyProperties(i,userLeaseOrderVo);
-                userLeaseOrderVo.setNetAmount(new BigDecimal(i.getNetAmount()));
+                userLeaseOrderVo.setNetAmount(new BigDecimal(String.valueOf(i.getNetAmount())));
                 userLeaseOrderVos.add(userLeaseOrderVo);
             });
         });
@@ -735,7 +735,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         userLeaseOrders.stream().forEach(map->{
             UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
             BeanUtils.copyProperties(map,userLeaseOrderVo);
-            userLeaseOrderVo.setNetAmount(new BigDecimal(map.getNetAmount()));
+            userLeaseOrderVo.setNetAmount(new BigDecimal(String.valueOf(map.getNetAmount())));
             userLeaseOrderVos.add(userLeaseOrderVo);
         });
         BigDecimal reduce = userLeaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);

@@ -10,6 +10,7 @@ import com.yuepei.service.CallBackService;
 import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo;
 import com.yuepei.system.mapper.*;
+import com.yuepei.system.utils.RedisServer;
 import com.yuepei.utils.RequestUtils;
 import com.yuepei.utils.WXCallBackUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -103,6 +104,12 @@ public class CallBackServiceImpl implements CallBackService {
 
     @Autowired
     private UserDiscountMapper userDiscountMapper;
+
+    @Autowired
+    private RedisServer redisServer;
+
+    @Value("${coupon.order}")
+    private String orderPrefix;
 
     private HashMap<String, String> hashMap = new HashMap<>();
 
@@ -309,7 +316,7 @@ public class CallBackServiceImpl implements CallBackService {
                 //记录优惠券金额
                 userLeaseOrder.setCouponPrice(couponPrice);
                 //实付金额
-                userLeaseOrder.setNetAmount(price);
+                userLeaseOrder.setNetAmount(new BigDecimal(price));
                 //付款时间
                 userLeaseOrder.setCreateTime(time);
                 //支付流水号
@@ -366,7 +373,7 @@ public class CallBackServiceImpl implements CallBackService {
             //记录优惠券金额
             userLeaseOrder.setCouponPrice((long) (userCoupon.getDiscountAmount()));
             //实付金额
-            userLeaseOrder.setNetAmount(price);
+            userLeaseOrder.setNetAmount(new BigDecimal(price));
             //付款时间
             userLeaseOrder.setCreateTime(DateUtils.getNowDate());
             //订单号
@@ -416,11 +423,13 @@ public class CallBackServiceImpl implements CallBackService {
                 }else if (status == 1){
                     if (temperature == 0){
                         System.out.println("异常还床");
+
                     }else if (temperature == 1){
                         String substring = timestamp.substring(0, 1);
                         if (substring.equals("D")){
                             String substring1 = timestamp.substring(3, 4);
                             UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectOrderByDeviceNumberAndChoose(deviceNumber,substring1);
+                            //TODO 计算订单金额
                         }
                         System.out.println("正常还床");
                     }

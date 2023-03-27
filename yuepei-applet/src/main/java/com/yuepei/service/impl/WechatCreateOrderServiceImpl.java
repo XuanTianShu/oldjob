@@ -191,7 +191,7 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
             return AjaxResult.success(pay);
         }else {
             //实付金额
-            userLeaseOrder.setNetAmount(userLeaseOrder.getPrice().longValue());
+            userLeaseOrder.setNetAmount(new BigDecimal(String.valueOf(userLeaseOrder.getPrice())));
             //付款时间
             userLeaseOrder.setCreateTime(new Date());
             //支付方式

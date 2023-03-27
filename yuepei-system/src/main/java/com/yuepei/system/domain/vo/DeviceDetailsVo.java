@@ -81,8 +81,4 @@ public class DeviceDetailsVo {
 
     /**代理商*/
     private String agentName;
-
-
-    /**科室名称*/
-    private String deviceDepartmentName;
 }

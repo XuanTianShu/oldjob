@@ -25,8 +25,4 @@ public class DeviceStatisticsVo {
 
     /**设备列表*/
     private List<DeviceDetailsVo> deviceDetailsVoList;
-
-
-    /**医院id*/
-    private Long hospitalId;
 }

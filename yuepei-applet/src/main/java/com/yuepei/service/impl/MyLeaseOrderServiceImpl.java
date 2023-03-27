@@ -243,7 +243,6 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     //修改订单
                     userLeaseOrder.setStatus("1");
                     userLeaseOrder.setDeviceNumber(userLeaseOrder.getDeviceNumber());
-                    userLeaseOrder.setDepositNumber(list.get(0));
                     userLeaseOrder.setRestoreTime(new Date());
                     userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
                     System.out.println("还床ok");
