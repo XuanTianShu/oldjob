@@ -57,5 +57,5 @@ public interface HospitalDeviceMapper {
 
     void insertHospital(Hospital hospital);
 
-    void insertHospitalUser(@Param("userId")Long userId,@Param("hospitalId") Long hospitalId);
+    void insertHospitalUser(@Param("userName")String userName,@Param("hospitalId") Long hospitalId);
 }

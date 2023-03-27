@@ -202,8 +202,8 @@
     <select id="selectUserLeaseOrder" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where device_number in
-        <foreach item="device_number" collection="list" index="index" open="(" separator="," close=")">
-            #{device_number}
+        <foreach item="deviceNumber" collection="deviceNumber" index="index" open="(" separator="," close=")">
+            #{deviceNumber}
         </foreach>
     </select>
     <select id="selectLeaseOrderDetails" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
@@ -250,5 +250,9 @@
     <select id="selectUserLeaseOrderByOrderNumber" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where CONCAT(IFNULL(order_number,''),IFNULL(device_number,'')) LIKE concat('%',#{orderNumber},'%')
+    </select>
+    <select id="selectUserLeaseOrderByDevice" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where device_number =#{deviceNumber}
     </select>
 </mapper>

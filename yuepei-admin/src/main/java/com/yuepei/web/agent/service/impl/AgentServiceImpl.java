@@ -96,6 +96,7 @@ public class AgentServiceImpl implements AgentService {
             deviceDetailsVos.clear();
             deviceDetailsVos.addAll(collect);
             Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(hospitalId);
+            manageVo.setHospitalId(hospital.getHospitalId());
             manageVo.setHospitalName(hospital.getHospitalName());
         }
         BigDecimal decimal = new BigDecimal(0);
@@ -155,16 +156,18 @@ public class AgentServiceImpl implements AgentService {
         List<Device> devices = deviceMapper.selectDeviceByUserId(userId);
         devices.stream().forEach(map->{
             Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(map.getHospitalId());
-            HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalByHospitalUserName(map.getHospitalId());
-            SysUser sysUser = sysUserMapper.selectUserByHospital(hospitalUser.getUserName());
-            if (sysUser!=null){
-                HospitalManagementVo hospitalManagementVo = new HospitalManagementVo();
-                hospitalManagementVo.setHospitalId(hospital.getHospitalId());
-                hospitalManagementVo.setHospitalName(hospital.getHospitalName());
-                hospitalManagementVo.setDeviceNum(devices.size());
-                hospitalManagementVo.setDeviceAddress(map.getDeviceAddress());
-                hospitalManagementVo.setProportion(sysUser.getProportion());
-                hospitalManagementVos.add(hospitalManagementVo);
+            if (hospital!=null){
+                HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalByHospitalUserName(map.getHospitalId());
+                SysUser sysUser = sysUserMapper.selectUserByHospital(hospitalUser.getUserName());
+                if (sysUser!=null){
+                    HospitalManagementVo hospitalManagementVo = new HospitalManagementVo();
+                    hospitalManagementVo.setHospitalId(hospital.getHospitalId());
+                    hospitalManagementVo.setHospitalName(hospital.getHospitalName());
+                    hospitalManagementVo.setDeviceNum(devices.size());
+                    hospitalManagementVo.setDeviceAddress(map.getDeviceAddress());
+                    hospitalManagementVo.setProportion(sysUser.getProportion());
+                    hospitalManagementVos.add(hospitalManagementVo);
+                }
             }
         });
         return hospitalManagementVos;
@@ -324,7 +327,7 @@ public class AgentServiceImpl implements AgentService {
         user1.setProportion(hospitalAgentVo.getDivided());
         sysUserMapper.insertSysUser(user1);
         //添加用户和医院关联表
-        hospitalDeviceMapper.insertHospitalUser(user1.getUserId(),hospital1.getHospitalId());
+        hospitalDeviceMapper.insertHospitalUser(user1.getUserName(),hospital.getHospitalId());
         //对设备进行修改
         deviceMapper.updateDeviceList(hospitalAgentVo.getDeviceNumber(),hospitalAgentVo.getHospitalAddress(),hospital.getHospitalId(),user1.getUserId());
         return "添加成功";
@@ -344,7 +347,7 @@ public class AgentServiceImpl implements AgentService {
                     leaseOrders.addAll(collect);
                 });
             }else {
-                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrder(numberList);
+                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByDevice(map.getDeviceNumber());
                 leaseOrders.addAll(userLeaseOrders);
             }
         });
@@ -394,7 +397,7 @@ public class AgentServiceImpl implements AgentService {
                 sysUsers.add(sysUser);
                 sysUsers.stream().forEach(map->{
                     List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(map.getUserId(), deviceDepartment, deviceTypeName, nameOrNumber);
-                    if (userLeaseOrderVos!=null){
+                    if (userLeaseOrderVos.size()!=0){
                         userLeaseOrderVoList.addAll(userLeaseOrderVos);
                     }
                 });
@@ -434,6 +437,9 @@ public class AgentServiceImpl implements AgentService {
         sysUser.setParentId(subAccountVo.getUserId());
         sysUser.setNickName(subAccountVo.getAgentName());
         sysUserMapper.insertUser(sysUser);
+        SysUser userById = sysUserMapper.selectUserById(subAccountVo.getUserId());
+        userById.setProportion(userById.getProportion()-sysUser.getProportion());
+        sysUserMapper.updateUser(userById);
         return "添加成功";
     }
 
@@ -548,7 +554,7 @@ public class AgentServiceImpl implements AgentService {
                 }
                 List<UserLeaseOrder> userLeaseOrders = userLeaseOrderList.stream().distinct().collect(Collectors.toList());
                 agentDeviceVo.setHospitalSum(hospitalList.size());
-                agentDeviceVo.setDeviceSum(collect.size());
+                agentDeviceVo.setDeviceSum(deviceList.size());
                 agentDeviceVo.setUseDeviceSum(userLeaseOrders.size());
                 agentDeviceVo.setDeviceTypes(collect);
                 return agentDeviceVo;
@@ -565,7 +571,8 @@ public class AgentServiceImpl implements AgentService {
             DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
             deviceNumber.add(deviceType);
         });
-        return deviceNumber;
+        List<DeviceType> collect = deviceNumber.stream().distinct().collect(Collectors.toList());
+        return collect;
     }
 
     @Override
@@ -581,40 +588,42 @@ public class AgentServiceImpl implements AgentService {
                 DeviceDetailsVo deviceDetailsVo = new DeviceDetailsVo();
                 DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
                 Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(map.getHospitalId());
-                String device_full_address = map.getDeviceFullAddress();
-                if (device_full_address!=null){
-                    String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
-                    Hospital deviceFloor = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[0]));
-                    Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
-                    Hospital deviceRoom = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[2]));
-                    Hospital deviceBed = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[3]));
-                    deviceDetailsVo.setDeviceTypeId(map.getDeviceTypeId());
-                    deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
-                    deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
-                    deviceDetailsVo.setStatus(map.getStatus());
-                    deviceDetailsVo.setAgentId(sysUser.getUserId());
-                    deviceDetailsVo.setAgentName(sysUser.getNickName());
-                    deviceDetailsVo.setHospitalId(map.getHospitalId());
-                    deviceDetailsVo.setHospitalName(hospital.getHospitalName());
-                    deviceDetailsVo.setDeviceFloor(deviceFloor.getHospitalId());
-                    deviceDetailsVo.setDeviceFloorName(deviceFloor.getHospitalName());
-                    deviceDetailsVo.setDeviceDepartment(Department.getHospitalId());
-                    deviceDetailsVo.setDeviceDepartmentName(Department.getHospitalName());
-                    deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
-                    deviceDetailsVo.setDeviceRoomName(deviceRoom.getHospitalName());
-                    deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
-                    deviceDetailsVo.setDeviceBedName(deviceBed.getHospitalName());
-                    deviceDetailsVoList.add(deviceDetailsVo);
-                }else {
-                    deviceDetailsVo.setDeviceTypeId(map.getDeviceTypeId());
-                    deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
-                    deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
-                    deviceDetailsVo.setStatus(map.getStatus());
-                    deviceDetailsVo.setAgentId(sysUser.getUserId());
-                    deviceDetailsVo.setAgentName(sysUser.getNickName());
-                    deviceDetailsVo.setHospitalId(map.getHospitalId());
-                    deviceDetailsVo.setHospitalName(hospital.getHospitalName());
-                    deviceDetailsVoList.add(deviceDetailsVo);
+                if (hospital!=null){
+                    String device_full_address = map.getDeviceFullAddress();
+                    if (device_full_address!=null){
+                        String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
+                        Hospital deviceFloor = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[0]));
+                        Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
+                        Hospital deviceRoom = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[2]));
+                        Hospital deviceBed = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[3]));
+                        deviceDetailsVo.setDeviceTypeId(map.getDeviceTypeId());
+                        deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
+                        deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
+                        deviceDetailsVo.setStatus(map.getStatus());
+                        deviceDetailsVo.setAgentId(sysUser.getUserId());
+                        deviceDetailsVo.setAgentName(sysUser.getNickName());
+                        deviceDetailsVo.setHospitalId(map.getHospitalId());
+                        deviceDetailsVo.setHospitalName(hospital.getHospitalName());
+                        deviceDetailsVo.setDeviceFloor(deviceFloor.getHospitalId());
+                        deviceDetailsVo.setDeviceFloorName(deviceFloor.getHospitalName());
+                        deviceDetailsVo.setDeviceDepartment(Department.getHospitalId());
+                        deviceDetailsVo.setDeviceDepartmentName(Department.getHospitalName());
+                        deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
+                        deviceDetailsVo.setDeviceRoomName(deviceRoom.getHospitalName());
+                        deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
+                        deviceDetailsVo.setDeviceBedName(deviceBed.getHospitalName());
+                        deviceDetailsVoList.add(deviceDetailsVo);
+                    }else {
+                        deviceDetailsVo.setDeviceTypeId(map.getDeviceTypeId());
+                        deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
+                        deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
+                        deviceDetailsVo.setStatus(map.getStatus());
+                        deviceDetailsVo.setAgentId(sysUser.getUserId());
+                        deviceDetailsVo.setAgentName(sysUser.getNickName());
+                        deviceDetailsVo.setHospitalId(map.getHospitalId());
+                        deviceDetailsVo.setHospitalName(hospital.getHospitalName());
+                        deviceDetailsVoList.add(deviceDetailsVo);
+                    }
                 }
             });
             BigDecimal decimal = new BigDecimal(0);
@@ -689,40 +698,42 @@ public class AgentServiceImpl implements AgentService {
                     DeviceDetailsVo deviceDetailsVo = new DeviceDetailsVo();
                     DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
                     Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(map.getHospitalId());
-                    String device_full_address = map.getDeviceFullAddress();
-                    if (device_full_address!=null){
-                        String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
-                        Hospital deviceFloor = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[0]));
-                        Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
-                        Hospital deviceRoom = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[2]));
-                        Hospital deviceBed = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[3]));
-                        deviceDetailsVo.setDeviceTypeId(map.getDeviceTypeId());
-                        deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
-                        deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
-                        deviceDetailsVo.setStatus(map.getStatus());
-                        deviceDetailsVo.setAgentId(sysUser.getUserId());
-                        deviceDetailsVo.setAgentName(sysUser.getNickName());
-                        deviceDetailsVo.setHospitalId(map.getHospitalId());
-                        deviceDetailsVo.setHospitalName(hospital.getHospitalName());
-                        deviceDetailsVo.setDeviceFloor(deviceFloor.getHospitalId());
-                        deviceDetailsVo.setDeviceFloorName(deviceFloor.getHospitalName());
-                        deviceDetailsVo.setDeviceDepartment(Department.getHospitalId());
-                        deviceDetailsVo.setDeviceDepartmentName(Department.getHospitalName());
-                        deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
-                        deviceDetailsVo.setDeviceRoomName(deviceRoom.getHospitalName());
-                        deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
-                        deviceDetailsVo.setDeviceBedName(deviceBed.getHospitalName());
-                        deviceDetailsVoList.add(deviceDetailsVo);
-                    }else {
-                        deviceDetailsVo.setDeviceTypeId(map.getDeviceTypeId());
-                        deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
-                        deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
-                        deviceDetailsVo.setStatus(map.getStatus());
-                        deviceDetailsVo.setAgentId(sysUser.getUserId());
-                        deviceDetailsVo.setAgentName(sysUser.getNickName());
-                        deviceDetailsVo.setHospitalId(map.getHospitalId());
-                        deviceDetailsVo.setHospitalName(hospital.getHospitalName());
-                        deviceDetailsVoList.add(deviceDetailsVo);
+                    if (hospital!=null){
+                        String device_full_address = map.getDeviceFullAddress();
+                        if (device_full_address!=null){
+                            String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
+                            Hospital deviceFloor = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[0]));
+                            Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
+                            Hospital deviceRoom = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[2]));
+                            Hospital deviceBed = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[3]));
+                            deviceDetailsVo.setDeviceTypeId(map.getDeviceTypeId());
+                            deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
+                            deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
+                            deviceDetailsVo.setStatus(map.getStatus());
+                            deviceDetailsVo.setAgentId(sysUser.getUserId());
+                            deviceDetailsVo.setAgentName(sysUser.getNickName());
+                            deviceDetailsVo.setHospitalId(map.getHospitalId());
+                            deviceDetailsVo.setHospitalName(hospital.getHospitalName());
+                            deviceDetailsVo.setDeviceFloor(deviceFloor.getHospitalId());
+                            deviceDetailsVo.setDeviceFloorName(deviceFloor.getHospitalName());
+                            deviceDetailsVo.setDeviceDepartment(Department.getHospitalId());
+                            deviceDetailsVo.setDeviceDepartmentName(Department.getHospitalName());
+                            deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
+                            deviceDetailsVo.setDeviceRoomName(deviceRoom.getHospitalName());
+                            deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
+                            deviceDetailsVo.setDeviceBedName(deviceBed.getHospitalName());
+                            deviceDetailsVoList.add(deviceDetailsVo);
+                        }else {
+                            deviceDetailsVo.setDeviceTypeId(map.getDeviceTypeId());
+                            deviceDetailsVo.setDeviceNumber(map.getDeviceNumber());
+                            deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
+                            deviceDetailsVo.setStatus(map.getStatus());
+                            deviceDetailsVo.setAgentId(sysUser.getUserId());
+                            deviceDetailsVo.setAgentName(sysUser.getNickName());
+                            deviceDetailsVo.setHospitalId(map.getHospitalId());
+                            deviceDetailsVo.setHospitalName(hospital.getHospitalName());
+                            deviceDetailsVoList.add(deviceDetailsVo);
+                        }
                     }
                 });
                 BigDecimal decimal = new BigDecimal(0);
@@ -792,40 +803,42 @@ public class AgentServiceImpl implements AgentService {
                         DeviceDetailsVo deviceDetailsVo = new DeviceDetailsVo();
                         DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(i.getDeviceTypeId());
                         Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(i.getHospitalId());
-                        String device_full_address = i.getDeviceFullAddress();
-                        if (device_full_address!=null){
-                            String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
-                            Hospital deviceFloor = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[0]));
-                            Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
-                            Hospital deviceRoom = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[2]));
-                            Hospital deviceBed = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[3]));
-                            deviceDetailsVo.setDeviceFloor(deviceFloor.getHospitalId());
-                            deviceDetailsVo.setDeviceFloorName(deviceFloor.getHospitalName());
-                            deviceDetailsVo.setDeviceDepartment(Department.getHospitalId());
-                            deviceDetailsVo.setDeviceDepartmentName(Department.getHospitalName());
-                            deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
-                            deviceDetailsVo.setDeviceRoomName(deviceRoom.getHospitalName());
-                            deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
-                            deviceDetailsVo.setDeviceBedName(deviceBed.getHospitalName());
-                            deviceDetailsVo.setDeviceTypeId(i.getDeviceTypeId());
-                            deviceDetailsVo.setDeviceNumber(i.getDeviceNumber());
-                            deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
-                            deviceDetailsVo.setStatus(i.getStatus());
-                            deviceDetailsVo.setAgentId(sysUser.getUserId());
-                            deviceDetailsVo.setAgentName(sysUser.getNickName());
-                            deviceDetailsVo.setHospitalId(i.getHospitalId());
-                            deviceDetailsVo.setHospitalName(hospital.getHospitalName());
-                            deviceDetailsVoList.add(deviceDetailsVo);
-                        }else {
-                            deviceDetailsVo.setDeviceTypeId(i.getDeviceTypeId());
-                            deviceDetailsVo.setDeviceNumber(i.getDeviceNumber());
-                            deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
-                            deviceDetailsVo.setStatus(i.getStatus());
-                            deviceDetailsVo.setAgentId(sysUser.getUserId());
-                            deviceDetailsVo.setAgentName(sysUser.getNickName());
-                            deviceDetailsVo.setHospitalId(i.getHospitalId());
-                            deviceDetailsVo.setHospitalName(hospital.getHospitalName());
-                            deviceDetailsVoList.add(deviceDetailsVo);
+                        if (hospital!=null){
+                            String device_full_address = i.getDeviceFullAddress();
+                            if (device_full_address!=null){
+                                String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
+                                Hospital deviceFloor = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[0]));
+                                Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
+                                Hospital deviceRoom = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[2]));
+                                Hospital deviceBed = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[3]));
+                                deviceDetailsVo.setDeviceFloor(deviceFloor.getHospitalId());
+                                deviceDetailsVo.setDeviceFloorName(deviceFloor.getHospitalName());
+                                deviceDetailsVo.setDeviceDepartment(Department.getHospitalId());
+                                deviceDetailsVo.setDeviceDepartmentName(Department.getHospitalName());
+                                deviceDetailsVo.setDeviceRoom(deviceRoom.getHospitalId());
+                                deviceDetailsVo.setDeviceRoomName(deviceRoom.getHospitalName());
+                                deviceDetailsVo.setDeviceBed(deviceBed.getHospitalId());
+                                deviceDetailsVo.setDeviceBedName(deviceBed.getHospitalName());
+                                deviceDetailsVo.setDeviceTypeId(i.getDeviceTypeId());
+                                deviceDetailsVo.setDeviceNumber(i.getDeviceNumber());
+                                deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
+                                deviceDetailsVo.setStatus(i.getStatus());
+                                deviceDetailsVo.setAgentId(sysUser.getUserId());
+                                deviceDetailsVo.setAgentName(sysUser.getNickName());
+                                deviceDetailsVo.setHospitalId(i.getHospitalId());
+                                deviceDetailsVo.setHospitalName(hospital.getHospitalName());
+                                deviceDetailsVoList.add(deviceDetailsVo);
+                            }else {
+                                deviceDetailsVo.setDeviceTypeId(i.getDeviceTypeId());
+                                deviceDetailsVo.setDeviceNumber(i.getDeviceNumber());
+                                deviceDetailsVo.setDeviceTypeName(deviceType.getDeviceTypeName());
+                                deviceDetailsVo.setStatus(i.getStatus());
+                                deviceDetailsVo.setAgentId(sysUser.getUserId());
+                                deviceDetailsVo.setAgentName(sysUser.getNickName());
+                                deviceDetailsVo.setHospitalId(i.getHospitalId());
+                                deviceDetailsVo.setHospitalName(hospital.getHospitalName());
+                                deviceDetailsVoList.add(deviceDetailsVo);
+                            }
                         }
                     });
                 });
