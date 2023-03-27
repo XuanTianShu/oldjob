@@ -44,9 +44,17 @@ public class DeviceDetailsVo {
     private Long deviceFloor;
 
     /**
+     * 设备楼层名称
+     * */
+    private String deviceFloorName;
+
+    /**
      * 设备科室
      * */
     private Long deviceDepartment;
+
+    /**科室名称*/
+    private String deviceDepartmentName;
 
     /**
      * 设备房间
@@ -54,9 +62,19 @@ public class DeviceDetailsVo {
     private Long deviceRoom;
 
     /**
+     * 设备房间
+     * */
+    private String deviceRoomName;
+
+    /**
      * 设备床位号
      * */
     private Long deviceBed;
+
+    /**
+     * 设备床位号
+     * */
+    private String deviceBedName;
 
     /**代理商id*/
     private Long agentId;

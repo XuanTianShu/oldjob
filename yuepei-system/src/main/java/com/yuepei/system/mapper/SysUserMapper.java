@@ -159,5 +159,7 @@ public interface SysUserMapper
 
     List<SysUser> selectUserByParentId(@Param("userId") Long userId);
 
+    void insertSysUser(SysUser user1);
+
     int checkUserOldPhoneNumber(@Param("oldPhoneNumber") String oldPhoneNumber, @Param("userId") Long userId);
 }

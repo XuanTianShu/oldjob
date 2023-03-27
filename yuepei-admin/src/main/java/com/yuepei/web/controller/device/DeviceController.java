@@ -12,6 +12,7 @@ import com.yuepei.system.mapper.InstructionsMapper;
 import com.yuepei.system.service.DeviceService;
 import com.yuepei.system.service.HospitalDeviceService;
 import com.yuepei.system.service.ServicePhoneService;
+import com.yuepei.system.service.VideoManagementService;
 import com.yuepei.utils.DictionaryEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,6 +67,9 @@ public class DeviceController extends BaseController {
 
     @Autowired
     private CarouselMapper carouselMapper;
+
+    @Autowired
+    private VideoManagementService videoManagementService;
 
 
     //修改接口路径
@@ -204,7 +208,7 @@ public class DeviceController extends BaseController {
     /**使用说明*/
     @GetMapping("/selectInstructionsList")
     public AjaxResult selectInstructions(){
-        return AjaxResult.success(instructionsMapper.selectInstructionsList(null));
+        return AjaxResult.success(videoManagementService.selectVideoManagementList(null));
     }
 
     /**轮播图*/

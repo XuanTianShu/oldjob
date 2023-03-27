@@ -259,6 +259,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			sysdate()
  		)
 	</insert>
+	<insert id="insertSysUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
+		insert into sys_user(user_name,password,nick_name,user_type,proportion)
+		values (#{userName},#{password},#{nickName},#{userType},proportion)
+
+	</insert>
 
 	<update id="updateUser" parameterType="com.yuepei.common.core.domain.entity.SysUser">
  		update sys_user

@@ -226,6 +226,13 @@
         </trim>
         where device_number = #{deviceNumber}
     </update>
+    <update id="updateDeviceList" parameterType="Device">
+        update device set device_address=#{hospitalAddress},user_id=#{userId},hospital_id=#{hospitalId}
+        where device_number in
+        <foreach collection="deviceNumber" item="deviceNumber" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </update>
 
     <delete id="deleteDeviceByDeviceId" parameterType="Long">
         delete from device where device_id = #{deviceId}
@@ -253,6 +260,10 @@
         <foreach item="deviceNumber" collection="array" open="(" separator="," close=")">
             #{deviceNumber}
         </foreach>
+    </select>
+    <select id="selectDeviceByUserId" parameterType="device" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        where user_id=#{userId}
     </select>
 
 </mapper>

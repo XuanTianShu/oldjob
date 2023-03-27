@@ -114,7 +114,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrder.stream().forEach(i->{
                 UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
                 BeanUtils.copyProperties(i,userLeaseOrderVo);
-                userLeaseOrderVo.setNetAmount(new BigDecimal(i.getNetAmount()));
+                userLeaseOrderVo.setNetAmount(i.getNetAmount());
                 leaseOrderVos.add(userLeaseOrderVo);
             });
         });
@@ -135,7 +135,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 userLeaseOrder.stream().forEach(i->{
                     UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
                     BeanUtils.copyProperties(i,userLeaseOrderVo);
-                    userLeaseOrderVo.setNetAmount(new BigDecimal(i.getNetAmount()));
+                    userLeaseOrderVo.setNetAmount(i.getNetAmount());
                     userLeaseOrderVos.add(userLeaseOrderVo);
                 });
             });
@@ -284,13 +284,11 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         //获取医院信息
         Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(device.getHospitalId());
         //获取代理商信息
-        AgentHospital agentHospital = agentMapper.selectAgentByHospitalId(device.getHospitalId());
-        Agent agent = agentMapper.selectAgent(agentHospital.getAgentId());
         UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
         BeanUtils.copyProperties(userLeaseOrder, userLeaseOrderVo);
         userLeaseOrderVo.setUserName(sysUser1.getUserName());
         userLeaseOrderVo.setProportion(sysUser1.getProportion());
-        userLeaseOrderVo.setAgentName(agent.getAgentName());
+        userLeaseOrderVo.setAgentName(sysUser1.getNickName());
         userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
         if (userLeaseOrder.getStatus().equals("0")){
             Long date = new Date().getTime();
@@ -383,6 +381,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             }else {
                 userLeaseOrderVo.setPlayTime(day+"天"+hour+"小时"+minute+"分钟"+second+"秒");
             }
+            userLeaseOrderVo.setPrice(userLeaseOrder.getPrice());
             userLeaseOrderVo.setPrice(new BigDecimal(String.valueOf(userLeaseOrder.getPrice())));
             userLeaseOrderVo.setContent(device.getContent());
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
@@ -437,7 +436,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             }else {
                 userLeaseOrderVo.setPlayTime(day+"天"+hour+"小时"+minute+"分钟"+second+"秒");
             }
-            userLeaseOrderVo.setPrice(new BigDecimal(String.valueOf(userLeaseOrder.getPrice())));
+            userLeaseOrderVo.setPrice(new BigDecimal(userLeaseOrder.getPrice()));
             userLeaseOrderVo.setContent(device.getContent());
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
             userLeaseOrderVo.setCouponPrice(userLeaseOrder.getCouponPrice());
@@ -594,7 +593,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
 
     @Override
     public AjaxResult loginHospitalPort(String userName, String password) {
-        SysUser user = sysUserMapper.selectUserByUser(userName);
+        SysUser user = sysUserMapper.selectUserByUserName(userName);
         if (user == null) {
             return AjaxResult.error("该账号不存在");
         }
@@ -710,7 +709,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         List<DeviceType> collect = deviceTypes.stream().distinct().collect(Collectors.toList());
         indexVo.setDeviceAmount(decimal);
         indexVo.setHospitalName(hospital.getHospitalName());
-        indexVo.setSum(collect.size());
+        indexVo.setSum(deviceList.size());
         indexVo.setProportion(sysUser.getProportion());
         return indexVo;
     }

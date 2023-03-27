@@ -1,9 +1,6 @@
 package com.yuepei.web.agent.controller;
 
 import com.yuepei.common.core.domain.AjaxResult;
-import com.yuepei.common.core.domain.entity.SysUser;
-import com.yuepei.system.domain.SysUserFeedback;
-import com.yuepei.system.domain.vo.DeviceDetailsVo;
 import com.yuepei.system.domain.vo.FeedbackInfoVo;
 import com.yuepei.system.domain.vo.HospitalAgentVo;
 import com.yuepei.system.domain.vo.SubAccountVo;
@@ -11,10 +8,8 @@ import com.yuepei.system.service.HospitalDeviceService;
 import com.yuepei.utils.TokenUtils;
 import com.yuepei.web.agent.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author zzy
@@ -91,15 +86,27 @@ public class AgentController {
     }
 
     /**医院下拉框*/
-    @GetMapping("/selectHospitalList/{userId}")
-    private AjaxResult selectHospitalList(@PathVariable(value = "userId")Long userId){
-        return AjaxResult.success(agentService.selectHospitalList(userId));
+    @GetMapping("/selectHospitalList")
+    private AjaxResult selectHospitalList(){
+        return AjaxResult.success(agentService.selectHospitalList());
+    }
+
+    /**查看该代理商下管理的医院*/
+    @GetMapping("/selectAgentHospitalList/{userId}")
+    private AjaxResult selectAgentHospitalList(@PathVariable(value = "userId")Long userId){
+        return AjaxResult.success(agentService.selectAgentHospitalList(userId));
     }
 
     /**设备下拉框*/
     @GetMapping("/selectDeviceList/{userId}")
     private AjaxResult selectDeviceList(@PathVariable(value = "userId")Long userId){
         return AjaxResult.success(agentService.selectDeviceList(userId));
+    }
+
+    /**设备编号下拉框*/
+    @GetMapping("/selectDeviceNumberList/{userId}")
+    private AjaxResult selectDeviceNumberList(@PathVariable(value = "userId")Long userId){
+        return AjaxResult.success(agentService.selectDeviceNumberList(userId));
     }
 
     /**代理端-添加医院*/
@@ -174,7 +181,7 @@ public class AgentController {
     /**代理端-设备故障*/
     @GetMapping("/selectDeviceFaultList")
     private AjaxResult selectDeviceFaultList(@RequestParam("userId")Long userId,
-                                             @RequestParam(value = "status",required = false)Integer status,
+                                             @RequestParam(value = "status",required = false,defaultValue = "0")Integer status,
                                              @RequestParam(value = "numberOrAddress",required = false,defaultValue = "")String numberOrAddress){
         return AjaxResult.success(agentService.selectDeviceFaultList(userId,status,numberOrAddress));
     }
@@ -188,7 +195,7 @@ public class AgentController {
     }
 
     /**代理端-故障详情-待维修-填写维修记录*/
-    @GetMapping("/writeMaintenanceRecords")
+    @PostMapping("/writeMaintenanceRecords")
     private AjaxResult writeMaintenanceRecords(@RequestBody FeedbackInfoVo feedback){
         return AjaxResult.success(agentService.writeMaintenanceRecords(feedback));
     }
@@ -197,5 +204,23 @@ public class AgentController {
     @GetMapping("/feedbackRepairCompleted/{feedbackId}")
     private AjaxResult feedbackRepairCompleted(@PathVariable("feedbackId")Long feedbackId){
         return AjaxResult.success(agentService.feedbackRepairCompleted(feedbackId));
+    }
+
+    /**代理端-拍照上传*/
+    @PostMapping("/uploadsFile")
+    private AjaxResult uploadsFile(@RequestBody FeedbackInfoVo feedbackInfoVo){
+        return AjaxResult.success(agentService.uploadsFile(feedbackInfoVo));
+    }
+
+    /**代理端-上传的文档列表*/
+    @GetMapping("/selectUploadsFileList/{userId}")
+    private AjaxResult selectUploadsFileList(@PathVariable("userId")Long userId){
+        return AjaxResult.success(agentService.selectUploadsFileList(userId));
+    }
+
+    /**代理端-上传文档列表-未处理*/
+    @GetMapping("/selectUploadsFileListDetails/{feedbackId}")
+    private AjaxResult selectUploadsFileListDetails(@PathVariable("feedbackId")Long feedbackId){
+        return AjaxResult.success(agentService.selectUploadsFileListDetails(feedbackId));
     }
 }

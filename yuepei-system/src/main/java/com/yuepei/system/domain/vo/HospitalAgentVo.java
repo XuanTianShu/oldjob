@@ -12,8 +12,6 @@ import java.util.List;
 public class HospitalAgentVo {
     /**用户id*/
     private Long userId;
-    /**医院id*/
-    private Long hospitalId;
     /**医院名称*/
     private String hospitalName;
     /**医院账号*/
@@ -27,5 +25,5 @@ public class HospitalAgentVo {
     /**分成比例*/
     private Long divided;
     /**划分名下设备*/
-    private String deviceNumber;
+    private List<String> deviceNumber;
 }

@@ -72,7 +72,7 @@ public class UserLeaseOrder extends BaseEntity {
     private String payType;
 
     /** 实付金额 */
-    private Long netAmount;
+    private BigDecimal netAmount;
 
     /** 优惠券额度 */
     private Long couponPrice;
