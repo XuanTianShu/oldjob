@@ -130,47 +130,47 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     System.out.println(userLeaseOrder.getRule()+"--前端传的--");
 
                     //TODO 将订单信息存放到redis
-                    System.out.println("新增内容");
-                    UserLeaseOrder userLeaseOrder1 = userLeaseOrderMapper.selectUserLeaseOrderByOpenId(orderNumber);
-                    System.out.println("订单编号："+orderNumber);
-                    System.out.println(userLeaseOrder1.getDeviceRule());
-                    String rule = userLeaseOrder1.getDeviceRule();
-                    JSONArray objects = JSON.parseArray(rule);
-                    Map<String, Object> map = new HashMap<>();
-                    Map<String, Object> map1 = new HashMap<>();
-                    for (int i = 0; i < objects.size(); i++) {
-                        JSONObject jsonObject = JSON.parseObject(objects.get(i).toString());
-                        int timeStatus = Integer.parseInt(jsonObject.get("time").toString());
-                        if (timeStatus == 0){
-                             map = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
-                        }else {
-                             map1 = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
-                        }
-                    }
-                    System.out.println("开始判断");
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-                    String format = simpleDateFormat.format(userLeaseOrder1.getLeaseTime());
-
-                    Date parse = simpleDateFormat.parse(format);
-                    Date startTime = simpleDateFormat.parse(map1.get("startTime").toString());
-                    boolean before = parse.before(startTime);
-                    System.out.println(parse+"下单时间");
-                    System.out.println(startTime+"固定套餐时间");
-                    System.out.println(before+"结果");
-                    if (before){
-                        long l = startTime.getTime() - parse.getTime();
-                        long nd = 1000 * 24 * 60 * 60;
-                        long nh = 1000 * 60 * 60;
-                        long nm = 1000 * 60;
-                        long ns = 1000;
-                        long sec = l % nd % nh % nm / ns;
-                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1,
-                                new Long(sec).intValue(),TimeUnit.SECONDS);
-                        System.out.println("存储到redis1");
-                    }else {
-                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);
-                        System.out.println("存储到redis2");
-                    }
+//                    System.out.println("新增内容");
+//                    UserLeaseOrder userLeaseOrder1 = userLeaseOrderMapper.selectUserLeaseOrderByOpenId(orderNumber);
+//                    System.out.println("订单编号："+orderNumber);
+//                    System.out.println(userLeaseOrder1.getDeviceRule());
+//                    String rule = userLeaseOrder1.getDeviceRule();
+//                    JSONArray objects = JSON.parseArray(rule);
+//                    Map<String, Object> map = new HashMap<>();
+//                    Map<String, Object> map1 = new HashMap<>();
+//                    for (int i = 0; i < objects.size(); i++) {
+//                        JSONObject jsonObject = JSON.parseObject(objects.get(i).toString());
+//                        int timeStatus = Integer.parseInt(jsonObject.get("time").toString());
+//                        if (timeStatus == 0){
+//                             map = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
+//                        }else {
+//                             map1 = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
+//                        }
+//                    }
+//                    System.out.println("开始判断");
+//                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+//                    String format = simpleDateFormat.format(userLeaseOrder1.getLeaseTime());
+//
+//                    Date parse = simpleDateFormat.parse(format);
+//                    Date startTime = simpleDateFormat.parse(map1.get("startTime").toString());
+//                    boolean before = parse.before(startTime);
+//                    System.out.println(parse+"下单时间");
+//                    System.out.println(startTime+"固定套餐时间");
+//                    System.out.println(before+"结果");
+//                    if (before){
+//                        long l = startTime.getTime() - parse.getTime();
+//                        long nd = 1000 * 24 * 60 * 60;
+//                        long nh = 1000 * 60 * 60;
+//                        long nm = 1000 * 60;
+//                        long ns = 1000;
+//                        long sec = l % nd % nh % nm / ns;
+//                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1,
+//                                new Long(sec).intValue(),TimeUnit.SECONDS);
+//                        System.out.println("存储到redis1");
+//                    }else {
+//                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);
+//                        System.out.println("存储到redis2");
+//                    }
                     System.out.println("没问题");
 //                    redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);
 

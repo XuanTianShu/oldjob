@@ -120,4 +120,6 @@ public class UserLeaseOrder extends BaseEntity {
     private BigDecimal timePrice;
 
     private BigDecimal fixedPrice;
+
+    private Long isValid;
 }

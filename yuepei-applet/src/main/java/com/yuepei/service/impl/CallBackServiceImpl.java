@@ -1,5 +1,6 @@
 package com.yuepei.service.impl;
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.wechat.pay.contrib.apache.httpclient.util.AesUtil;
 import com.yuepei.common.core.domain.AjaxResult;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,13 +27,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
 /**
  * 　　　　 ┏┓       ┏┓+ +
  * 　　　　┏┛┻━━━━━━━┛┻┓ + +
@@ -418,18 +421,107 @@ public class CallBackServiceImpl implements CallBackService {
                  * 其中第 16 位表示共享品种类
                  */
                 String timestamp = (String) map1.get("timestamp");
+                String substring = timestamp.substring(0, 1);
                 if (status == 0){
                     System.out.println("借床");
+                    if (substring.equals("D")) {
+                        //子锁号
+                        String substring1 = timestamp.substring(3, 4);
+                        UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectOrderByDeviceNumberAndChoose(deviceNumber, substring1);
+                        //订单变成有效订单
+                        userLeaseOrder.setIsValid(1L);
+                        //TODO 计算套餐
+                        String rule = userLeaseOrder.getDeviceRule();
+                        JSONArray objects = JSON.parseArray(rule);
+                        Map<String, Object> hashMap = new HashMap<>();
+                        Map<String, Object> objectMap = new HashMap<>();
+                        for (int i = 0; i < objects.size(); i++) {
+                            JSONObject object = JSON.parseObject(objects.get(i).toString());
+                            int timeStatus = Integer.parseInt(object.get("time").toString());
+                            if (timeStatus == 0){
+                                hashMap = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
+                            }else {
+                                objectMap = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
+                            }
+                        }
+                        System.out.println("开始判断");
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+                        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+                        String format = simpleDateFormat.format(userLeaseOrder.getLeaseTime());
+
+                        Date parse = simpleDateFormat.parse(format);
+                        Date startTime = simpleDateFormat.parse(objectMap.get("startTime").toString());
+                        BigDecimal price = new BigDecimal(objectMap.get("price").toString());
+                        System.out.println(price + "固定套餐的价格");
+                        boolean before = parse.before(startTime);
+                        System.out.println(parse+"下单时间");
+                        System.out.println(startTime+"固定套餐时间");
+                        System.out.println(before+"结果");
+                        if (before){
+                            long l = startTime.getTime() - parse.getTime();
+                            long nd = 1000 * 24 * 60 * 60;
+                            long nh = 1000 * 60 * 60;
+                            long nm = 1000 * 60;
+                            long ns = 1000;
+                            long min = l % nd % nh / nm;
+                            System.out.println(min+"------"+l);
+                            long sec = l / ns;
+                            System.out.println(sec+"多少秒钟");
+                            redisServer.setCacheObject(orderPrefix+userLeaseOrder.getOrderNumber(),userLeaseOrder,
+                                    new Long(sec).intValue(), TimeUnit.SECONDS);
+                            System.out.println("存储到redis1");
+                        }else {
+                            redisServer.setCacheObject(orderPrefix+userLeaseOrder.getOrderNumber(),userLeaseOrder);
+                            System.out.println("存储到redis2");
+                        }
+                        //修改订单信息
+//                        userLeaseOrderMapper.updateUserLeaseOrder(userLeaseOrder);
+                    }
+                    System.out.println("借床成功");
                 }else if (status == 1){
                     if (temperature == 0){
                         System.out.println("异常还床");
-
                     }else if (temperature == 1){
-                        String substring = timestamp.substring(0, 1);
                         if (substring.equals("D")){
+                            //子锁号
                             String substring1 = timestamp.substring(3, 4);
                             UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectOrderByDeviceNumberAndChoose(deviceNumber,substring1);
+                            userLeaseOrder.setRestoreTime(new Date());
+                            userLeaseOrder.setStatus("1");
                             //TODO 计算订单金额
+                            int time = 0;
+                            long l = userLeaseOrder.getLeaseTime().getTime() - new Date().getTime();
+                            long nd = 1000 * 24 * 60 * 60;
+                            long nh = 1000 * 60 * 60;
+                            long nm = 1000 * 60;
+                            long ns = 1000;
+
+                            // 计算差多少天
+                            long day = l / nd;
+                            // 计算差多少小时
+                            long hour = l % nd / nh;
+                            // 计算差多少分钟
+                            long min = l % nd % nh / nm;
+                            if (day != 0){
+                                time += day * 24;
+                            }
+                            if (hour != 0){
+                                time += hour;
+                            }
+                            if (min > 0){
+                                time += time+1;
+                            }
+
+                            long valid = l / ns;
+                            if (valid > 60){
+                                //收费
+                                long keyExpire = redisServer.getKeyExpire(orderPrefix + userLeaseOrder.getOrderNumber());
+                                System.out.println(keyExpire+"过期时间");
+                            }else {
+                                //免费
+//                                userLeaseOrder.setPrice(new BigDecimal(0));
+                            }
+//                            userLeaseOrderMapper.updateUserLeaseOrder(userLeaseOrder);
                         }
                         System.out.println("正常还床");
                     }
@@ -440,10 +532,13 @@ public class CallBackServiceImpl implements CallBackService {
                 log.info("电量:==============={}",integer);
             }
 //            log.info("map:============={}", map);
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
+            System.out.println("NB数据上报执行事务回滚");
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            System.out.println("NB数据上报执行回滚成功");
         }
-        return null;
+        return AjaxResult.error();
     }
 
     public static String getAllRequestParam2(HttpServletRequest request) throws IOException {

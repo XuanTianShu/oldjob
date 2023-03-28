@@ -88,6 +88,7 @@ public class WechatRefundController {
     public AjaxResult userDepositRefund(HttpServletRequest request){
         SysUser user = tokenUtils.analysis(request);
         return AjaxResult.success(userRefundService.userDepositRefund(user.getOpenid()));
+//        return AjaxResult.success(userRefundService.userDepositRefund("oc0od5Zsw2QNICOtv8M9OsXGxHFA"));
     }
 
     //TODO 后台处理用户退款申请

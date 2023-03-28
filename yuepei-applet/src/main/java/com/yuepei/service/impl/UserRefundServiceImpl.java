@@ -223,6 +223,7 @@ public class UserRefundServiceImpl implements UserRefundService {
     @Transactional
     @Override
     public AjaxResult userDepositRefund(String openid) {
+        System.out.println(openid+"用户标识");
         //查询该用户缴纳的押金
         List<UserDepositVO> userDepositVOList =  userDepositOrderMapper.selectUserDepositList(openid);
         //查询订单绑定中的押金
@@ -239,7 +240,9 @@ public class UserRefundServiceImpl implements UserRefundService {
         }
         if (userDepositVOList.size() != 0){
             //TODO 批量更新押金状态，防止重复操作
+            System.out.println("更新状态");
             userDepositOrderMapper.bathUpdateUserDeposit(userDepositVOList);
+            System.out.println("更新成功");
             for (UserDepositVO userDepositVO : userDepositVOList) {
                 String outTradeNo = UUID.randomUUID().toString().replace("-", "");
                 HashMap<Object, Object> payMap = new HashMap<>();

@@ -216,4 +216,13 @@ public class RedisServer {
     public Collection<String> keys(final String pattern) {
         return redisTemplate.keys(pattern);
     }
+
+    /**
+     * 查询key的生命周期
+     * @param key redis 存数据的键
+     * @return 默认单位秒，也可以自行传入单位
+     */
+    public long getKeyExpire(String key) {
+        return redisTemplate.getExpire(key);
+    }
 }

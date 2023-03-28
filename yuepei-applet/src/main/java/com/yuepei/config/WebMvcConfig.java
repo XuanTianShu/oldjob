@@ -49,7 +49,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/wechat/user/order/bluetoothCallback",
                         "/wechat/user/us/compactList",
                         "/wechat/user/investor/**",
-                        "/wechat/user/refund/userRefund");
+                        "/wechat/user/refund/userRefund",
+                        "/wechat/user/refund/userDepositRefund");
     }
 
     @Bean

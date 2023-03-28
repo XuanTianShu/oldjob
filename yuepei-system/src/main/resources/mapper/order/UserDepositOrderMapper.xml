@@ -93,15 +93,11 @@
         </trim>
         where order_number = #{orderNumber}
     </update>
-    <update id="bathUpdateUserDeposit">
-        <foreach collection="userDepositVOList" item="userDepositVO" separator=";" index="index">
+    <update id="bathUpdateUserDeposit" parameterType="java.util.List">
+        <foreach collection="userDepositVOList" item="item" separator=";">
             update user_deposit_order
-            <set>
-                `status` = 3
-            </set>
-            <where>
-                order_number = #{userDepositVO.orderNumber}
-            </where>
+            set `status` = '3'
+            where order_number = #{item.orderNumber}
         </foreach>
     </update>
 
@@ -147,7 +143,7 @@
     </select>
     <select id="selectUserDepositList" resultMap="UserDepositResult">
         SELECT id, openid, order_number, device_number, deposit_num,
-               deposit_status, STATUS, create_time FROM user_deposit_order
+               deposit_status, `status`, create_time FROM user_deposit_order
         WHERE openid = #{openid} AND STATUS = 1 AND deposit_status = 0
     </select>
 </mapper>

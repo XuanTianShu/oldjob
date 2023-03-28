@@ -19,6 +19,9 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,14 +83,29 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                         map1 = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
                     }
                 }
+
+                SimpleDateFormat simpleDateFormat2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-
+                Calendar instance = Calendar.getInstance();
+                instance.setTime(userLeaseOrder.getLeaseTime());
+                int i = instance.get(Calendar.HOUR_OF_DAY);
+                int i1 = instance.get(Calendar.MINUTE);
+                int i2 = instance.get(Calendar.SECOND);
+                String s1 = null;
+                if (i1 <= 9){
+                    s1 = i + ":" +"0"+ i1 + ":" + i2;
+                }else {
+                    s1 = i + ":" + i1 + ":" + i2;
+                }
                 //下单时间
-                Date leaseTime = userLeaseOrder.getLeaseTime();
+//                Date leaseTime = userLeaseOrder.getLeaseTime();
                 //固定套餐开始时间
-                Date startTime = simpleDateFormat.parse(map1.get("startTime").toString());
-
-                long l = startTime.getTime() - leaseTime.getTime();
+//                Date startTime = simpleDateFormat.parse(map1.get("startTime").toString());
+                String startTime = (String) map1.get("startTime");
+                Date parse2 = simpleDateFormat.parse(s1);
+                Date parse3 = simpleDateFormat.parse(startTime);
+                long l = parse3.getTime() - parse2.getTime();
+                System.out.println(parse3+"====="+parse2);
 
                 int time = 0;
 
@@ -112,8 +130,11 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                     time += time+1;
                 }
                 BigDecimal price = new BigDecimal(map1.get("price").toString());
+                System.out.println(price+"计时套餐的价格");
                 DecimalFormat decimalFormat = new DecimalFormat("0.00");
                 BigDecimal multiply = price.multiply(new BigDecimal(time));
+                System.out.println(new BigDecimal(time)+"======");
+                System.out.println(multiply+"计算后的计时套餐的价格");
                 userLeaseOrder.setTimePrice(new BigDecimal(decimalFormat.format(multiply)));
                 userLeaseOrderMapper.updateUserLeaseOrder(userLeaseOrder);
                 System.out.println("修改成功");

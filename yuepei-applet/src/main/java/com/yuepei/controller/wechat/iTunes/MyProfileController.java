@@ -32,6 +32,7 @@ public class MyProfileController extends BaseController {
     public AjaxResult profile(HttpServletRequest request)
     {
         SysUser user = tokenUtils.analysis(request);
+        user = userService.selectUserById(user.getUserId());
         AjaxResult ajax = AjaxResult.success(user);
         ajax.put("roleGroup", userService.selectUserRoleGroup(user.getUserName()));
         ajax.put("postGroup", userService.selectUserPostGroup(user.getUserName()));

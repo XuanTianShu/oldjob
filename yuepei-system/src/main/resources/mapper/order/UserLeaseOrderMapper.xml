@@ -33,6 +33,7 @@
         <result property="agentProportion" column="agentProportion"/>
         <result property="hospitalProportion" column="hospitalProportion"/>
         <result property="platformProportion" column="platformProportion"/>
+        <result property="isValid" column="is_valid"/>
     </resultMap>
 
     <resultMap id="LeaseOrderResult" type="LeaseOrderVO">
@@ -220,6 +221,12 @@
         <trim prefix="SET" suffixOverrides=",">
             <if test="openid != null">openid = #{openid},</if>
             <if test="orderNumber != null">order_number = #{orderNumber},</if>
+            <if test="outTradeNo != null">out_trade_no = #{outTradeNo},</if>
+            <if test="deviceRule != null">device_rule = #{deviceRule},</if>
+            <if test="deviceType != null">device_type = #{deviceType},</if>
+            <if test="timePrice != null">time_price = #{timePrice},</if>
+            <if test="fixedPrice != null">fixed_price = #{fixedPrice},</if>
+            <if test="deposit != null">deposit = #{deposit},</if>
             <if test="deviceNumber != null">device_number = #{deviceNumber},</if>
             <if test="leaseTime != null">lease_time = #{leaseTime},</if>
             <if test="leaseAddress != null">lease_address = #{leaseAddress},</if>
@@ -239,6 +246,7 @@
             <if test="agentProportion != null">agentProportion = #{agentProportion},</if>
             <if test="platformProportion != null">platformProportion = #{platformProportion},</if>
             <if test="depositNumber != null">deposit_number = #{depositNumber},</if>
+            <if test="isValid != null">is_valid = #{isValid},</if>
         </trim>
         where id = #{id}
     </update>
@@ -361,10 +369,16 @@
         FROM user_lease_order WHERE openid = #{openid}
                                 AND `status` IN (0,1)
     </select>
-    <select id="selectOrderByDeviceNumberAndChoose" resultType="com.yuepei.system.domain.UserLeaseOrder">
-        select * from user_lease_order where device_number = #{deviceNumber} and choose = #{substring1}
+    <select id="selectOrderByDeviceNumberAndChoose" resultMap="UserLeaseOrderResult">
+        SELECT `id`,`openid`,`order_number`,`device_number`,`out_trade_no`,`device_rule`,`device_type`,`lease_time`,`lease_address`,
+               `restore_time`,`restore_address`,`time_price`,`fixed_price`,`price`,`investorProportion`,`hospitalProportion`,`agentProportion`,
+               `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
+        FROM `user_lease_order` where device_number = #{deviceNumber} and choose = #{substring1} and `status` = 0
     </select>
     <select id="selectUserLeaseOrderByOpenId" resultMap="UserLeaseOrderResult">
-        select * from user_lease_order where order_number = #{orderNumber}
+        SELECT `id`,`openid`,`order_number`,`device_number`,`out_trade_no`,`device_rule`,`device_type`,`lease_time`,`lease_address`,
+               `restore_time`,`restore_address`,`time_price`,`fixed_price`,`price`,`investorProportion`,`hospitalProportion`,`agentProportion`,
+               `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
+        FROM `user_lease_order` where order_number = #{orderNumber}
     </select>
 </mapper>
