@@ -12,32 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * 　　　　 ┏┓       ┏┓+ +
- * 　　　　┏┛┻━━━━━━━┛┻┓ + +
- * 　　　　┃　　　　　　 ┃
- * 　　　　┃　　　━　　　┃ ++ + + +
- * 　　　 █████━█████  ┃+
- * 　　　　┃　　　　　　 ┃ +
- * 　　　　┃　　　┻　　　┃
- * 　　　　┃　　　　　　 ┃ + +
- * 　　　　┗━━┓　　　 ┏━┛
- * 　　　　　　┃　　  ┃
- * 　　　　　　┃　　  ┃ + + + +
- * 　　　　　　┃　　　┃　Code is far away from bug with the animal protection
- * 　　　　　　┃　　　┃ + 　　　　         神兽保佑,代码永无bug
- * 　　　　　　┃　　　┃
- * 　　　　　　┃　　　┃　　+
- * 　　　　　　┃　 　 ┗━━━┓ + +
- * 　　　　　　┃ 　　　　　┣-┓
- * 　　　　　　┃ 　　　　　┏-┛
- * 　　　　　　┗┓┓┏━━━┳┓┏┛ + + + +
- * 　　　　　　 ┃┫┫　 ┃┫┫
- * 　　　　　　 ┗┻┛　 ┗┻┛+ + + +
- * *********************************************************
- *
- * @author ：AK
- * @create ：2022/12/16 14:29
- **/
+ * 我的押金
+ */
 @RestController
 @RequestMapping("/wechat/user/deposit")
 public class MyDepositController {
@@ -56,7 +32,6 @@ public class MyDepositController {
     @GetMapping("/selectUserDepositInfo")
     public AjaxResult selectUserDepositInfo(HttpServletRequest request,String status,String depositStatus){
         SysUser user = tokenUtils.analysis(request);
-        System.out.println(status+"======="+depositStatus);
         return AjaxResult.success(depositService.selectUserDepositInfo(user.getOpenid(),status,depositStatus));
     }
 

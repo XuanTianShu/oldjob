@@ -81,5 +81,5 @@ public interface ISysUserFeedbackService {
      */
     public int deleteSysUserFeedbackByFeedbackId(Long feedbackId);
 
-    public List<SysUserFeedback> selectFaultFeedbackList(Long userId,Long status);
+    public List<SysUserFeedback> selectFaultFeedbackList(Long userId,Long status,String deviceNumber);
 }

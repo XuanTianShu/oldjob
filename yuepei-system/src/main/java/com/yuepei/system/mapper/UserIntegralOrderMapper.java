@@ -58,7 +58,7 @@ public interface UserIntegralOrderMapper {
      */
     public int insertUserIntegralOrder(UserIntegralBalanceDepositVo userIntegralDetail);
 
-    public List<UserIntegralBalanceDepositVo> selectUserIntegralOrderByUserId(@Param("openid") String openid , @Param("status") Integer status);
+    public List<UserIntegralBalanceDepositVo> selectUserIntegralOrderByUserId(@Param("openid") String openid , @Param("userIntegralBalanceDepositVo") UserIntegralBalanceDepositVo userIntegralBalanceDepositVo);
 
     List<UserIntegralBalanceDepositVo> selectIntegralDetailList(UserIntegralBalanceDepositVo userIntegralBalanceDepositVo);
 }

@@ -4,7 +4,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.SysUserMapper">
 
-    <resultMap type="SysUser" id="SysUserResult">
+    <resultMap type="com.yuepei.common.core.domain.entity.SysUser" id="SysUserResult">
         <id     property="userId"       column="user_id"      />
         <result property="deptId"       column="dept_id"      />
         <result property="userName"     column="user_name"    />
@@ -28,11 +28,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="remark"       column="remark"       />
 		<result property="userType"		column="user_type"	  />
 		<result property="proportion"   column="proportion"/>
-        <association property="dept"    column="dept_id" javaType="SysDept" resultMap="deptResult" />
+		<result property="parentId"   column="parent_id"/>
+        <association property="dept"    column="dept_id" javaType="com.yuepei.common.core.domain.entity.SysDept" resultMap="deptResult" />
         <collection  property="roles"   javaType="java.util.List"           resultMap="RoleResult" />
     </resultMap>
 
-    <resultMap id="deptResult" type="SysDept">
+    <resultMap id="deptResult" type="com.yuepei.common.core.domain.entity.SysDept">
         <id     property="deptId"    column="dept_id"     />
         <result property="parentId"  column="parent_id"   />
         <result property="deptName"  column="dept_name"   />
@@ -42,7 +43,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="status"    column="dept_status" />
     </resultMap>
 
-    <resultMap id="RoleResult" type="SysRole">
+    <resultMap id="RoleResult" type="com.yuepei.common.core.domain.entity.SysRole">
         <id     property="roleId"       column="role_id"        />
         <result property="roleName"     column="role_name"      />
         <result property="roleKey"      column="role_key"       />
@@ -52,16 +53,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
 	<sql id="selectUserVo">
-        select u.user_id, u.dept_id, u.user_name, u.balance, u.openid, u.integral, u.nick_name, u.email, u.avatar, u.phone_number, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
+        select u.user_id, u.dept_id, u.user_name, u.balance, u.openid, u.integral, u.nick_name, u.email, u.avatar, u.phone_number, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,u.user_type,u.proportion,u.parent_id,
         d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.status as dept_status,
-        r.role_id, r.role_name, r.role_key,u.proportion, r.role_sort, r.data_scope, r.status as role_status
+        r.role_id, r.role_name, r.role_key,u.proportion, r.role_sort,u.user_type, r.data_scope, r.status as role_status
         from sys_user u
 		    left join sys_dept d on u.dept_id = d.dept_id
 		    left join sys_user_role ur on u.user_id = ur.user_id
 		    left join sys_role r on r.role_id = ur.role_id
     </sql>
 
-    <select id="selectUserList" parameterType="SysUser" resultMap="SysUserResult">
+    <select id="selectUserList" parameterType="com.yuepei.common.core.domain.entity.SysUser" resultMap="SysUserResult">
 		select u.user_id, u.dept_id, u.nick_name,u.proportion, u.user_name, u.email, u.avatar, u.phone_number, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader from sys_user u
 		left join sys_dept d on u.dept_id = d.dept_id
 		where u.del_flag = '0'
@@ -93,7 +94,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		${params.dataScope}
 	</select>
 
-	<select id="selectAllocatedList" parameterType="SysUser" resultMap="SysUserResult">
+	<select id="selectAllocatedList" parameterType="com.yuepei.common.core.domain.entity.SysUser" resultMap="SysUserResult">
 	    select distinct u.user_id, u.dept_id, u.user_name,u.proportion, u.nick_name, u.email, u.phone_number, u.status, u.create_time
 	    from sys_user u
 			 left join sys_dept d on u.dept_id = d.dept_id
@@ -110,7 +111,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		${params.dataScope}
 	</select>
 
-	<select id="selectUnallocatedList" parameterType="SysUser" resultMap="SysUserResult">
+	<select id="selectUnallocatedList" parameterType="com.yuepei.common.core.domain.entity.SysUser" resultMap="SysUserResult">
 	    select distinct u.user_id, u.dept_id, u.user_name,u.proportion, u.nick_name, u.email, u.phone_number, u.status, u.create_time
 	    from sys_user u
 			 left join sys_dept d on u.dept_id = d.dept_id
@@ -131,6 +132,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="selectUserByUserName" parameterType="String" resultMap="SysUserResult">
 	    <include refid="selectUserVo"/>
 		where u.user_name = #{userName} and u.del_flag = '0'
+	</select>
+
+	<select id="selectUserByUser" parameterType="String" resultMap="SysUserResult">
+		<include refid="selectUserVo"/>
+		where u.user_name = #{userName} and u.del_flag = '0' and (user_type='03' or user_type='04' or user_type='05')
 	</select>
 
 	<select id="selectUserByOpenid" parameterType="string" resultMap="SysUserResult">
@@ -160,7 +166,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	</select>
 
 	<select id="selectWechatUserList" parameterType="SysUser" resultMap="SysUserResult">
-		select u.user_id, u.dept_id, u.openid, u.nick_name,u.proportion, u.user_name, u.balance, u.integral, u.email, u.avatar, u.phone_number, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader from sys_user u
+		select u.user_id, u.dept_id, u.openid, u.nick_name,u.proportion, u.user_name, u.user_type,
+		       u.balance, u.integral, u.email, u.avatar, u.phone_number, u.sex, u.status,
+		       u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
+		       d.dept_name, d.leader from sys_user u
 		left join sys_dept d on u.dept_id = d.dept_id
 		where u.del_flag = '0'
 		<if test="userId != null and userId != 0">
@@ -190,8 +199,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		<!-- 数据范围过滤 -->
 		${params.dataScope}
 	</select>
+	<select id="getPassword" resultType="com.yuepei.common.core.domain.entity.SysUser">
+		SELECT
+			su.user_id,
+			su.`PASSWORD`
+		FROM
+			sys_user su
+		WHERE
+			su.user_name = #{userName};
+	</select>
+    <select id="checkUserOldPhoneNumber" resultType="java.lang.Integer">
+		SELECT COUNT(1) FROM sys_user WHERE user_id = #{userId} AND phone_number = #{oldPhoneNumber}
+	</select>
 
-    <insert id="insertUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
+	<insert id="insertUser" parameterType="com.yuepei.common.core.domain.entity.SysUser" useGeneratedKeys="true" keyProperty="userId">
  		insert into sys_user(
  			<if test="userId != null and userId != 0">user_id,</if>
  			<if test="deptId != null and deptId != 0">dept_id,</if>
@@ -206,8 +227,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="status != null and status != ''">status,</if>
  			<if test="createBy != null and createBy != ''">create_by,</if>
  			<if test="remark != null and remark != ''">remark,</if>
- 		    <if test="userType != null and userType != ''">user_type,</if>
- 		    <if test="proportion != null">proportion,</if>
+ 			<if test="userType != null and userType != ''">user_type,</if>
+ 			<if test="proportion != null and proportion != ''">proportion,</if>
+ 			<if test="contacts != null and contacts != ''">contacts,</if>
+ 			<if test="role != null and role != ''">role,</if>
+ 			<if test="area != null and area != ''">area,</if>
+ 			<if test="addressDetailed != null and addressDetailed != ''">address_detailed,</if>
+ 			<if test="parentId != null and parentId != ''">parent_id,</if>
  			create_time
  		)values(
  			<if test="userId != null and userId != ''">#{userId},</if>
@@ -223,13 +249,23 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="status != null and status != ''">#{status},</if>
  			<if test="createBy != null and createBy != ''">#{createBy},</if>
  			<if test="remark != null and remark != ''">#{remark},</if>
- 		    <if test="userType != null and userType != ''">#{userType},</if>
- 		    <if test="proportion != null">#{proportion},</if>
+			<if test="userType != null and userType != ''">#{userType},</if>
+			<if test="proportion != null and proportion != ''">#{proportion},</if>
+			<if test="contacts != null and contacts != ''">#{contacts},</if>
+			<if test="role != null and role != ''">#{role},</if>
+			<if test="area != null and area != ''">#{area},</if>
+			<if test="addressDetailed != null and addressDetailed != ''">#{addressDetailed},</if>
+			<if test="parentId != null and parentId != ''">#{parentId},</if>
  			sysdate()
  		)
 	</insert>
+	<insert id="insertSysUser" parameterType="SysUser" useGeneratedKeys="true" keyProperty="userId">
+		insert into sys_user(user_name,password,nick_name,user_type,proportion)
+		values (#{userName},#{password},#{nickName},#{userType},proportion)
 
-	<update id="updateUser" parameterType="SysUser">
+	</insert>
+
+	<update id="updateUser" parameterType="com.yuepei.common.core.domain.entity.SysUser">
  		update sys_user
  		<set>
  			<if test="deptId != null and deptId != 0">dept_id = #{deptId},</if>
@@ -248,28 +284,29 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="loginDate != null">login_date = #{loginDate},</if>
  			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
  			<if test="remark != null">remark = #{remark},</if>
+ 		    <if test="integral != null">integral = #{integral},</if>
  			update_time = sysdate()
  		</set>
  		where user_id = #{userId}
 	</update>
 
-	<update id="updateUserStatus" parameterType="SysUser">
+	<update id="updateUserStatus" parameterType="com.yuepei.common.core.domain.entity.SysUser">
  		update sys_user set status = #{status} where user_id = #{userId}
 	</update>
 
-	<update id="updateUserAvatar" parameterType="SysUser">
+	<update id="updateUserAvatar" parameterType="com.yuepei.common.core.domain.entity.SysUser">
  		update sys_user set avatar = #{avatar} where user_name = #{userName}
 	</update>
 
-	<update id="resetUserPwd" parameterType="SysUser">
+	<update id="resetUserPwd" parameterType="com.yuepei.common.core.domain.entity.SysUser">
  		update sys_user set password = #{password} where user_name = #{userName}
 	</update>
 
-	<update id="updateUserPhoneNumber"  parameterType="SysUser">
+	<update id="updateUserPhoneNumber"  parameterType="com.yuepei.common.core.domain.entity.SysUser">
 		update sys_user set phone_number = #{phoneNumber} where user_id = #{userId}
 	</update>
 
-	<update id="updateUserIntegralByOpenid" parameterType="SysUser">
+	<update id="updateUserIntegralByOpenid" parameterType="com.yuepei.common.core.domain.entity.SysUser">
 		update sys_user
 		<set>
 			<if test="integral != null  and integral != ''">integral = integral + #{integral},</if>
@@ -288,5 +325,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			#{userId}
         </foreach>
  	</delete>
-
+	<select id="selectUserByHospital" parameterType="SysUser" resultMap="SysUserResult">
+		select user_id, dept_id, user_name, balance, openid, integral, nick_name, email, avatar, phone_number, password, sex, status, del_flag, login_ip, login_date, create_by, create_time, remark,user_type,proportion,parent_id
+		from sys_user
+		where user_name=#{userName}
+		and user_type='04'
+	</select>
+    <select id="selectUserByParentId" parameterType="SysUser" resultMap="SysUserResult">
+		select user_id, dept_id, user_name, balance, openid, integral, nick_name, email, avatar, phone_number, password, sex, status, del_flag, login_ip, login_date, create_by, create_time, remark,user_type,proportion,parent_id
+		from sys_user
+		where parent_id=#{userId}
+	</select>
 </mapper>

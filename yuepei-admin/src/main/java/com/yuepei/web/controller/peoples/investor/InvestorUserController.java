@@ -11,8 +11,11 @@ import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.common.utils.StringUtils;
 import com.yuepei.common.utils.poi.ExcelUtil;
 import com.yuepei.framework.web.domain.server.Sys;
+import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.InvestorUser;
+import com.yuepei.system.domain.vo.DeviceInvestorVO;
 import com.yuepei.system.mapper.SysUserMapper;
+import com.yuepei.system.service.DeviceInvestorService;
 import com.yuepei.system.service.IInvestorUserService;
 import com.yuepei.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +41,9 @@ public class InvestorUserController extends BaseController
     @Autowired
     private ISysUserService userService;
 
+    @Autowired
+    private DeviceInvestorService deviceInvestorService;
+
     /**
      * 查询投资人管理列表
      */
@@ -46,10 +52,35 @@ public class InvestorUserController extends BaseController
     public TableDataInfo list(SysUser user)
     {
         startPage();
-        user.setUserType("03");
         List<SysUser> list = investorUserService.selectInvestorUserList(user);
         return getDataTable(list);
     }
+
+    /**
+     * 根据投资人查询投资设备信息
+     * @param deviceInvestor
+     * @return
+     */
+    @GetMapping("/deviceProportionList")
+    public TableDataInfo deviceProportionList(DeviceInvestor deviceInvestor){
+        startPage();
+        List<DeviceInvestor> list = deviceInvestorService.deviceProportionList(deviceInvestor);
+        return getDataTable(list);
+    }
+
+    /**
+     * 查询未投资的设备
+     * @param investorId
+     * @return
+     */
+    @GetMapping("/deviceByInvestorId/{investorId}")
+    public TableDataInfo deviceByInvestorId(@PathVariable("investorId") Long investorId){
+        startPage();
+        List<DeviceInvestorVO> list = deviceInvestorService.deviceByInvestorId(investorId);
+        return getDataTable(list);
+    }
+
+
 
     /**
      * 导出投资人管理列表

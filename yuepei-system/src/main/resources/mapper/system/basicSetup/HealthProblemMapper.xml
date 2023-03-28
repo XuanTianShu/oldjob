@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yuepei.system.mapper.HealthProblemMapper">
+    <resultMap type="HealthProblem" id="HealthProblemResult">
+        <result property="healthProblemId"    column="health_problem_id"    />
+        <result property="healthProblemTitle"    column="health_problem_title"    />
+        <result property="healthProblemSolution"    column="health_problem_solution"    />
+    </resultMap>
+
+    <sql id="selectHealthProblemVo">
+        select health_problem_id, health_problem_title, health_problem_solution from health_problem
+    </sql>
+
+    <select id="selectHealthProblemList" parameterType="HealthProblem" resultMap="HealthProblemResult">
+        <include refid="selectHealthProblemVo"/>
+        <where>
+            <if test="healthProblemTitle != null  and healthProblemTitle != ''"> and health_problem_title = #{healthProblemTitle}</if>
+            <if test="healthProblemSolution != null  and healthProblemSolution != ''"> and health_problem_solution = #{healthProblemSolution}</if>
+        </where>
+    </select>
+
+    <select id="selectHealthProblemByHealthProblemId" parameterType="Long" resultMap="HealthProblemResult">
+        <include refid="selectHealthProblemVo"/>
+        where health_problem_id = #{healthProblemId}
+    </select>
+
+    <insert id="insertHealthProblem" parameterType="HealthProblem" useGeneratedKeys="true" keyProperty="healthProblemId">
+        insert into health_problem
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="healthProblemTitle != null">health_problem_title,</if>
+            <if test="healthProblemSolution != null">health_problem_solution,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="healthProblemTitle != null">#{healthProblemTitle},</if>
+            <if test="healthProblemSolution != null">#{healthProblemSolution},</if>
+        </trim>
+    </insert>
+
+    <update id="updateHealthProblem" parameterType="HealthProblem">
+        update health_problem
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="healthProblemTitle != null">health_problem_title = #{healthProblemTitle},</if>
+            <if test="healthProblemSolution != null">health_problem_solution = #{healthProblemSolution},</if>
+        </trim>
+        where health_problem_id = #{healthProblemId}
+    </update>
+
+    <delete id="deleteHealthProblemByHealthProblemId" parameterType="Long">
+        delete from health_problem where health_problem_id = #{healthProblemId}
+    </delete>
+
+    <delete id="deleteHealthProblemByHealthProblemIds" parameterType="String">
+        delete from health_problem where health_problem_id in
+        <foreach item="healthProblemId" collection="array" open="(" separator="," close=")">
+            #{healthProblemId}
+        </foreach>
+    </delete>
+</mapper>

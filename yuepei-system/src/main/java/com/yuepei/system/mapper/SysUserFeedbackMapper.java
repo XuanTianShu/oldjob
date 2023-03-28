@@ -82,5 +82,13 @@ public interface SysUserFeedbackMapper {
      */
     public int deleteSysUserFeedbackByFeedbackIds(Long[] feedbackIds);
 
-    List<SysUserFeedback> selectFaultFeedbackList(@Param("userId") Long userId , @Param("status") Long status);
+    List<SysUserFeedback> selectFaultFeedbackList(@Param("userId") Long userId , @Param("status") Long status, @Param("deviceNumber") String deviceNumber);
+
+    List<SysUserFeedback> selectDeviceFaultList(@Param("deviceNumber") String deviceNumber,@Param("status")Integer status);
+
+    SysUserFeedback selectSysUserFeedbackById(@Param("feedbackId") Long feedbackId);
+
+    List<SysUserFeedback> selectSysUserFeedbackByUserId(@Param("userId") Long userId);
+
+    int updateSysUserFeedbackById(SysUserFeedback sysUserFeedback);
 }

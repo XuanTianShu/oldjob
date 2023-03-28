@@ -56,6 +56,7 @@ public class MyPayController {
     public AjaxResult selectUserBalance(HttpServletRequest request){
         SysUser user = tokenUtils.analysis(request);
         return AjaxResult.success(userService.selectUserById(user.getUserId()));
+//        return AjaxResult.success(userService.selectUserById(121L));
     }
 
 

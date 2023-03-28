@@ -61,6 +61,8 @@ public class MyCouponServiceImpl implements MyCouponService {
     private UserIntegralOrderMapper userIntegralOrderMapper;
 
 
+
+
     /**
      * 查询【请填写功能名称】列表
      *
@@ -85,6 +87,7 @@ public class MyCouponServiceImpl implements MyCouponService {
         userCoupon.setUserId(userId);
         userCoupon.setStatus(0);
         userCoupon.setCouponStartTime(DateUtils.getNowDate());
+        System.out.println(DateUtils.addDays(DateUtils.getNowDate(), coupon.getValidityDays())+"================================");
         userCoupon.setCouponEndTime(DateUtils.addDays(DateUtils.getNowDate(),coupon.getValidityDays()));
         userCoupon.setTitle(coupon.getTitle());
         userCoupon.setUseLimit(coupon.getUseLimit());

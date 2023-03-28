@@ -202,7 +202,7 @@ public class HospitalController extends BaseController {
     }
 
     @GetMapping("/queryTreeByDeviceNumber")
-    public AjaxResult queryTreeByDeviceNumber(String deviceNumber){
-        return AjaxResult.success(hospitalService.queryTreeByDeviceNumber(deviceNumber));
+    public AjaxResult queryTreeByDeviceNumber(Device device){
+        return AjaxResult.success(hospitalService.queryTreeByDeviceNumber(device));
     }
 }

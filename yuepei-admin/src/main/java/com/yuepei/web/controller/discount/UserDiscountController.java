@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户卡包Controller
@@ -51,9 +52,11 @@ public class UserDiscountController extends BaseController
      * @return
      */
     @PostMapping("/selectMyDiscountByOpenId")
-    public TableDataInfo selectMyDiscountByOpenId(HttpServletRequest request,UserDiscount userDiscount){
+    public TableDataInfo selectMyDiscountByOpenId(HttpServletRequest request, UserDiscount userDiscount){
         startPage();
+        System.out.println("========================================================");
         SysUser user = tokenUtils.analysis(request);
+        System.out.println(user.getOpenid()+"-----------------");
         return getDataTable(userDiscountService.selectMyDiscountByOpenId(user.getOpenid(),userDiscount));
     }
 
@@ -88,7 +91,7 @@ public class UserDiscountController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody UserDiscount userDiscount)
     {
-        return toAjax(userDiscountService.insertUserDiscount(userDiscount));
+        return AjaxResult.success(userDiscountService.insertUserDiscount(userDiscount));
     }
 
     /**

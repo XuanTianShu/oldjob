@@ -7,7 +7,10 @@ import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.common.enums.BusinessType;
 import com.yuepei.common.utils.poi.ExcelUtil;
+import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.InvestorUser;
+import com.yuepei.system.domain.vo.HospitalVO;
+import com.yuepei.system.service.HospitalService;
 import com.yuepei.system.service.IInvestorUserService;
 import com.yuepei.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +36,18 @@ public class HospitalUserController extends BaseController {
     @Autowired
     private ISysUserService userService;
 
+    @Autowired
+    private HospitalService hospitalService;
+
     /**
-     * 查询医院用户管理列表
+     * 查询医院列表
      */
     @PreAuthorize("@ss.hasPermi('system:hospitalUser:list')")
     @GetMapping("/list")
-    public TableDataInfo list(SysUser user)
+    public TableDataInfo list(HospitalVO hospital)
     {
         startPage();
-        user.setUserType("04");
-        List<SysUser> list = userService.selectWechatUserList(user);
+        List<HospitalVO> list = hospitalService.selectHospitalListVO(hospital);
         return getDataTable(list);
     }
 

@@ -2,12 +2,8 @@ package com.yuepei.controller.wechat.user;
 
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
-import com.yuepei.common.utils.SecurityUtils;
-import com.yuepei.system.domain.Discount;
-import com.yuepei.system.domain.DiscountThreshold;
-import com.yuepei.system.mapper.UserIntegralOrderMapper;
+import com.yuepei.system.mapper.SysUserMapper;
 import com.yuepei.system.service.IDiscountService;
-import com.yuepei.utils.DictionaryEnum;
 import com.yuepei.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +26,9 @@ public class JYBController {
     @Autowired
     private IDiscountService discountService;
 
+    @Autowired
+    private SysUserMapper sysUserMapper;
+
 
     /**
      * 用户使用积分兑换优惠券
@@ -37,10 +36,10 @@ public class JYBController {
      * @param request
      * @return
      */
-    @Transactional
     @PostMapping("/assignUser")
     public AjaxResult assignUser(Long discountId, HttpServletRequest request) {
         SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(discountService.updateUserIntegral(discountId,user));
+//        SysUser user = sysUserMapper.selectUserByOpenid("oc0od5fazQUUOnkUbxreEkeYopfI");
+        return discountService.updateUserIntegral(discountId,user);
     }
 }

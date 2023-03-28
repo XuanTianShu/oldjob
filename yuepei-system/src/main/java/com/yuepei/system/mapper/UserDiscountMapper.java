@@ -1,6 +1,7 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.DiscountThreshold;
+import com.yuepei.system.domain.UserCoupon;
 import com.yuepei.system.domain.UserDiscount;
 import org.apache.ibatis.annotations.Param;
 
@@ -83,4 +84,6 @@ public interface UserDiscountMapper
      * @return
      */
     List<UserDiscount> selectMyDiscountByOpenId(@Param("openid") String openid, @Param("userDiscount") UserDiscount userDiscount);
+
+    UserDiscount selectUserCouponById(@Param("parseLong") Long parseLong);
 }

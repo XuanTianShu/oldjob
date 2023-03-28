@@ -20,6 +20,9 @@
         <result property="deviceIotNumber"    column="device_iot_number"    />
         <result property="deviceMac"    column="device_mac"    />
         <result property="investorId" column="investor_id"/>
+        <result property="electric" column="electric"/>
+        <result property="electricEarly" column="electric_early"/>
+        <result property="userId" column="user_id"/>
     </resultMap>
 
     <resultMap id="DeviceRuleResult" type="com.yuepei.system.domain.vo.DeviceVO">
@@ -28,7 +31,7 @@
         <result property="deviceNumber" column="device_number"/>
         <result property="deviceIotNumber" column="device_iot_number"/>
         <result property="deviceMac" column="device_mac"/>
-        <result property="deviceDeposit" column="device_deposit"/>
+        <result property="deviceDeposit" column="deviceDeposit"/>
         <result property="billingId" column="billing_id"/>
         <result property="hospitalId" column="hospital_id"/>
         <result property="deviceQRCode" column="device_qR_code"/>
@@ -42,26 +45,58 @@
         <result property="exists" column="exists"/>
     </resultMap>
 
+    <resultMap id="DeviceByPersonnelResult" type="com.yuepei.system.domain.vo.DeviceByPersonnelVO">
+        <result property="deviceId" column="device_id"/>
+        <result property="deviceTypeId" column="device_type_id"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="deviceMac" column="device_mac"/>
+        <result property="hospitalId" column="hospital_id"/>
+        <result property="deviceQrCode" column="device_qR_code"/>
+        <result property="deviceAddress" column="device_address"/>
+        <result property="deviceFullAddress" column="device_full_address"/>
+        <result property="rows" column="rows"/>
+        <result property="status" column="status"/>
+        <result property="investorId" column="investor_id"/>
+        <result property="electric" column="electric"/>
+        <result property="electricEarly" column="electric_early"/>
+        <result property="agentName" column="agentName"/>
+        <result property="hospitalName" column="hospitalName"/>
+        <result property="content" column="content"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
 
     <sql id="selectDeviceVo">
         select device_id, device_type_id, device_number,device_iot_number,device_mac,
-               device_deposit, billing_id,hospital_id, device_qR_code, device_address,
-               device_full_address,`rows`,heart_time, create_time, status,investor_id from device
+               device_deposit, billing_id,hospital_id, device_qR_code, device_address,content,
+    device_full_address,`rows`,heart_time, create_time, status,investor_id,electric,electric_early,user_id from device
     </sql>
 
-    <select id="selectDeviceList" parameterType="Device" resultMap="DeviceResult">
-        <include refid="selectDeviceVo"/>
+    <select id="selectDeviceList" parameterType="Device" resultMap="DeviceByPersonnelResult">
+        <!--SELECT d.device_id, d.device_type_id, d.device_number,d.device_iot_number,d.device_mac,d.user_id,
+        d.device_deposit, d.billing_id,d.hospital_id, d.device_qR_code, d.device_address,d.content,
+        d.device_full_address,d.`rows`,d.heart_time, d.create_time, d.status,d.investor_id,
+        d.electric,d.electric_early,IFNULL(su.`nick_name`,'无') AS agentName,
+        IFNULL(s.`nick_name`,'无') AS hospitalName FROM device AS d
+        LEFT JOIN agent_hospital AS ah ON ah.`hospital_id` = d.`hospital_id`
+        LEFT JOIN sys_user AS su ON su.`user_id` = ah.`agent_id`
+        LEFT JOIN hospital_user AS hu ON hu.`hospital_id` = d.`hospital_id`
+        LEFT JOIN sys_user AS s ON s.`user_name` = hu.`user_name`-->
+        SELECT d.device_id, d.device_type_id, d.device_number,d.device_iot_number,d.device_mac,d.user_id,
+        d.device_deposit, d.billing_id,d.hospital_id, d.device_qR_code, d.device_address,d.content,
+        d.device_full_address,d.`rows`,d.heart_time, d.create_time, d.status,d.investor_id,
+        d.electric,d.electric_early,IFNULL(su.`nick_name`,'无') AS agentName,
+        IFNULL(s.`nick_name`,'无') AS hospitalName FROM device AS d
+        LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+        LEFT JOIN hospital_user AS hu ON hu.`hospital_id` = d.`hospital_id`
+        LEFT JOIN sys_user AS s ON s.`user_name` = hu.`user_name`
         <where>
-            <if test="deviceTypeId !=null"> and device_type_id = #{deviceTypeId}</if>
-            <if test="deviceNumber != null "> and device_number = #{deviceNumber}</if>
-            <if test="billingId != null "> and billing_id = #{billingId}</if>
-            <if test="hospitalId != null "> and hospital_id = #{hospitalId}</if>
-            <if test="deviceQrCode != null  and deviceQrCode != ''"> and device_qR_code = #{deviceQrCode}</if>
-            <if test="deviceAddress != null  and deviceAddress != ''"> and device_address = #{deviceAddress}</if>
-            <if test="deviceFullAddress != null  and deviceFullAddress != ''"> and device_full_address = #{deviceFullAddress}</if>
-            <if test="heartTime != null "> and heart_time = #{heartTime}</if>
-            <if test="status != null "> and status = #{status}</if>
-            <if test="investorId != null and investorId != ''"> and investor_id = #{investorId}</if>
+            <if test="deviceTypeId !=null"> and d.device_type_id = #{deviceTypeId}</if>
+            <if test="deviceNumber != null "> and d.device_number = #{deviceNumber}</if>
+            <if test="hospitalId != null "> and d.hospital_id = #{hospitalId}</if>
+            <if test="status != null "> and d.status = #{status}</if>
+            <if test="userId != null"> and d.user_id = #{userId}</if>
+            and d.device_number IN(SELECT device_number FROM device_investor)
         </where>
     </select>
 
@@ -76,16 +111,17 @@
     </select>
 
     <select id="selectDeviceInfoByDeviceNumber" parameterType="String" resultMap="DeviceRuleResult">
-SELECT d.device_id, d.device_type_id, d.device_number,
-       d.device_iot_number,d.device_mac,d.device_deposit, d.billing_id,
+    SELECT d.device_id, d.device_type_id, d.device_number,d.user_id,
+       d.device_iot_number,d.device_mac,dt.`device_type_deposit` as deviceDeposit, d.billing_id,
        d.hospital_id, d.device_qR_code, d.device_address,
        d.device_full_address,d.`rows`,d.heart_time,
        d.`status`,dr.`rule`,dr.`depict`,(
        SELECT COUNT(1) FROM user_lease_order AS ulo INNER JOIN
-                device AS d ON d.`device_number` = ulo.device_number
-        WHERE d.`device_number` = #{deviceNumber}) AS `exists` FROM device AS d
+       device AS d ON d.`device_number` = ulo.device_number
+       WHERE d.`device_number` = #{deviceNumber}) AS `exists` FROM device AS d
        LEFT JOIN device_rule AS dr ON dr.`device_number` = d.`device_number`
-        WHERE d.device_number = #{deviceNumber}
+       INNER JOIN device_type AS dt ON dt.`device_type_id` = d.`device_type_id`
+    WHERE d.device_number = #{deviceNumber}
     </select>
 
     <select id="checkDeviceByType" resultType="java.lang.Integer">
@@ -129,6 +165,10 @@ SELECT d.device_id, d.device_type_id, d.device_number,
             <if test="createTime != null">create_time,</if>
             <if test="status != null">status,</if>
             <if test="investorId != null">investor_id,</if>
+            <if test="electric != null">electric,</if>
+            <if test="electricEarly != null">electric_early,</if>
+            <if test="content != null">content,</if>
+            <if test="userId != null">user_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="deviceTypeId != null">#{deviceTypeId},</if>
@@ -146,6 +186,10 @@ SELECT d.device_id, d.device_type_id, d.device_number,
             <if test="createTime != null">#{createTime},</if>
             <if test="status != null">#{status},</if>
             <if test="investorId != null">#{investorId},</if>
+            <if test="electric != null">#{electric},</if>
+            <if test="electricEarly != null">#{electricEarly},</if>
+            <if test="content != null">#{content},</if>
+            <if test="userId != null">#{userId},</if>
         </trim>
     </insert>
 
@@ -167,6 +211,10 @@ SELECT d.device_id, d.device_type_id, d.device_number,
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="status != null">status = #{status},</if>
             <if test="investorId != null and investorId != ''">investor_id = #{investorId},</if>
+            <if test="electric != null">electric = #{electric},</if>
+            <if test="electricEarly != null">electric_early = #{electricEarly},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="userId != null">user_id = #{userId},</if>
         </trim>
         where device_id = #{deviceId}
     </update>
@@ -174,8 +222,16 @@ SELECT d.device_id, d.device_type_id, d.device_number,
         update device
         <trim prefix="SET" suffixOverrides=",">
             <if test=" rows!= null ">`rows` = #{rows},</if>
+            <if test="status != null">`status` = #{status},</if>
         </trim>
         where device_number = #{deviceNumber}
+    </update>
+    <update id="updateDeviceList" parameterType="Device">
+        update device set device_address=#{hospitalAddress},user_id=#{userId},hospital_id=#{hospitalId}
+        where device_number in
+        <foreach collection="deviceNumber" item="deviceNumber" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
     </update>
 
     <delete id="deleteDeviceByDeviceId" parameterType="Long">
@@ -191,6 +247,23 @@ SELECT d.device_id, d.device_type_id, d.device_number,
     <select id="selectDeviceByHospitalId" parameterType="device" resultMap="DeviceResult">
         <include refid="selectDeviceVo"/>
         where hospital_id = #{hospitalId}
+    </select>
+    <select id="selectDeviceByDeviceNumberList" parameterType="device" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        where device_number in
+        <foreach item="deviceNumber" collection="list" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </select>
+    <select id="selectDeviceByDeviceIds" resultType="java.lang.String">
+        select device_number from device where device_id in
+        <foreach item="deviceNumber" collection="array" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </select>
+    <select id="selectDeviceByUserId" parameterType="device" resultMap="DeviceResult">
+        <include refid="selectDeviceVo"/>
+        where user_id=#{userId}
     </select>
 
 </mapper>

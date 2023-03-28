@@ -42,8 +42,8 @@ public class MyIntegralServiceImpl implements MyIntegralService {
     private UserIntegralOrderMapper userIntegralOrderMapper;
 
     @Override
-    public List<UserIntegralBalanceDepositVo> integralList(String openid, Integer status ) {
-        return userIntegralOrderMapper.selectUserIntegralOrderByUserId(openid,status);
+    public List<UserIntegralBalanceDepositVo> integralList(String openid, UserIntegralBalanceDepositVo userIntegralBalanceDepositVo ) {
+        return userIntegralOrderMapper.selectUserIntegralOrderByUserId(openid,userIntegralBalanceDepositVo);
     }
 
     @Override

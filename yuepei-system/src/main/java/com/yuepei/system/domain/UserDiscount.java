@@ -47,6 +47,16 @@ public class UserDiscount extends BaseEntity
     @Excel(name = "状态 0待使用1已使用2已过期")
     private Long status;
 
+    private Long type;
+
+    public void setType(Long type){
+        this.type = type;
+    }
+
+    public Long getType(){
+        return type;
+    }
+
     public void setId(Long id)
     {
         this.id = id;

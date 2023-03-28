@@ -48,6 +48,16 @@ public class Hospital extends TreeEntity {
     @Excel(name = "")
     private String hospitalRule;
 
+    private Long proportion;
+
+    public void setProportion(Long proportion){
+        this.proportion = proportion;
+    }
+
+    public Long getProportion(){
+        return proportion;
+    }
+
     public void setHospitalId(Long hospitalId)
     {
         this.hospitalId = hospitalId;
@@ -85,6 +95,7 @@ public class Hospital extends TreeEntity {
                 .append("hospitalRule", getHospitalRule())
                 .append("createTime", getCreateTime())
                 .append("updateTime", getUpdateTime())
+                .append("proportion",getProportion())
                 .toString();
     }
 }

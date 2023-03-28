@@ -32,7 +32,7 @@ import java.util.List;
  * @create ：2023/1/7 15:49
  **/
 public interface MyBalanceService {
-    List<UserIntegralBalanceDepositVo> selectUserBalanceByOpenid(String openid, Integer status);
+    List<UserIntegralBalanceDepositVo> selectUserBalanceByOpenid(String openid, UserIntegralBalanceDepositVo userIntegralBalanceDepositVo);
 
     List<UserIntegralBalanceDepositVo> selectBalanceDetailList(UserIntegralBalanceDepositVo userIntegralBalanceDepositVo);
 }

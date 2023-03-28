@@ -153,6 +153,10 @@ public class SysUserController extends BaseController
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysUser user)
     {
+        //03投资人05代理商
+//        if (user.getUserType().equals("03")){
+//
+//        }
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
         if (UserConstants.NOT_UNIQUE.equals(userService.checkUserNameUnique(user)))

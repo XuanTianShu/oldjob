@@ -66,13 +66,13 @@ public class UserLeaseOrder extends BaseEntity {
     private String restoreAddress;
 
     /** 应付金额 */
-    private Long price;
+    private BigDecimal price;
 
     /** 支付方式 */
     private String payType;
 
     /** 实付金额 */
-    private Long netAmount;
+    private BigDecimal netAmount;
 
     /** 优惠券额度 */
     private Long couponPrice;
@@ -90,4 +90,36 @@ public class UserLeaseOrder extends BaseEntity {
     private String rule;
 
     private String outTradeNo;
+
+    private Long deposit;
+
+    private Long choose;
+
+    private String child;
+
+    private String depositNumber;
+
+    private Long investorProportion;
+
+    private Long hospitalProportion;
+
+    private Long agentProportion;
+
+    private Long platformProportion;
+
+    private Long electric;
+
+    private String deviceMac;
+
+    private String deviceAddress;
+
+    private String rows;
+
+    private String deviceRule;
+
+    private BigDecimal timePrice;
+
+    private BigDecimal fixedPrice;
+
+    private Long isValid;
 }

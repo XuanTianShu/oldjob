@@ -6,6 +6,7 @@ import com.yuepei.system.domain.UserDiscount;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户卡包Service接口
@@ -79,7 +80,7 @@ public interface IUserDiscountService
      * @param userDiscount
      * @return
      */
-    List<UserDiscount> selectMyDiscountByOpenId(String openid,UserDiscount userDiscount);
+    List<UserDiscount> selectMyDiscountByOpenId(String openid, UserDiscount userDiscount);
 
 //    List<UserDiscount> selectMyDiscountByOpenId(String openid);
 }

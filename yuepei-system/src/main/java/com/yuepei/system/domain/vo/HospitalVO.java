@@ -5,12 +5,13 @@ import lombok.Data;
 
 @Data
 public class HospitalVO {
-
     /** 主键 */
     private Long hospitalId;
 
     /** 主键 */
     private Long parentId;
+
+    private String proportion;
 
     /** 名称 */
     @Excel(name = "名称")

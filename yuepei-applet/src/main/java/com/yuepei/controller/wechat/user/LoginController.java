@@ -2,6 +2,7 @@ package com.yuepei.controller.wechat.user;
 import com.yuepei.common.constant.Constants;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.common.core.domain.model.LoginBody;
 import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.service.LoginService;
 import com.yuepei.system.mapper.SysUserMapper;
@@ -67,11 +68,12 @@ public class LoginController {
     @GetMapping("/loginHospitalPort")
     private AjaxResult loginHospitalPort(@RequestParam("userName")String userName,
                                          @RequestParam("password")String password){
-        AjaxResult ajax = new AjaxResult();
+//        AjaxResult ajax = new AjaxResult();
+        AjaxResult ajax = AjaxResult.success();
         //得到用户密码
         SysUser users = sysUserMapper.getPassword(userName);
         if(users==null||"".equals(users)){
-            return AjaxResult.error();
+            return AjaxResult.error("该账号不存在");
         }
         //解析判断
         boolean isTrue = SecurityUtils.matchesPassword(password, users.getPassword());
@@ -82,13 +84,12 @@ public class LoginController {
             //生成Token令牌,存入ajax
             String token = tokenUtils.createToken(users);
             SysUser sysUser = sysUserMapper.selectUserByUserName(userName);
-            ajax.put(Constants.TOKEN,token);
-            ajax.put("data",sysUser);
-            return ajax;
+//            ajax.put(Constants.TOKEN,token);
+//            ajax.put("data",sysUser);
+            return AjaxResult.success().put(Constants.TOKEN,token).put("data",sysUser);
+        } else {
+            return AjaxResult.error("请输入正确的账号密码");
         }
-        //失败
-        return AjaxResult.error();
-        //return hospitalDeviceService.loginHospitalPort(userName,password);
     }
 
     /**
@@ -146,9 +147,9 @@ public class LoginController {
     }
 
     /**设备类型下拉框*/
-    @GetMapping("/selectDeviceTypeName")
-    public AjaxResult selectDeviceTypeName(){
-        return AjaxResult.success(hospitalDeviceService.selectDeviceTypeName());
+    @GetMapping("/selectDeviceTypeName/{userId}")
+    public AjaxResult selectDeviceTypeName(@PathVariable("userId") Long userId){
+        return AjaxResult.success(hospitalDeviceService.selectDeviceTypeName(userId));
     }
 
     /**选择科室下拉框*/

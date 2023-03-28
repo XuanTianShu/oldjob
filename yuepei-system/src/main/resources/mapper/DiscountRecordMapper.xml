@@ -96,6 +96,11 @@
             <if test="threshold != null">threshold,</if>
             <if test="grantTime != null">grant_time,</if>
             <if test="status != null">status,</if>
+            <if test="isJyb != null">is_jyb,</if>
+            <if test="hospitalname != null">hospitalName,</if>
+            <if test="integral != null">integral,</if>
+            <if test="status != null">`status`,</if>
+            <if test="threshold != null">threshold,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="issuer != null">#{issuer},</if>
@@ -104,12 +109,18 @@
             <if test="threshold != null">#{threshold},</if>
             <if test="grantTime != null">#{grantTime},</if>
             <if test="status != null">#{status},</if>
+            <if test="isJyb != null">#{isJyb},</if>
+            <if test="hospitalname != null">#{hospitalname},</if>
+            <if test="integral != null">#{integral},</if>
+            <if test="status != null">#{status},</if>
+            <if test="threshold != null">#{threshold},</if>
         </trim>
     </insert>
     <insert id="sendDiscountRecord">
         insert into discount_record(`issuer`,`userId`,`price`,`threshold`,`grant_time`,`status`,is_jyb) values
         <foreach item="discountRecord" collection="userId1" index="index"  separator=",">
-            (#{userId},#{discountRecord},#{discount.money},#{discountThreshold.thresholdName},#{date},#{discount.isStatus},#{discount.isJyb})
+            (#{userId},#{discountRecord},#{discount.money},#{discountThreshold.thresholdName},
+             #{date},#{discount.isStatus},#{discount.isJyb})
         </foreach>
     </insert>
 

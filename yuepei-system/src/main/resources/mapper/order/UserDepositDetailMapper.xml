@@ -26,11 +26,12 @@
     </select>
 
     <select id="selectUserDepositDetailByOpenid" parameterType="Long" resultMap="UserDepositDetailResult">
-        select * from user_deposit_detail
+        select id,openid,`sum`,create_time,`status` from user_deposit_detail
         <where>
             openid = #{openid}
             <if test="status != null"> and status = #{status}</if>
         </where>
+        order by create_time desc
     </select>
 
     <insert id="insertUserDepositDetail" parameterType="com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo" useGeneratedKeys="true" keyProperty="id">

@@ -36,5 +36,5 @@ public interface BasicInformationService {
 
     AjaxResult updateUserPhoneNumber(Long userId, String phoneNumber,String code);
 
-    AjaxResult getCode(String phoneNumber);
+    AjaxResult getCode(String oldPhoneNumber,String newPhoneNumber,SysUser sysUser);
 }

@@ -3,6 +3,7 @@ package com.yuepei.system.domain.vo;
 import com.yuepei.common.core.domain.BaseEntity;
 import com.yuepei.system.domain.DeviceRule;
 import com.yuepei.system.domain.Hospital;
+import com.yuepei.system.domain.UserLeaseOrder;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -48,6 +49,8 @@ public class DeviceVO extends BaseEntity {
     private String hospitalName;
 
     private List<HospitalRuleVO> deviceRules;
+
+    private List<String> depositList;
 
     private Integer exists;
 }

@@ -8,6 +8,7 @@ import com.yuepei.system.service.ISysUserFeedbackService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -76,7 +77,7 @@ public class SysUserFeedbackServiceImpl implements ISysUserFeedbackService {
     public int insertSysUserFeedback(SysUserFeedback sysUserFeedback)
     {
         sysUserFeedback.setStatus(0);
-        sysUserFeedback.setFeedbackTime(DateUtils.getDate());
+        sysUserFeedback.setFeedbackTime(new Date());
         return sysUserFeedbackMapper.insertSysUserFeedback(sysUserFeedback);
     }
 
@@ -117,8 +118,8 @@ public class SysUserFeedbackServiceImpl implements ISysUserFeedbackService {
     }
 
     @Override
-    public List<SysUserFeedback> selectFaultFeedbackList(Long userId ,Long status) {
-        return sysUserFeedbackMapper.selectFaultFeedbackList(userId,status);
+    public List<SysUserFeedback> selectFaultFeedbackList(Long userId ,Long status,String deviceNumber) {
+        return sysUserFeedbackMapper.selectFaultFeedbackList(userId,status,deviceNumber);
     }
 
 }

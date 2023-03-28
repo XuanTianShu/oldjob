@@ -94,9 +94,19 @@ public class Device extends BaseEntity {
     @Excel(name = "设备状态")
     private Long status;
 
+    /** 设备电量 */
+    @Excel(name = "设备电量")
+    private Long electric;
+
+    /** 预警值 */
+    @Excel(name = "预警值")
+    private Long electricEarly;
+
+    private String content;
+
     private String investorId;
 
     private List<DeviceRule> deviceRules;
 
-
+    private Long userId;
 }

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yuepei.system.mapper.MedicalProblemMapper">
+    <resultMap type="MedicalProblem" id="MedicalProblemResult">
+        <result property="medicalProblemId"    column="medical_problem_id"    />
+        <result property="medicalProblemTitle"    column="medical_problem_title"    />
+        <result property="medicalProblemSolution"    column="medical_problem_solution"    />
+    </resultMap>
+
+    <sql id="selectMedicalProblemVo">
+        select medical_problem_id, medical_problem_title, medical_problem_solution from medical_problem
+    </sql>
+
+    <select id="selectMedicalProblemList" parameterType="MedicalProblem" resultMap="MedicalProblemResult">
+        <include refid="selectMedicalProblemVo"/>
+        <where>
+            <if test="medicalProblemTitle != null  and medicalProblemTitle != ''"> and medical_problem_title = #{medicalProblemTitle}</if>
+            <if test="medicalProblemSolution != null  and medicalProblemSolution != ''"> and medical_problem_solution = #{medicalProblemSolution}</if>
+        </where>
+    </select>
+
+    <select id="selectMedicalProblemByMedicalProblemId" parameterType="Long" resultMap="MedicalProblemResult">
+        <include refid="selectMedicalProblemVo"/>
+        where medical_problem_id = #{medicalProblemId}
+    </select>
+
+    <insert id="insertMedicalProblem" parameterType="MedicalProblem" useGeneratedKeys="true" keyProperty="medicalProblemId">
+        insert into medical_problem
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="medicalProblemTitle != null">medical_problem_title,</if>
+            <if test="medicalProblemSolution != null">medical_problem_solution,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="medicalProblemTitle != null">#{medicalProblemTitle},</if>
+            <if test="medicalProblemSolution != null">#{medicalProblemSolution},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMedicalProblem" parameterType="MedicalProblem">
+        update medical_problem
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="medicalProblemTitle != null">medical_problem_title = #{medicalProblemTitle},</if>
+            <if test="medicalProblemSolution != null">medical_problem_solution = #{medicalProblemSolution},</if>
+        </trim>
+        where medical_problem_id = #{medicalProblemId}
+    </update>
+
+    <delete id="deleteMedicalProblemByMedicalProblemId" parameterType="Long">
+        delete from medical_problem where medical_problem_id = #{medicalProblemId}
+    </delete>
+
+    <delete id="deleteMedicalProblemByMedicalProblemIds" parameterType="String">
+        delete from medical_problem where medical_problem_id in
+        <foreach item="medicalProblemId" collection="array" open="(" separator="," close=")">
+            #{medicalProblemId}
+        </foreach>
+    </delete>
+</mapper>

@@ -12,32 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * 　　　　 ┏┓       ┏┓+ +
- * 　　　　┏┛┻━━━━━━━┛┻┓ + +
- * 　　　　┃　　　　　　 ┃
- * 　　　　┃　　　━　　　┃ ++ + + +
- * 　　　 █████━█████  ┃+
- * 　　　　┃　　　　　　 ┃ +
- * 　　　　┃　　　┻　　　┃
- * 　　　　┃　　　　　　 ┃ + +
- * 　　　　┗━━┓　　　 ┏━┛
- * 　　　　　　┃　　  ┃
- * 　　　　　　┃　　  ┃ + + + +
- * 　　　　　　┃　　　┃　Code is far away from bug with the animal protection
- * 　　　　　　┃　　　┃ + 　　　　         神兽保佑,代码永无bug
- * 　　　　　　┃　　　┃
- * 　　　　　　┃　　　┃　　+
- * 　　　　　　┃　 　 ┗━━━┓ + +
- * 　　　　　　┃ 　　　　　┣-┓
- * 　　　　　　┃ 　　　　　┏-┛
- * 　　　　　　┗┓┓┏━━━┳┓┏┛ + + + +
- * 　　　　　　 ┃┫┫　 ┃┫┫
- * 　　　　　　 ┗┻┛　 ┗┻┛+ + + +
- * *********************************************************
- *
- * @author ：AK
- * @create ：2022/12/22 14:40
- **/
+ * 故障申报
+ */
 @RestController
 @RequestMapping("/wechat/user/feedback")
 public class FaultFeedbackController {
@@ -53,12 +29,13 @@ public class FaultFeedbackController {
     public AjaxResult insertFaultFeed(HttpServletRequest request, @RequestBody SysUserFeedback feedback){
         SysUser user = tokenUtils.analysis(request);
         feedback.setUserId(user.getUserId());
+        System.out.println(feedback.getPhoneNumber()+"--------------手机号");
         return AjaxResult.success(userFeedbackService.insertSysUserFeedback(feedback));
     }
 
     @GetMapping("/selectFaultFeedbackList")
-    public AjaxResult selectFaultFeedbackList(HttpServletRequest request,Long status){
+    public AjaxResult selectFaultFeedbackList(HttpServletRequest request,Long status,String deviceNumber){
         SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(userFeedbackService.selectFaultFeedbackList(user.getUserId(),status));
+        return AjaxResult.success(userFeedbackService.selectFaultFeedbackList(user.getUserId(),status,deviceNumber));
     }
 }

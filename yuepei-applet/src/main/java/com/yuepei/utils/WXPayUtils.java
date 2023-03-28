@@ -70,7 +70,7 @@ public class WXPayUtils {
     @Autowired
     public CloseableHttpClient wxPayClient;
 
-    public HashMap<String, String> sendPay(String openid, Long price,String outTradeNo,String notifyUrl){
+    public HashMap<String, String> sendPay(String openid, BigDecimal price,String outTradeNo,String notifyUrl){
 
         HashMap<Object, Object> payMap = new HashMap<>();
         payMap.put("appid", appId);
@@ -81,7 +81,8 @@ public class WXPayUtils {
         Amount amount = new Amount();
 //        new BigDecimal(price).multiply(BigDecimal.valueOf(100)).longValue()
 //        amount.setTotal(new BigDecimal(price).multiply(BigDecimal.valueOf(100)).longValue());
-        amount.setTotal(new BigDecimal(price).longValue());
+//        BigDecimal multiply = new BigDecimal(price).multiply(new BigDecimal(100));
+        amount.setTotal(price.multiply(new BigDecimal(100)).longValue());
         amount.setCurrency("CNY");
         payMap.put("amount", amount);
         HashMap<Object, Object> payerMap = new HashMap<>();

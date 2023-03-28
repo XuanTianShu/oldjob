@@ -91,4 +91,6 @@ public interface HospitalMapper {
      * @return
      */
     int checkHospitalName(@Param("hospitalName") String hospitalName, @Param("hospitalId") Long hospitalId);
+
+    List<HospitalVO> selectHospitalListVO(HospitalVO hospital);
 }

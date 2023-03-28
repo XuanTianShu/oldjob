@@ -81,7 +81,7 @@ public interface UserBalanceDetailMapper {
      */
     public int deleteUserBalanceDetailByIds(Long[] ids);
 
-    public List<UserIntegralBalanceDepositVo> selectUserBalanceDetailByOpenid(@Param("openid") String openid, @Param("status") Integer status);
+    public List<UserIntegralBalanceDepositVo> selectUserBalanceDetailByOpenid(@Param("openid") String openid, @Param("userIntegralBalanceDepositVo") UserIntegralBalanceDepositVo userIntegralBalanceDepositVo);
 
     List<UserIntegralBalanceDepositVo> selectBalanceDetailList(UserIntegralBalanceDepositVo userIntegralBalanceDepositVo);
 }

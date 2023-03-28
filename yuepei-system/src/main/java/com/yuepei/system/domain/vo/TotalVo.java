@@ -18,7 +18,7 @@ public class TotalVo {
     private BigDecimal dividendAmount;
 
     /**有效订单*/
-    private int effectiveOrder;
+    private Integer effectiveOrder;
 
     /**有效订单列表*/
     private List<OrderVo> orderVos;

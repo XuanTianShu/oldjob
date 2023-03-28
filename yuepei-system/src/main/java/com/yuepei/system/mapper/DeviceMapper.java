@@ -1,7 +1,6 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.common.core.domain.entity.SysUser;
-import com.yuepei.system.domain.AgentHospital;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.DeviceRule;
 import com.yuepei.system.domain.Hospital;
@@ -91,7 +90,7 @@ public interface DeviceMapper {
 
     public Device selectDeviceByDeviceNumber(String deviceNumber);
 
-    public int updateDeviceByDeviceNumber(@Param("rows") String rows, @Param("deviceNumber") String deviceNumber);
+    public int updateDeviceByDeviceNumber(@Param("rows") String rows, @Param("deviceNumber") String deviceNumber, @Param("status") Integer status);
 
     public DeviceVO selectDeviceInfoByDeviceNumber(@Param("deviceNumber") String deviceNumber);
 
@@ -107,4 +106,12 @@ public interface DeviceMapper {
     int checkDeviceNumber(Device device);
 
     List<Device> selectDeviceByHospitalId(Long hospitalId);
+
+    List<Device> selectDeviceByDeviceNumberList(List<String> device);
+
+    List<Device> selectDeviceByUserId(@Param("userId") Long userId);
+
+    void updateDeviceList(@Param("deviceNumber") List<String> deviceNumber,@Param("hospitalAddress") String hospitalAddress,@Param("hospitalId") Long hospitalId,@Param("userId") Long userId);
+
+    List<String> selectDeviceByDeviceIds(Long[] deviceIds);
 }

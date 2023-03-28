@@ -42,8 +42,8 @@ public class MyBalanceServiceImpl implements MyBalanceService {
     private UserBalanceDetailMapper userBalanceDetailMapper;
 
     @Override
-    public List<UserIntegralBalanceDepositVo> selectUserBalanceByOpenid(String openid, Integer status) {
-        return userBalanceDetailMapper.selectUserBalanceDetailByOpenid(openid,status);
+    public List<UserIntegralBalanceDepositVo> selectUserBalanceByOpenid(String openid, UserIntegralBalanceDepositVo userIntegralBalanceDepositVo) {
+        return userBalanceDetailMapper.selectUserBalanceDetailByOpenid(openid,userIntegralBalanceDepositVo);
     }
 
     @Override
