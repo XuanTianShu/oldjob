@@ -10,6 +10,7 @@ import com.yuepei.system.domain.UserDiscount;
 import com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo;
 import com.yuepei.system.mapper.*;
 import com.yuepei.system.service.IDiscountService;
+import com.yuepei.system.utils.RedisServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -48,11 +49,11 @@ public class DiscountServiceImpl implements IDiscountService
     @Autowired
     private UserDiscountMapper userDiscountMapper;
 
-//    @Autowired
-//    private RedisServer redisServer;
+    @Autowired
+    private RedisServer redisServer;
 
-    @Value("${coupon.prefix}")
-    private String couponPre;
+    @Value("${coupon.coin}")
+    private String JYBPre;
 
     /**
      * 查询优惠券
@@ -186,7 +187,7 @@ public class DiscountServiceImpl implements IDiscountService
                 userDiscountMapper.insertUserDiscount(userDiscount);
 //                System.out.println(insertUserDiscount.getId()+"====================兑换之后的主键===========================");
                 //TODO 存储redis修改过期
-//                redisServer.setCacheObject(couponPre+);
+                redisServer.setCacheObject(JYBPre+new Date().getTime()+"_"+user.getUserId(),user);
 
                 //更新用户积分
                 user.setIntegral(Integer.parseInt(String.valueOf(sysUser.getIntegral() - discount.getIntegral())));

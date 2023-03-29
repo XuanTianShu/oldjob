@@ -84,6 +84,11 @@
         </trim>
         where id = #{id}
     </update>
+    <update id="batchUpdateUserCoupon">
+        UPDATE `user_discount`
+        SET `status` = '2'
+        WHERE DATE(expire_time) &lt;= CURDATE() AND user_id = #{userId};
+    </update>
 
     <delete id="deleteUserCouponById" parameterType="Long">
         delete from user_coupon where id = #{id}

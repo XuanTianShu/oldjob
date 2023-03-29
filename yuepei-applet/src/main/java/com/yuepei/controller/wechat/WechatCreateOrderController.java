@@ -8,6 +8,7 @@ import com.yuepei.service.WechatCreateOrderService;
 import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.utils.TokenUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -146,16 +147,40 @@ public class WechatCreateOrderController {
      * @return
      */
     @PostMapping("/balancePrepaymentOrder")
-    public AjaxResult balancePrepaymentOrder(HttpServletRequest request,UserLeaseOrder userLeaseOrder,long couponId){
+    public AjaxResult balancePrepaymentOrder(HttpServletRequest request,UserLeaseOrder userLeaseOrder,Long couponId){
         SysUser user = tokenUtils.analysis(request);
         return callBackService.balancePrepaymentOrder(user.getOpenid(),couponId,userLeaseOrder);
     }
 
 
+    /**
+     * NB数据上报
+     * @param request
+     * @return
+     */
     @PostMapping("/bluetoothCallback")
     public AjaxResult bluetoothCallback(HttpServletRequest request) {
         return callBackService.bluetoothCallback(request);
     }
 
 
+    /**
+     * PH70通用测试
+     */
+    @PostMapping("/PH70Callback")
+    public AjaxResult PH70Callback(HttpServletRequest request){
+        log.info("接收到PH70数据变化");
+        return callBackService.PH70Callback(request);
+    }
+
+    /**
+     * XG70NBT通用测试
+     * @param request
+     * @return
+     */
+    @PostMapping("/XG70NBTCallback")
+    public AjaxResult XG70NBTCallback(HttpServletRequest request){
+        log.info("接收到XG70NBT数据变化");
+        return callBackService.XG70NBTCallback(request);
+    }
 }

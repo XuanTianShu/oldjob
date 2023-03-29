@@ -16,12 +16,13 @@ import com.yuepei.system.domain.DiscountThreshold;
 import com.yuepei.system.domain.UserDiscount;
 import com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo;
 import com.yuepei.system.service.*;
+import com.yuepei.system.utils.RedisServer;
 import com.yuepei.utils.DictionaryEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.connection.RedisServer;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 　　　　 ┏┓       ┏┓+ +
@@ -60,6 +62,7 @@ import java.util.List;
  * @author ：AK
  * @create ：2022/12/16 15:46
  **/
+@Slf4j
 @RestController
 @RequestMapping("/system/wechatUser")
 public class wechatUserController extends BaseController {
@@ -85,8 +88,8 @@ public class wechatUserController extends BaseController {
     @Autowired
     private IUserDiscountService userDiscountService;
 
-//    @Autowired
-//    private RedisServer redisServer;
+    @Autowired
+    private RedisServer redisServer;
 
     @Value("${coupon.prefix}")
     private String couponPre;
@@ -144,14 +147,16 @@ public class wechatUserController extends BaseController {
             String format = simpleDateFormat.format(instance.getTime());
             instance.add(Calendar.DAY_OF_MONTH,Integer.parseInt(discount.getPeriod().toString()));
             String s = simpleDateFormat.format(instance.getTime());
+            Date parse = simpleDateFormat.parse(s);
             discountRecordService.sendDiscountRecord(SecurityUtils.getUserId(),userId,discount,discountThreshold,new Date());
-            userDiscountService.sendUserDiscount(userId,discountThreshold,simpleDateFormat.parse(format),simpleDateFormat.parse(s),discount.getMoney());
+            userDiscountService.sendUserDiscount(userId,discountThreshold,simpleDateFormat.parse(format),parse,discount.getMoney());
 
-            UserDiscount userDiscount = new UserDiscount();
-            userDiscount.setStatus(0L);
-            List<UserDiscount> userDiscounts = userDiscountService.selectUserDiscountList(userDiscount);
-            for (int i = 0; i < userDiscounts.size(); i++) {
-                System.out.println(userDiscounts.get(i).getId()+"-----------------"+i);
+            log.info("优惠券过期时间：{}",parse);
+            long l = parse.getTime() - new Date().getTime();
+            log.info("发放时间：{}",new Date().getTime());
+            log.info("过期时间戳：{}",l);
+            for (int i = 0; i < userId.length; i++) {
+                redisServer.setCacheObject(couponPre+new Date().getTime()+"_"+userId[i],discount,new Long(l).intValue(), TimeUnit.SECONDS);
             }
 
             discount.setSentNum(discount.getSentNum()+userId.length);

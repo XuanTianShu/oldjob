@@ -83,4 +83,6 @@ public interface UserCouponMapper {
     public int deleteUserCouponByIds(Long[] ids);
 
     List<UserCoupon> selectUserCoupon(@Param("userId") Long userId, @Param("status") Integer status);
+
+    void batchUpdateUserCoupon(@Param("userId") String userId);
 }

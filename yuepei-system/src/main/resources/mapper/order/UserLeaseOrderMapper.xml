@@ -7,6 +7,11 @@
     <resultMap type="UserLeaseOrder" id="UserLeaseOrderResult">
         <result property="id"    column="id"    />
         <result property="openid"    column="openid"    />
+        <result property="outTradeNo" column="out_trade_no"/>
+        <result property="deviceRule" column="device_rule"/>
+        <result property="timePrice" column="time_price"/>
+        <result property="fixedPrice" column="fixed_price"/>
+        <result property="depositNumber" column="deposit_number"/>
         <result property="orderNumber"    column="order_number"    />
         <result property="deviceNumber"    column="device_number"    />
         <result property="deviceType"    column="device_type"    />
@@ -268,6 +273,7 @@
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="child != null">child = #{child},</if>
             <if test="choose != null">choose = #{choose},</if>
+            <if test="outTradeNo != null">out_trade_no = #{outTradeNo},</if>
             <if test="investorProportion != null">investorProportion = #{investorProportion},</if>
             <if test="hospitalProportion != null">hospitalProportion = #{hospitalProportion},</if>
             <if test="agentProportion != null">agentProportion = #{agentProportion},</if>
@@ -373,12 +379,18 @@
         SELECT `id`,`openid`,`order_number`,`device_number`,`out_trade_no`,`device_rule`,`device_type`,`lease_time`,`lease_address`,
                `restore_time`,`restore_address`,`time_price`,`fixed_price`,`price`,`investorProportion`,`hospitalProportion`,`agentProportion`,
                `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
-        FROM `user_lease_order` where device_number = #{deviceNumber} and choose = #{substring1} and `status` = 0
+        FROM `user_lease_order` where child = #{substring1} and `status` = 0
     </select>
     <select id="selectUserLeaseOrderByOpenId" resultMap="UserLeaseOrderResult">
         SELECT `id`,`openid`,`order_number`,`device_number`,`out_trade_no`,`device_rule`,`device_type`,`lease_time`,`lease_address`,
                `restore_time`,`restore_address`,`time_price`,`fixed_price`,`price`,`investorProportion`,`hospitalProportion`,`agentProportion`,
                `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
         FROM `user_lease_order` where order_number = #{orderNumber}
+    </select>
+    <select id="selectOrderByDeviceNumber" resultMap="UserLeaseOrderResult">
+        SELECT `id`,`openid`,`order_number`,`device_number`,`out_trade_no`,`device_rule`,`device_type`,`lease_time`,`lease_address`,
+               `restore_time`,`restore_address`,`time_price`,`fixed_price`,`price`,`investorProportion`,`hospitalProportion`,`agentProportion`,
+               `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
+        FROM `user_lease_order` where child = #{substring1} and `status` = 0 and is_valid = 1
     </select>
 </mapper>
