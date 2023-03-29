@@ -51,7 +51,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/wechat/user/order/XG70NBTCallback",
                         "/wechat/user/us/compactList",
                         "/wechat/user/investor/**",
-                        "/wechat/user/refund/userRefund");
+                        "/wechat/user/refund/userRefund",
                         "/wechat/user/refund/userRefundCallBack",
                         "/wechat/user/order/weChatWithdrawal");
     }
