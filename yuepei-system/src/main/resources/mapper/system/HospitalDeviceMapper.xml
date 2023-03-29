@@ -16,7 +16,7 @@
         values (#{hospitalName},#{parentId})
     </insert>
     <insert id="insertHospitalUser" parameterType="HospitalUser">
-        insert into hospital_user (hospital_id,user_id) values (#{hospitalId},#{userId})
+        insert into hospital_user (hospital_id,user_name) values (#{hospitalId},#{userName})
     </insert>
 
     <resultMap type="UserLeaseOrder" id="UserLeaseOrderResult">
