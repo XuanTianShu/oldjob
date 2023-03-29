@@ -11,11 +11,13 @@ import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.UserPayOrder;
 import com.yuepei.system.mapper.*;
 import com.yuepei.utils.DictionaryEnum;
+import com.yuepei.utils.RequestUtils;
 import com.yuepei.utils.WXPayUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -72,14 +74,15 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
     @Autowired
     private UserLeaseOrderMapper userLeaseOrderMapper;
 
-
+    @Autowired
+    private RequestUtils requestUtils;
 
     @Override
     public AjaxResult payPrepaymentOrder(Long userId, Long price) {
         String outTradeNo = UUID.randomUUID().toString().replace("-", "");
         SysUser user = userMapper.selectUserById(userId);
         String notifyUrl = "https://www.yp10000.com/prod-api/wechat/user/order/payCallBack";
-        HashMap<String, String> pay = wxPayUtils.sendPay(user.getOpenid(), price, outTradeNo,notifyUrl);
+        HashMap<String, String> pay = wxPayUtils.sendPay(user.getOpenid(), new BigDecimal(price), outTradeNo,notifyUrl);
         if (pay != null){
             if (pay.get("message")==null){
                 //创建 充值 预支付订单
@@ -104,7 +107,7 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
         String outTradeNo = UUID.randomUUID().toString().replace("-", "");
         SysUser user = userMapper.selectUserById(userId);
         String notifyUrl = "https://www.yp10000.com/prod-api/wechat/user/order/depositCallBack";
-        HashMap<String, String> deposit = wxPayUtils.sendPay(user.getOpenid(), price, outTradeNo,notifyUrl);
+        HashMap<String, String> deposit = wxPayUtils.sendPay(user.getOpenid(), new BigDecimal(price), outTradeNo,notifyUrl);
         if (deposit != null){
             if (deposit.get("message")==null){
                 //创建 押金 预支付订单
@@ -129,17 +132,17 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
     @Override
     public AjaxResult paymentPrepaymentOrder(String openid,UserLeaseOrder userLeaseOrder,Integer couponId) {
         String notifyUrl = "https://www.yp10000.com/prod-api/wechat/user/order/paymentCallBack";
-        Long price;
+        Long price = null;
         UserCoupon userCoupon = null;
         if(couponId == null){
-            price  = userLeaseOrder.getPrice();
+//            price  = userLeaseOrder.getPrice();
         }else {
             userCoupon = userCouponMapper.selectUserCouponById(Long.parseLong(couponId.toString()));
-            price  = userLeaseOrder.getPrice() - userCoupon.getDiscountAmount()*100;
+//            price  = userLeaseOrder.getPrice() - userCoupon.getDiscountAmount()*100;
 //            TODO 修改使用后的优惠卷
         log.info("优惠卷状态更新成功");
         }
-        HashMap<String, String> pay = wxPayUtils.sendPay(openid,price, userLeaseOrder.getOrderNumber(),notifyUrl);
+        HashMap<String, String> pay = wxPayUtils.sendPay(openid,userLeaseOrder.getPrice(), userLeaseOrder.getOrderNumber(),notifyUrl);
         if (pay != null){
             if (pay.get("message")==null){
                 // 存储 支付信息 回调支付成功 处理
@@ -161,7 +164,7 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
 //                userOrder.setPlayTime();
                 BigDecimal divide = new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100), 2);
 //                userOrder.setNetAmount(Long.parseLong(String.valueOf(divide)));
-                userOrder.setNetAmount(Long.parseLong(price.toString()));
+//                userOrder.setNetAmount(Long.parseLong(price.toString()));
                 userOrder.setRestoreTime(new Date());
                 userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userOrder);
             }else {
@@ -169,5 +172,16 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
             }
         }
         return AjaxResult.success(pay);
+    }
+
+    @Override
+    public AjaxResult weChatWithdrawal(String openid, Long amount, String remark, String bankMemo) {
+        SysUser user = userMapper.selectUserByOpenid(openid);
+        HashMap<String, String> pay = wxPayUtils.withdrawal(openid, amount, remark, bankMemo);
+        System.out.println("pay======================================"+pay);
+        if (user.getBalance() < amount * 100) {
+            return AjaxResult.error("提现金额不能大于余额");
+        }
+        return null;
     }
 }

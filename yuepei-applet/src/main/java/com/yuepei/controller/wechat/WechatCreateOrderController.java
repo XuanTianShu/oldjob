@@ -141,4 +141,11 @@ public class WechatCreateOrderController {
         SysUser user = tokenUtils.analysis(request);
         return callBackService.balancePrepaymentOrder(user.getOpenid(),couponId,userLeaseOrder);
     }
+
+    /**提现*/
+    @PostMapping("/weChatWithdrawal")
+    public AjaxResult weChatWithdrawal(HttpServletRequest request,Long amount,String remark,String bankMemo){
+        SysUser user = tokenUtils.analysis(request);
+        return createOrderService.weChatWithdrawal(user.getOpenid(),amount,remark,bankMemo);
+    }
 }

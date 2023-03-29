@@ -79,8 +79,8 @@ public class LoginController {
             //HashMap<String, Object> userIdMap = new HashMap<>();
             //userIdMap.put("userId",users.getUserId());
             //生成Token令牌,存入ajax
-            String token = tokenUtils.createToken(users);
             SysUser sysUser = sysUserMapper.selectUserByUserName(userName);
+            String token = tokenUtils.createToken(sysUser);
 //            ajax.put(Constants.TOKEN,token);
 //            ajax.put("data",sysUser);
             return AjaxResult.success().put(Constants.TOKEN,token).put("data",sysUser);

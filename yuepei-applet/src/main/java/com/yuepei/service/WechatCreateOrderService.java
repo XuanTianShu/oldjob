@@ -3,6 +3,8 @@ package com.yuepei.service;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.system.domain.UserLeaseOrder;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 　　　　 ┏┓       ┏┓+ +
  * 　　　　┏┛┻━━━━━━━┛┻┓ + +
@@ -37,4 +39,6 @@ public interface WechatCreateOrderService {
     public AjaxResult depositPrepaymentOrder(Long userId, Long price,String deviceNumber);
 
     public AjaxResult paymentPrepaymentOrder(String openid,UserLeaseOrder userLeaseOrder,Integer couponId);
+
+    AjaxResult weChatWithdrawal(String openid, Long amount, String remark, String bankMemo);
 }
