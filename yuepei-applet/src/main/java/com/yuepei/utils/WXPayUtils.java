@@ -1,5 +1,9 @@
 package com.yuepei.utils;
 
+import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.google.gson.Gson;
 import com.wechat.pay.contrib.apache.httpclient.util.PemUtil;
 import com.yuepei.common.exception.ServiceException;
@@ -67,6 +71,9 @@ public class WXPayUtils {
     @Value("${wechat.appId}")
     private String appId;
 
+    @Value("${wechat.secrect}")
+    private String secrect;
+
     @Autowired
     public CloseableHttpClient wxPayClient;
 
@@ -81,6 +88,7 @@ public class WXPayUtils {
         Amount amount = new Amount();
 //        new BigDecimal(price).multiply(BigDecimal.valueOf(100)).longValue()
 //        amount.setTotal(new BigDecimal(price).multiply(BigDecimal.valueOf(100)).longValue());
+        amount.setTotal(price.longValue());
 //        BigDecimal multiply = new BigDecimal(price).multiply(new BigDecimal(100));
         amount.setTotal(price.multiply(new BigDecimal(100)).longValue());
         amount.setCurrency("CNY");
@@ -221,4 +229,57 @@ public class WXPayUtils {
             throw new ServiceException("私钥文件不存在");
         }
     }
+
+    /**
+     * 获取access_token
+     *
+     * @param appId 小程序唯一凭证
+     * @param appSecret 小程序唯一凭证密钥
+     * @return
+     */
+    public JSONObject getAccessToken(String appId, String appSecret) {
+        String tokenUrl = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="
+                + appId + "&secret=" + appSecret;
+        String body = HttpUtil.createGet(tokenUrl).execute().body();
+        JSONObject jsonObject = JSONUtil.parseObj(body);
+        if (jsonObject.get("access_token") == null) {
+            log.error("获取access_token失败:{}", jsonObject.toString());
+            return null;
+        } else {
+            return jsonObject;
+        }
+    }
+
+    public HashMap<String, String> withdrawal(String openid, Long price, String remark, String bankMemo){
+        JSONObject tokenUrl = getAccessToken(appId, secrect);
+        String token =(String) tokenUrl.get("access_token");
+        System.out.println(token);
+        HashMap<Object, Object> payMap = new HashMap<>();
+        payMap.put("mchid", mchKey);
+        payMap.put("amount",new BigDecimal(price));
+        payMap.put("remark", remark);
+        payMap.put("bank_emo",bankMemo);
+        payMap.put("biz_type",1);
+        //请求地址
+        HttpPost httpPost = new HttpPost("https://api.weixin.qq.com/shop/funds/submitwithdraw?access_token="+token);
+        // 请求数据
+        Gson gson = new Gson();
+        String json = gson.toJson(payMap);
+        //设置请求信息
+        StringEntity stringEntity = new StringEntity(json, "utf-8");
+        stringEntity.setContentType("application/json");
+        httpPost.setEntity(stringEntity);
+        httpPost.setHeader("Accept", "application/json");
+        // 3.完成签名并执行请求
+        CloseableHttpResponse response = null;
+        try {
+            response = wxPayClient.execute(httpPost);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // 4.解析response对象
+        HashMap<String, String> resultMap = resolverResponse(response);
+        return resultMap;
+    }
+
 }

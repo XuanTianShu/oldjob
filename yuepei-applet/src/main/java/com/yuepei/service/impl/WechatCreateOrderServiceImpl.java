@@ -8,6 +8,7 @@ import com.yuepei.service.WechatCreateOrderService;
 import com.yuepei.system.domain.*;
 import com.yuepei.system.mapper.*;
 import com.yuepei.utils.DictionaryEnum;
+import com.yuepei.utils.RequestUtils;
 import com.yuepei.utils.WXPayUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
@@ -71,6 +73,8 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
     @Autowired
     private UserLeaseOrderMapper userLeaseOrderMapper;
 
+    @Autowired
+    private RequestUtils requestUtils;
     @Autowired
     private UserDiscountMapper userDiscountMapper;
 
@@ -204,5 +208,16 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
             userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
             return AjaxResult.success();
         }
+    }
+
+    @Override
+    public AjaxResult weChatWithdrawal(String openid, Long amount, String remark, String bankMemo) {
+        SysUser user = userMapper.selectUserByOpenid(openid);
+        HashMap<String, String> pay = wxPayUtils.withdrawal(openid, amount, remark, bankMemo);
+        System.out.println("pay======================================"+pay);
+        if (user.getBalance() < amount * 100) {
+            return AjaxResult.error("提现金额不能大于余额");
+        }
+        return null;
     }
 }

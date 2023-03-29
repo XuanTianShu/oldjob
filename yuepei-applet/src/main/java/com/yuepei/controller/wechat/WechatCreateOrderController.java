@@ -183,4 +183,11 @@ public class WechatCreateOrderController {
         log.info("接收到XG70NBT数据变化");
         return callBackService.XG70NBTCallback(request);
     }
+
+    /**提现*/
+    @PostMapping("/weChatWithdrawal")
+    public AjaxResult weChatWithdrawal(HttpServletRequest request,Long amount,String remark,String bankMemo){
+        SysUser user = tokenUtils.analysis(request);
+        return createOrderService.weChatWithdrawal(user.getOpenid(),amount,remark,bankMemo);
+    }
 }
