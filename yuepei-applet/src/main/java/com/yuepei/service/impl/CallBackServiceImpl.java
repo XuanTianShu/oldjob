@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.nio.charset.StandardCharsets;
@@ -445,82 +447,86 @@ public class CallBackServiceImpl implements CallBackService {
                 if (status == 0){
                     System.out.println("借床");
                     if (substring.equals("D")) {
-                        UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectOrderByDeviceNumberAndChoose(substring2);
-                        if (userLeaseOrder != null){
-                            //TODO 计算套餐
-                            log.info("订单使用套餐：{}",userLeaseOrder.getDeviceRule());
-                            String rule = userLeaseOrder.getDeviceRule();
-                            JSONArray objects = JSON.parseArray(rule);
-                            Map<String, Object> hashMap = new HashMap<>();
-                            Map<String, Object> objectMap = new HashMap<>();
-                            for (int i = 0; i < objects.size(); i++) {
-                                JSONObject object = JSON.parseObject(objects.get(i).toString());
-                                int timeStatus = Integer.parseInt(object.get("time").toString());
-                                if (timeStatus == 0){
-                                    hashMap = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
-                                }else {
-                                    objectMap = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
-                                }
-                            }
-                            System.out.println("开始判断");
-                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-                            simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
-                            String format = simpleDateFormat.format(userLeaseOrder.getLeaseTime());
-
-                            Date parse = simpleDateFormat.parse(format);
-                            Date startTime = simpleDateFormat.parse(objectMap.get("startTime").toString());
-                            BigDecimal price = new BigDecimal(objectMap.get("price").toString());
-                            System.out.println(price + "固定套餐的价格");
-                            boolean before = parse.before(startTime);
-                            System.out.println(parse+"下单时间");
-                            System.out.println(startTime+"固定套餐时间");
-                            System.out.println(before+"结果");
-                            //订单变成有效订单
-                            userLeaseOrder.setIsValid(1L);
-
-                            if (before){
-                                long l = startTime.getTime() - parse.getTime();
-                                long nd = 1000 * 24 * 60 * 60;
-                                long nh = 1000 * 60 * 60;
-                                long nm = 1000 * 60;
-                                long ns = 1000;
-                                long sec = l / ns;
-                                System.out.println(sec+"多少秒钟");
-                                redisServer.setCacheObject(orderPrefix+userLeaseOrder.getOrderNumber(),userLeaseOrder,
-                                        new Long(sec).intValue(), TimeUnit.SECONDS);
-                                System.out.println("存储到redis1");
-                            }else {
-                                redisServer.setCacheObject(orderPrefix+userLeaseOrder.getOrderNumber(),userLeaseOrder);
-                                System.out.println("存储到redis2");
-                            }
-                            //修改订单信息
-                            userLeaseOrderMapper.updateUserLeaseOrder(userLeaseOrder);
-
-                            Device device = deviceMapper.selectDeviceByDeviceNumber(deviceNumber);
-                            String rows = device.getRows();
-
-                            int count = 0;
-                            Gson gson = new Gson();
-                            List<ItemVO> itemList = gson.fromJson(rows, new TypeToken<List<ItemVO>>(){}.getType());
-                            if (itemList.size() != 0){
-                                for (int i = 0; i < itemList.size(); i++) {
-                                    int index = itemList.get(i).getIndex();
-                                    if (Integer.parseInt(substring1) == index){
-                                        itemList.get(i).setStatus(2);
-                                        count=count+1;
-                                    }else if (itemList.get(i).getStatus() != 0){
-                                        count=count+1;
+                        if (temperature == 2 || temperature == 3){
+                            UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectOrderByDeviceNumberAndChoose(substring2);
+                            if (userLeaseOrder != null){
+                                //TODO 计算套餐
+                                log.info("订单使用套餐：{}",userLeaseOrder.getDeviceRule());
+                                String rule = userLeaseOrder.getDeviceRule();
+                                JSONArray objects = JSON.parseArray(rule);
+                                Map<String, Object> hashMap = new HashMap<>();
+                                Map<String, Object> objectMap = new HashMap<>();
+                                for (int i = 0; i < objects.size(); i++) {
+                                    JSONObject object = JSON.parseObject(objects.get(i).toString());
+                                    int timeStatus = Integer.parseInt(object.get("time").toString());
+                                    if (timeStatus == 0){
+                                        hashMap = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
+                                    }else {
+                                        objectMap = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
                                     }
                                 }
+                                System.out.println("开始判断");
+                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+                                simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+                                String format = simpleDateFormat.format(userLeaseOrder.getLeaseTime());
+
+                                Date parse = simpleDateFormat.parse(format);
+                                Date startTime = simpleDateFormat.parse(objectMap.get("startTime").toString());
+                                BigDecimal price = new BigDecimal(objectMap.get("price").toString());
+                                System.out.println(price + "固定套餐的价格");
+                                boolean before = parse.before(startTime);
+                                System.out.println(parse+"下单时间");
+                                System.out.println(startTime+"固定套餐时间");
+                                System.out.println(before+"结果");
+                                //订单变成有效订单
+                                userLeaseOrder.setIsValid(1L);
+
+                                if (before){
+                                    long l = startTime.getTime() - parse.getTime();
+                                    long nd = 1000 * 24 * 60 * 60;
+                                    long nh = 1000 * 60 * 60;
+                                    long nm = 1000 * 60;
+                                    long ns = 1000;
+                                    long sec = l / ns;
+                                    System.out.println(sec+"多少秒钟");
+                                    redisServer.setCacheObject(orderPrefix+userLeaseOrder.getOrderNumber(),userLeaseOrder,
+                                            new Long(sec).intValue(), TimeUnit.SECONDS);
+                                    System.out.println("存储到redis1");
+                                }else {
+                                    redisServer.setCacheObject(orderPrefix+userLeaseOrder.getOrderNumber(),userLeaseOrder);
+                                    System.out.println("存储到redis2");
+                                }
+                                //修改订单信息
+                                userLeaseOrderMapper.updateUserLeaseOrder(userLeaseOrder);
+
+                                Device device = deviceMapper.selectDeviceByDeviceNumber(deviceNumber);
+                                String rows = device.getRows();
+
+                                int count = 0;
+                                Gson gson = new Gson();
+                                List<ItemVO> itemList = gson.fromJson(rows, new TypeToken<List<ItemVO>>(){}.getType());
+                                if (itemList.size() != 0){
+                                    for (int i = 0; i < itemList.size(); i++) {
+                                        int index = itemList.get(i).getIndex();
+                                        if (Integer.parseInt(substring1) == index){
+                                            itemList.get(i).setStatus(2);
+                                            count=count+1;
+                                        }else if (itemList.get(i).getStatus() != 0){
+                                            count=count+1;
+                                        }
+                                    }
+                                }
+                                if (count == itemList.size()){
+                                    deviceMapper.updateDeviceByDeviceNumber(gson.toJson(itemList),deviceNumber,1);
+                                }else {
+                                    deviceMapper.updateDeviceByDeviceNumber(gson.toJson(itemList),deviceNumber,0);
+                                }
                             }
-                            if (count == itemList.size()){
-                            deviceMapper.updateDeviceByDeviceNumber(gson.toJson(itemList),deviceNumber,1);
-                            }else {
-                            deviceMapper.updateDeviceByDeviceNumber(gson.toJson(itemList),deviceNumber,0);
-                            }
+                            System.out.println("借床成功");
+                        }else if (temperature == 4){
+                            log.info("借床异常");
                         }
                     }
-                    System.out.println("借床成功");
                 }else if (status == 1){
                     if (temperature == 0){
                         System.out.println("异常还床");
@@ -654,7 +660,7 @@ public class CallBackServiceImpl implements CallBackService {
             byte[] bytes = Base64.getDecoder().decode(apPdata);
             String hexBinary = DatatypeConverter.printHexBinary(bytes);
             log.info("PH70数据上报16进制64解密：{}",hexBinary);
-            //7E010200060864515065974661001A086451506597387E
+            //7E 0102 0006 0864515065974661 001A 086451506597 38 7E
             /**
              * 7E//:头
              * 0102//:命令ID
