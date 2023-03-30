@@ -1222,7 +1222,7 @@ public class AgentServiceImpl implements AgentService {
         String string = JSON.toJSONString(lists);
         sysUserFeedback.setDevicePicture(string);
         sysUserFeedback.setStatus(1);
-        sysUserFeedback.setFeedbackTime(DateUtils.getDate());
+        sysUserFeedback.setFeedbackTime(new Date());
         return sysUserFeedbackMapper.updateSysUserFeedbackById(sysUserFeedback);
     }
 
@@ -1258,7 +1258,7 @@ public class AgentServiceImpl implements AgentService {
         });
         String string = JSON.toJSONString(lists);
         feedback.setFeedbackUrl(string);
-        feedback.setFeedbackTime(DateUtils.getTime());
+        feedback.setFeedbackTime(new Date());
         feedback.setFeedbackType("3");
         feedback.setStatus(0);
         return sysUserFeedbackMapper.insertSysUserFeedback(feedback);

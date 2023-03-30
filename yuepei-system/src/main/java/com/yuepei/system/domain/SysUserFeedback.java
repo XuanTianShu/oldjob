@@ -4,6 +4,8 @@ import com.yuepei.common.annotation.Excel;
 import com.yuepei.common.core.domain.BaseEntity;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * 　　　　 ┏┓       ┏┓+ +
  * 　　　　┏┛┻━━━━━━━┛┻┓ + +
@@ -60,7 +62,7 @@ public class SysUserFeedback extends BaseEntity {
     private String feedbackUrl;
 
     /** 意见反馈时间 */
-    private String feedbackTime;
+    private Date feedbackTime;
 
     /** 意见反馈状态 */
     private Integer status;
