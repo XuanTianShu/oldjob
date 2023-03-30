@@ -9,6 +9,7 @@ import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.core.redis.RedisCache;
 import com.yuepei.common.utils.DateUtils;
+import com.yuepei.controller.wechat.UsrDemo;
 import com.yuepei.service.CallBackService;
 import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.vo.ItemVO;
@@ -653,13 +654,20 @@ public class CallBackServiceImpl implements CallBackService {
         try {
             String reader = getAllRequestParam2(request);
             log.info("PH70数据上报:============={}", reader);
-            JSONObject object = JSON.parseObject(reader);
-            Map<String,Object> map = (Map<String,Object>)object.get("payload");
-            String apPdata = String.valueOf(map.get("APPdata"));
-            log.info("PH70数据上报16进制64加密：{}",apPdata);
-            byte[] bytes = Base64.getDecoder().decode(apPdata);
-            String hexBinary = DatatypeConverter.printHexBinary(bytes);
-            log.info("PH70数据上报16进制64解密：{}",hexBinary);
+//            JSONObject object = JSON.parseObject(reader);
+//            Map<String,Object> map = (Map<String,Object>)object.get("payload");
+//            String apPdata = String.valueOf(map.get("APPdata"));
+//            log.info("PH70数据上报16进制64加密：{}",apPdata);
+//            byte[] bytes = Base64.getDecoder().decode(apPdata);
+//            String hexBinary = DatatypeConverter.printHexBinary(bytes);
+//            log.info("PH70数据上报16进制64解密：{}",hexBinary);
+            log.info("post开始");
+            UsrDemo.httpPostExample();
+            log.info("post结束");
+//            log.info("get开始");
+//            UsrDemo.httpGetExample();
+//            log.info("post结束");
+            log.info("下发成功");
             //7E 0102 0006 0864515065974661 001A 086451506597 38 7E
             /**
              * 7E//:头
