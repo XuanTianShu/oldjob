@@ -180,7 +180,7 @@
         where goods_id = #{goodsId}
     </select>
 
-    <select id="selectLeaseOrder" resultType="java.lang.String">
+    <select id="selectDeviceNumber" resultType="java.lang.String">
         select device_number from device where user_id = #{userId}
     </select>
 
@@ -225,6 +225,9 @@
         <include refid="selectDevice"/>
         where user_id = #{userId}
         and (device_number=#{numberOrAddress} or device_address=#{numberOrAddress})
+    </select>
+    <select id="selectDeviceNumberByHospitalId" resultType="java.lang.String">
+        select device_number from device where hospital_id=#{hospitalId}
     </select>
 
 

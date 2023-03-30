@@ -2,6 +2,7 @@ package com.yuepei.system.domain.vo;
 
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public class FeedbackInfoVo {
     private List<String> feedbackUrl;
 
     /** 意见反馈时间 */
-    private String feedbackTime;
+    private Date feedbackTime;
 
     /** 意见反馈状态 */
     private Integer status;
