@@ -234,7 +234,11 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         if (hospitalUser==null){
             return null;
         }
-        List<String> numberList = hospitalDeviceMapper.selectLeaseOrder(hospitalUser.getHospitalId());
+        List<String> numberList = new ArrayList<>();
+        List<Device> devices = hospitalDeviceMapper.selectDeviceByHospitalId(hospitalUser.getHospitalId());
+        devices.stream().forEach(map->{
+            numberList.add(map.getDeviceNumber());
+        });
         List<UserLeaseOrder> leaseOrders = new ArrayList<>();
         if (!orderNumber.equals("")){
             List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(orderNumber);
@@ -243,9 +247,10 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 leaseOrders.addAll(collect);
             });
         }else {
-
-            List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrder(numberList);
-            leaseOrders.addAll(userLeaseOrders);
+            if (numberList.size()!=0){
+                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrder(numberList);
+                leaseOrders.addAll(userLeaseOrders);
+            }
         }
         List<UserLeaseOrderVo> userLeaseOrderList = leaseOrders.stream().map(a -> {
             UserLeaseOrderVo b = new UserLeaseOrderVo();

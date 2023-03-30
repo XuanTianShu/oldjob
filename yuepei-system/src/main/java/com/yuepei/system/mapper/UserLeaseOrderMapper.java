@@ -94,7 +94,7 @@ public interface UserLeaseOrderMapper {
      */
     List<UserLeaseOrder> leaseOrderList(LeaseOrderVO leaseOrderVO);
 
-    List<UserLeaseOrder> selectUserLeaseOrder(List<String> deviceNumber);
+    List<UserLeaseOrder> selectUserLeaseOrder(@Param("deviceNumber") List<String> deviceNumber);
 
     UserLeaseOrder selectLeaseOrderDetails(@Param("orderNumber") String orderNumber);
 
@@ -116,9 +116,13 @@ public interface UserLeaseOrderMapper {
 
     List<UserLeaseOrder> selectUserLeaseOrderByOrderNumber(String orderNumber);
 
+    List<UserLeaseOrder> selectUserLeaseOrderByDevice(@Param("deviceNumber") String deviceNumber);
+
     List<UserOrderVO> selectUserOrderDepositList(@Param("openid") String openid);
 
-    UserLeaseOrder selectOrderByDeviceNumberAndChoose(@Param("deviceNumber") String deviceNumber, @Param("substring1") String substring1);
+    UserLeaseOrder selectOrderByDeviceNumberAndChoose(@Param("substring1") String substring1);
 
     UserLeaseOrder selectUserLeaseOrderByOpenId(@Param("orderNumber") String orderNumber);
+
+    UserLeaseOrder selectOrderByDeviceNumber(@Param("substring1") String substring1);
 }

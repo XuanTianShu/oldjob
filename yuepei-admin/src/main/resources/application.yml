@@ -161,5 +161,6 @@ wechat:
 
 
 coupon:
-  prefix: userCouon_
+  prefix: userCoupon_
   order: order_
+  coin: JYB_

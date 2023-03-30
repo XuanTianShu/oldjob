@@ -7,6 +7,11 @@
     <resultMap type="UserLeaseOrder" id="UserLeaseOrderResult">
         <result property="id"    column="id"    />
         <result property="openid"    column="openid"    />
+        <result property="outTradeNo" column="out_trade_no"/>
+        <result property="deviceRule" column="device_rule"/>
+        <result property="timePrice" column="time_price"/>
+        <result property="fixedPrice" column="fixed_price"/>
+        <result property="depositNumber" column="deposit_number"/>
         <result property="orderNumber"    column="order_number"    />
         <result property="deviceNumber"    column="device_number"    />
         <result property="deviceType"    column="device_type"    />
@@ -109,6 +114,7 @@
     <select id="leaseOrderList" parameterType="LeaseOrderVO" resultMap="LeaseOrderResult">
         <include refid="selectLeaseOrderVO"/>
         <where>
+            and lo.is_valid = 1
             <if test="orderNumber != null  and orderNumber != ''"> and lo.order_number = #{orderNumber}</if>
             <if test="deviceNumber != null  and deviceNumber != ''"> and lo.device_number = #{deviceNumber}</if>
             <if test="deviceType != null  and deviceType != ''"> and lo.device_type = #{deviceType}</if>
@@ -150,12 +156,13 @@
         a.`lease_time`,a.`lease_address`,a.`restore_time`,a.`restore_address`,a.`price`,
         a.`investorProportion`,a.`hospitalProportion`,a.`agentProportion`,a.`platformProportion`,
         a.`pay_type`,a.`net_amount`,a.`coupon_price`,a.`status`,a.`play_time`,a.`choose`,a.`deposit`,
-        a.`child`,a.`create_time`,a.`deposit_number`,b.rule,d.`device_mac`,d.`rows`,d.`device_address`
-        FROM user_lease_order a,device_rule b,device d
+        a.`child`,a.`create_time`,a.`deposit_number`,b.rule,d.`device_mac`,d.`rows`,d.`device_address`,
+        a.is_valid
+        FROM user_lease_order a
+        LEFT JOIN device_rule b ON a.`device_number` =  b.`device_number`
+        INNER JOIN device d ON d.`device_number` = a.`device_number`
         <where>
-            a.openid = #{openid}
-            and a.device_number = b.device_number
-            and d.device_number = a.device_number
+            a.openid = #{openid} and a.is_valid = 1
             <if test="status != null">and a.status = #{status}</if>
         </where>
     </select>
@@ -268,6 +275,7 @@
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="child != null">child = #{child},</if>
             <if test="choose != null">choose = #{choose},</if>
+            <if test="outTradeNo != null">out_trade_no = #{outTradeNo},</if>
             <if test="investorProportion != null">investorProportion = #{investorProportion},</if>
             <if test="hospitalProportion != null">hospitalProportion = #{hospitalProportion},</if>
             <if test="agentProportion != null">agentProportion = #{agentProportion},</if>
@@ -291,8 +299,8 @@
     <select id="selectUserLeaseOrder" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where device_number in
-        <foreach item="device_number" collection="list" index="index" open="(" separator="," close=")">
-            #{device_number}
+        <foreach item="deviceNumber" collection="deviceNumber" index="index" open="(" separator="," close=")">
+            #{deviceNumber}
         </foreach>
     </select>
     <select id="selectLeaseOrderDetails" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
@@ -311,16 +319,17 @@
     </select>
 
     <select id="selectDayOrder" resultType="com.yuepei.system.domain.vo.OrderSumAndMoneyVO">
-        SELECT (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= lease_time AND `status` = 2) AS `todayOrderNum`,
-        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= create_time AND `status` = 2) AS todayOrderMoney,
-        (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= lease_time AND `status` = 2) AS `sevenDayOrderNum`,
-        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= create_time AND `status` = 2) AS sevenDayOrderMoney,
-        (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= lease_time AND `status` = 2) AS thirtyDayOrderNum,
-        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= create_time AND `status` = 2) AS thirtyDayOrderMoney
+        SELECT (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1) AS `todayOrderNum`,
+        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1) AS todayOrderMoney,
+        (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1) AS `sevenDayOrderNum`,
+        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1) AS sevenDayOrderMoney,
+        (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1) AS thirtyDayOrderNum,
+        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1) AS thirtyDayOrderMoney
     </select>
     <select id="selectConditionOrder" resultType="com.yuepei.system.domain.vo.ConditionOrderVO">
         SELECT (SELECT IFNULL(SUM(net_amount),0) FROM user_lease_order
             <where>
+                and is_valid = 1
                 <if test="deviceNumber != null  and deviceNumber != ''"> and device_number = #{deviceNumber}</if>
                 <if test="payType != null  and payType != ''"> and pay_type = #{payType}</if>
                 <if test="status != null  and status != ''"> and status = #{status}</if>
@@ -333,6 +342,7 @@
         INNER JOIN agent_hospital AS ah ON ah.`hospital_id` = h.`hospital_id`
         INNER JOIN sys_user AS su ON su.`user_id` = ah.`agent_id`
             <where>
+                and lo.is_valid = 1
                 <if test="deviceNumber != null  and deviceNumber != ''"> and lo.device_number = #{deviceNumber}</if>
                 <if test="payType != null  and payType != ''"> and lo.pay_type = #{payType}</if>
                 <if test="status != null  and status != ''"> and lo.status = #{status}</if>
@@ -350,6 +360,10 @@
     <select id="selectUserLeaseOrderByOrderNumber" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where CONCAT(IFNULL(order_number,''),IFNULL(device_number,'')) LIKE concat('%',#{orderNumber},'%')
+    </select>
+    <select id="selectUserLeaseOrderByDevice" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where device_number =#{deviceNumber}
     </select>
     <select id="selectUserOrderByDeviceNumber" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM user_lease_order WHERE device_number = #{deviceNumber} and
@@ -373,12 +387,18 @@
         SELECT `id`,`openid`,`order_number`,`device_number`,`out_trade_no`,`device_rule`,`device_type`,`lease_time`,`lease_address`,
                `restore_time`,`restore_address`,`time_price`,`fixed_price`,`price`,`investorProportion`,`hospitalProportion`,`agentProportion`,
                `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
-        FROM `user_lease_order` where device_number = #{deviceNumber} and choose = #{substring1} and `status` = 0
+        FROM `user_lease_order` where child = #{substring1} and `status` = 0
     </select>
     <select id="selectUserLeaseOrderByOpenId" resultMap="UserLeaseOrderResult">
         SELECT `id`,`openid`,`order_number`,`device_number`,`out_trade_no`,`device_rule`,`device_type`,`lease_time`,`lease_address`,
                `restore_time`,`restore_address`,`time_price`,`fixed_price`,`price`,`investorProportion`,`hospitalProportion`,`agentProportion`,
                `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
         FROM `user_lease_order` where order_number = #{orderNumber}
+    </select>
+    <select id="selectOrderByDeviceNumber" resultMap="UserLeaseOrderResult">
+        SELECT `id`,`openid`,`order_number`,`device_number`,`out_trade_no`,`device_rule`,`device_type`,`lease_time`,`lease_address`,
+               `restore_time`,`restore_address`,`time_price`,`fixed_price`,`price`,`investorProportion`,`hospitalProportion`,`agentProportion`,
+               `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
+        FROM `user_lease_order` where child = #{substring1} and `status` = 0 and is_valid = 1
     </select>
 </mapper>
