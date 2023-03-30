@@ -1,9 +1,13 @@
 package com.yuepei.web.hospital.controller;
 
+import com.yuepei.common.core.controller.BaseController;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
-import com.yuepei.utils.TokenUtils;
+import com.yuepei.common.core.page.TableDataInfo;
+import com.yuepei.framework.web.service.SysLoginService;
+import com.yuepei.system.domain.vo.DeviceDetailsVo;
 import com.yuepei.system.service.HospitalDeviceService;
+import com.yuepei.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +19,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @RestController
 @RequestMapping("/hospital/user/info")
-public class HospitalDeviceController {
-/*
+public class HospitalDeviceController extends BaseController {
 
     @Autowired
     private TokenUtils tokenUtils;
@@ -24,6 +27,10 @@ public class HospitalDeviceController {
     @Autowired
     private HospitalDeviceService hospitalDeviceService;
 
+    @Autowired
+    private SysLoginService loginService;
+
+    /**
     */
 /**根据账号密码登录*//*
 
@@ -39,9 +46,10 @@ public class HospitalDeviceController {
     * *//*
 
     @GetMapping("/selectDeviceType")
-    public AjaxResult selectHospital(HttpServletRequest request){
+    public TableDataInfo selectHospital(HttpServletRequest request){
+        startPage();
         SysUser analysis = tokenUtils.analysis(request);
-        return AjaxResult.success(hospitalDeviceService.selectDeviceType(analysis.getUserId()));
+        return getDataTable(hospitalDeviceService.selectDeviceType(analysis.getUserId()));
     }
 
     */

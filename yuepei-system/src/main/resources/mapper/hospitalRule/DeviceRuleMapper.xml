@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.DeviceRuleMapper">
 
-    <resultMap type="com.yuepei.system.domain.DeviceRule" id="DeviceRuleResult">
+    <resultMap type="DeviceRule" id="DeviceRuleResult">
         <result property="id"    column="id"    />
         <result property="deviceTypeId"    column="device_type_id"    />
         <result property="title"    column="title"    />
@@ -18,7 +18,7 @@
         select id, device_type_id, title, rule, depict, hospital_id, device_number from device_rule
     </sql>
 
-    <select id="selectDeviceRuleList" parameterType="com.yuepei.system.domain.DeviceRule" resultMap="DeviceRuleResult">
+    <select id="selectDeviceRuleList" parameterType="DeviceRule" resultMap="DeviceRuleResult">
         <include refid="selectDeviceRuleVo"/>
         <where>
             <if test="deviceTypeId != null "> and device_type_id = #{deviceTypeId}</if>
@@ -29,16 +29,16 @@
             <if test="deviceNumber != null and deviceNumber != ''"> and device_number = #{deviceNumber}</if>
         </where>
     </select>
-    <select id="selectHospitalRule" parameterType="com.yuepei.system.domain.DeviceRule" resultMap="DeviceRuleResult">
+    <select id="selectHospitalRule" parameterType="DeviceRule" resultMap="DeviceRuleResult">
         <include refid="selectDeviceRuleVo"></include>
         where hospital_id = #{id}
     </select>
-    <select id="selectDeviceRuleByDeviceNumber" parameterType="Long" resultMap="DeviceRuleResult">
+    <select id="selectDeviceRuleByDeviceNumber" parameterType="String" resultMap="DeviceRuleResult">
         <include refid="selectDeviceRuleVo"/>
         where device_number = #{deviceNumber}
     </select>
 
-    <insert id="insertDeviceRule" parameterType="com.yuepei.system.domain.DeviceRule" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertDeviceRule" parameterType="DeviceRule" useGeneratedKeys="true" keyProperty="id">
         insert into device_rule
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="deviceTypeId != null">device_type_id,</if>
@@ -58,7 +58,7 @@
         </trim>
     </insert>
 
-    <update id="updateDeviceRule" parameterType="com.yuepei.system.domain.DeviceRule">
+    <update id="updateDeviceRule" parameterType="DeviceRule">
         update device_rule
         <trim prefix="SET" suffixOverrides=",">
             <if test="deviceTypeId != null">device_type_id = #{deviceTypeId},</if>

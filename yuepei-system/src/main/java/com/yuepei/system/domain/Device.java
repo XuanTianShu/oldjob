@@ -4,6 +4,7 @@ import com.yuepei.common.annotation.Excel;
 import com.yuepei.common.core.domain.BaseEntity;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -93,9 +94,19 @@ public class Device extends BaseEntity {
     @Excel(name = "设备状态")
     private Long status;
 
-    private List<DeviceRule> deviceRules;
+    /** 设备电量 */
+    @Excel(name = "设备电量")
+    private Long electric;
+
+    /** 预警值 */
+    @Excel(name = "预警值")
+    private Long electricEarly;
 
     private String content;
+
+    private String investorId;
+
+    private List<DeviceRule> deviceRules;
 
     private Long userId;
 }

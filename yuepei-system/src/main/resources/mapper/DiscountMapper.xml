@@ -4,80 +4,115 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.DiscountMapper">
 
-    <resultMap type="com.yuepei.system.domain.Discount" id="DiscountResult">
+    <resultMap type="Discount" id="DiscountResult">
         <result property="id"    column="id"    />
-        <result property="hospitalId"    column="hospital_id"    />
+        <result property="discountName"    column="discount_name"    />
         <result property="money"    column="money"    />
-        <result property="threshold"    column="threshold"    />
+        <result property="thresholdId"    column="threshold_id"    />
+        <result property="period"    column="period"    />
+        <result property="status"    column="status"    />
         <result property="sentNum"    column="sent_num"    />
         <result property="unbilledNum"    column="unbilled_num"    />
-        <result property="discountType"    column="discount_type"    />
+        <result property="isJyb"    column="is_jyb"    />
+        <result property="isStatus"    column="is_status"    />
+        <result property="isStatus"    column="is_status"    />
         <result property="createTime"    column="create_time"    />
-        <result property="endTime"    column="end_time"    />
-        <result property="status"    column="status"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="integral"    column="integral"    />
+        <result property="thresholdName"         column="threshold_name"/>
+        <result property="hospitalId" column="hospital_id"/>
+        <result property="hospitalName" column="hospital_name"/>
+        <result property="updateTime"    column="update_time"    />
     </resultMap>
 
     <sql id="selectDiscountVo">
-        select id, hospital_id, money, threshold, sent_num, unbilled_num, discount_type, create_time, end_time, status from discount
+        <!--select id, discount_name, money, threshold_id, period, status, sent_num, unbilled_num, is_status, create_time, update_time from discount-->
+        SELECT d.id, d.discount_name, d.money, d.threshold_id, d.period, d.status, IFNULL(dt.`threshold_name`,'无') AS threshold_name,d.hospital_id,
+        d.sent_num, d.unbilled_num, d.is_status, d.create_time,d.integral,d.is_jyb, d.update_time FROM discount AS d
+        LEFT JOIN `discount_threshold` AS dt ON dt.`Id` = d.`threshold_id`
+    </sql>
+    <sql id="selectJYBVo">
+        SELECT d.id, d.discount_name, d.money, d.threshold_id, d.period, d.status,d.hospital_id,h.`hospital_name`,
+               d.sent_num, d.unbilled_num, d.is_status, d.create_time,d.integral,d.is_jyb, d.update_time FROM discount AS d
+        INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
     </sql>
 
-    <select id="selectDiscountList" parameterType="com.yuepei.system.domain.Discount" resultMap="DiscountResult">
-        <include refid="selectDiscountVo"/>
+    <select id="selectDiscountList" parameterType="Discount" resultMap="DiscountResult">
+        <if test="isJyb == 1">
+            <include refid="selectJYBVo"/>
+        </if>
+        <if test="isJyb == 2">
+            <include refid="selectDiscountVo"/>
+        </if>
         <where>
-            <if test="hospitalId != null "> and hospital_id = #{hospitalId}</if>
-            <if test="money != null "> and money = #{money}</if>
-            <if test="threshold != null "> and threshold = #{threshold}</if>
-            <if test="sentNum != null "> and sent_num = #{sentNum}</if>
-            <if test="unbilledNum != null "> and unbilled_num = #{unbilledNum}</if>
-            <if test="discountType != null "> and discount_type = #{discountType}</if>
-            <if test="endTime != null "> and end_time = #{endTime}</if>
-            <if test="status != null "> and status = #{status}</if>
+            <if test="discountName != null  and discountName != ''"> and d.discount_name like concat('%', #{discountName}, '%')</if>
+            <if test="money != null "> and d.money = #{money}</if>
+            <if test="thresholdId != null "> and d.threshold_id = #{thresholdId}</if>
+            <if test="period != null "> and d.period = #{period}</if>
+            <if test="status != null "> and d.status = #{status}</if>
+            <if test="sentNum != null "> and d.sent_num = #{sentNum}</if>
+            <if test="isJyb != null "> and d.is_jyb = #{isJyb}</if>
+            <if test="unbilledNum != null "> and d.unbilled_num = #{unbilledNum}</if>
+            <if test="isStatus != null "> and d.is_status = #{isStatus}</if>
+            <if test="hospitalId != null"> and d.hospital_id = #{hospitalId}</if>
         </where>
     </select>
 
     <select id="selectDiscountById" parameterType="Long" resultMap="DiscountResult">
         <include refid="selectDiscountVo"/>
-        where id = #{id}
+        where d.id = #{id}
     </select>
 
-    <insert id="insertDiscount" parameterType="com.yuepei.system.domain.Discount" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertDiscount" parameterType="Discount" useGeneratedKeys="true" keyProperty="id">
         insert into discount
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="hospitalId != null">hospital_id,</if>
+            <if test="discountName != null">discount_name,</if>
             <if test="money != null">money,</if>
-            <if test="threshold != null">threshold,</if>
+            <if test="thresholdId != null">threshold_id,</if>
+            <if test="period != null">period,</if>
+            <if test="status != null">status,</if>
             <if test="sentNum != null">sent_num,</if>
             <if test="unbilledNum != null">unbilled_num,</if>
-            <if test="discountType != null">discount_type,</if>
+            <if test="isStatus != null">is_status,</if>
             <if test="createTime != null">create_time,</if>
-            <if test="endTime != null">end_time,</if>
-            <if test="status != null">status,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="isJyb != null">is_jyb,</if>
+            <if test="integral != null">integral,</if>
+            <if test="hospitalId != null">hospital_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="hospitalId != null">#{hospitalId},</if>
+            <if test="discountName != null">#{discountName},</if>
             <if test="money != null">#{money},</if>
-            <if test="threshold != null">#{threshold},</if>
+            <if test="thresholdId != null">#{thresholdId},</if>
+            <if test="period != null">#{period},</if>
+            <if test="status != null">#{status},</if>
             <if test="sentNum != null">#{sentNum},</if>
             <if test="unbilledNum != null">#{unbilledNum},</if>
-            <if test="discountType != null">#{discountType},</if>
+            <if test="isStatus != null">#{isStatus},</if>
             <if test="createTime != null">#{createTime},</if>
-            <if test="endTime != null">#{endTime},</if>
-            <if test="status != null">#{status},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="isJyb != null">#{isJyb},</if>
+            <if test="integral != null">#{integral},</if>
+            <if test="hospitalId != null">#{hospitalId},</if>
         </trim>
     </insert>
 
-    <update id="updateDiscount" parameterType="com.yuepei.system.domain.Discount">
+    <update id="updateDiscount" parameterType="Discount">
         update discount
         <trim prefix="SET" suffixOverrides=",">
-            <if test="hospitalId != null">hospital_id = #{hospitalId},</if>
+            <if test="discountName != null">discount_name = #{discountName},</if>
             <if test="money != null">money = #{money},</if>
-            <if test="threshold != null">threshold = #{threshold},</if>
+            <if test="thresholdId != null">threshold_id = #{thresholdId},</if>
+            <if test="period != null">period = #{period},</if>
+            <if test="status != null">status = #{status},</if>
             <if test="sentNum != null">sent_num = #{sentNum},</if>
             <if test="unbilledNum != null">unbilled_num = #{unbilledNum},</if>
-            <if test="discountType != null">discount_type = #{discountType},</if>
+            <if test="isStatus != null">is_status = #{isStatus},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
-            <if test="endTime != null">end_time = #{endTime},</if>
-            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="isJyb != null">is_jyb = #{isJyb},</if>
+            <if test="integral != null">integral = #{integral},</if>
+            <if test="hospitalId != null">hospital_id = #{hospitalId},</if>
         </trim>
         where id = #{id}
     </update>

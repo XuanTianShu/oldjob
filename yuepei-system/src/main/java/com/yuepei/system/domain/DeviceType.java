@@ -3,6 +3,7 @@ package com.yuepei.system.domain;
 import com.yuepei.common.annotation.Excel;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -42,7 +43,7 @@ public class DeviceType {
     /** 设备类型名称 */
     private String deviceTypeName;
 
-    /** 设备类型押金*/
-    private Long deviceTypeDeposit;
+    /** 设备类型押金 */
+    private BigDecimal deviceTypeDeposit;
 
 }

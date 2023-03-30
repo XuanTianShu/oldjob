@@ -89,6 +89,7 @@ public class DeviceController extends BaseController {
     @GetMapping("/selectDeviceType/{userId}")
     public AjaxResult selectHospital(@PathVariable("userId") Long userId){
         return AjaxResult.success(hospitalDeviceService.selectDeviceType(userId));
+//        return AjaxResult.success(hospitalDeviceService.selectDeviceType(151L));
     }
 
 

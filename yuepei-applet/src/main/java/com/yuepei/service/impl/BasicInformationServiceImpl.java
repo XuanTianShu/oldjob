@@ -67,12 +67,18 @@ public class BasicInformationServiceImpl implements BasicInformationService {
     }
 
     @Override
-    public AjaxResult getCode(String phoneNumber) {
-        SysUser user = sysUserMapper.selectUserByPhoneNumber(phoneNumber);
+    public AjaxResult getCode(String oldPhoneNumber,String newPhoneNumber,SysUser sysUser) {
+        if (oldPhoneNumber != null){
+            int b = sysUserMapper.checkUserOldPhoneNumber(oldPhoneNumber,sysUser.getUserId());
+            if (b < 0){
+                return AjaxResult.error("原手机号不对");
+            }
+        }
+        SysUser user = sysUserMapper.selectUserByPhoneNumber(newPhoneNumber);
         if(StringUtils.isNull(user)){
             String randomNum = aliSMS.getRandomNum(6);
-            redisCache.setCacheObject(phoneNumber, randomNum, 300, TimeUnit.SECONDS);
-            if (aliSMS.sendSmsCode(phoneNumber,randomNum)) {
+            redisCache.setCacheObject(newPhoneNumber, randomNum, 300, TimeUnit.SECONDS);
+            if (aliSMS.sendSmsCode(newPhoneNumber,randomNum)) {
                 return AjaxResult.success();
             }
             return AjaxResult.error();

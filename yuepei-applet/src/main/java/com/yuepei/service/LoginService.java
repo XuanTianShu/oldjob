@@ -33,4 +33,6 @@ import com.yuepei.common.core.domain.entity.SysUser;
 public interface LoginService {
 
     AjaxResult login(String code, SysUser sysUser);
+
+    AjaxResult APPLogin(SysUser sysUser);
 }

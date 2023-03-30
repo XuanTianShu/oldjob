@@ -25,6 +25,7 @@ public class DiscountType extends BaseEntity
     /** 状态 */
     @Excel(name = "状态")
     private Long status;
+    private String discountName;
 
     public void setId(Long id)
     {
@@ -50,9 +51,17 @@ public class DiscountType extends BaseEntity
         this.status = status;
     }
 
-    public Long getStatus()
-    {
+    public Long getStatus() {
         return status;
+    }
+    public void setDiscountName(String discountName)
+    {
+        this.discountName = discountName;
+    }
+
+    public String getDiscountName()
+    {
+        return discountName;
     }
 
     @Override
@@ -61,6 +70,7 @@ public class DiscountType extends BaseEntity
                 .append("id", getId())
                 .append("discountTypeName", getDiscountTypeName())
                 .append("status", getStatus())
+                .append("discountName", getDiscountName())
                 .append("createTime", getCreateTime())
                 .append("updateTime", getUpdateTime())
                 .toString();

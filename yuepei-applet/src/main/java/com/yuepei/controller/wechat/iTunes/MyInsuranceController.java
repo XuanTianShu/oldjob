@@ -1,11 +1,14 @@
 package com.yuepei.controller.wechat.iTunes;
 
+import com.yuepei.common.core.controller.BaseController;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.mapper.UserInsuranceMapper;
 import com.yuepei.system.domain.UserInsurance;
 import com.yuepei.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,7 +44,7 @@ import javax.servlet.http.HttpServletRequest;
  **/
 @RestController
 @RequestMapping("/wechat/user/insurance")
-public class MyInsuranceController {
+public class MyInsuranceController extends BaseController {
 
     @Autowired
     private TokenUtils tokenUtils;
@@ -58,6 +61,12 @@ public class MyInsuranceController {
         }else {
             return AjaxResult.success(userInsuranceMapper.updateUserInsurance(userInsurance));
         }
+    }
+
+    @GetMapping("/selectByUserId")
+    public AjaxResult selectByUserId(HttpServletRequest request){
+        SysUser user = tokenUtils.analysis(request);
+        return AjaxResult.success(userInsuranceMapper.selectUserInsuranceByUserId(user.getUserId()));
     }
 
 }

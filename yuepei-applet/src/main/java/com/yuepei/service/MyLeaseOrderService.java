@@ -1,5 +1,6 @@
 package com.yuepei.service;
 
+import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.ConditionOrderVO;
 import com.yuepei.system.domain.vo.LeaseOrderVO;
@@ -37,7 +38,7 @@ import java.util.List;
 public interface MyLeaseOrderService {
     List<UserLeaseOrder> userLeaseOrder(String openid, Integer status);
 
-    int insertUserLeaseOrder(String openid, String rows, UserLeaseOrder userLeaseOrder);
+    AjaxResult insertUserLeaseOrder(String openid, String rows, UserLeaseOrder userLeaseOrder);
 
     /**
      * 查询租赁订单

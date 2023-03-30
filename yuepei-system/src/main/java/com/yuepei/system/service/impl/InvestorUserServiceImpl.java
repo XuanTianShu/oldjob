@@ -1,5 +1,7 @@
 package com.yuepei.system.service.impl;
 
+import com.yuepei.common.annotation.DataScope;
+import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.utils.DateUtils;
 import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.system.domain.InvestorUser;
@@ -41,9 +43,10 @@ public class InvestorUserServiceImpl implements IInvestorUserService
      * @return 投资人管理
      */
     @Override
-    public List<InvestorUser> selectInvestorUserList(InvestorUser investorUser)
+    @DataScope(deptAlias = "d", userAlias = "u")
+    public List<SysUser> selectInvestorUserList(SysUser user)
     {
-        return investorUserMapper.selectInvestorUserList(investorUser);
+        return investorUserMapper.selectInvestorUserList(user);
     }
 
     /**

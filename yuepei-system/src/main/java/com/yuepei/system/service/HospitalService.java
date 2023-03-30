@@ -1,8 +1,11 @@
 package com.yuepei.system.service;
 
+import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.Hospital;
+import com.yuepei.system.domain.vo.HospitalVO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 　　　　 ┏┓       ┏┓+ +
@@ -80,10 +83,7 @@ public interface HospitalService {
      */
     public int deleteHospitalByHospitalId(Long hospitalId);
 
-    /**
-     * 是否存在该医院
-     * @param hospitalName 医院名称
-     * @return
-     */
-    boolean checkHospitalName(String hospitalName,Long hospitalId);
+    Map<String,Object> queryTreeByDeviceNumber(Device device);
+
+    List<HospitalVO> selectHospitalListVO(HospitalVO hospital);
 }

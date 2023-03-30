@@ -34,10 +34,11 @@
         select id,openid,`sum`,create_time,status from user_integral_detail
         <where>
             openid = #{openid}
-            <if test="status != null">
-                and status = #{status}
+            <if test="userIntegralBalanceDepositVo.status != null">
+                and status = #{userIntegralBalanceDepositVo.status}
             </if>
         </where>
+        order by create_time desc
     </select>
     <select id="selectIntegralDetailList"
             resultType="com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo">
@@ -47,6 +48,7 @@
                 and openid = #{openid}
             </if>
         </where>
+        order by create_time desc
     </select>
 
     <insert id="insertUserIntegralOrder" parameterType="com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo" useGeneratedKeys="true" keyProperty="id">

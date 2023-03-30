@@ -4,20 +4,34 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.HospitalMapper">
 
-    <resultMap type="com.yuepei.system.domain.Hospital" id="HospitalResult">
+    <resultMap type="Hospital" id="HospitalResult">
         <result property="hospitalId"    column="hospital_id"    />
         <result property="hospitalName"    column="hospital_name"    />
-        <result property="hospitalRule" column="hospital_rule"/>
+        <result property="parentId"    column="parent_id"    />
+        <result property="hospitalRule"    column="hospital_rule"    />
+        <result property="proportion" column="proportion"/>
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <resultMap type="com.yuepei.system.domain.vo.HospitalVO" id="HospitalResultVO">
+        <result property="hospitalId"    column="hospital_id"    />
+        <result property="hospitalName"    column="hospital_name"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="proportion" column="proportion"/>
     </resultMap>
 
     <sql id="selectHospitalVo">
-        select hospital_id, hospital_name,hospital_rule from hospital
+        select hospital_id, hospital_name, parent_id, hospital_rule, create_time,proportion, update_time from hospital
     </sql>
 
-    <select id="selectHospitalList" parameterType="com.yuepei.system.domain.Hospital" resultMap="HospitalResult">
+    <select id="selectHospitalList" parameterType="Hospital" resultMap="HospitalResult">
         <include refid="selectHospitalVo"/>
         <where>
+            <if test="hospitalId != null"> and hospital_id = #{hospitalId}</if>
             <if test="hospitalName != null  and hospitalName != ''"> and hospital_name like concat('%', #{hospitalName}, '%')</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="hospitalRule != null  and hospitalRule != ''"> and hospital_rule = #{hospitalRule}</if>
         </where>
     </select>
 
@@ -25,31 +39,65 @@
         <include refid="selectHospitalVo"/>
         where hospital_id = #{hospitalId}
     </select>
+    <select id="selectTreeOne" parameterType="Long" resultMap="HospitalResultVO">
+        SELECT hospital_id,hospital_name,parent_id,proportion FROM hospital
+        WHERE parent_id = #{hospitalId}
+    </select>
+    <select id="selectTree" parameterType="Long" resultMap="HospitalResultVO">
+        SELECT hospital_id,hospital_name,parent_id,proportion FROM hospital
+        WHERE parent_id IN
+        <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
+            #{hospitalId}
+        </foreach>
+    </select>
     <select id="checkHospitalName" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM hospital
         <where>
             <if test="hospitalName != null and hospitalName != ''"> and hospital_name = #{hospitalName}</if>
             <if test="hospitalId != null"> and hospital_id != #{hospitalId}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+        </where>
+    </select>
+    <select id="selectHospitalListVO" parameterType="com.yuepei.system.domain.vo.HospitalVO" resultMap="HospitalResultVO">
+        select hospital_id, hospital_name, parent_id,proportion from hospital
+        <where>
+            <if test="hospitalId != null"> and hospital_id = #{hospitalId}</if>
+            <if test="hospitalName != null  and hospitalName != ''"> and hospital_name like concat('%', #{hospitalName}, '%')</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
         </where>
     </select>
 
-    <insert id="insertHospital" parameterType="com.yuepei.system.domain.Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
+    <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
         insert into hospital
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="hospitalName != null">hospital_name,</if>
-            <if test="hospitalRule != null and hospitalRule != ''">hospital_rule,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="hospitalRule != null">hospital_rule,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="proportion != null">proportion,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="hospitalName != null">#{hospitalName},</if>
-            <if test="hospitalRule != null and hospitalRule != ''">#{hospitalRule},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="hospitalRule != null">#{hospitalRule},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="proportion != null">#{proportion},</if>
         </trim>
     </insert>
 
-    <update id="updateHospital" parameterType="com.yuepei.system.domain.Hospital">
+    <update id="updateHospital" parameterType="Hospital">
         update hospital
         <trim prefix="SET" suffixOverrides=",">
+            <if test="parentId != null">parent_id = #{parentId},</if>
             <if test="hospitalName != null">hospital_name = #{hospitalName},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="hospitalRule != null">hospital_rule = #{hospitalRule},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
             <if test="hospitalRule != null and hospitalRule != ''">hospital_rule = #{hospitalRule},</if>
+            <if test="proportion != null">proportion = #{proportion},</if>
         </trim>
         where hospital_id = #{hospitalId}
     </update>

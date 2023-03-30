@@ -1,7 +1,13 @@
 package com.yuepei.system.mapper;
 
+import com.yuepei.system.domain.Discount;
 import com.yuepei.system.domain.DiscountRecord;
+import com.yuepei.system.domain.DiscountThreshold;
+import com.yuepei.system.domain.vo.DiscountRecordVO;
+import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,10 +29,10 @@ public interface DiscountRecordMapper
     /**
      * 查询优惠券发放记录列表
      *
-     * @param discountRecord 优惠券发放记录
+     * @param discountRecordVO 优惠券发放记录
      * @return 优惠券发放记录集合
      */
-    public List<DiscountRecord> selectDiscountRecordList(DiscountRecord discountRecord);
+    public List<DiscountRecordVO> selectDiscountRecordList(DiscountRecordVO discountRecordVO);
 
     /**
      * 新增优惠券发放记录
@@ -59,4 +65,16 @@ public interface DiscountRecordMapper
      * @return 结果
      */
     public int deleteDiscountRecordByIds(Long[] ids);
+
+    /**
+     * 添加优惠券记录
+     * @param userId
+     * @param userId1
+     * @param discount
+     * @param discountThreshold
+     * @param date
+     */
+    void sendDiscountRecord(@Param("userId") Long userId, @Param("userId1") Long[] userId1,
+                            @Param("discount") Discount discount, @Param("discountThreshold") DiscountThreshold discountThreshold,
+                            @Param("date") Date date);
 }

@@ -34,7 +34,7 @@ public class DiscountController extends BaseController
     /**
      * 查询优惠券列表
      */
-    @PreAuthorize("@ss.hasPermi('system:discount:list')")
+//    @PreAuthorize("@ss.hasPermi('system:discount:list')")
     @GetMapping("/list")
     public TableDataInfo list(Discount discount)
     {

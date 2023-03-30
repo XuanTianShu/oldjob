@@ -67,5 +67,5 @@ public interface DeviceRuleMapper
      */
     List<DeviceRule> selectHospitalRule(Long id);
 
-    DeviceRule selectDeviceRuleByDeviceNumber(Long deviceNumber);
+    DeviceRule selectDeviceRuleByDeviceNumber(String deviceNumber);
 }

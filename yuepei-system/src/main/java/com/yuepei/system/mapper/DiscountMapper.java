@@ -1,6 +1,7 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.Discount;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 

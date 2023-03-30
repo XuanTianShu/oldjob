@@ -37,4 +37,6 @@ public interface UserRefundService {
     AjaxResult userRefund(String openid, String orderNumber);
 
     HashMap<String, String> userRefundCallBack(HttpServletRequest request) throws GeneralSecurityException;
+
+    AjaxResult userDepositRefund(String openid);
 }

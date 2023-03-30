@@ -1,11 +1,16 @@
 package com.yuepei.system.service.impl;
 
+import com.yuepei.system.domain.Discount;
 import com.yuepei.system.domain.DiscountRecord;
+import com.yuepei.system.domain.DiscountThreshold;
+import com.yuepei.system.domain.vo.DiscountRecordVO;
 import com.yuepei.system.mapper.DiscountRecordMapper;
 import com.yuepei.system.service.IDiscountRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,13 +40,13 @@ public class DiscountRecordServiceImpl implements IDiscountRecordService
     /**
      * 查询优惠券发放记录列表
      *
-     * @param discountRecord 优惠券发放记录
+     * @param discountRecordVO 优惠券发放记录
      * @return 优惠券发放记录
      */
     @Override
-    public List<DiscountRecord> selectDiscountRecordList(DiscountRecord discountRecord)
+    public List<DiscountRecordVO> selectDiscountRecordList(DiscountRecordVO discountRecordVO)
     {
-        return discountRecordMapper.selectDiscountRecordList(discountRecord);
+        return discountRecordMapper.selectDiscountRecordList(discountRecordVO);
     }
 
     /**
@@ -90,5 +95,18 @@ public class DiscountRecordServiceImpl implements IDiscountRecordService
     public int deleteDiscountRecordById(Long id)
     {
         return discountRecordMapper.deleteDiscountRecordById(id);
+    }
+
+    /**
+     * 添加优惠券记录
+     * @param userId
+     * @param userId1
+     * @param discount
+     * @param discountThreshold
+     * @param date
+     */
+    @Override
+    public void sendDiscountRecord(Long userId, Long[] userId1, Discount discount, DiscountThreshold discountThreshold, Date date) {
+        discountRecordMapper.sendDiscountRecord(userId,userId1,discount,discountThreshold,date);
     }
 }

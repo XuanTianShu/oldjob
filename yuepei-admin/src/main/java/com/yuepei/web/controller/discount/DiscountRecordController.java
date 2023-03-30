@@ -7,6 +7,7 @@ import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.common.enums.BusinessType;
 import com.yuepei.common.utils.poi.ExcelUtil;
 import com.yuepei.system.domain.DiscountRecord;
+import com.yuepei.system.domain.vo.DiscountRecordVO;
 import com.yuepei.system.service.IDiscountRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,10 +34,10 @@ public class DiscountRecordController extends BaseController
      */
     @PreAuthorize("@ss.hasPermi('system:record:list')")
     @GetMapping("/list")
-    public TableDataInfo list(DiscountRecord discountRecord)
+    public TableDataInfo list(DiscountRecordVO discountRecordVO)
     {
         startPage();
-        List<DiscountRecord> list = discountRecordService.selectDiscountRecordList(discountRecord);
+        List<DiscountRecordVO> list = discountRecordService.selectDiscountRecordList(discountRecordVO);
         return getDataTable(list);
     }
 
@@ -46,10 +47,10 @@ public class DiscountRecordController extends BaseController
     @PreAuthorize("@ss.hasPermi('system:record:export')")
     @Log(title = "优惠券发放记录", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(HttpServletResponse response, DiscountRecord discountRecord)
+    public void export(HttpServletResponse response, DiscountRecordVO discountRecordVO)
     {
-        List<DiscountRecord> list = discountRecordService.selectDiscountRecordList(discountRecord);
-        ExcelUtil<DiscountRecord> util = new ExcelUtil<DiscountRecord>(DiscountRecord.class);
+        List<DiscountRecordVO> list = discountRecordService.selectDiscountRecordList(discountRecordVO);
+        ExcelUtil<DiscountRecordVO> util = new ExcelUtil<DiscountRecordVO>(DiscountRecordVO.class);
         util.exportExcel(response, list, "优惠券发放记录数据");
     }
 

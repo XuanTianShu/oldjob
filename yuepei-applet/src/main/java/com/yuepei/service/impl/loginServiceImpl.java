@@ -12,6 +12,9 @@ import com.yuepei.common.utils.MessageUtils;
 import com.yuepei.common.utils.ServletUtils;
 import com.yuepei.common.utils.StringUtils;
 import com.yuepei.common.utils.ip.IpUtils;
+import com.yuepei.framework.manager.AsyncManager;
+import com.yuepei.framework.manager.factory.AsyncFactory;
+import com.yuepei.framework.security.context.AuthenticationContextHolder;
 import com.yuepei.mapper.LoginMapper;
 import com.yuepei.service.LoginService;
 import com.yuepei.system.mapper.SysUserMapper;
@@ -112,9 +115,30 @@ public class loginServiceImpl implements LoginService {
             sysUser.setOpenid(openid);
             sysUser.setRoleId(2L);
             userService.insertUser(sysUser);
+            //TODO 发放新人优惠券
             SysUser sysUser1 = userMapper.selectUserByOpenid(openid);
             recordLoginInfo(sysUser1.getUserId());
             return ajax.put(Constants.TOKEN, tokenUtils.createToken(sysUser1));
+        }
+    }
+
+    @Override
+    public AjaxResult APPLogin(SysUser sysUser) {
+        AjaxResult ajax = AjaxResult.success();
+        //判断 用户是否存在
+        // 用户验证
+        SysUser sysUserList = userMapper.selectUserByUserName(sysUser.getUserName());
+        if(!StringUtils.isNull(sysUserList)){
+            if ("1".equals(sysUserList.getStatus())){
+                return AjaxResult.error("账号已被封禁");
+            }
+            recordLoginInfo(sysUserList.getUserId());
+            return ajax.put(Constants.TOKEN, tokenUtils.createToken(sysUserList));
+        }else {
+            sysUser.setRoleId(2L);
+            userService.insertUser(sysUser);
+            recordLoginInfo(sysUserList.getUserId());
+            return ajax.put(Constants.TOKEN, tokenUtils.createToken(sysUserList));
         }
     }
 

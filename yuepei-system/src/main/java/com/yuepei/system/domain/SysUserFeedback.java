@@ -72,4 +72,6 @@ public class SysUserFeedback extends BaseEntity {
 
     /**设备图片*/
     private String devicePicture;
+
+    private String deviceAddress;
 }

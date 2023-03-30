@@ -55,7 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<sql id="selectUserVo">
         select u.user_id, u.dept_id, u.user_name, u.balance, u.openid, u.integral, u.nick_name, u.email, u.avatar, u.phone_number, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,u.user_type,u.proportion,u.parent_id,
         d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.status as dept_status,
-        r.role_id, r.role_name, r.role_key,u.proportion, r.role_sort, r.data_scope, r.status as role_status
+        r.role_id, r.role_name, r.role_key,u.proportion, r.role_sort,u.user_type, r.data_scope, r.status as role_status
         from sys_user u
 		    left join sys_dept d on u.dept_id = d.dept_id
 		    left join sys_user_role ur on u.user_id = ur.user_id
@@ -134,6 +134,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		where u.user_name = #{userName} and u.del_flag = '0'
 	</select>
 
+	<select id="selectUserByUser" parameterType="String" resultMap="SysUserResult">
+		<include refid="selectUserVo"/>
+		where u.user_name = #{userName} and u.del_flag = '0' and (user_type='03' or user_type='04' or user_type='05')
+	</select>
+
 	<select id="selectUserByOpenid" parameterType="string" resultMap="SysUserResult">
 		<include refid="selectUserVo"/>
 		where u.openid = #{openid} and u.del_flag = '0'
@@ -160,10 +165,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		select user_id, email from sys_user where email = #{email} and del_flag = '0' limit 1
 	</select>
 
-	<select id="selectWechatUserList" parameterType="com.yuepei.common.core.domain.entity.SysUser" resultMap="SysUserResult">
-		select u.user_id, u.dept_id, u.openid, u.nick_name,u.proportion, u.user_name, u.balance, u.integral, u.email, u.avatar, u.phone_number, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader from sys_user u
+	<select id="selectWechatUserList" parameterType="SysUser" resultMap="SysUserResult">
+		select u.user_id, u.dept_id, u.openid, u.nick_name,u.proportion, u.user_name, u.user_type,
+		       u.balance, u.integral, u.email, u.avatar, u.phone_number, u.sex, u.status,
+		       u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,
+		       d.dept_name, d.leader from sys_user u
 		left join sys_dept d on u.dept_id = d.dept_id
-		where u.del_flag = '0' AND u.openid IS NOT NULL
+		where u.del_flag = '0'
 		<if test="userId != null and userId != 0">
 			AND u.user_id = #{userId}
 		</if>
@@ -190,6 +198,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		</if>
 		<!-- 数据范围过滤 -->
 		${params.dataScope}
+	</select>
+	<select id="getPassword" resultType="com.yuepei.common.core.domain.entity.SysUser">
+		SELECT
+			su.user_id,
+			su.`PASSWORD`
+		FROM
+			sys_user su
+		WHERE
+			su.user_name = #{userName};
+	</select>
+    <select id="checkUserOldPhoneNumber" resultType="java.lang.Integer">
+		SELECT COUNT(1) FROM sys_user WHERE user_id = #{userId} AND phone_number = #{oldPhoneNumber}
 	</select>
 
 	<insert id="insertUser" parameterType="com.yuepei.common.core.domain.entity.SysUser" useGeneratedKeys="true" keyProperty="userId">
@@ -264,6 +284,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="loginDate != null">login_date = #{loginDate},</if>
  			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
  			<if test="remark != null">remark = #{remark},</if>
+ 		    <if test="integral != null">integral = #{integral},</if>
  			update_time = sysdate()
  		</set>
  		where user_id = #{userId}
@@ -304,15 +325,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			#{userId}
         </foreach>
  	</delete>
-	<select id="getPassword" resultType="com.yuepei.common.core.domain.entity.SysUser">
-		SELECT
-			su.user_id,
-			su.`PASSWORD`
-		FROM
-			sys_user su
-		WHERE
-			su.user_name = #{userName};
-	</select>
 	<select id="selectUserByHospital" parameterType="SysUser" resultMap="SysUserResult">
 		select user_id, dept_id, user_name, balance, openid, integral, nick_name, email, avatar, phone_number, password, sex, status, del_flag, login_ip, login_date, create_by, create_time, remark,user_type,proportion,parent_id
 		from sys_user

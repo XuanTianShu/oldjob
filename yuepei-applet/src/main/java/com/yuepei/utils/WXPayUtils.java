@@ -89,6 +89,8 @@ public class WXPayUtils {
 //        new BigDecimal(price).multiply(BigDecimal.valueOf(100)).longValue()
 //        amount.setTotal(new BigDecimal(price).multiply(BigDecimal.valueOf(100)).longValue());
         amount.setTotal(price.longValue());
+//        BigDecimal multiply = new BigDecimal(price).multiply(new BigDecimal(100));
+        amount.setTotal(price.multiply(new BigDecimal(100)).longValue());
         amount.setCurrency("CNY");
         payMap.put("amount", amount);
         HashMap<Object, Object> payerMap = new HashMap<>();

@@ -39,7 +39,7 @@ public interface HospitalDeviceService {
 
     List<String> selectDeviceTypeName(Long userId);
 
-    Map<String,List<HospitalVo>> selectDeviceAddress1(Long hospitalId);
+    Map<String,List<HospitalVO>> selectDeviceAddress1(Long hospitalId);
 
     IndexVo indexPage(Long userId);
 

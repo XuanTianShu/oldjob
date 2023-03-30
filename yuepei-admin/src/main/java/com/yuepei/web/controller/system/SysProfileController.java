@@ -1,5 +1,6 @@
 package com.yuepei.web.controller.system;
 
+import com.yuepei.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,9 +25,11 @@ import com.yuepei.common.utils.file.MimeTypeUtils;
 import com.yuepei.framework.web.service.TokenService;
 import com.yuepei.system.service.ISysUserService;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 个人信息 业务处理
- * 
+ *
  * @author ruoyi
  */
 @RestController
@@ -43,7 +46,7 @@ public class SysProfileController extends BaseController
      * 个人信息
      */
     @GetMapping
-    public AjaxResult profile()
+    public AjaxResult profile(HttpServletRequest request)
     {
         LoginUser loginUser = getLoginUser();
         SysUser user = loginUser.getUser();

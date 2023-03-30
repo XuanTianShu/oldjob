@@ -30,13 +30,14 @@
         where id = #{id}
     </select>
     <select id="selectUserBalanceDetailByOpenid"  parameterType="String" resultMap="UserBalanceDetailResult">
-        select * from user_balance_detail
+        SELECT Id,openid,`sum`,create_time,`status` FROM user_balance_detail
         <where>
             openid = #{openid}
-            <if test="status != null">
-                and status = #{status}
+            <if test="userIntegralBalanceDepositVo.status != null">
+                and status = #{userIntegralBalanceDepositVo.status}
             </if>
         </where>
+        order by create_time desc
     </select>
     <select id="selectBalanceDetailList" resultType="com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo">
         SELECT id,openid,`sum`,create_time AS createTime,`status` FROM user_balance_detail

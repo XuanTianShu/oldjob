@@ -1,6 +1,7 @@
 package com.yuepei.system.service.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
@@ -11,20 +12,26 @@ import com.yuepei.common.utils.bean.BeanValidators;
 import com.yuepei.common.utils.qrCode.QrCodeUtil;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.DeviceRule;
+import com.yuepei.system.domain.DeviceType;
 import com.yuepei.system.domain.pojo.DevicePo;
 import com.yuepei.system.domain.vo.DeviceVO;
 import com.yuepei.system.domain.vo.HospitalRuleVO;
+import com.yuepei.system.mapper.DeviceInvestorMapper;
 import com.yuepei.system.mapper.DeviceMapper;
 import com.yuepei.system.mapper.DeviceTypeMapper;
+import com.yuepei.system.mapper.InvestorUserMapper;
 import com.yuepei.system.service.DeviceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import javax.validation.Validator;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -62,12 +69,18 @@ public class DeviceServiceImpl implements DeviceService {
     @Autowired
     private DeviceMapper deviceMapper;
 
+    @Autowired
+    private DeviceTypeMapper deviceTypeMapper;
+
 
     @Value("${yuepei.profile}")
     private String profile;
 
     @Autowired
     protected Validator validator;
+
+    @Autowired
+    private DeviceInvestorMapper deviceInvestorMapper;
 
     /**
      * 查询设备
@@ -102,6 +115,11 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public AjaxResult insertDevice(Device device)
     {
+        Long[] longs = new Long[]{};
+        JSONArray objects = JSON.parseArray(device.getInvestorId());
+        List<Long> list = objects.toJavaList(Long.class);
+        deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
+        deviceInvestorMapper.insert(list.toArray(longs),device.getDeviceNumber());
         try{
             //二维码是否跳转小程序暂定
             String enCode = QrCodeUtil.enCode(device.getDeviceNumber(),"https://www.yp10000.com/"+"?deviceNumber="+device.getDeviceNumber(), profile, true);
@@ -203,9 +221,15 @@ public class DeviceServiceImpl implements DeviceService {
      * @param device 设备
      * @return 结果
      */
+    @Transactional
     @Override
     public int updateDevice(Device device)
     {
+        Long[] longs = new Long[]{};
+        JSONArray objects = JSON.parseArray(device.getInvestorId());
+        List<Long> list = objects.toJavaList(Long.class);
+        int i = deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
+        int insert = deviceInvestorMapper.insert(list.toArray(longs), device.getDeviceNumber());
         return deviceMapper.updateDevice(device);
     }
 
@@ -215,9 +239,12 @@ public class DeviceServiceImpl implements DeviceService {
      * @param deviceIds 需要删除的设备主键
      * @return 结果
      */
+    @Transactional
     @Override
     public int deleteDeviceByDeviceIds(Long[] deviceIds)
     {
+        List<String> list = deviceMapper.selectDeviceByDeviceIds(deviceIds);
+        deviceInvestorMapper.deleteByInvestorIds(list);
         return deviceMapper.deleteDeviceByDeviceIds(deviceIds);
     }
 
@@ -227,9 +254,12 @@ public class DeviceServiceImpl implements DeviceService {
      * @param deviceId 设备主键
      * @return 结果
      */
+    @Transactional
     @Override
     public int deleteDeviceByDeviceId(Long deviceId)
     {
+        Device device = deviceMapper.selectDeviceByDeviceId(deviceId);
+        deviceInvestorMapper.deleteByInvestorId(device.getDeviceNumber());
         return deviceMapper.deleteDeviceByDeviceId(deviceId);
     }
 
@@ -241,8 +271,15 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public DeviceVO selectDeviceInfoByDeviceNumber(String deviceNumber) {
         DeviceVO device = deviceMapper.selectDeviceInfoByDeviceNumber(deviceNumber);
-        List<HospitalRuleVO> deviceRules = JSON.parseArray(device.getHospitalRule(), HospitalRuleVO.class);
-        device.setDeviceRules(deviceRules);
+        if (device.getExists() > 0){
+            device.setExists(1);
+        }else {
+            device.setExists(0);
+        }
+        if (device.getRule() != null){
+            List<HospitalRuleVO> deviceRules = JSON.parseArray(device.getRule(), HospitalRuleVO.class);
+            device.setDeviceRules(deviceRules);
+        }
         return device;
     }
 

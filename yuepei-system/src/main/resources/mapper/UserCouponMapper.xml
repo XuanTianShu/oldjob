@@ -80,8 +80,14 @@
             <if test="couponStartTime != null">coupon_start_time = #{couponStartTime},</if>
             <if test="couponEndTime != null">coupon_end_time = #{couponEndTime},</if>
             <if test="couponCreateTime != null">coupon_create_time = #{couponCreateTime},</if>
+            <if test="status != null">`status` = #{status},</if>
         </trim>
         where id = #{id}
+    </update>
+    <update id="batchUpdateUserCoupon">
+        UPDATE `user_discount`
+        SET `status` = '2'
+        WHERE DATE(expire_time) &lt;= CURDATE() AND user_id = #{userId};
     </update>
 
     <delete id="deleteUserCouponById" parameterType="Long">

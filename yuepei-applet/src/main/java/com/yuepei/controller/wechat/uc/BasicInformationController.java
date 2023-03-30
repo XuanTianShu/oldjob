@@ -6,6 +6,7 @@ import com.yuepei.service.BasicInformationService;
 import com.yuepei.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,9 +56,10 @@ public class BasicInformationController {
     }
 
 
-    @GetMapping("/getCode")
-    public AjaxResult getCode(String phoneNumber){
-        return basicInformationService.getCode(phoneNumber);
+    @PostMapping("/getCode")
+    public AjaxResult getCode(String oldPhoneNumber,String newPhoneNumber,HttpServletRequest request){
+        SysUser analysis = tokenUtils.analysis(request);
+        return basicInformationService.getCode(oldPhoneNumber,newPhoneNumber,analysis);
     }
 
 

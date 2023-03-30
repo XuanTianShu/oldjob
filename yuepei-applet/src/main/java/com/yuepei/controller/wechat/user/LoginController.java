@@ -2,11 +2,13 @@ package com.yuepei.controller.wechat.user;
 import com.yuepei.common.constant.Constants;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.common.core.domain.model.LoginBody;
 import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.service.LoginService;
 import com.yuepei.system.mapper.SysUserMapper;
 import com.yuepei.system.service.HospitalDeviceService;
 import com.yuepei.utils.TokenUtils;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -67,6 +69,7 @@ public class LoginController {
     private AjaxResult loginHospitalPort(@RequestParam("userName")String userName,
                                          @RequestParam("password")String password){
 //        AjaxResult ajax = new AjaxResult();
+        AjaxResult ajax = AjaxResult.success();
         //得到用户密码
         SysUser users = sysUserMapper.getPassword(userName);
         if(users==null||"".equals(users)){

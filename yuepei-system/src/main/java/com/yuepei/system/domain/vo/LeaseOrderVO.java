@@ -64,6 +64,24 @@ public class LeaseOrderVO extends BaseEntity {
     /** 租赁时长 */
     private String playTime;
 
+    /** 支付流水号 */
     private String outTradeNo;
+
+    /** 代理商名称 */
+    private String agentName;
+
+    private Long investorProportion;
+
+    private Long hospitalProportion;
+
+    private Long agentProportion;
+
+    private Long platformProportion;
+
+    private Long choose;
+
+    private String child;
+
+    private String phoneNumber;
 
 }

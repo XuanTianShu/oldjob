@@ -6,26 +6,80 @@
 
     <resultMap type="com.yuepei.system.domain.DiscountRecord" id="DiscountRecordResult">
         <result property="id"    column="Id"    />
+        <result property="issuer"    column="issuer"    />
         <result property="userid"    column="userId"    />
-        <result property="discountTypeName"    column="discount_type_name"    />
         <result property="price"    column="price"    />
         <result property="threshold"    column="threshold"    />
+        <result property="status"       column="status"/>
+        <result property="grantTime"    column="grant_time"    />
+    </resultMap>
+
+    <resultMap id="DiscountRecordVOResult" type="com.yuepei.system.domain.vo.DiscountRecordVO">
+        <result property="sNickName" column="sNickName"/>
+        <result property="hospitalName" column="hospitalName"/>
+        <result property="uNickName" column="uNickName"/>
+        <result property="price" column="price"/>
+        <result property="threshold" column="threshold"/>
+        <result property="status" column="status"/>
+        <result property="grantTime" column="grant_time"/>
+        <result property="integral" column="integral"/>
+        <result property="isJyb" column="is_jyb"/>
+        <result property="status"       column="status"/>
         <result property="grantTime"    column="grant_time"    />
     </resultMap>
 
     <sql id="selectDiscountRecordVo">
-        select Id, userId, discount_type_name, price, threshold, grant_time from discount_record
+        SELECT su.`nick_name` AS uNickName,dr.`price`,ifnull(dr.`threshold`,'无') as threshold,
+               dr.`integral`,dr.`hospitalName`,dr.`is_jyb`,dr.`grant_time`
+        FROM `discount_record` AS dr
+                 INNER JOIN sys_user AS su ON su.`user_id` = dr.`userId`
     </sql>
 
-    <select id="selectDiscountRecordList" parameterType="com.yuepei.system.domain.DiscountRecord" resultMap="DiscountRecordResult">
-        <include refid="selectDiscountRecordVo"/>
-        <where>
-            <if test="userid != null "> and userId = #{userid}</if>
-            <if test="discountTypeName != null  and discountTypeName != ''"> and discount_type_name like concat('%', #{discountTypeName}, '%')</if>
-            <if test="price != null "> and price = #{price}</if>
-            <if test="threshold != null  and threshold != ''"> and threshold = #{threshold}</if>
-            <if test="grantTime != null "> and grant_time = #{grantTime}</if>
-        </where>
+    <sql id="DiscountRecordVo">
+        select s.`nick_name` as sNickName,ifnull(h.`hospital_name`,'无') as hospitalName,su.`nick_name` as uNickName,
+               dr.`price`,dr.`threshold`,dr.`status`,dr.`grant_time`,dr.integral,dr.is_jyb
+        from `discount_record` as dr
+                 inner join sys_user as su on dr.`userId` = su.`user_id`
+                 inner join sys_user as s on s.`user_id` = dr.`issuer`
+                 inner join hospital_user as hu on hu.`user_name` = s.`user_name`
+                 left join hospital as h on h.`hospital_id` = hu.`hospital_id`
+    </sql>
+
+    <select id="selectDiscountRecordList" parameterType="com.yuepei.system.domain.vo.DiscountRecordVO" resultMap="DiscountRecordVOResult">
+        <if test="isJyb == 1">
+            <include refid="selectDiscountRecordVo"/>
+            <where>
+                <if test="isJyb != null">
+                    and dr.is_jyb = #{isJyb}
+                </if>
+                <if test="uNickName != null and uNickName != ''">
+                    and su.`nick_name` like concat('%', #{uNickName}, '%')
+                </if>
+                <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                    and date_format(dr.grant_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+                </if>
+                <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                    and date_format(dr.grant_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+                </if>
+            </where>
+        </if>
+        <if test="isJyb == 2">
+            <include refid="DiscountRecordVo"/>
+            <where>
+                <if test="isJyb != null">
+                    and dr.is_jyb = #{isJyb}
+                </if>
+                <if test="uNickName != null and uNickName != ''">
+                    and su.`nick_name` like concat('%', #{uNickName}, '%')
+                </if>
+                <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                    and date_format(dr.grant_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+                </if>
+                <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                    and date_format(dr.grant_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+                </if>
+            </where>
+        </if>
     </select>
 
     <select id="selectDiscountRecordById" parameterType="Long" resultMap="DiscountRecordResult">
@@ -36,29 +90,49 @@
     <insert id="insertDiscountRecord" parameterType="com.yuepei.system.domain.DiscountRecord" useGeneratedKeys="true" keyProperty="id">
         insert into discount_record
         <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="issuer != null">issuer,</if>
             <if test="userid != null">userId,</if>
-            <if test="discountTypeName != null">discount_type_name,</if>
             <if test="price != null">price,</if>
             <if test="threshold != null">threshold,</if>
             <if test="grantTime != null">grant_time,</if>
+            <if test="status != null">status,</if>
+            <if test="isJyb != null">is_jyb,</if>
+            <if test="hospitalname != null">hospitalName,</if>
+            <if test="integral != null">integral,</if>
+            <if test="status != null">`status`,</if>
+            <if test="threshold != null">threshold,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="issuer != null">#{issuer},</if>
             <if test="userid != null">#{userid},</if>
-            <if test="discountTypeName != null">#{discountTypeName},</if>
             <if test="price != null">#{price},</if>
             <if test="threshold != null">#{threshold},</if>
             <if test="grantTime != null">#{grantTime},</if>
+            <if test="status != null">#{status},</if>
+            <if test="isJyb != null">#{isJyb},</if>
+            <if test="hospitalname != null">#{hospitalname},</if>
+            <if test="integral != null">#{integral},</if>
+            <if test="status != null">#{status},</if>
+            <if test="threshold != null">#{threshold},</if>
         </trim>
+    </insert>
+    <insert id="sendDiscountRecord">
+        insert into discount_record(`issuer`,`userId`,`price`,`threshold`,`grant_time`,`status`,is_jyb) values
+        <foreach item="discountRecord" collection="userId1" index="index"  separator=",">
+            (#{userId},#{discountRecord},#{discount.money},#{discountThreshold.thresholdName},
+             #{date},#{discount.isStatus},#{discount.isJyb})
+        </foreach>
     </insert>
 
     <update id="updateDiscountRecord" parameterType="com.yuepei.system.domain.DiscountRecord">
         update discount_record
         <trim prefix="SET" suffixOverrides=",">
+            <if test="issuer != null">issuer = #{issuer},</if>
             <if test="userid != null">userId = #{userid},</if>
-            <if test="discountTypeName != null">discount_type_name = #{discountTypeName},</if>
             <if test="price != null">price = #{price},</if>
             <if test="threshold != null">threshold = #{threshold},</if>
             <if test="grantTime != null">grant_time = #{grantTime},</if>
+            <if test="status != null">status = #{status},</if>
         </trim>
         where Id = #{id}
     </update>

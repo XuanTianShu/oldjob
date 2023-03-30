@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yuepei.system.mapper.DeviceInvestorMapper">
+    <resultMap id="deviceInvestorQuery" type="com.yuepei.system.domain.DeviceInvestor">
+        <result property="investorId" column="investor_id"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="proportion" column="proportion"/>
+        <result property="createTime" column="create_time"/>
+        <result property="id" column="Id"/>
+    </resultMap>
+
+    <resultMap id="deviceInvestorVOResult" type="deviceInvestorVO">
+        <result property="deviceNumber" column="device_number"/>
+        <result property="deviceId" column="device_id"/>
+    </resultMap>
+
+    <sql id="deviceInvestorVO">
+        SELECT Id,device_number,investor_id,proportion,create_time FROM device_investor
+    </sql>
+
+    <insert id="insert" parameterType="String">
+        insert into device_investor(`investor_id`,`device_number`) values
+        <foreach item="discountRecord" collection="toArray" index="index"  separator=",">
+            (#{discountRecord},#{deviceNumber})
+        </foreach>
+    </insert>
+
+    <delete id="delByInvestorId" parameterType="String">
+        delete from device_investor where device_number = #{deviceNumber}
+    </delete>
+    <delete id="deleteByInvestorIds">
+        delete from device_investor where device_number in
+        <foreach item="deviceNumber" collection="list" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </delete>
+    <delete id="deleteByInvestorId">
+        delete from device_investor where device_number = #{deviceNumber}
+    </delete>
+    <select id="deviceProportionList" parameterType="DeviceInvestor" resultMap="deviceInvestorQuery">
+        <include refid="deviceInvestorVO"/>
+        <where>
+            <if test="investorId != null">
+                and investor_id = #{investorId}
+            </if>
+        </where>
+    </select>
+    <select id="deviceByInvestorId" parameterType="long" resultMap="deviceInvestorVOResult">
+        SELECT device_number,device_id FROM device WHERE device_number NOT IN(
+        SELECT device_number FROM device_investor WHERE investor_id = #{investorId})
+    </select>
+</mapper>

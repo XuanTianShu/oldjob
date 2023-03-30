@@ -71,6 +71,7 @@ public class SysUserCooperationServiceImpl implements ISysUserCooperationService
     @Override
     public int insertCooperation(SysUserCooperation sysUserCooperation)
     {
+        System.out.println(sysUserCooperation.getApplyFor()+"-------------------");
         return cooperationMapper.insertCooperation(sysUserCooperation);
     }
 

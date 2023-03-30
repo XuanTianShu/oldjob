@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yuepei.system.mapper.ServiceWarmPromptMapper">
+    <resultMap type="ServiceWarmPrompt" id="ServiceWarmPromptResult">
+        <result property="serviceWarmPromptId"    column="service_warm_prompt_id"    />
+        <result property="serviceWarmPromptInfo"    column="service_warm_prompt_info"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectServiceWarmPromptVo">
+        select service_warm_prompt_id, service_warm_prompt_info, create_time, update_time from service_warm_prompt
+    </sql>
+
+    <select id="selectServiceWarmPromptList" parameterType="ServiceWarmPrompt" resultMap="ServiceWarmPromptResult">
+        <include refid="selectServiceWarmPromptVo"/>
+        <where>
+            <if test="serviceWarmPromptInfo != null  and serviceWarmPromptInfo != ''"> and service_warm_prompt_info = #{serviceWarmPromptInfo}</if>
+        </where>
+    </select>
+
+    <select id="selectServiceWarmPromptByServiceWarmPromptId" parameterType="Long" resultMap="ServiceWarmPromptResult">
+        <include refid="selectServiceWarmPromptVo"/>
+        where service_warm_prompt_id = #{serviceWarmPromptId}
+    </select>
+
+    <insert id="insertServiceWarmPrompt" parameterType="ServiceWarmPrompt" useGeneratedKeys="true" keyProperty="serviceWarmPromptId">
+        insert into service_warm_prompt
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="serviceWarmPromptInfo != null">service_warm_prompt_info,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="serviceWarmPromptInfo != null">#{serviceWarmPromptInfo},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateServiceWarmPrompt" parameterType="ServiceWarmPrompt">
+        update service_warm_prompt
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="serviceWarmPromptInfo != null">service_warm_prompt_info = #{serviceWarmPromptInfo},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where service_warm_prompt_id = #{serviceWarmPromptId}
+    </update>
+
+    <delete id="deleteServiceWarmPromptByServiceWarmPromptId" parameterType="Long">
+        delete from service_warm_prompt where service_warm_prompt_id = #{serviceWarmPromptId}
+    </delete>
+
+    <delete id="deleteServiceWarmPromptByServiceWarmPromptIds" parameterType="String">
+        delete from service_warm_prompt where service_warm_prompt_id in
+        <foreach item="serviceWarmPromptId" collection="array" open="(" separator="," close=")">
+            #{serviceWarmPromptId}
+        </foreach>
+    </delete>
+</mapper>
