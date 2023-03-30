@@ -339,16 +339,18 @@ public class AgentServiceImpl implements AgentService {
         List<Device> deviceList = deviceMapper.selectDeviceByUserId(sysUser.getUserId());
         List<UserLeaseOrder> leaseOrders = new ArrayList<>();
         deviceList.stream().forEach(map->{
-            List<String> numberList = hospitalDeviceMapper.selectLeaseOrder(map.getUserId());
-            if (!nameOrNumber.equals("")){
-                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber);
-                numberList.stream().forEach(i->{
-                    List<UserLeaseOrder> collect = userLeaseOrders.stream().filter(j -> j.getDeviceNumber().equals(i)).collect(Collectors.toList());
-                    leaseOrders.addAll(collect);
-                });
-            }else {
-                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByDevice(map.getDeviceNumber());
-                leaseOrders.addAll(userLeaseOrders);
+            List<String> numberList = hospitalDeviceMapper.selectDeviceNumber(map.getUserId());
+            if (numberList.size()!=0){
+                if (!nameOrNumber.equals("")){
+                    List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber);
+                    numberList.stream().forEach(i->{
+                        List<UserLeaseOrder> collect = userLeaseOrders.stream().filter(j -> j.getDeviceNumber().equals(i)).collect(Collectors.toList());
+                        leaseOrders.addAll(collect);
+                    });
+                }else {
+                    List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByDevice(map.getDeviceNumber());
+                    leaseOrders.addAll(userLeaseOrders);
+                }
             }
         });
         List<UserLeaseOrderVo> userLeaseOrderList = leaseOrders.stream().map(a -> {
@@ -906,7 +908,7 @@ public class AgentServiceImpl implements AgentService {
     }
 
     public TotalVo revenueStatistics(SysUser user,int statistics){
-        List<String> deviceNumbers = hospitalDeviceMapper.selectLeaseOrder(user.getUserId());
+        List<String> deviceNumbers = hospitalDeviceMapper.selectDeviceNumber(user.getUserId());
         if (deviceNumbers.size()==0){
             return null;
         }

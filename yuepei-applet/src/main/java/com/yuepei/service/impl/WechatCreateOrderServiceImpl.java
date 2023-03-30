@@ -182,6 +182,6 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
         if (user.getBalance() < amount * 100) {
             return AjaxResult.error("提现金额不能大于余额");
         }
-        return null;
+        return AjaxResult.success(pay);
     }
 }

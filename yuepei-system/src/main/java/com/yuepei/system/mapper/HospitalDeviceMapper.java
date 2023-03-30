@@ -29,7 +29,7 @@ public interface HospitalDeviceMapper {
 
     Goods selectGoodsByGoodsName(@Param("goodsId") Long goodsId);
 
-    List<String> selectLeaseOrder(@Param("userId") Long userId);
+    List<String> selectDeviceNumber(@Param("userId") Long userId);
 
     HospitalUser selectHospitalbyUserName(@Param("userName") String userName);
 
@@ -58,4 +58,6 @@ public interface HospitalDeviceMapper {
     void insertHospital(Hospital hospital);
 
     void insertHospitalUser(@Param("userName")String userName,@Param("hospitalId") Long hospitalId);
+
+    List<String> selectDeviceNumberByHospitalId(@Param("hospitalId")Long hospitalId);
 }
