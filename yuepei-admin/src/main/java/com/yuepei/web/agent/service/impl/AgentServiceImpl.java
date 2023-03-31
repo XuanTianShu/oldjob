@@ -1060,25 +1060,7 @@ public class AgentServiceImpl implements AgentService {
             BigDecimal dividendAmount = new BigDecimal(0);
             List<Integer> effectiveOrder = new ArrayList<>();
             TotalVo total = revenueStatistics(sysUser,statistics);
-            BeanUtils.copyProperties(total,totalVo);
-            orderVo.addAll(total.getOrderVos());
-            totalVo.setOrderAmount(orderAmount.add(total.getOrderAmount()));
-            totalVo.setDividendAmount(dividendAmount.add(total.getDividendAmount()));
-            effectiveOrder.add(total.getEffectiveOrder());
-            int sum = 0;
-            for (Integer integer : effectiveOrder) {
-                sum+=integer;
-            }
-            totalVo.setEffectiveOrder(sum);
-            totalVo.setOrderVos(orderVo);
-        }else {
-            List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
-            if (sysUsers.size()==0){
-                List<OrderVo> orderVo = new ArrayList<>();
-                BigDecimal orderAmount = new BigDecimal(0);
-                BigDecimal dividendAmount = new BigDecimal(0);
-                List<Integer> effectiveOrder = new ArrayList<>();
-                TotalVo total = revenueStatistics(sysUser,statistics);
+            if (total!=null){
                 BeanUtils.copyProperties(total,totalVo);
                 orderVo.addAll(total.getOrderVos());
                 totalVo.setOrderAmount(orderAmount.add(total.getOrderAmount()));
@@ -1090,6 +1072,28 @@ public class AgentServiceImpl implements AgentService {
                 }
                 totalVo.setEffectiveOrder(sum);
                 totalVo.setOrderVos(orderVo);
+            }
+        }else {
+            List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
+            if (sysUsers.size()==0){
+                List<OrderVo> orderVo = new ArrayList<>();
+                BigDecimal orderAmount = new BigDecimal(0);
+                BigDecimal dividendAmount = new BigDecimal(0);
+                List<Integer> effectiveOrder = new ArrayList<>();
+                TotalVo total = revenueStatistics(sysUser,statistics);
+                if (total!=null){
+                    BeanUtils.copyProperties(total,totalVo);
+                    orderVo.addAll(total.getOrderVos());
+                    totalVo.setOrderAmount(orderAmount.add(total.getOrderAmount()));
+                    totalVo.setDividendAmount(dividendAmount.add(total.getDividendAmount()));
+                    effectiveOrder.add(total.getEffectiveOrder());
+                    int sum = 0;
+                    for (Integer integer : effectiveOrder) {
+                        sum+=integer;
+                    }
+                    totalVo.setEffectiveOrder(sum);
+                    totalVo.setOrderVos(orderVo);
+                }
             }else {
                 sysUsers.add(sysUser);
                 List<OrderVo> orderVo = new ArrayList<>();
