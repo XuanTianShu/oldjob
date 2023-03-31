@@ -319,33 +319,84 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             }
             Date leaseTime = userLeaseOrderVo.getLeaseTime();
             SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            Date date1 = new Date();
             String format = dateFormat.format(leaseTime);
-            String hospitalRule = hospital.getHospitalRule();
-            JSONArray jsonArray = JSON.parseArray(hospitalRule);
-            for (int i = 0; i < jsonArray.size(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
+            String format1 = dateFormat.format(date1);
+            JSONArray deviceRule = JSON.parseArray(userLeaseOrder.getDeviceRule());
+            BigDecimal price1 = BigDecimal.ZERO;
+            for (int i = 0; i < deviceRule.size(); i++) {
+                JSONObject jsonObject = deviceRule.getJSONObject(i);
+                Integer time1 = (Integer) jsonObject.get("time");
                 String startTime = (String) jsonObject.get("startTime");
-                String endTime = (String) jsonObject.get("endTime");
                 try {
                     Date parse = dateFormat.parse(format);
                     Date start = dateFormat.parse(startTime);
-                    Date end = dateFormat.parse(endTime);
-                    if (start.compareTo(parse)==1&&end.compareTo(parse)==-1){
-                        String price = (String) jsonObject.get("price");
-                        userLeaseOrderVo.setEstimateAmount(new BigDecimal(price));
+                    Date now = dateFormat.parse(format1);
+                    if (start.compareTo(parse)==1){
+                        if (time1==0){
+                            Long time2 = new Date(now.getTime() - parse.getTime()).getTime();
+                            Long minute1 = time2 / 1000 / 60 / 60;
+                            Long minute2 = time2 / 1000 / 60 % 60 ;
+                            BigDecimal price = (BigDecimal) jsonObject.get("price");
+                            price1=price1.add(price);
+                            if (minute2<10){
+                                userLeaseOrderVo.setEvaluate(price.multiply(new BigDecimal(minute1)));
+                            }else {
+                                userLeaseOrderVo.setEvaluate(price.multiply(new BigDecimal(minute1+1)));
+                            }
+                        }else if (time1==1){
+                            if (now.compareTo(start)==1){
+                                Long time2 = new Date(start.getTime() - parse.getTime()).getTime();
+                                Long minute1 = time2 / 1000 / 60 / 60;
+                                Long minute2 = time2 / 1000 / 60 % 60 ;
+                                BigDecimal price = (BigDecimal) jsonObject.get("price");
+                                if (minute2<10){
+                                    userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1)).add(price));
+                                }else {
+                                    userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1+1)).add(price));
+                                }
+                            }else {
+                                BigDecimal price = (BigDecimal) jsonObject.get("price");
+                                userLeaseOrderVo.setEvaluate(price);
+                            }
+                        }
+                    }else {
+                        if (time1==0){
+                            Long time2 = new Date(now.getTime() - parse.getTime()).getTime();
+                            Long minute1 = time2 / 1000 / 60 /60 ;
+                            Long minute2 = time2 / 1000 / 60 % 60 ;
+                            BigDecimal price = (BigDecimal) jsonObject.get("price");
+                            price1=price1.add(price);
+                            if (minute2<10){
+                                userLeaseOrderVo.setEvaluate(price.multiply(new BigDecimal(minute1)));
+                            }else {
+                                userLeaseOrderVo.setEvaluate(price.multiply(new BigDecimal(minute1+1)));
+                            }
+                        }
                     }
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
             }
-            userLeaseOrderVo.setContent(device.getContent());
+            /*Date date1 = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            String format = dateFormat.format(date1);
+            JSONArray deviceRule = JSON.parseArray(userLeaseOrder.getDeviceRule());
+            for (int i = 0; i < deviceRule.size(); i++) {
+                JSONObject jsonObject = deviceRule.getJSONObject(i);
+                try {
+                    Date parse = dateFormat.parse(format);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }*/
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
             userLeaseOrderVo.setLeaseTime(userLeaseOrder.getLeaseTime());
             userLeaseOrderVo.setLeaseAddress(userLeaseOrder.getLeaseAddress());
             userLeaseOrderVo.setOrderNumber(userLeaseOrder.getOrderNumber());
         }
         if (userLeaseOrder.getStatus().equals("1")){
-            Date leaseTime = userLeaseOrderVo.getLeaseTime();
+            /*Date leaseTime = userLeaseOrderVo.getLeaseTime();
             SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
             String format = dateFormat.format(leaseTime);
             String hospitalRule = hospital.getHospitalRule();
@@ -365,10 +416,11 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-            }
-            Long restoreTime = userLeaseOrderVo.getRestoreTime().getTime();
-            Long leaseTimeTime = leaseTime.getTime();
-            Long time = new Date(restoreTime - leaseTimeTime).getTime();
+            }*/
+//            Long restoreTime = userLeaseOrderVo.getRestoreTime().getTime();
+//            Long leaseTimeTime = leaseTime.getTime();
+//            Long time = new Date(restoreTime - leaseTimeTime).getTime();
+            Long time = Long.valueOf(userLeaseOrderVo.getPlayTime());
             Long day = time/1000/60/60/24;
             Long hour = time/1000/60/60%24;
             Long minute = time/1000/60%60;
@@ -387,7 +439,18 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 userLeaseOrderVo.setPlayTime(day+"天"+hour+"小时"+minute+"分钟"+second+"秒");
             }
             userLeaseOrderVo.setPrice(userLeaseOrder.getPrice());
-            userLeaseOrderVo.setContent(device.getContent());
+            JSONArray deviceRule = JSON.parseArray(userLeaseOrder.getDeviceRule());
+            for (int i = 0; i < deviceRule.size(); i++) {
+                JSONObject jsonObject = deviceRule.getJSONObject(i);
+                Integer time1 = (Integer) jsonObject.get("time");
+                if (time1==0){
+                    BigDecimal price = (BigDecimal) jsonObject.get("price");
+                    userLeaseOrderVo.setContent(price+device.getContent());
+                }else {
+                    BigDecimal price = (BigDecimal) jsonObject.get("price");
+                    userLeaseOrderVo.setEstimateAmount(price);
+                }
+            }
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
             userLeaseOrderVo.setCouponPrice(userLeaseOrder.getCouponPrice());
             userLeaseOrderVo.setLeaseTime(userLeaseOrder.getLeaseTime());
@@ -399,7 +462,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrderVo.setNetAmount(userLeaseOrder.getNetAmount());
         }
         if (userLeaseOrder.getStatus().equals("2")){
-            Date leaseTime = userLeaseOrderVo.getLeaseTime();
+            /*Date leaseTime = userLeaseOrderVo.getLeaseTime();
             SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
             String format = dateFormat.format(leaseTime);
             String hospitalRule = hospital.getHospitalRule();
@@ -419,10 +482,11 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-            }
-            Long restoreTime = userLeaseOrderVo.getRestoreTime().getTime();
-            Long leaseTimeTime = leaseTime.getTime();
-            Long time = new Date(restoreTime - leaseTimeTime).getTime();
+            }*/
+//            Long restoreTime = userLeaseOrderVo.getRestoreTime().getTime();
+//            Long leaseTimeTime = leaseTime.getTime();
+//            Long time = new Date(restoreTime - leaseTimeTime).getTime();
+            Long time = Long.valueOf(userLeaseOrderVo.getPlayTime());
             Long day = time/1000/60/60/24;
             Long hour = time/1000/60/60%24;
             Long minute = time/1000/60%60;
@@ -441,7 +505,18 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 userLeaseOrderVo.setPlayTime(day+"天"+hour+"小时"+minute+"分钟"+second+"秒");
             }
             userLeaseOrderVo.setPrice(userLeaseOrder.getPrice());
-            userLeaseOrderVo.setContent(device.getContent());
+            JSONArray deviceRule = JSON.parseArray(userLeaseOrder.getDeviceRule());
+            for (int i = 0; i < deviceRule.size(); i++) {
+                JSONObject jsonObject = deviceRule.getJSONObject(i);
+                Integer time1 = (Integer) jsonObject.get("time");
+                if (time1==0){
+                    BigDecimal price = (BigDecimal) jsonObject.get("price");
+                    userLeaseOrderVo.setContent(price+device.getContent());
+                }else {
+                    BigDecimal price = (BigDecimal) jsonObject.get("price");
+                    userLeaseOrderVo.setEstimateAmount(price);
+                }
+            }
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
             userLeaseOrderVo.setCouponPrice(userLeaseOrder.getCouponPrice());
             userLeaseOrderVo.setLeaseTime(userLeaseOrder.getLeaseTime());

@@ -75,8 +75,53 @@ public class UserLeaseOrderVo {
     /**计费规则*/
     private String content;
 
-    /**预估金额&套餐费用*/
+    /**套餐费用*/
     private BigDecimal estimateAmount;
+
+    /** 支付时间 */
+    private Date endTime;
+
+    /** 计费规则 */
+    private String rule;
+
+    private String outTradeNo;
+
+    private Long deposit;
+
+    private Long choose;
+
+    private String child;
+
+    private String depositNumber;
+
+    private Long investorProportion;
+
+    private Long hospitalProportion;
+
+    private Long agentProportion;
+
+    private Long platformProportion;
+
+    private Long electric;
+
+    private String deviceMac;
+
+    private String deviceAddress;
+
+    private String rows;
+
+    private String deviceRule;
+
+    private BigDecimal timePrice;
+
+    private BigDecimal fixedPrice;
+
+    private Long isValid;
+
+    /**
+     * 预估金额
+     * */
+    private BigDecimal evaluate;
 
     /**科室*/
     private String department;
