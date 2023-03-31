@@ -98,6 +98,7 @@
             <if test="userId != null"> and d.user_id = #{userId}</if>
             and d.device_number IN(SELECT device_number FROM device_investor)
         </where>
+        GROUP BY d.device_id
     </select>
 
     <select id="selectDeviceByDeviceId" parameterType="Long" resultMap="DeviceResult">

@@ -295,6 +295,9 @@
             #{id}
         </foreach>
     </delete>
+    <delete id="deleteUserLeaseOrderByOrderNumber">
+        delete from user_lease_order where order_number = #{orderNumber} and is_valid = 0
+    </delete>
 
     <select id="selectUserLeaseOrder" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>

@@ -122,6 +122,9 @@ public class CallBackServiceImpl implements CallBackService {
     @Value("${coupon.order}")
     private String orderPrefix;
 
+    @Value("${coupon.valid}")
+    private String orderValid;
+
     @Autowired
     private DeviceMapper deviceMapper;
 
@@ -332,7 +335,7 @@ public class CallBackServiceImpl implements CallBackService {
                 //记录优惠券金额
                 userLeaseOrder.setCouponPrice(couponPrice);
                 //实付金额
-                userLeaseOrder.setNetAmount(new BigDecimal(price).multiply(new BigDecimal(100)));
+                userLeaseOrder.setNetAmount(new BigDecimal(price).divide(new BigDecimal(100),MathContext.DECIMAL64));
                 //付款时间
                 userLeaseOrder.setCreateTime(time);
                 //支付流水号
@@ -500,6 +503,8 @@ public class CallBackServiceImpl implements CallBackService {
                                 //修改订单信息
                                 userLeaseOrderMapper.updateUserLeaseOrder(userLeaseOrder);
 
+                                redisServer.deleteObject(orderValid+userLeaseOrder.getOrderNumber());
+
                                 Device device = deviceMapper.selectDeviceByDeviceNumber(deviceNumber);
                                 String rows = device.getRows();
 
@@ -609,6 +614,9 @@ public class CallBackServiceImpl implements CallBackService {
                                     userLeaseOrder.setTimePrice(new BigDecimal(0));
                                     userLeaseOrder.setFixedPrice(new BigDecimal(0));
                                 }
+                                Device device = deviceMapper.selectDeviceByDeviceNumber(deviceNumber);
+
+                                userLeaseOrder.setRestoreAddress(device.getDeviceAddress());
                                 log.info("userLeaseOrder.getTimePrice():{}",userLeaseOrder.getTimePrice());
                                 log.info("userLeaseOrder.getFixedPrice():{}",userLeaseOrder.getFixedPrice());
                                 log.info("日志：{}",userLeaseOrder.getTimePrice().add(userLeaseOrder.getFixedPrice(), MathContext.DECIMAL32));
@@ -616,8 +624,23 @@ public class CallBackServiceImpl implements CallBackService {
                                 log.info("修改的id：{}",userLeaseOrder.getId());
                                 userLeaseOrderMapper.updateUserLeaseOrder(userLeaseOrder);
                                 redisServer.deleteObject(orderPrefix+userLeaseOrder.getOrderNumber());
+
+                                System.out.println("正常还床");
+
+                                String rows = device.getRows();
+                                Gson gson = new Gson();
+                                List<ItemVO> itemList = gson.fromJson(rows, new TypeToken<List<ItemVO>>(){}.getType());
+                                if (itemList.size() != 0){
+                                    for (int i = 0; i < itemList.size(); i++) {
+                                        int index = itemList.get(i).getIndex();
+                                        if (Integer.parseInt(substring1) == index){
+                                            itemList.get(i).setStatus(0);
+                                        }
+                                    }
+                                }
+                                deviceMapper.updateDeviceByDeviceNumber(gson.toJson(itemList),deviceNumber,0);
                             }
-                            System.out.println("正常还床");
+                        }else {
                             Device device = deviceMapper.selectDeviceByDeviceNumber(deviceNumber);
                             String rows = device.getRows();
                             Gson gson = new Gson();
@@ -630,7 +653,7 @@ public class CallBackServiceImpl implements CallBackService {
                                     }
                                 }
                             }
-                        deviceMapper.updateDeviceByDeviceNumber(gson.toJson(itemList),deviceNumber,0);
+                            deviceMapper.updateDeviceByDeviceNumber(gson.toJson(itemList),deviceNumber,0);
                         }
 
                     }

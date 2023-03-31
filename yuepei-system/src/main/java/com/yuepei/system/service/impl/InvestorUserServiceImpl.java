@@ -4,12 +4,15 @@ import com.yuepei.common.annotation.DataScope;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.utils.DateUtils;
 import com.yuepei.common.utils.SecurityUtils;
+import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.InvestorUser;
+import com.yuepei.system.domain.vo.TotalProportionVO;
 import com.yuepei.system.mapper.InvestorUserMapper;
 import com.yuepei.system.service.IInvestorUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -98,5 +101,21 @@ public class InvestorUserServiceImpl implements IInvestorUserService
     public int deleteInvestorUserById(Long id)
     {
         return investorUserMapper.deleteInvestorUserById(id);
+    }
+
+    @Override
+    public TotalProportionVO totalProportion(DeviceInvestor deviceInvestor) {
+        return investorUserMapper.totalProportion(deviceInvestor);
+    }
+
+    @Override
+    public int addDevice(DeviceInvestor deviceInvestor) {
+        deviceInvestor.setCreateTime(new Date());
+        return investorUserMapper.addDevice(deviceInvestor);
+    }
+
+    @Override
+    public int updateDevice(DeviceInvestor deviceInvestor) {
+        return investorUserMapper.updateDevice(deviceInvestor);
     }
 }

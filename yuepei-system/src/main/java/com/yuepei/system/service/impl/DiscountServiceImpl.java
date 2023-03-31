@@ -11,6 +11,7 @@ import com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo;
 import com.yuepei.system.mapper.*;
 import com.yuepei.system.service.IDiscountService;
 import com.yuepei.system.utils.RedisServer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 优惠券Service业务层处理
@@ -28,6 +30,7 @@ import java.util.List;
  * @author ohy
  * @date 2023-02-21
  */
+@Slf4j
 @Service
 public class DiscountServiceImpl implements IDiscountService
 {
@@ -186,8 +189,16 @@ public class DiscountServiceImpl implements IDiscountService
                 userDiscount.setExpireTime(simpleDateFormat.parse(s));
                 userDiscountMapper.insertUserDiscount(userDiscount);
 //                System.out.println(insertUserDiscount.getId()+"====================兑换之后的主键===========================");
+
+                String format1 = simpleDateFormat.format(new Date());
+                Date parse = simpleDateFormat.parse(format1);
+                long l = simpleDateFormat.parse(s).getTime() - parse.getTime();
+                long l1 = l / 1000;
+
+                log.info("开始"+new Long(l1).intValue());
                 //TODO 存储redis修改过期
-                redisServer.setCacheObject(JYBPre+new Date().getTime()+"_"+user.getUserId(),user);
+                redisServer.setCacheObject(JYBPre+new Date().getTime()+"_"+user.getUserId(),user,new Long(l1).intValue(), TimeUnit.SECONDS);
+                log.info("结束");
 
                 //更新用户积分
                 user.setIntegral(Integer.parseInt(String.valueOf(sysUser.getIntegral() - discount.getIntegral())));

@@ -14,10 +14,12 @@ import com.yuepei.framework.web.domain.server.Sys;
 import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.InvestorUser;
 import com.yuepei.system.domain.vo.DeviceInvestorVO;
+import com.yuepei.system.domain.vo.TotalProportionVO;
 import com.yuepei.system.mapper.SysUserMapper;
 import com.yuepei.system.service.DeviceInvestorService;
 import com.yuepei.system.service.IInvestorUserService;
 import com.yuepei.system.service.ISysUserService;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +56,13 @@ public class InvestorUserController extends BaseController
         startPage();
         List<SysUser> list = investorUserService.selectInvestorUserList(user);
         return getDataTable(list);
+    }
+
+    @GetMapping("/totalProportion")
+    public AjaxResult totalProportion(DeviceInvestor deviceInvestor){
+        TotalProportionVO totalProportion = investorUserService.totalProportion(deviceInvestor);
+        System.out.println(deviceInvestor.getDeviceNumber()+"--------");
+        return AjaxResult.success(totalProportion);
     }
 
     /**
@@ -103,6 +112,11 @@ public class InvestorUserController extends BaseController
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
         return AjaxResult.success(investorUserService.selectInvestorUserById(id));
+    }
+
+    @GetMapping("/device/{id}")
+    public AjaxResult getDeviceById(@PathVariable("id") Long id){
+        return AjaxResult.success(deviceInvestorService.getDeviceById(id));
     }
 
     /**
@@ -168,4 +182,27 @@ public class InvestorUserController extends BaseController
     {
         return toAjax(investorUserService.deleteInvestorUserByIds(ids));
     }
+
+    /**
+     * 投资设备
+     */
+    @PostMapping("/addDevice")
+    public AjaxResult addDevice(@RequestBody DeviceInvestor deviceInvestor){
+        TotalProportionVO totalProportion = investorUserService.totalProportion(deviceInvestor);
+        if (totalProportion.getTotalProportion() < Integer.parseInt(deviceInvestor.getProportion())){
+            return AjaxResult.error("超过可分配比例");
+        }
+        return toAjax(investorUserService.addDevice(deviceInvestor));
+    }
+
+    @PutMapping("/updateDevice")
+    public AjaxResult updateDevice(@RequestBody DeviceInvestor deviceInvestor){
+        TotalProportionVO totalProportion = investorUserService.totalProportion(deviceInvestor);
+        if (totalProportion.getTotalProportion() < Integer.parseInt(deviceInvestor.getProportion())){
+            return AjaxResult.error("超过可分配比例");
+        }
+        return toAjax(investorUserService.updateDevice(deviceInvestor));
+    }
+
+
 }

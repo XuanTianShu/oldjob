@@ -125,4 +125,6 @@ public interface UserLeaseOrderMapper {
     UserLeaseOrder selectUserLeaseOrderByOpenId(@Param("orderNumber") String orderNumber);
 
     UserLeaseOrder selectOrderByDeviceNumber(@Param("substring1") String substring1);
+
+    void deleteUserLeaseOrderByOrderNumber(@Param("orderNumber") String orderNumber);
 }

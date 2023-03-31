@@ -2,11 +2,14 @@ package com.yuepei.controller.wechat.user;
 
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.system.domain.Discount;
 import com.yuepei.system.mapper.SysUserMapper;
 import com.yuepei.system.service.IDiscountService;
 import com.yuepei.utils.TokenUtils;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

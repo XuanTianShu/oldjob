@@ -9,4 +9,6 @@ public interface DeviceInvestorService {
     List<DeviceInvestor> deviceProportionList(DeviceInvestor deviceInvestor);
 
     List<DeviceInvestorVO> deviceByInvestorId(Long investorId);
+
+    DeviceInvestor getDeviceById(Long id);
 }
