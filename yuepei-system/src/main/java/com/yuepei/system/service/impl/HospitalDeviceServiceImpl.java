@@ -83,7 +83,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(hospitalUser.getHospitalId());
             DeviceDetailsVo deviceDetailsVo = new DeviceDetailsVo();
             String device_full_address = map.getDeviceFullAddress();
-            if (device_full_address!=null) {
+            if (!device_full_address.equals("0")) {
                 String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
                 Hospital deviceFloor = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[0]));
                 Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
@@ -207,7 +207,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         List<String> deviceDepartment = new ArrayList<>();
         deviceList.stream().forEach(map -> {
             String device_full_address = map.getDeviceFullAddress();
-            if (device_full_address!=null) {
+            if (!device_full_address.equals("0")) {
                 String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
                 Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
                 deviceDepartment.add(Department.getHospitalName());
@@ -447,8 +447,25 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                     BigDecimal price = (BigDecimal) jsonObject.get("price");
                     userLeaseOrderVo.setContent(price+device.getContent());
                 }else {
-                    BigDecimal price = (BigDecimal) jsonObject.get("price");
-                    userLeaseOrderVo.setEstimateAmount(price);
+                    String start = String.valueOf(jsonObject.get("startTime"));
+                    String end = String.valueOf(jsonObject.get("endTime"));
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+                    Date date1 = new Date();
+                    String format = dateFormat.format(userLeaseOrder.getLeaseTime());
+                    String format1 = dateFormat.format(date1);
+                    try {
+                        Date parse = dateFormat.parse(format);
+                        Date now = dateFormat.parse(format1);
+                        Long time2 = new Date(now.getTime() - parse.getTime()).getTime();
+                        Long minute2 = time2 / 1000 / 60 % 60 ;
+                        if (minute2<10){
+                            userLeaseOrderVo.setEstimateAmount("(当日"+start+"~(次日)"+end+")  "+BigDecimal.ZERO);
+                        }else {
+                            userLeaseOrderVo.setEstimateAmount("(当日"+start+"~(次日)"+end+")  "+userLeaseOrder.getFixedPrice().add(userLeaseOrder.getTimePrice()));
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
@@ -513,8 +530,25 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                     BigDecimal price = (BigDecimal) jsonObject.get("price");
                     userLeaseOrderVo.setContent(price+device.getContent());
                 }else {
-                    BigDecimal price = (BigDecimal) jsonObject.get("price");
-                    userLeaseOrderVo.setEstimateAmount(price);
+                    String start = String.valueOf(jsonObject.get("startTime"));
+                    String end = String.valueOf(jsonObject.get("endTime"));
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+                    Date date1 = new Date();
+                    String format = dateFormat.format(userLeaseOrder.getLeaseTime());
+                    String format1 = dateFormat.format(date1);
+                    try {
+                        Date parse = dateFormat.parse(format);
+                        Date now = dateFormat.parse(format1);
+                        Long time2 = new Date(now.getTime() - parse.getTime()).getTime();
+                        Long minute2 = time2 / 1000 / 60 % 60 ;
+                        if (minute2<10){
+                            userLeaseOrderVo.setEstimateAmount("(当日"+start+"~(次日)"+end+")  "+BigDecimal.ZERO);
+                        }else {
+                            userLeaseOrderVo.setEstimateAmount("(当日"+start+"~(次日)"+end+")  "+userLeaseOrder.getFixedPrice().add(userLeaseOrder.getTimePrice()));
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
@@ -568,8 +602,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                     orderVo.setOrderNumber(map.getOrderNumber());
                     BigDecimal decimal = map.getNetAmount();
                     orderVo.setNetAmount(decimal);
-                    orderVo.setDividendRatio(sysUser.getProportion());
-                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                    orderVo.setDividendRatio(map.getHospitalProportion());
+                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
                     orderVos.add(orderVo);
                 });
                 totalVo.setEffectiveOrder(orderVos.size());
@@ -599,8 +633,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                     orderVo.setOrderNumber(map.getOrderNumber());
                     BigDecimal decimal = map.getNetAmount();
                     orderVo.setNetAmount(decimal);
-                    orderVo.setDividendRatio(sysUser.getProportion());
-                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                    orderVo.setDividendRatio(map.getHospitalProportion());
+                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
                     orderVos.add(orderVo);
                 });
                 totalVo.setEffectiveOrder(orderVos.size());
@@ -640,8 +674,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                     orderVo.setOrderNumber(map.getOrderNumber());
                     BigDecimal decimal = map.getNetAmount();
                     orderVo.setNetAmount(decimal);
-                    orderVo.setDividendRatio(sysUser.getProportion());
-                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                    orderVo.setDividendRatio(map.getHospitalProportion());
+                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
                     orderVos.add(orderVo);
                 });
                 totalVo.setEffectiveOrder(orderVos.size());
@@ -657,8 +691,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                     orderVo.setOrderNumber(map.getOrderNumber());
                     BigDecimal decimal = map.getNetAmount();
                     orderVo.setNetAmount(decimal);
-                    orderVo.setDividendRatio(sysUser.getProportion());
-                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                    orderVo.setDividendRatio(map.getHospitalProportion());
+                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
                     orderVos.add(orderVo);
                 });
                 totalVo.setEffectiveOrder(orderVos.size());

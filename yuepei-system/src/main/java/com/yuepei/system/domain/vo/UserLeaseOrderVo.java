@@ -76,7 +76,7 @@ public class UserLeaseOrderVo {
     private String content;
 
     /**套餐费用*/
-    private BigDecimal estimateAmount;
+    private String estimateAmount;
 
     /** 支付时间 */
     private Date endTime;
