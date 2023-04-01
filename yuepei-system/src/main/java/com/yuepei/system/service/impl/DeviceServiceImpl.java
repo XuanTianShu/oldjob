@@ -112,6 +112,7 @@ public class DeviceServiceImpl implements DeviceService {
      * @param device 设备
      * @return 结果
      */
+    @Transactional
     @Override
     public AjaxResult insertDevice(Device device)
     {
