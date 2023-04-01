@@ -6,4 +6,10 @@ import lombok.Data;
 public class TotalProportionVO {
 
     private Integer totalProportion;
+
+    private Integer suProportion;
+
+    private Integer hProportion;
+
+    private Integer diProportion;
 }

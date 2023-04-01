@@ -8,4 +8,8 @@ public class DeviceInvestorVO {
     private Long deviceId;
 
     private String deviceNumber;
+
+    private String investorId;
+
+    private String userInvestorId;
 }

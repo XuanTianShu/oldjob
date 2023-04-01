@@ -1,19 +1,28 @@
 package com.yuepei.system.service.impl;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.yuepei.common.annotation.DataScope;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.utils.DateUtils;
 import com.yuepei.common.utils.SecurityUtils;
+import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.InvestorUser;
+import com.yuepei.system.domain.vo.DeviceInvestorVO;
 import com.yuepei.system.domain.vo.TotalProportionVO;
+import com.yuepei.system.mapper.DeviceMapper;
 import com.yuepei.system.mapper.InvestorUserMapper;
 import com.yuepei.system.service.IInvestorUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 投资人管理Service业务层处理
@@ -26,6 +35,9 @@ public class InvestorUserServiceImpl implements IInvestorUserService
 {
     @Autowired
     private InvestorUserMapper investorUserMapper;
+
+    @Autowired
+    private DeviceMapper deviceMapper;
 
     /**
      * 查询投资人管理
@@ -108,14 +120,58 @@ public class InvestorUserServiceImpl implements IInvestorUserService
         return investorUserMapper.totalProportion(deviceInvestor);
     }
 
+    @Transactional
     @Override
     public int addDevice(DeviceInvestor deviceInvestor) {
         deviceInvestor.setCreateTime(new Date());
+        //TODO 修改设备投资人信息
         return investorUserMapper.addDevice(deviceInvestor);
     }
 
     @Override
     public int updateDevice(DeviceInvestor deviceInvestor) {
         return investorUserMapper.updateDevice(deviceInvestor);
+    }
+
+    @Transactional
+    @Override
+    public int deleteDeviceByIds(Long[] ids) {
+        List<DeviceInvestorVO> list = deviceMapper.selectInvestorDeviceByIds(ids);
+        for (int i = 0; i < list.size(); i++) {
+            String investorId = list.get(i).getInvestorId();
+            String userInvestorId = list.get(i).getUserInvestorId();
+            Long[] longs = new Long[]{};
+            JSONArray objects = JSON.parseArray(investorId);
+            List<Long> toJavaList = objects.toJavaList(Long.class);
+            for (int k = toJavaList.size() - 1; k >= 0; k--) {
+                if (toJavaList.get(k).equals(Long.parseLong(userInvestorId))){
+                    toJavaList.remove(k);
+                }
+            }
+            list.get(i).setInvestorId(Arrays.toString(toJavaList.toArray(longs)));
+        }
+        deviceMapper.updateInvestorDevice(list);
+        return investorUserMapper.deleteDeviceByIds(ids);
+    }
+
+    @Transactional
+    @Override
+    public int deleteDeviceById(Long id) {
+        List<DeviceInvestorVO> list = deviceMapper.selectInvestorDeviceById(id);
+        for (int i = 0; i < list.size(); i++) {
+            String investorId = list.get(i).getInvestorId();
+            String userInvestorId = list.get(i).getUserInvestorId();
+            Long[] longs = new Long[]{};
+            JSONArray objects = JSON.parseArray(investorId);
+            List<Long> toJavaList = objects.toJavaList(Long.class);
+            for (int k = toJavaList.size() - 1; k >= 0; k--) {
+                if (toJavaList.get(k).equals(Long.parseLong(userInvestorId))){
+                    toJavaList.remove(k);
+                }
+            }
+            list.get(i).setInvestorId(Arrays.toString(toJavaList.toArray(longs)));
+        }
+        deviceMapper.updateInvestorDevice(list);
+        return investorUserMapper.deleteDeviceById(id);
     }
 }

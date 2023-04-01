@@ -61,7 +61,6 @@ public class InvestorUserController extends BaseController
     @GetMapping("/totalProportion")
     public AjaxResult totalProportion(DeviceInvestor deviceInvestor){
         TotalProportionVO totalProportion = investorUserService.totalProportion(deviceInvestor);
-        System.out.println(deviceInvestor.getDeviceNumber()+"--------");
         return AjaxResult.success(totalProportion);
     }
 
@@ -184,7 +183,7 @@ public class InvestorUserController extends BaseController
     }
 
     /**
-     * 投资设备
+     * 投资设备比例
      */
     @PostMapping("/addDevice")
     public AjaxResult addDevice(@RequestBody DeviceInvestor deviceInvestor){
@@ -195,6 +194,11 @@ public class InvestorUserController extends BaseController
         return toAjax(investorUserService.addDevice(deviceInvestor));
     }
 
+    /**
+     * 修改设备比例
+     * @param deviceInvestor
+     * @return
+     */
     @PutMapping("/updateDevice")
     public AjaxResult updateDevice(@RequestBody DeviceInvestor deviceInvestor){
         TotalProportionVO totalProportion = investorUserService.totalProportion(deviceInvestor);
@@ -204,5 +208,25 @@ public class InvestorUserController extends BaseController
         return toAjax(investorUserService.updateDevice(deviceInvestor));
     }
 
+    /**
+     * 删除设备比例
+     */
+    @PreAuthorize("@ss.hasPermi('system:investorUser:remove')")
+    @Log(title = "投资人管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/delDevices/{ids}")
+    public AjaxResult delDevice(@PathVariable Long[] ids)
+    {
+        return toAjax(investorUserService.deleteDeviceByIds(ids));
+    }
 
+    /**
+     * 删除设备比例
+     */
+    @PreAuthorize("@ss.hasPermi('system:investorUser:remove')")
+    @Log(title = "投资人管理", businessType = BusinessType.DELETE)
+    @DeleteMapping("/delDevice/{id}")
+    public AjaxResult delDevice(@PathVariable Long id)
+    {
+        return toAjax(investorUserService.deleteDeviceById(id));
+    }
 }

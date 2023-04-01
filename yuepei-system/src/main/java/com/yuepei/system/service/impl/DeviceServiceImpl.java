@@ -228,8 +228,10 @@ public class DeviceServiceImpl implements DeviceService {
         Long[] longs = new Long[]{};
         JSONArray objects = JSON.parseArray(device.getInvestorId());
         List<Long> list = objects.toJavaList(Long.class);
-        int i = deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
-        int insert = deviceInvestorMapper.insert(list.toArray(longs), device.getDeviceNumber());
+        if (list.size() > 0){
+            int i = deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
+            int insert = deviceInvestorMapper.insert(list.toArray(longs), device.getDeviceNumber());
+        }
         return deviceMapper.updateDevice(device);
     }
 

@@ -69,4 +69,8 @@ public interface InvestorUserMapper
     int addDevice(DeviceInvestor deviceInvestor);
 
     int updateDevice(DeviceInvestor deviceInvestor);
+
+    int deleteDeviceByIds(Long[] ids);
+
+    int deleteDeviceById(@Param("id") Long id);
 }

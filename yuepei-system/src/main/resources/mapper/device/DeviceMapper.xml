@@ -65,6 +65,20 @@
         <result property="userId" column="user_id"/>
     </resultMap>
 
+    <resultMap id="DeviceInvestorResult" type="com.yuepei.system.domain.vo.DeviceInvestorVO">
+        <result property="deviceId" column="device_id"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="userInvestorId" column="userInvestorId"/>
+        <result property="investorId" column="investor_id"/>
+    </resultMap>
+
+    <resultMap id="deviceProportionResult" type="com.yuepei.system.domain.vo.TotalProportionVO">
+        <result property="diProportion" column="diProportion"/>
+        <result property="hProportion" column="hProportion"/>
+        <result property="suProportion" column="suProportion"/>
+        <result property="totalProportion" column="totalProportion"/>
+    </resultMap>
+
 
     <sql id="selectDeviceVo">
         select device_id, device_type_id, device_number,device_iot_number,device_mac,
@@ -90,13 +104,13 @@
         LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
         LEFT JOIN hospital_user AS hu ON hu.`hospital_id` = d.`hospital_id`
         LEFT JOIN sys_user AS s ON s.`user_name` = hu.`user_name`
+        LEFT JOIN device_investor AS di ON di.device_number = d.device_number
         <where>
             <if test="deviceTypeId !=null"> and d.device_type_id = #{deviceTypeId}</if>
             <if test="deviceNumber != null "> and d.device_number = #{deviceNumber}</if>
             <if test="hospitalId != null "> and d.hospital_id = #{hospitalId}</if>
             <if test="status != null "> and d.status = #{status}</if>
             <if test="userId != null"> and d.user_id = #{userId}</if>
-            and d.device_number IN(SELECT device_number FROM device_investor)
         </where>
         GROUP BY d.device_id
     </select>
@@ -234,6 +248,13 @@
             #{deviceNumber}
         </foreach>
     </update>
+    <update id="updateInvestorDevice" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE device
+            SET investor_id=#{item.investorId}
+            WHERE device_number=#{item.deviceNumber}
+        </foreach>
+    </update>
 
     <delete id="deleteDeviceByDeviceId" parameterType="Long">
         delete from device where device_id = #{deviceId}
@@ -265,6 +286,32 @@
     <select id="selectDeviceByUserId" parameterType="device" resultMap="DeviceResult">
         <include refid="selectDeviceVo"/>
         where user_id=#{userId}
+    </select>
+    <select id="selectInvestorDeviceByIds" resultMap="DeviceInvestorResult">
+        SELECT d.device_id,d.`device_number`,d.`investor_id`,
+        di.`investor_id` AS userInvestorId FROM device AS d
+        INNER JOIN device_investor AS di
+        ON di.device_number = d.device_number
+        WHERE di.Id IN
+        <foreach item="deviceNumber" collection="array" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </select>
+    <select id="selectInvestorDeviceById"  resultMap="DeviceInvestorResult">
+        SELECT d.device_id,d.`device_number`,d.`investor_id`,
+        di.`investor_id` AS userInvestorId FROM device AS d
+        INNER JOIN device_investor AS di
+        ON di.device_number = d.device_number
+        WHERE di.Id = #{id}
+    </select>
+    <select id="selectDeviceProportionDetail" parameterType="String" resultMap="deviceProportionResult">
+        SELECT su.`proportion` AS suProportion,
+               h.`proportion` AS hProportion,IFNULL(SUM(di.`proportion`),0) AS diProportion
+        FROM device AS d
+                 LEFT JOIN sys_user AS su ON d.`user_id` = su.`user_id`
+                 LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
+                 LEFT JOIN device_investor AS di ON di.`device_number` = d.`device_number`
+        WHERE d.device_number = #{deviceNumber}
     </select>
 
 </mapper>

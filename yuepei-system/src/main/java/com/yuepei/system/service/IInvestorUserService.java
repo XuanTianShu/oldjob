@@ -68,4 +68,8 @@ public interface IInvestorUserService
     int addDevice(DeviceInvestor deviceInvestor);
 
     int updateDevice(DeviceInvestor deviceInvestor);
+
+    int deleteDeviceByIds(Long[] ids);
+
+    int deleteDeviceById(Long id);
 }
