@@ -459,9 +459,9 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                         Long time2 = new Date(now.getTime() - parse.getTime()).getTime();
                         Long minute2 = time2 / 1000 / 60 % 60 ;
                         if (minute2<10){
-                            userLeaseOrderVo.setEstimateAmount("(当日"+start+"~(次日)"+end+")  "+BigDecimal.ZERO);
+                            userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+BigDecimal.ZERO);
                         }else {
-                            userLeaseOrderVo.setEstimateAmount("(当日"+start+"~(次日)"+end+")  "+userLeaseOrder.getFixedPrice().add(userLeaseOrder.getTimePrice()));
+                            userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+userLeaseOrder.getFixedPrice().add(userLeaseOrder.getTimePrice()));
                         }
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -542,9 +542,9 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                         Long time2 = new Date(now.getTime() - parse.getTime()).getTime();
                         Long minute2 = time2 / 1000 / 60 % 60 ;
                         if (minute2<10){
-                            userLeaseOrderVo.setEstimateAmount("(当日"+start+"~(次日)"+end+")  "+BigDecimal.ZERO);
+                            userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+BigDecimal.ZERO);
                         }else {
-                            userLeaseOrderVo.setEstimateAmount("(当日"+start+"~(次日)"+end+")  "+userLeaseOrder.getFixedPrice().add(userLeaseOrder.getTimePrice()));
+                            userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+userLeaseOrder.getFixedPrice().add(userLeaseOrder.getTimePrice()));
                         }
                     } catch (ParseException e) {
                         e.printStackTrace();

@@ -106,16 +106,19 @@ public class AgentServiceImpl implements AgentService {
             manageVo.setHospitalId(hospital.getHospitalId());
             manageVo.setHospitalName(hospital.getHospitalName());
         }
-        BigDecimal decimal = new BigDecimal(0);
         List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
         deviceDetailsVos.stream().forEach(map->{
             List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
             userLeaseOrders.addAll(userLeaseOrderList);
         });
+        List<BigDecimal> decimals = new ArrayList<>();
         userLeaseOrders.stream().forEach(map->{
-            BigDecimal bigDecimal = map.getNetAmount();
-            decimal.add(bigDecimal);
+            decimals.add(map.getNetAmount());
         });
+        BigDecimal decimal = BigDecimal.ZERO;
+        for (BigDecimal price : decimals) {
+            decimal=decimal.add(price);
+        }
         manageVo.setDeviceAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
         manageVo.setUtilizationRate(0L);
         manageVo.setDetailsVos(deviceDetailsVos);
@@ -342,7 +345,7 @@ public class AgentServiceImpl implements AgentService {
         //添加用户和医院关联表
         hospitalDeviceMapper.insertHospitalUser(user1.getUserName(),hospital.getHospitalId());
         //对设备进行修改
-        deviceMapper.updateDeviceList(hospitalAgentVo.getDeviceNumber(),hospitalAgentVo.getHospitalAddress(),hospital.getHospitalId(),user1.getUserId());
+        deviceMapper.updateDeviceList(hospitalAgentVo.getDeviceNumber(),hospitalAgentVo.getHospitalAddress(),hospital.getHospitalId(),sysUser.getUserId());
         return "添加成功";
     }
 
