@@ -95,4 +95,6 @@ public interface UserDepositOrderMapper {
     List<UserDepositVO> selectUserDepositList(@Param("openid") String openid);
 
     void bathUpdateUserDeposit(@Param("userDepositVOList") List<UserDepositVO> userDepositVOList);
+
+    void bathUpdateUserDeposits(@Param("userDepositVOList") List<UserDepositVO> userDepositVOList);
 }

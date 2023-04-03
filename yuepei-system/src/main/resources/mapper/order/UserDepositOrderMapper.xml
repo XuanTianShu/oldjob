@@ -100,6 +100,13 @@
             where order_number = #{item.orderNumber}
         </foreach>
     </update>
+    <update id="bathUpdateUserDeposits">
+        <foreach collection="userDepositVOList" item="item" separator=";">
+            update user_deposit_order
+            set `status` = '1'
+            where order_number = #{item.orderNumber}
+        </foreach>
+    </update>
 
     <delete id="deleteUserDepositOrderById" parameterType="Long">
         delete from user_deposit_order where id = #{id}

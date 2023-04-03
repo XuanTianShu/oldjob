@@ -34,10 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.GeneralSecurityException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 　　　　 ┏┓       ┏┓+ +
@@ -182,7 +179,6 @@ public class UserRefundServiceImpl implements UserRefundService {
                 );
                 //商户订单号
                 String out_trade_no = (String) parseObject.get("out_trade_no");
-                System.out.println(out_trade_no+"--");
                 Object amount = parseObject.get("amount");
                 JSONObject jsonObject1 = JSONObject.parseObject(amount.toString());
                 Object price = jsonObject1.get("payer_refund");
@@ -220,7 +216,6 @@ public class UserRefundServiceImpl implements UserRefundService {
      * @param openid
      * @return
      */
-    @Transactional
     @Override
     public AjaxResult userDepositRefund(String openid) {
         System.out.println(openid+"用户标识");
@@ -238,6 +233,7 @@ public class UserRefundServiceImpl implements UserRefundService {
                 }
             }
         }
+        List<String> list = new ArrayList<>();
         if (userDepositVOList.size() != 0){
             //TODO 批量更新押金状态，防止重复操作
             System.out.println("更新状态");
@@ -282,9 +278,23 @@ public class UserRefundServiceImpl implements UserRefundService {
                     String refund_id = resultMap.get("refund_id");
                     String transaction_id = resultMap.get("transaction_id");
                     String out_trade_no = resultMap.get("out_trade_no");
+                    list.add(out_trade_no);
                     String status = resultMap.get("status");
-                    System.out.println(userDepositVO.getOrderNumber() + "--" + out_trade_no + "--" + status);
                 }
+            }
+            if (list.size() > 0){
+                for (String s : list) {
+                    for (int k = userDepositVOList.size() - 1; k >= 0; k--) {
+                        if (s.equals(userDepositVOList.get(k).getOrderNumber())){
+                            userDepositVOList.remove(k);
+                        }
+                    }
+                }
+                if (userDepositVOList.size() > 0){
+                    userDepositOrderMapper.bathUpdateUserDeposits(userDepositVOList);
+                }
+            }else {
+                userDepositOrderMapper.bathUpdateUserDeposits(userDepositVOList);
             }
             return AjaxResult.success();
         }
