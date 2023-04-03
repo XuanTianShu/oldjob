@@ -340,6 +340,7 @@ public class AgentServiceImpl implements AgentService {
         user1.setPassword(SecurityUtils.encryptPassword(hospitalAgentVo.getPassword()));
         user1.setNickName("医院用户");
         user1.setUserType("04");
+        user1.setContacts(hospitalAgentVo.getContacts());
         user1.setProportion(hospitalAgentVo.getDivided());
         sysUserMapper.insertSysUser(user1);
         //添加用户和医院关联表

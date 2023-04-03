@@ -34,10 +34,10 @@
         <result property="deviceMac" column="device_mac"/>
         <result property="rows" column="rows"/>
         <result property="deviceRule" column="device_rule"/>
-        <result property="investorProportion" column="investor_proportion"/>
-        <result property="agentProportion" column="agent_proportion"/>
-        <result property="hospitalProportion" column="hospital_proportion"/>
-        <result property="platformProportion" column="platform_proportion"/>
+        <result property="investorProportion" column="investorProportion"/>
+        <result property="agentProportion" column="agentProportion"/>
+        <result property="hospitalProportion" column="hospitalProportion"/>
+        <result property="platformProportion" column="platformProportion"/>
         <result property="isValid" column="is_valid"/>
     </resultMap>
 

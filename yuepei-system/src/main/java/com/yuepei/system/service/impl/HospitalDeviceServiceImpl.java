@@ -821,10 +821,9 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
             deviceTypes.add(deviceType);
         });
-        List<DeviceType> collect = deviceTypes.stream().distinct().collect(Collectors.toList());
         indexVo.setDeviceAmount(decimal);
         indexVo.setHospitalName(hospital.getHospitalName());
-        indexVo.setSum(collect.size());
+        indexVo.setSum(deviceList.size());
         indexVo.setProportion(sysUser.getProportion());
         return indexVo;
     }
