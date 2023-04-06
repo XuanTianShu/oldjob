@@ -186,7 +186,7 @@ public class AgentServiceImpl implements AgentService {
         DeviceManageVo deviceManageVo = new DeviceManageVo();
         SysUser user = sysUserMapper.selectUserById(userId);
         List<HospitalManagementVo> hospitalManagementVos = new ArrayList<>();
-        ArrayList<Hospital> hospitals = new ArrayList<>();
+        List<Hospital> hospitals = new ArrayList<>();
         if (user.getParentId()!=0){
             List<Device> deviceList = deviceMapper.selectDeviceByUserId(user.getUserId());
             deviceList.stream().forEach(map->{
@@ -324,6 +324,7 @@ public class AgentServiceImpl implements AgentService {
         }
         Hospital hospital = new Hospital();
         hospital.setHospitalName(hospitalAgentVo.getHospitalName());
+        hospital.setType(1L);
         hospital.setParentId(0L);
         hospitalDeviceMapper.insertHospital(hospital);
         SysUser user = sysUserMapper.selectUserByUserName(hospitalAgentVo.getAccountNumber());
@@ -959,18 +960,17 @@ public class AgentServiceImpl implements AgentService {
             return null;
         }
         List<String> deviceNumbers = new ArrayList<>();
-        deviceList.stream().forEach(map->{
-            deviceNumbers.add(map.getDeviceNumber());
-        });
         List<Long> hospitalIds = new ArrayList<>();
         deviceList.stream().forEach(map->{
+            deviceNumbers.add(map.getDeviceNumber());
             hospitalIds.add(map.getHospitalId());
         });
+        List<Long> collect = hospitalIds.stream().distinct().collect(Collectors.toList());
         TotalVo totalVo = new TotalVo();
         List<OrderVo> orderVos = new ArrayList<>();
         List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
         if (statistics == 1) {
-            hospitalIds.stream().forEach(map->{
+            collect.stream().forEach(map->{
                 List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectRevenueStatistics(deviceNumbers,map);
                 userLeaseOrderList.addAll(userLeaseOrders);
             });
@@ -1012,7 +1012,7 @@ public class AgentServiceImpl implements AgentService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else if (statistics == 2) {
-            hospitalIds.stream().forEach(map->{
+            collect.stream().forEach(map->{
                 List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectRevenueStatistics(deviceNumbers,map);
                 userLeaseOrderList.addAll(userLeaseOrders);
             });
@@ -1046,7 +1046,7 @@ public class AgentServiceImpl implements AgentService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else if (statistics == 3) {
-            hospitalIds.stream().forEach(map->{
+            collect.stream().forEach(map->{
                 List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectRevenueStatistics(deviceNumbers,map);
                 userLeaseOrderList.addAll(userLeaseOrders);
             });
@@ -1090,7 +1090,7 @@ public class AgentServiceImpl implements AgentService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else {
-            hospitalIds.stream().forEach(map->{
+            collect.stream().forEach(map->{
                 List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectRevenueStatistics(deviceNumbers,map);
                 userLeaseOrderList.addAll(userLeaseOrders);
             });

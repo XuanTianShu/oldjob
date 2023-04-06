@@ -12,8 +12,8 @@
         left join sys_user su on hu.user_name=su.user_name
     </sql>
     <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
-        insert into hospital(hospital_name,parent_id)
-        values (#{hospitalName},#{parentId})
+        insert into hospital(hospital_name,parent_id,type)
+        values (#{hospitalName},#{parentId},#{type})
     </insert>
     <insert id="insertHospitalUser" parameterType="HospitalUser">
         insert into hospital_user (hospital_id,user_name) values (#{hospitalId},#{userName})
@@ -66,6 +66,7 @@
         <result property="deviceTypeId" column="device_type_id"></result>
         <result property="hospitalId" column="hospital_id"></result>
         <result property="deviceDeposit" column="device_deposit"></result>
+        <result property="investorId" column="investor_id"></result>
         <result property="billingId" column="billing_id"></result>
         <result property="deviceQrCode" column="device_qR_code"></result>
         <result property="deviceAddress" column="device_address"></result>
@@ -230,6 +231,8 @@
     <select id="selectDeviceNumberByHospitalId" resultType="java.lang.String">
         select device_number from device where hospital_id=#{hospitalId}
     </select>
-
-
+    <select id="selectInvestorId" parameterType="Device" resultMap="DeviceTypeDetailsResult">
+        <include refid="selectDevice"/>
+        where investor_id LIKE concat('%"',#{userId},'"%')
+    </select>
 </mapper>

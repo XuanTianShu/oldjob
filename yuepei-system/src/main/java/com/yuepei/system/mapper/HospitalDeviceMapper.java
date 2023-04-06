@@ -59,4 +59,6 @@ public interface HospitalDeviceMapper {
     void insertHospitalUser(@Param("userName")String userName,@Param("hospitalId") Long hospitalId);
 
     List<String> selectDeviceNumberByHospitalId(@Param("hospitalId")Long hospitalId);
+
+    List<Device> selectInvestorId(@Param("userId") Long userId);
 }
