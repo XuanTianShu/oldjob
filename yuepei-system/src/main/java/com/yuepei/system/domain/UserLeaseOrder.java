@@ -122,4 +122,6 @@ public class UserLeaseOrder extends BaseEntity {
     private BigDecimal fixedPrice;
 
     private Long isValid;
+
+    private String hospitalId;
 }

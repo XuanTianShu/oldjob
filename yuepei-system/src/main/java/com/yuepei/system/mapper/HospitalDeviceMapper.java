@@ -28,7 +28,7 @@ public interface HospitalDeviceMapper {
 
     Goods selectGoodsByGoodsName(@Param("goodsId") Long goodsId);
 
-    List<String> selectDeviceNumber(@Param("userId") Long userId);
+    List<Device> selectDeviceNumber(@Param("userId") Long userId);
 
     HospitalUser selectHospitalbyUserName(@Param("userName") String userName);
 
