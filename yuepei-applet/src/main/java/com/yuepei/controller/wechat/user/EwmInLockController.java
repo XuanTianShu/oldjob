@@ -98,6 +98,7 @@ public class EwmInLockController {
 
     /**
      * 创建设备开锁指令
+     * 未使用
      * @return
      */
     @PostMapping("/unlocking")

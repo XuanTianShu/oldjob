@@ -82,7 +82,6 @@ public class MyLeaseOrderController {
     @PostMapping("/insertUserLeaseOrder")
     public AjaxResult insertUserLeaseOrder(HttpServletRequest request, String rows, @RequestBody UserLeaseOrder userLeaseOrder){
         SysUser user = tokenUtils.analysis(request);
-        System.out.println(rows+"--------获取值-------"+userLeaseOrder.getDeviceNumber());
         return myLeaseOrderService.insertUserLeaseOrder(user.getOpenid(),rows,userLeaseOrder);
     }
 
@@ -99,7 +98,6 @@ public class MyLeaseOrderController {
             deviceNumber.setElectric(device.getElectric());
             deviceNumber.setStatus(2L);
             deviceMapper.updateDevice(deviceNumber);
-            System.out.println("出现故障无法借床!");
             return AjaxResult.error("出现故障无法借床！");
         }else {
             deviceNumber.setStatus(0L);

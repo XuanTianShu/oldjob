@@ -2,6 +2,7 @@ package com.yuepei.system.domain;
 
 import com.yuepei.common.annotation.Excel;
 import com.yuepei.common.core.domain.BaseEntity;
+import lombok.Data;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
  * @author ohy
  * @date 2023-02-14
  */
+@Data
 public class InvestorUser extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -41,6 +43,8 @@ public class InvestorUser extends BaseEntity
     /** 分成比例 */
     @Excel(name = "分成比例")
     private Long proportion;
+
+    private Long totalProportion;
 
     public void setId(Long id)
     {
@@ -118,6 +122,7 @@ public class InvestorUser extends BaseEntity
                 .append("proportion", getProportion())
                 .append("createTime", getCreateTime())
                 .append("updateTime", getUpdateTime())
+                .append("totalProportion",getTotalProportion())
                 .toString();
     }
 }

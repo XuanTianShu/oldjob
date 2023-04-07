@@ -18,4 +18,6 @@ public interface DeviceInvestorMapper {
     void deleteByInvestorIds(List<String> list);
 
     void deleteByInvestorId(@Param("deviceNumber") String deviceNumber);
+
+    DeviceInvestor getDeviceById(@Param("id") Long id);
 }

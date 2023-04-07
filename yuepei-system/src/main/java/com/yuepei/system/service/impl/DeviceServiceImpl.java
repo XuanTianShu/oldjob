@@ -112,6 +112,7 @@ public class DeviceServiceImpl implements DeviceService {
      * @param device 设备
      * @return 结果
      */
+    @Transactional
     @Override
     public AjaxResult insertDevice(Device device)
     {
@@ -228,8 +229,10 @@ public class DeviceServiceImpl implements DeviceService {
         Long[] longs = new Long[]{};
         JSONArray objects = JSON.parseArray(device.getInvestorId());
         List<Long> list = objects.toJavaList(Long.class);
-        int i = deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
-        int insert = deviceInvestorMapper.insert(list.toArray(longs), device.getDeviceNumber());
+        if (list.size() > 0){
+            int i = deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
+            int insert = deviceInvestorMapper.insert(list.toArray(longs), device.getDeviceNumber());
+        }
         return deviceMapper.updateDevice(device);
     }
 

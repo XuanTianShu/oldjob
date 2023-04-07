@@ -14,6 +14,7 @@
         <result property="proportion"    column="proportion"    />
         <result property="createTime"    column="create_time"    />
         <result property="updateTime"    column="update_time"    />
+        <result property="totalProportion" column="totalProportion"/>
     </resultMap>
 
     <resultMap type="com.yuepei.common.core.domain.entity.SysUser" id="SysUserResult">
@@ -109,6 +110,21 @@
         <include refid="selectInvestorUserVo"/>
         where id = #{id}
     </select>
+    <select id="totalProportion" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
+        SELECT (100 - IFNULL(SUM(su.`proportion`), 0) -
+                IFNULL(SUM(di.`proportion`), 0) -
+                IFNULL(SUM(h.`proportion`), 0)) AS totalProportion FROM device AS d
+                LEFT JOIN device_investor AS di ON d.`device_number` = di.`device_number`
+                LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+                LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
+        <where>
+            and d.device_number = #{deviceNumber}
+            <if test="id != null">
+                and di.id = #{id}
+            </if>
+        </where>
+
+    </select>
 
     <insert id="insertInvestorUser" parameterType="com.yuepei.system.domain.InvestorUser" useGeneratedKeys="true" keyProperty="id">
         insert into investor_user
@@ -133,6 +149,19 @@
             <if test="updateTime != null">#{updateTime},</if>
         </trim>
     </insert>
+    <insert id="addDevice" parameterType="com.yuepei.system.domain.DeviceInvestor" useGeneratedKeys="true" keyProperty="id">
+        insert into device_investor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceNumber != null">device_number,</if>
+            <if test="investorId != null">investor_id,</if>
+            <if test="proportion != null">proportion,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceNumber != null">#{deviceNumber},</if>
+            <if test="investorId != null">#{investorId},</if>
+            <if test="proportion != null">#{proportion},</if>
+        </trim>
+    </insert>
 
     <update id="updateInvestorUser" parameterType="com.yuepei.system.domain.InvestorUser">
         update investor_user
@@ -148,6 +177,15 @@
         </trim>
         where id = #{id}
     </update>
+    <update id="updateDevice">
+        update device_investor
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="deviceNumber != null">device_number = #{deviceNumber},</if>
+            <if test="investorId != null">investor_id = #{investorId},</if>
+            <if test="proportion != null">proportion = #{proportion},</if>
+        </trim>
+        where id = #{id}
+    </update>
 
     <delete id="deleteInvestorUserById" parameterType="Long">
         delete from investor_user where id = #{id}
@@ -158,5 +196,14 @@
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
+    </delete>
+    <delete id="deleteDeviceByIds" parameterType="String">
+        delete from device_investor where Id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteDeviceById">
+        delete from device_investor where Id = #{id}
     </delete>
 </mapper>

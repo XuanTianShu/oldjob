@@ -46,7 +46,13 @@
         </where>
     </select>
     <select id="deviceByInvestorId" parameterType="long" resultMap="deviceInvestorVOResult">
-        SELECT device_number,device_id FROM device WHERE device_number NOT IN(
-        SELECT device_number FROM device_investor WHERE investor_id = #{investorId})
+        SELECT device_number,device_id FROM device WHERE NOT EXISTS(
+                SELECT device_number FROM device_investor
+                WHERE device.`device_number` = device_investor.device_number
+                  AND device_investor.investor_id = #{investorId})
+    </select>
+    <select id="getDeviceById" parameterType="long" resultMap="deviceInvestorQuery">
+        <include refid="deviceInvestorVO"></include>
+        where id = #{id}
     </select>
 </mapper>

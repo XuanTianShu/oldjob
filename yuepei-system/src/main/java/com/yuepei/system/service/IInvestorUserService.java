@@ -1,7 +1,9 @@
 package com.yuepei.system.service;
 
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.InvestorUser;
+import com.yuepei.system.domain.vo.TotalProportionVO;
 
 import java.util.List;
 
@@ -60,4 +62,14 @@ public interface IInvestorUserService
      * @return 结果
      */
     public int deleteInvestorUserById(Long id);
+
+    TotalProportionVO totalProportion(DeviceInvestor deviceInvestor);
+
+    int addDevice(DeviceInvestor deviceInvestor);
+
+    int updateDevice(DeviceInvestor deviceInvestor);
+
+    int deleteDeviceByIds(Long[] ids);
+
+    int deleteDeviceById(Long id);
 }

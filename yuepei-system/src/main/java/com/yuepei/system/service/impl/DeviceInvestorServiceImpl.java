@@ -24,4 +24,9 @@ public class DeviceInvestorServiceImpl implements DeviceInvestorService {
     public List<DeviceInvestorVO> deviceByInvestorId(Long investorId) {
         return deviceInvestorMapper.deviceByInvestorId(investorId);
     }
+
+    @Override
+    public DeviceInvestor getDeviceById(Long id) {
+        return deviceInvestorMapper.getDeviceById(id);
+    }
 }

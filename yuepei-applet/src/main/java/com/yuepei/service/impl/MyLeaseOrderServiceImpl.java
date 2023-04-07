@@ -14,10 +14,12 @@ import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.ConditionOrderVO;
 import com.yuepei.system.domain.vo.LeaseOrderVO;
 import com.yuepei.system.domain.vo.OrderSumAndMoneyVO;
+import com.yuepei.system.domain.vo.TotalProportionVO;
 import com.yuepei.system.mapper.DeviceMapper;
 import com.yuepei.system.mapper.DeviceTypeMapper;
 import com.yuepei.system.mapper.UserLeaseOrderMapper;
 import com.yuepei.system.utils.RedisServer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -57,6 +59,7 @@ import java.util.concurrent.TimeUnit;
  * @author ：AK
  * @create ：2023/1/9 18:34
  **/
+@Slf4j
 @Service
 public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
     @Autowired
@@ -71,8 +74,8 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
     @Autowired
     private RedisServer redisServer;
 
-    @Value("${coupon.order}")
-    private String orderPrefix;
+    @Value("${coupon.valid}")
+    private String orderValid;
 
     @Override
     public List<UserLeaseOrder> userLeaseOrder(String openid, Integer status) {
@@ -114,10 +117,20 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     String uuid = String.format("%040d", new BigInteger(UUID.randomUUID().toString().replace("-", ""), 16));
                     String orderNumber = uuid.substring(uuid.length() - 16);
 
+                    //计算订单代理商、投资人、医院分成比例
+                    TotalProportionVO totalProportionVO = deviceMapper.selectDeviceProportionDetail(userLeaseOrder.getDeviceNumber());
+
+                    //TODO 记录订单分成比例详情
+
                     Device device = deviceMapper.selectDeviceByDeviceNumber(userLeaseOrder.getDeviceNumber());
                     DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(device.getDeviceTypeId());
                     userLeaseOrder.setDeviceType(deviceType.getDeviceTypeName());
                     userLeaseOrder.setLeaseTime(new Date());
+                    int proportionCount = 100-(totalProportionVO.getHProportion() + totalProportionVO.getDiProportion() + totalProportionVO.getSuProportion());
+                    userLeaseOrder.setPlatformProportion(Long.parseLong(String.valueOf(proportionCount)));
+                    userLeaseOrder.setAgentProportion(Long.parseLong(String.valueOf(totalProportionVO.getSuProportion())));
+                    userLeaseOrder.setHospitalProportion(Long.parseLong(String.valueOf(totalProportionVO.getHProportion())));
+                    userLeaseOrder.setInvestorProportion(Long.parseLong(String.valueOf(totalProportionVO.getDiProportion())));
                     userLeaseOrder.setOrderNumber(orderNumber);
                     userLeaseOrder.setOpenid(openid);
                     userLeaseOrder.setStatus("0");
@@ -127,9 +140,9 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     userLeaseOrder.setDeposit(new BigDecimal(String.valueOf(deviceType.getDeviceTypeDeposit())).longValue());
                     userLeaseOrderMapper.insertUserLeaseOrder(userLeaseOrder);
 
+                    redisServer.setCacheObject(orderValid+orderNumber,userLeaseOrder,300,TimeUnit.SECONDS);
                     System.out.println(userLeaseOrder.getRule()+"--前端传的--");
-
-                    //TODO 将订单信息存放到redis
+                    //将订单信息存放到redis
 //                    System.out.println("新增内容");
 //                    UserLeaseOrder userLeaseOrder1 = userLeaseOrderMapper.selectUserLeaseOrderByOpenId(orderNumber);
 //                    System.out.println("订单编号："+orderNumber);
@@ -171,11 +184,8 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
 //                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);
 //                        System.out.println("存储到redis2");
 //                    }
-                    System.out.println("没问题");
 //                    redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);
-
-
-                    System.out.println("借床ok");
+                    log.info("借床ok");
 
 
                     if (rows != null){
@@ -202,22 +212,23 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                         }
                     }else {
                         System.out.println(userLeaseOrder.getDeviceNumber()+"--------"+"修改单个锁");
-                        Device device1 = new Device();
-                        device1.setDeviceNumber(userLeaseOrder.getDeviceNumber());
-                        device1.setStatus(1L);
-                        deviceMapper.updateDevice(device1);
+//                        Device device1 = new Device();
+//                        device1.setDeviceNumber(userLeaseOrder.getDeviceNumber());
+//                        device1.setStatus(1L);
+//                        deviceMapper.updateDevice(device1);
                     }
 
-                    return AjaxResult.success();
-                }else {
+//                    return AjaxResult.success();
+                }
+//                else {
                     //计算使用时长
-                    UserLeaseOrder userLease = userLeaseOrderMapper.selectLeaseOrderDetails(userLeaseOrder.getOrderNumber());
-                    long time = userLease.getLeaseTime().getTime();
-                    Date date = new Date();
-                    long l = date.getTime() - time;
-                    userLeaseOrder.setPlayTime(String.valueOf(l));
+//                    UserLeaseOrder userLease = userLeaseOrderMapper.selectLeaseOrderDetails(userLeaseOrder.getOrderNumber());
+//                    long time = userLease.getLeaseTime().getTime();
+//                    Date date = new Date();
+//                    long l = date.getTime() - time;
+//                    userLeaseOrder.setPlayTime(String.valueOf(l));
 
-                    //TODO 计算计时套餐费用和固定套餐费用
+                    // 计算计时套餐费用和固定套餐费用
 //                    String deviceRule = userLease.getDeviceRule();
 //                    JSONArray objects = JSON.parseArray(deviceRule);
 //                    Map<String, Object> map = new HashMap<>();
@@ -239,45 +250,45 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
 
 
 
-                    System.out.println("还床");
+//                    System.out.println("还床");
                     //修改订单
-                    userLeaseOrder.setStatus("1");
-                    userLeaseOrder.setDeviceNumber(userLeaseOrder.getDeviceNumber());
-                    userLeaseOrder.setRestoreTime(new Date());
-                    userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
-                    System.out.println("还床ok");
+//                    userLeaseOrder.setStatus("1");
+//                    userLeaseOrder.setDeviceNumber(userLeaseOrder.getDeviceNumber());
+//                    userLeaseOrder.setRestoreTime(new Date());
+//                    userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
+//                    System.out.println("还床ok");
 
-                    if (rows != null){
-                        ObjectMapper objectMapper = new ObjectMapper();
-                        List<Item> itemList;
-                        itemList = objectMapper.readValue(rows, new com.fasterxml.jackson.core.type.TypeReference<List<Item>>() {
-                        });
-                        for (int i = Objects.requireNonNull(itemList).size() - 1; i >= 0; i--) {
-                            if (itemList.get(i).getStatus() != 0){
-                                itemList.remove(i);
-                            }
-                        }
-                        if (itemList.size() != 0){
-                            System.out.println(0+"====");
+//                    if (rows != null){
+//                        ObjectMapper objectMapper = new ObjectMapper();
+//                        List<Item> itemList;
+//                        itemList = objectMapper.readValue(rows, new com.fasterxml.jackson.core.type.TypeReference<List<Item>>() {
+//                        });
+//                        for (int i = Objects.requireNonNull(itemList).size() - 1; i >= 0; i--) {
+//                            if (itemList.get(i).getStatus() != 0){
+//                                itemList.remove(i);
+//                            }
+//                        }
+//                        if (itemList.size() != 0){
+//                            System.out.println(0+"====");
                             //修改 格子柜状态
-                            deviceMapper.updateDeviceByDeviceNumber(rows,userLeaseOrder.getDeviceNumber(),0);
-                            System.out.println("修改成功");
-                        }else {
-                            System.out.println(1+"=====");
+//                            deviceMapper.updateDeviceByDeviceNumber(rows,userLeaseOrder.getDeviceNumber(),0);
+//                            System.out.println("修改成功");
+//                        }else {
+//                            System.out.println(1+"=====");
                             //修改 格子柜状态
-                            deviceMapper.updateDeviceByDeviceNumber(rows,userLeaseOrder.getDeviceNumber(),1);
-                            System.out.println("修改成功");
-                        }
-                    }else {
-                        System.out.println(userLeaseOrder.getDeviceNumber()+"--------"+"修改单个锁");
-                        Device device = new Device();
-                        device.setDeviceNumber(userLeaseOrder.getDeviceNumber());
-                        device.setStatus(1L);
-                        deviceMapper.updateDevice(device);
-                    }
+//                            deviceMapper.updateDeviceByDeviceNumber(rows,userLeaseOrder.getDeviceNumber(),1);
+//                            System.out.println("修改成功");
+//                        }
+//                    }else {
+//                        System.out.println(userLeaseOrder.getDeviceNumber()+"--------"+"修改单个锁");
+//                        Device device = new Device();
+//                        device.setDeviceNumber(userLeaseOrder.getDeviceNumber());
+//                        device.setStatus(1L);
+//                        deviceMapper.updateDevice(device);
+//                    }
 
                     return AjaxResult.success();
-                }
+//                }
             }else {
                 return AjaxResult.error("未缴纳押金");
             }

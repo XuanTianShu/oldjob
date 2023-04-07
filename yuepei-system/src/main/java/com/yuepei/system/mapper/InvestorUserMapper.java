@@ -1,7 +1,10 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.InvestorUser;
+import com.yuepei.system.domain.vo.TotalProportionVO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -60,4 +63,14 @@ public interface InvestorUserMapper
      * @return 结果
      */
     public int deleteInvestorUserByIds(Long[] ids);
+
+    TotalProportionVO totalProportion(DeviceInvestor deviceInvestor);
+
+    int addDevice(DeviceInvestor deviceInvestor);
+
+    int updateDevice(DeviceInvestor deviceInvestor);
+
+    int deleteDeviceByIds(Long[] ids);
+
+    int deleteDeviceById(@Param("id") Long id);
 }

@@ -4,5 +4,10 @@
       "name": "spring.datasource.druid.master.username",
       "type": "java.lang.String",
       "description": "Description for spring.datasource.druid.master.username."
-  }
-] }
+    },
+    {
+      "name": "log4j.logger.org.apache.ibatis",
+      "type": "java.lang.String",
+      "description": "Description for log4j.logger.org.apache.ibatis."
+    }
+  ] }
