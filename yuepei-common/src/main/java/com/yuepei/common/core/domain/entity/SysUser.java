@@ -125,9 +125,18 @@ public class SysUser extends BaseEntity
     /** 角色ID */
     private Long roleId;
 
+    private Long hospitalId;
+
     public SysUser()
     {
 
+    }
+    public Long getHospitalId(){
+        return hospitalId;
+    }
+
+    public void setHospitalId(Long hospitalId){
+        this.hospitalId=hospitalId;
     }
 
     public SysUser(Long userId)

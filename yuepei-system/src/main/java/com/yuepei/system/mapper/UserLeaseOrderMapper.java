@@ -97,13 +97,13 @@ public interface UserLeaseOrderMapper {
 
     UserLeaseOrder selectLeaseOrderDetails(@Param("orderNumber") String orderNumber);
 
-    List<UserLeaseOrder> selectRevenueStatistics(List<String> deviceNumber, Long hospitalId);
+    List<UserLeaseOrder> selectRevenueStatistics(@Param("deviceNumber") List<String> deviceNumber,@Param("hospitalId") Long hospitalId);
 
     OrderSumAndMoneyVO selectDayOrder();
 
     ConditionOrderVO selectConditionOrder(LeaseOrderVO leaseOrderVO);
 
-    List<UserLeaseOrder> selectUserLeaseOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber,@Param("hospitalId") Long hospitalId);
+    List<UserLeaseOrder> selectUserLeaseOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber,@Param("hospitalId") String hospitalId);
 
     int selectUserOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber, @Param("openid") String openid);
 

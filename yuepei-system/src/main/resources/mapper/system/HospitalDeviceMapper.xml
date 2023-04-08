@@ -4,19 +4,9 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.HospitalDeviceMapper">
 
-    <sql id="DeviceTypeVo">
-        select dt.device_type_name from device_type dt
-        left join device d on dt.device_type_id=d.device_type_id
-        left join hospital h on d.hospital_id=h.hospital_id
-        left join hospital_user hu on h.hospital_id=hu.hospital_id
-        left join sys_user su on hu.user_name=su.user_name
-    </sql>
     <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
         insert into hospital(hospital_name,parent_id,type)
         values (#{hospitalName},#{parentId},#{type})
-    </insert>
-    <insert id="insertHospitalUser" parameterType="HospitalUser">
-        insert into hospital_user (hospital_id,user_name) values (#{hospitalId},#{userName})
     </insert>
 
     <resultMap type="UserLeaseOrder" id="UserLeaseOrderResult">
@@ -46,11 +36,6 @@
         <result property="deviceTypeId" column="device_type_id"></result>
         <result property="deviceTypeName" column="device_type_name"></result>
         <result property="deviceTypeDeposit" column="device_type_deposit"></result>
-    </resultMap>
-
-    <resultMap id="HospitalUserResult" type="HospitalUser">
-        <result property="hospitalId" column="hospital_id"></result>
-        <result property="userName" column="user_name"></result>
     </resultMap>
 
     <sql id="DeviceDetails">
@@ -129,12 +114,6 @@
         select goods_id,goods_type_id,goods_name,goods_url,goods_price,goods_all_stock,create_time from Goods
     </sql>
 
-    <select id="selectDeviceType" parameterType="DeviceType" resultMap="DeviceTypeResult">
-        <include refid="DeviceTypeVo"/>
-        where su.user_id=#{userId}
-        group by dt.device_type_name
-    </select>
-
     <select id="selectDeviceTypeDetails" parameterType="Device" resultMap="DeviceTypeDetailsResult">
         select hospital_id,device_number,device_full_address,status
         from device
@@ -185,10 +164,6 @@
         <include refid="selectDevice"/>
         where user_id = #{userId}
     </select>
-
-    <select id="selectHospitalbyUserName" parameterType="HospitalUser" resultMap="HospitalUserResult">
-        select hospital_id,user_name from hospital_user where user_name=#{userName}
-    </select>
     <select id="selectDeviceByType" parameterType="DeviceType" resultMap="DeviceTypeResult">
         select device_type_id,device_type_name,device_type_deposit from device_type where device_type_name=#{deviceType}
     </select>
@@ -212,9 +187,6 @@
     </select>
     <select id="selectHospitalByDepartment" parameterType="Hospital" resultMap="HospitalResult">
         select hospital_id,hospital_name from hospital where hospital_name=#{deviceDepartment}
-    </select>
-    <select id="selectHospitalByHospitalUserName" parameterType="HospitalUser" resultMap="HospitalUserResult">
-        select hospital_id,user_name from hospital_user where hospital_id=#{hospitalId}
     </select>
     <select id="selectHospitalByHospitalId" parameterType="Hospital" resultMap="HospitalResult">
         <include refid="selectHospital"/>

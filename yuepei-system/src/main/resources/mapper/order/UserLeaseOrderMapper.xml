@@ -317,8 +317,8 @@
         where status=2
         and hospitalId=#{hospitalId}
         and device_number in
-        <foreach item="device_number" collection="list" index="index" open="(" separator="," close=")">
-            #{device_number}
+        <foreach item="deviceNumber" collection="deviceNumber" index="index" open="(" separator="," close=")">
+            #{deviceNumber}
         </foreach>
     </select>
 

@@ -8,6 +8,7 @@ import lombok.Data;
  */
 @Data
 public class SubAccountManageVo {
+    private String investorName;
     private String agentName;
     private Integer hospitalSum;
     private Integer deviceSum;

@@ -12,7 +12,6 @@ import java.util.List;
  * @date 2023/2/10 10:19
  */
 public interface HospitalDeviceMapper {
-    List<DeviceType> selectDeviceType(@Param("userId") Long userId);
 
     List<Device> selectDeviceTypeDetails(@Param("deviceTypeId") Long deviceTypeId, @Param("hospitalId")Long hospitalId);
 
@@ -30,8 +29,6 @@ public interface HospitalDeviceMapper {
 
     List<Device> selectDeviceNumber(@Param("userId") Long userId);
 
-    HospitalUser selectHospitalbyUserName(@Param("userName") String userName);
-
     DeviceType selectDeviceByType(@Param("deviceType") String deviceType);
 
     List<Hospital> selectHospitalByParentId(@Param("hospitalId") Long hospitalId);
@@ -46,8 +43,6 @@ public interface HospitalDeviceMapper {
 
     List<Hospital> selectHospitalByDepartment(@Param("deviceDepartment") String deviceDepartment);
 
-    HospitalUser selectHospitalByHospitalUserName(@Param("hospitalId") Long hospitalId);
-
     Hospital selectHospitalByHospitalId(@Param("hospitalName")String hospitalName);
 
     List<Hospital> selectHospitalList();
@@ -55,8 +50,6 @@ public interface HospitalDeviceMapper {
     List<Device> selectDeviceByHospitalIdLike(@Param("userId") Long userId,@Param("numberOrAddress") String numberOrAddress);
 
     void insertHospital(Hospital hospital);
-
-    void insertHospitalUser(@Param("userName")String userName,@Param("hospitalId") Long hospitalId);
 
     List<String> selectDeviceNumberByHospitalId(@Param("hospitalId")Long hospitalId);
 
