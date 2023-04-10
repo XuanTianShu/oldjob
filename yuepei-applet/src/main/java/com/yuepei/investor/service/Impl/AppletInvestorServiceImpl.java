@@ -389,7 +389,9 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             deviceDetailsVos.add(detailsVo);
         });
         if (hospitalId!=null){
-            List<DeviceDetailsVo> collect = deviceDetailsVos.stream().filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
+            List<DeviceDetailsVo> collect = deviceDetailsVos.stream()
+                    .filter(map -> map.getHospitalId()!=null)
+                    .filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
             deviceDetailsVos.clear();
             deviceDetailsVos.addAll(collect);
         }
@@ -545,7 +547,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 List<UserLeaseOrder> collect = userLeaseOrders.stream().filter(j -> j.getDeviceNumber().equals(map.getDeviceNumber())).collect(Collectors.toList());
                 leaseOrders.addAll(collect);
             }else {
-                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByDevice(map.getDeviceNumber(),map.getHospitalId());
+                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByDevice(map.getDeviceNumber(),String.valueOf(map.getHospitalId()));
                 leaseOrders.addAll(userLeaseOrders);
             }
         });
