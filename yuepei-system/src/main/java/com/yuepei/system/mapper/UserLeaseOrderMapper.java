@@ -127,4 +127,10 @@ public interface UserLeaseOrderMapper {
     UserLeaseOrder selectOrderByDeviceNumber(@Param("substring1") String substring1);
 
     void deleteUserLeaseOrderByOrderNumber(@Param("orderNumber") String orderNumber);
+
+    AgentAndHospitalNameVO selectUserNameAndHospitalName(@Param("deviceNumber") String deviceNumber);
+
+    void updateUserLeaseOrderByDeviceNumber(UserLeaseOrder userLeaseOrder);
+
+    UserLeaseOrder selectLeaseOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber);
 }

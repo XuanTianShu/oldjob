@@ -87,7 +87,7 @@
     <update id="batchUpdateUserCoupon">
         UPDATE `user_discount`
         SET `status` = '2'
-        WHERE DATE(expire_time) &lt;= NOW() AND user_id = #{userId};
+        WHERE DATE(expire_time) &lt;= NOW() AND user_id = #{userId}
     </update>
 
     <delete id="deleteUserCouponById" parameterType="Long">

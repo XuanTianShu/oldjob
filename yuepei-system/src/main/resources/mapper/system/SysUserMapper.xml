@@ -234,6 +234,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="area != null and area != ''">area,</if>
  			<if test="addressDetailed != null and addressDetailed != ''">address_detailed,</if>
  			<if test="parentId != null and parentId != ''">parent_id,</if>
+ 		    <if test="hospitalId != null">hospital_id,</if>
  			create_time
  		)values(
  			<if test="userId != null and userId != ''">#{userId},</if>
@@ -256,6 +257,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 			<if test="area != null and area != ''">#{area},</if>
 			<if test="addressDetailed != null and addressDetailed != ''">#{addressDetailed},</if>
 			<if test="parentId != null and parentId != ''">#{parentId},</if>
+ 		    <if test="hospitalId != null">#{hospitalId},</if>
  			sysdate()
  		)
 	</insert>
@@ -285,6 +287,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
  			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
  			<if test="remark != null">remark = #{remark},</if>
  		    <if test="integral != null">integral = #{integral},</if>
+ 		    <if test="proportion != null">proportion = #{proportion},</if>
+ 		    <if test="hospitalId != null">hospital_id = #{hospitalId},</if>
  			update_time = sysdate()
  		</set>
  		where user_id = #{userId}

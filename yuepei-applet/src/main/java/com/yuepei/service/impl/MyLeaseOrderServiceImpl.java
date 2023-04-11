@@ -11,10 +11,7 @@ import com.yuepei.service.MyLeaseOrderService;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.DeviceType;
 import com.yuepei.system.domain.UserLeaseOrder;
-import com.yuepei.system.domain.vo.ConditionOrderVO;
-import com.yuepei.system.domain.vo.LeaseOrderVO;
-import com.yuepei.system.domain.vo.OrderSumAndMoneyVO;
-import com.yuepei.system.domain.vo.TotalProportionVO;
+import com.yuepei.system.domain.vo.*;
 import com.yuepei.system.mapper.DeviceMapper;
 import com.yuepei.system.mapper.DeviceTypeMapper;
 import com.yuepei.system.mapper.UserLeaseOrderMapper;
@@ -85,6 +82,7 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
     @Transactional
     @Override
     public AjaxResult insertUserLeaseOrder(String openid, String rows, UserLeaseOrder userLeaseOrder) {
+        log.info(userLeaseOrder.getDeviceNumber());
         try {
             //修改该设备状态
 //            Device deviceNumber = deviceMapper.selectDeviceByDeviceNumber(userLeaseOrder.getDeviceNumber());
@@ -121,9 +119,9 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     TotalProportionVO totalProportionVO = deviceMapper.selectDeviceProportionDetail(userLeaseOrder.getDeviceNumber());
 
                     //TODO 记录订单分成比例详情
-
                     Device device = deviceMapper.selectDeviceByDeviceNumber(userLeaseOrder.getDeviceNumber());
                     DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(device.getDeviceTypeId());
+                    AgentAndHospitalNameVO agentAndHospitalNameVO = userLeaseOrderMapper.selectUserNameAndHospitalName(userLeaseOrder.getDeviceNumber());
                     userLeaseOrder.setDeviceType(deviceType.getDeviceTypeName());
                     userLeaseOrder.setLeaseTime(new Date());
                     int proportionCount = 100-(totalProportionVO.getHProportion() + totalProportionVO.getDiProportion() + totalProportionVO.getSuProportion());
@@ -133,12 +131,12 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     userLeaseOrder.setInvestorProportion(Long.parseLong(String.valueOf(totalProportionVO.getDiProportion())));
                     userLeaseOrder.setOrderNumber(orderNumber);
                     userLeaseOrder.setOpenid(openid);
-                    userLeaseOrder.setStatus("0");
+                    userLeaseOrder.setUserName(agentAndHospitalNameVO.getUserName());
+                    userLeaseOrder.setHospitalName(agentAndHospitalNameVO.getHospitalName());
                     userLeaseOrder.setDeviceNumber(userLeaseOrder.getDeviceNumber());
                     userLeaseOrder.setDepositNumber(list.get(0));
                     userLeaseOrder.setDeviceRule(userLeaseOrder.getRule());
                     userLeaseOrder.setDeposit(new BigDecimal(String.valueOf(deviceType.getDeviceTypeDeposit())).longValue());
-                    userLeaseOrderMapper.insertUserLeaseOrder(userLeaseOrder);
 
                     redisServer.setCacheObject(orderValid+orderNumber,userLeaseOrder,300,TimeUnit.SECONDS);
                     System.out.println(userLeaseOrder.getRule()+"--前端传的--");
@@ -188,7 +186,8 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     log.info("借床ok");
 
 
-                    if (rows != null){
+                    log.info("rows:{}",rows);
+                    if (!rows.equals("1")){
                         ObjectMapper objectMapper = new ObjectMapper();
                         List<Item> itemList;
                         itemList = objectMapper.readValue(rows, new com.fasterxml.jackson.core.type.TypeReference<List<Item>>() {
@@ -210,14 +209,19 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                             deviceMapper.updateDeviceByDeviceNumber(rows,userLeaseOrder.getDeviceNumber(),1);
                             System.out.println("修改成功");
                         }
+                        userLeaseOrder.setIsValid(1L);
                     }else {
-                        System.out.println(userLeaseOrder.getDeviceNumber()+"--------"+"修改单个锁");
-//                        Device device1 = new Device();
-//                        device1.setDeviceNumber(userLeaseOrder.getDeviceNumber());
-//                        device1.setStatus(1L);
-//                        deviceMapper.updateDevice(device1);
+                        System.out.println("修改单个锁");
+                        Device device1 = new Device();
+                        device1.setDeviceNumber(userLeaseOrder.getDeviceNumber());
+                        device1.setStatus(1L);
+                        deviceMapper.updateDevice(device1);
+                        userLeaseOrder.setIsValid(1L);
                     }
+                    log.info("参数：{}",userLeaseOrder.getIsValid());
 
+                    userLeaseOrderMapper.insertUserLeaseOrder(userLeaseOrder);
+                    log.info("执行完");
 //                    return AjaxResult.success();
                 }
 //                else {

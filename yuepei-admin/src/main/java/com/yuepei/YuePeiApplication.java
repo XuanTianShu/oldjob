@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
 public class YuePeiApplication
 {
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) {
         SpringApplication.run(YuePeiApplication.class, args);
     }
 }

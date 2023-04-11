@@ -1,7 +1,11 @@
 package com.yuepei.system.mapper;
 
+import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.system.domain.DeviceHospital;
+import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.vo.HospitalVO;
+import com.yuepei.system.domain.vo.TotalProportionVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -93,4 +97,20 @@ public interface HospitalMapper {
     int checkHospitalName(@Param("hospitalName") String hospitalName, @Param("hospitalId") Long hospitalId);
 
     List<HospitalVO> selectHospitalListVO(HospitalVO hospital);
+
+    List<SysUser> userList(SysUser sysUser);
+
+    Hospital selectHospitalById(@Param("hospitalId") Long hospitalId);
+
+    int selectDeviceByHospitals(Long[] ids);
+
+    int selectUserByHospitals(Long[] ids);
+
+    int selectDeviceByHospital(@Param("ids") Long ids);
+
+    int selectUserByHospital(@Param("ids") Long ids);
+
+    TotalProportionVO totalProportion(@Param("hospitalId") Long hospitalId);
+
+    List<DeviceInvestor> deviceProportionList(DeviceHospital deviceHospital);
 }

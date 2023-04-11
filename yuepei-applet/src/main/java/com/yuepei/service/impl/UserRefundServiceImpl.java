@@ -29,8 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.security.GeneralSecurityException;
@@ -299,6 +301,30 @@ public class UserRefundServiceImpl implements UserRefundService {
             return AjaxResult.success();
         }
         return AjaxResult.error("暂无可退押金！");
+    }
+
+    @Override
+    public AjaxResult unlocking(HttpServletRequest request) {
+        try {
+            String reader = getAllRequestParam2(request);
+            log.info("开锁数据上报:============={}", reader);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("开锁数据上报执行事务回滚");
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            System.out.println("开锁数据上报执行回滚成功");
+        }
+        return null;
+    }
+
+    public static String getAllRequestParam2(HttpServletRequest request) throws IOException {
+        BufferedReader br = request.getReader();
+        String str;
+        StringBuilder wholeStr = new StringBuilder();
+        while((str = br.readLine()) != null){
+            wholeStr.append(str);
+        }
+        return wholeStr.toString();
     }
 
 

@@ -10,16 +10,10 @@ import com.yuepei.common.utils.DateUtils;
 import com.yuepei.common.utils.StringUtils;
 import com.yuepei.common.utils.bean.BeanValidators;
 import com.yuepei.common.utils.qrCode.QrCodeUtil;
-import com.yuepei.system.domain.Device;
-import com.yuepei.system.domain.DeviceRule;
-import com.yuepei.system.domain.DeviceType;
+import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.pojo.DevicePo;
-import com.yuepei.system.domain.vo.DeviceVO;
-import com.yuepei.system.domain.vo.HospitalRuleVO;
-import com.yuepei.system.mapper.DeviceInvestorMapper;
-import com.yuepei.system.mapper.DeviceMapper;
-import com.yuepei.system.mapper.DeviceTypeMapper;
-import com.yuepei.system.mapper.InvestorUserMapper;
+import com.yuepei.system.domain.vo.*;
+import com.yuepei.system.mapper.*;
 import com.yuepei.system.service.DeviceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +76,15 @@ public class DeviceServiceImpl implements DeviceService {
     @Autowired
     private DeviceInvestorMapper deviceInvestorMapper;
 
+    @Autowired
+    private SysUserMapper sysUserMapper;
+
+    @Autowired
+    private HospitalMapper hospitalMapper;
+
+    @Autowired
+    private DeviceHospitalMapper deviceHospitalMapper;
+
     /**
      * 查询设备
      *
@@ -119,8 +122,10 @@ public class DeviceServiceImpl implements DeviceService {
         Long[] longs = new Long[]{};
         JSONArray objects = JSON.parseArray(device.getInvestorId());
         List<Long> list = objects.toJavaList(Long.class);
-        deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
-        deviceInvestorMapper.insert(list.toArray(longs),device.getDeviceNumber());
+        if (list.size() > 0){
+            deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
+            deviceInvestorMapper.insert(list.toArray(longs),device.getDeviceNumber());
+        }
         try{
             //二维码是否跳转小程序暂定
             String enCode = QrCodeUtil.enCode(device.getDeviceNumber(),"https://www.yp10000.com/"+"?deviceNumber="+device.getDeviceNumber(), profile, true);
@@ -149,9 +154,11 @@ public class DeviceServiceImpl implements DeviceService {
             }
             deviceMapper.insertDevice(device);
         }catch (SQLException e){
+            e.printStackTrace();
             return AjaxResult.error("设备已存在");
         }
         catch (Exception ex) {
+            ex.printStackTrace();
             return AjaxResult.error("生成二维码异常 操作失败！");
         }
         return AjaxResult.success();
@@ -230,8 +237,24 @@ public class DeviceServiceImpl implements DeviceService {
         JSONArray objects = JSON.parseArray(device.getInvestorId());
         List<Long> list = objects.toJavaList(Long.class);
         if (list.size() > 0){
-            int i = deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
-            int insert = deviceInvestorMapper.insert(list.toArray(longs), device.getDeviceNumber());
+            deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
+            deviceInvestorMapper.insert(list.toArray(longs), device.getDeviceNumber());
+        }
+        deviceInvestorMapper.updateProportion(device.getDeviceNumber());
+        if (device.getUserId() != null){
+            SysUser user = new SysUser();
+            user.setUserId(device.getUserId());
+            user.setProportion(Long.parseLong(device.getAgentProportion()));
+            sysUserMapper.updateUser(user);
+        }
+        if (device.getHospitalId() != 0 && device.getHospitalId() != null){
+            DeviceHospital deviceHospital = new DeviceHospital();
+            deviceHospital.setDeviceNumber(String.valueOf(device.getDeviceId()));
+            deviceHospital.setHospitalId(String.valueOf(device.getHospitalId()));
+            deviceHospital.setProportion(device.getHospitalProportion());
+            deviceHospitalMapper.insert(deviceHospital);
+        }else {
+            deviceHospitalMapper.del(String.valueOf(device.getDeviceId()));
         }
         return deviceMapper.updateDevice(device);
     }
@@ -326,6 +349,37 @@ public class DeviceServiceImpl implements DeviceService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public TotalProportionVO totalProportion(Device device) {
+        return deviceMapper.totalProportion(device);
+    }
+
+    @Override
+    public List<AgentPersonnelVO> agentPersonnel(String deviceNumber) {
+        return deviceMapper.agentPersonnel(deviceNumber);
+    }
+
+    @Override
+    public List<HospitalPersonnelVO> hospitalPersonnel(String deviceNumber) {
+        return deviceMapper.hospitalPersonnel(deviceNumber);
+    }
+
+    @Override
+    public List<InvestorPersonnelVO> investorPersonnel(String deviceNumber) {
+        return deviceMapper.investorPersonnel(deviceNumber);
+    }
+
+    @Override
+    public TotalProportionVO getDeviceProportion(String deviceNumber) {
+        return deviceMapper.getDeviceProportion(deviceNumber);
+    }
+
+    @Override
+    public TotalProportionVO getAgentProportion(Long userId) {
+        System.out.println(userId);
+        return deviceMapper.getAgentProportion(userId);
     }
 
 }

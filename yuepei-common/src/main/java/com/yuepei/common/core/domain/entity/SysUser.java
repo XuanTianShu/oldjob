@@ -125,6 +125,8 @@ public class SysUser extends BaseEntity
     /** 角色ID */
     private Long roleId;
 
+    private String hospitalId;
+
     public SysUser()
     {
 

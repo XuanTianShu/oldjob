@@ -20,4 +20,6 @@ public interface DeviceInvestorMapper {
     void deleteByInvestorId(@Param("deviceNumber") String deviceNumber);
 
     DeviceInvestor getDeviceById(@Param("id") Long id);
+
+    void updateProportion(@Param("deviceNumber") String deviceNumber);
 }

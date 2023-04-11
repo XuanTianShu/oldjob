@@ -16,4 +16,8 @@ public class HospitalVO {
     /** 名称 */
     @Excel(name = "名称")
     private String hospitalName;
+
+    private String type;
+
+    private String deviceSum;
 }

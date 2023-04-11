@@ -24,6 +24,9 @@
             (#{discountRecord},#{deviceNumber})
         </foreach>
     </insert>
+    <update id="updateProportion">
+        UPDATE device_investor SET proportion = 0 WHERE device_number = #{deviceNumber}
+    </update>
 
     <delete id="delByInvestorId" parameterType="String">
         delete from device_investor where device_number = #{deviceNumber}

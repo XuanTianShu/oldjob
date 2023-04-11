@@ -46,6 +46,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/wechat/user/order/depositCallBack",
                         "/wechat/user/order/paymentCallBack",
                         "/wechat/user/refund/userRefundCallBack",
+                        "/wechat/user/refund/unlocking",
                         "/wechat/user/order/bluetoothCallback",
                         "/wechat/user/order/PH70Callback",
                         "/wechat/user/order/XG70NBTCallback",
@@ -53,6 +54,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/wechat/user/investor/**",
                         "/wechat/user/refund/userRefund",
                         "/wechat/user/refund/userRefundCallBack",
+                        "/wechat/user/refund/PH70InstructCallback",
+                        "/wechat/user/refund/PH70IncidentCallback",
                         "/wechat/user/order/weChatWithdrawal");
     }
 

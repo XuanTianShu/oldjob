@@ -1,9 +1,13 @@
 package com.yuepei.system.service.impl;
 
+import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.utils.DateUtils;
 import com.yuepei.system.domain.Device;
+import com.yuepei.system.domain.DeviceHospital;
+import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.vo.HospitalVO;
+import com.yuepei.system.domain.vo.TotalProportionVO;
 import com.yuepei.system.mapper.DeviceMapper;
 import com.yuepei.system.mapper.HospitalMapper;
 import com.yuepei.system.service.HospitalService;
@@ -174,5 +178,45 @@ public class HospitalServiceImpl implements HospitalService {
     @Override
     public List<HospitalVO> selectHospitalListVO(HospitalVO hospital) {
         return hospitalMapper.selectHospitalListVO(hospital);
+    }
+
+    @Override
+    public List<SysUser> userList(SysUser sysUser) {
+        return hospitalMapper.userList(sysUser);
+    }
+
+    @Override
+    public Hospital selectHospitalById(Long hospitalId) {
+        return hospitalMapper.selectHospitalById(hospitalId);
+    }
+
+    @Override
+    public int selectDeviceByHospitals(Long[] ids) {
+        return hospitalMapper.selectDeviceByHospitals(ids);
+    }
+
+    @Override
+    public int selectUserByHospitals(Long[] ids) {
+        return hospitalMapper.selectUserByHospitals(ids);
+    }
+
+    @Override
+    public int selectDeviceByHospital(Long ids) {
+        return hospitalMapper.selectDeviceByHospital(ids);
+    }
+
+    @Override
+    public int selectUserByHospital(Long ids) {
+        return hospitalMapper.selectUserByHospital(ids);
+    }
+
+    @Override
+    public TotalProportionVO totalProportion(Long hospitalId) {
+        return hospitalMapper.totalProportion(hospitalId);
+    }
+
+    @Override
+    public List<DeviceInvestor> deviceProportionList(DeviceHospital deviceHospital) {
+        return hospitalMapper.deviceProportionList(deviceHospital);
     }
 }

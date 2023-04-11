@@ -53,4 +53,8 @@ public interface CallBackService {
     AjaxResult PH70Callback(HttpServletRequest request);
 
     AjaxResult XG70NBTCallback(HttpServletRequest request);
+
+    AjaxResult PH70InstructCallback(HttpServletRequest request);
+
+    AjaxResult PH70IncidentCallback(HttpServletRequest request);
 }

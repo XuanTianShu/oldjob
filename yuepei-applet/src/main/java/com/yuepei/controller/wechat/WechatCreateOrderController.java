@@ -147,7 +147,7 @@ public class WechatCreateOrderController {
      * @return
      */
     @PostMapping("/balancePrepaymentOrder")
-    public AjaxResult balancePrepaymentOrder(HttpServletRequest request,UserLeaseOrder userLeaseOrder,Long couponId){
+    public AjaxResult balancePrepaymentOrder(HttpServletRequest request,@RequestBody UserLeaseOrder userLeaseOrder,Long couponId){
         SysUser user = tokenUtils.analysis(request);
         return callBackService.balancePrepaymentOrder(user.getOpenid(),couponId,userLeaseOrder);
     }
@@ -171,6 +171,27 @@ public class WechatCreateOrderController {
     public AjaxResult PH70Callback(HttpServletRequest request){
         log.info("接收到PH70数据变化");
         return callBackService.PH70Callback(request);
+    }
+
+    /**
+     * PH70设备指令响应通知
+     * @return
+     */
+    @PostMapping("/PH70InstructCallback")
+    public AjaxResult PH70InstructCallback(HttpServletRequest request){
+        log.info("接收PH70设备指令响应通知");
+        return callBackService.PH70InstructCallback(request);
+    }
+
+    /**
+     * PH70设备事件上报通知
+     * @param request
+     * @return
+     */
+    @PostMapping("/PH70IncidentCallback")
+    public AjaxResult PH70IncidentCallback(HttpServletRequest request){
+        log.info("设备事件上报通知");
+        return callBackService.PH70IncidentCallback(request);
     }
 
     /**

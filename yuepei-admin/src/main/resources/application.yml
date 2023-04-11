@@ -92,6 +92,9 @@ spring:
         max-active: 8
         # #连接池最大阻塞等待时间（使用负值表示没有限制）
         max-wait: -1ms
+  mvc:
+    async:
+      request-timeout: 30000
 
 # token配置
 token:
@@ -134,7 +137,6 @@ xss:
   # 匹配链接
   urlPatterns: /system/*,/monitor/*,/tool/*,/device/*,/wechat/*,/hospital/*
 
-
 ##阿里短信平台
 ali-sms:
   accessKeyId: LTAI5t7xPcDv5wfj4CCHKpfw
@@ -152,13 +154,20 @@ wechat:
   mchSerialNo: 60429C8DE59522973013086A09AEA5759275B9F7
 #  privateKeyPath: D:\WXCertUtil\cert\apiclient_key.pem
   privateKeyPath: /home/Yuepei_Nursingbed/privateKeyPath/WXCertUtil/cert/apiclient_key.pem
-##蓝牙相关
-#bluetooth:
-#  appId: ad1ddd68e3f941b78389ba11584917f9
-#  secrect: 1c227a6b2d964c11985197521995c510
-#  privateKeyPath: D:\WXCertUtil\bluetooth\outgoing.CertwithKey.pem
+
+##一拖五蓝牙相关
+bluetooth:
+  appId: ad1ddd68e3f941b78389ba11584917f9
+  secrect: 1c227a6b2d964c11985197521995c510
+
+##电信云平台应用管理
+telecom:
+  secret: 9tgo2urw0u
+  application: mExxmN0D098
+  domain: 2000297260.api.ctwing.cn
 
 
+##卡券
 coupon:
   prefix: userCoupon_
   order: order_

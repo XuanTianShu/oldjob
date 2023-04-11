@@ -111,19 +111,26 @@
         where id = #{id}
     </select>
     <select id="totalProportion" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
-        SELECT (100 - IFNULL(SUM(su.`proportion`), 0) -
+        <!--SELECT (100 - IFNULL(SUM(su.`proportion`), 0) -
                 IFNULL(SUM(di.`proportion`), 0) -
                 IFNULL(SUM(h.`proportion`), 0)) AS totalProportion FROM device AS d
                 LEFT JOIN device_investor AS di ON d.`device_number` = di.`device_number`
                 LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
-                LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
+                LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`-->
+        SELECT IF(adjustedProportion &lt; 0, 0, adjustedProportion)
+        AS totalProportion FROM (
+        SELECT (IFNULL(investor_proportion, 0) -
+        (SELECT IFNULL(SUM(proportion), 0)
+        FROM device_investor
         <where>
-            and d.device_number = #{deviceNumber}
+            and device_number = #{deviceNumber}
             <if test="id != null">
-                and di.id = #{id}
+                and Id != #{id}
             </if>
-        </where>
-
+        </where>)
+        ) AS adjustedProportion
+        FROM device WHERE device_number = #{deviceNumber}
+        ) AS result
     </select>
 
     <insert id="insertInvestorUser" parameterType="com.yuepei.system.domain.InvestorUser" useGeneratedKeys="true" keyProperty="id">

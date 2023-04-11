@@ -5,9 +5,7 @@ import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.DeviceRule;
 import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.pojo.DevicePo;
-import com.yuepei.system.domain.vo.DeviceInvestorVO;
-import com.yuepei.system.domain.vo.DeviceVO;
-import com.yuepei.system.domain.vo.TotalProportionVO;
+import com.yuepei.system.domain.vo.*;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.security.core.parameters.P;
@@ -124,4 +122,18 @@ public interface DeviceMapper {
     void updateInvestorDevice(@Param("list") List<DeviceInvestorVO> list);
 
     TotalProportionVO selectDeviceProportionDetail(@Param("deviceNumber") String deviceNumber);
+
+    TotalProportionVO totalProportion(Device device);
+
+    List<AgentPersonnelVO> agentPersonnel(@Param("deviceNumber") String deviceNumber);
+
+    List<HospitalPersonnelVO> hospitalPersonnel(@Param("deviceNumber") String deviceNumber);
+
+    List<InvestorPersonnelVO> investorPersonnel(@Param("deviceNumber") String deviceNumber);
+
+    TotalProportionVO getDeviceProportion(@Param("deviceNumber") String deviceNumber);
+
+    TotalProportionVO getAgentProportion(@Param("userId") Long userId);
+
+    void updateDeviceStatus(Device device);
 }

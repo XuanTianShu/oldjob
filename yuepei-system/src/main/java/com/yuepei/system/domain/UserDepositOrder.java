@@ -60,4 +60,6 @@ public class UserDepositOrder extends BaseEntity {
 
     /** 订单状态 */
     private Integer status;
+
+    private String transactionId;
 }

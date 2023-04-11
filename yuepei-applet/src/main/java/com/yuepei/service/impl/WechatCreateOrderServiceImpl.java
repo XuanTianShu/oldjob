@@ -199,7 +199,7 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
             //付款时间
             userLeaseOrder.setCreateTime(new Date());
             //支付方式
-            userLeaseOrder.setPayType("1");
+            userLeaseOrder.setPayType("0");
             //修改状态
             userLeaseOrder.setStatus("2");
             //支付成功押金订单为0
