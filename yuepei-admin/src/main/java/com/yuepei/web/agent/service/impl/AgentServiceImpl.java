@@ -106,11 +106,13 @@ public class AgentServiceImpl implements AgentService {
         deviceDetailsVos.stream().forEach(map->{
             deviceNumbers.add(map.getDeviceNumber());
         });
-        List<UserLeaseOrder> userLeaseOrders = agentMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
         List<BigDecimal> decimals = new ArrayList<>();
-        userLeaseOrders.stream().forEach(map->{
-            decimals.add(map.getNetAmount());
-        });
+        if (deviceNumbers.size()!=0){
+            List<UserLeaseOrder> userLeaseOrders = agentMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
+            userLeaseOrders.stream().forEach(map->{
+                decimals.add(map.getNetAmount());
+            });
+        }
         BigDecimal decimal = BigDecimal.ZERO;
         for (BigDecimal price : decimals) {
             decimal=decimal.add(price);
@@ -228,12 +230,14 @@ public class AgentServiceImpl implements AgentService {
         devices.stream().forEach(map->{
             deviceNumbers.add(map.getDeviceNumber());
         });
-        List<UserLeaseOrder> userLeaseOrders = agentMapper.selectUserLeaseOrderByDevices(deviceNumbers, String.valueOf(userId));
-        userLeaseOrders.stream().forEach(i->{
-            UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
-            BeanUtils.copyProperties(i,userLeaseOrderVo);
-            userLeaseOrderVos.add(userLeaseOrderVo);
-        });
+        if (deviceNumbers.size()!=0){
+            List<UserLeaseOrder> userLeaseOrders = agentMapper.selectUserLeaseOrderByDevices(deviceNumbers, String.valueOf(userId));
+            userLeaseOrders.stream().forEach(i->{
+                UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
+                BeanUtils.copyProperties(i,userLeaseOrderVo);
+                userLeaseOrderVos.add(userLeaseOrderVo);
+            });
+        }
         BigDecimal reduce = userLeaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         deviceManageVo.setDeviceAmount(reduce);
         if (hospitalId!=null){
@@ -638,10 +642,12 @@ public class AgentServiceImpl implements AgentService {
             deviceDetailsVoList.stream().forEach(map->{
                 deviceNumbers.add(map.getDeviceNumber());
             });
-            List<UserLeaseOrder> userLeaseOrderList = agentMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
             List<BigDecimal> decimals = new ArrayList<>();
-            BigDecimal reduce = userLeaseOrderList.stream().map(UserLeaseOrder::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-            decimals.add(reduce);
+            if (deviceNumbers.size()!=0){
+                List<UserLeaseOrder> userLeaseOrderList = agentMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
+                BigDecimal reduce = userLeaseOrderList.stream().map(UserLeaseOrder::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                decimals.add(reduce);
+            }
             BigDecimal decimal = BigDecimal.ZERO;
             for (BigDecimal price : decimals) {
                 decimal=decimal.add(price);
@@ -766,10 +772,12 @@ public class AgentServiceImpl implements AgentService {
                 deviceDetailsVoList.stream().forEach(map->{
                     deviceNumbers.add(map.getDeviceNumber());
                 });
-                List<UserLeaseOrder> userLeaseOrderList = agentMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
                 List<BigDecimal> decimals = new ArrayList<>();
-                BigDecimal reduce = userLeaseOrderList.stream().map(UserLeaseOrder::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                decimals.add(reduce);
+                if (deviceNumbers.size()!=0){
+                    List<UserLeaseOrder> userLeaseOrderList = agentMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
+                    BigDecimal reduce = userLeaseOrderList.stream().map(UserLeaseOrder::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    decimals.add(reduce);
+                }
                 BigDecimal decimal = BigDecimal.ZERO;
                 for (BigDecimal price : decimals) {
                     decimal=decimal.add(price);
@@ -892,10 +900,12 @@ public class AgentServiceImpl implements AgentService {
                 deviceDetailsVoList.stream().forEach(map->{
                     deviceNumbers.add(map.getDeviceNumber());
                 });
-                List<UserLeaseOrder> userLeaseOrderList = agentMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
                 List<BigDecimal> decimals = new ArrayList<>();
-                BigDecimal reduce = userLeaseOrderList.stream().map(UserLeaseOrder::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                decimals.add(reduce);
+                if (deviceNumbers.size()!=0){
+                    List<UserLeaseOrder> userLeaseOrderList = agentMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
+                    BigDecimal reduce = userLeaseOrderList.stream().map(UserLeaseOrder::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+                    decimals.add(reduce);
+                }
                 BigDecimal decimal = BigDecimal.ZERO;
                 for (BigDecimal price : decimals) {
                     decimal=decimal.add(price);

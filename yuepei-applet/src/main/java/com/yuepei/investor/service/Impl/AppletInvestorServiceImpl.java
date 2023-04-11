@@ -161,12 +161,14 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         deviceList.stream().forEach(map->{
             deviceNumbers.add(map.getDeviceNumber());
         });
-        List<UserLeaseOrder> userLeaseOrder = appletInvestorMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
-        userLeaseOrder.stream().forEach(i->{
-            UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
-            BeanUtils.copyProperties(i,userLeaseOrderVo);
-            userLeaseOrderVos.add(userLeaseOrderVo);
-        });
+        if (deviceNumbers.size()!=0){
+            List<UserLeaseOrder> userLeaseOrder = appletInvestorMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
+            userLeaseOrder.stream().forEach(i->{
+                UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
+                BeanUtils.copyProperties(i,userLeaseOrderVo);
+                userLeaseOrderVos.add(userLeaseOrderVo);
+            });
+        }
         BigDecimal decimal = userLeaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         indexVo.setDeviceAmount(decimal);
         indexVo.setSum(deviceList.size());
@@ -431,7 +433,9 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             deviceDetailsVos.addAll(collect);
         }
         if (!departmentName.equals("")){
-            List<DeviceDetailsVo> collect = deviceDetailsVos.stream().filter(map -> map.getDeviceDepartmentName().equals(departmentName)).collect(Collectors.toList());
+            List<DeviceDetailsVo> collect = deviceDetailsVos.stream()
+                    .filter(map -> map.getDeviceDepartmentName()!=null)
+                    .filter(map -> map.getDeviceDepartmentName().equals(departmentName)).collect(Collectors.toList());
             deviceDetailsVos.clear();
             deviceDetailsVos.addAll(collect);
         }
@@ -439,11 +443,13 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         deviceDetailsVos.stream().forEach(map->{
             deviceNumbers.add(map.getDeviceNumber());
         });
-        List<UserLeaseOrder> userLeaseOrderList = appletInvestorMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
         List<BigDecimal> decimals = new ArrayList<>();
-        userLeaseOrderList.stream().forEach(map->{
-            decimals.add(map.getNetAmount());
-        });
+        if (deviceNumbers.size()!=0){
+            List<UserLeaseOrder> userLeaseOrderList = appletInvestorMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
+            userLeaseOrderList.stream().forEach(map->{
+                decimals.add(map.getNetAmount());
+            });
+        }
         BigDecimal decimal = BigDecimal.ZERO;
         for (BigDecimal price : decimals) {
             decimal=decimal.add(price);

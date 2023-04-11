@@ -111,12 +111,14 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         deviceDetailsVos.stream().forEach(map->{
             deviceNumbers.add(map.getDeviceNumber());
         });
-        List<UserLeaseOrder> userLeaseOrders = hospitalDeviceMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
-        userLeaseOrders.stream().forEach(i->{
-            UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
-            BeanUtils.copyProperties(i,userLeaseOrderVo);
-            leaseOrderVos.add(userLeaseOrderVo);
-        });
+        if (deviceNumbers.size()!=0){
+            List<UserLeaseOrder> userLeaseOrders = hospitalDeviceMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
+            userLeaseOrders.stream().forEach(i->{
+                UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
+                BeanUtils.copyProperties(i,userLeaseOrderVo);
+                leaseOrderVos.add(userLeaseOrderVo);
+            });
+        }
         BigDecimal reduce = leaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         deviceStatisticsVo.setDeviceAmount(reduce);
         if (!deviceDepartment.equals("")){
