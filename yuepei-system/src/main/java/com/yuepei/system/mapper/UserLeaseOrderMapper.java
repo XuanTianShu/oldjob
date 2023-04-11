@@ -3,7 +3,6 @@ package com.yuepei.system.mapper;
 import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.*;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 
@@ -98,13 +97,13 @@ public interface UserLeaseOrderMapper {
 
     UserLeaseOrder selectLeaseOrderDetails(@Param("orderNumber") String orderNumber);
 
-    List<UserLeaseOrder> selectRevenueStatistics(List<String> deviceNumber);
+    List<UserLeaseOrder> selectRevenueStatistics(@Param("deviceNumber") List<String> deviceNumber,@Param("hospitalId") Long hospitalId);
 
     OrderSumAndMoneyVO selectDayOrder();
 
     ConditionOrderVO selectConditionOrder(LeaseOrderVO leaseOrderVO);
 
-    List<UserLeaseOrder> selectUserLeaseOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber);
+    List<UserLeaseOrder> selectUserLeaseOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber,@Param("hospitalId") String hospitalId);
 
     int selectUserOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber, @Param("openid") String openid);
 
@@ -112,11 +111,11 @@ public interface UserLeaseOrderMapper {
 
     List<String> selectUSerLeaseOrderDeposit(@Param("openid") String openid, @Param("deviceNumber") String deviceNumber);
 
-    UserLeaseOrder selectUseDevice(@Param("deviceNumber")String deviceNumber);
+    UserLeaseOrder selectUseDevice(@Param("deviceNumber") String deviceNumber,@Param("hospitalId") Long hospitalId);
 
-    List<UserLeaseOrder> selectUserLeaseOrderByOrderNumber(String orderNumber);
+    List<UserLeaseOrder> selectUserLeaseOrderByOrderNumber(@Param("orderNumber") String orderNumber,@Param("hospitalId") Long hospitalId);
 
-    List<UserLeaseOrder> selectUserLeaseOrderByDevice(@Param("deviceNumber") String deviceNumber);
+    List<UserLeaseOrder> selectUserLeaseOrderByDevice(@Param("deviceNumber") String deviceNumber,@Param("hospitalId") String hospitalId);
 
     List<UserOrderVO> selectUserOrderDepositList(@Param("openid") String openid);
 
@@ -127,6 +126,12 @@ public interface UserLeaseOrderMapper {
     UserLeaseOrder selectOrderByDeviceNumber(@Param("substring1") String substring1);
 
     void deleteUserLeaseOrderByOrderNumber(@Param("orderNumber") String orderNumber);
+
+    List<UserLeaseOrder> selectUserLeaseOrderByInvestorId(@Param("userId") String userId);
+
+    List<UserLeaseOrder> selectUserLeaseOrderByAgentId(@Param("userId") String userId);
+
+    List<UserLeaseOrder> selectUserLeaseOrderByHospitalId(@Param("userId") String userId);
 
     AgentAndHospitalNameVO selectUserNameAndHospitalName(@Param("deviceNumber") String deviceNumber);
 

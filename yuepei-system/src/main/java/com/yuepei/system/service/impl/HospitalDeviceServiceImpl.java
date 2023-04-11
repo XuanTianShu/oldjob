@@ -57,8 +57,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     public List<DeviceType> selectDeviceType(Long userId) {
         List<DeviceType> deviceTypes = new ArrayList<>();
         SysUser sysUser = sysUserMapper.selectUserById(userId);
-        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
-        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(hospitalUser.getHospitalId());
+        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(sysUser.getHospitalId());
         List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(hospital.getHospitalId());
         deviceList.stream().forEach(map->{
             DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
@@ -72,15 +71,14 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     public DeviceStatisticsVo selectDeviceTypeDetails(Long deviceTypeId, Long userId, String deviceDepartment) {
         //根据当前账号搜索代理医院id
         SysUser user = sysUserMapper.selectUserById(userId);
-        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(user.getUserName());
-        Hospital hospitalName = hospitalDeviceMapper.selectHospitalByHospitalName(hospitalUser.getHospitalId());
+        Hospital hospitalName = hospitalDeviceMapper.selectHospitalByHospitalName(user.getHospitalId());
         //搜索该设备数量及对应详细地址
-        List<Device> deviceList = hospitalDeviceMapper.selectDeviceTypeDetails(deviceTypeId, hospitalUser.getHospitalId());
+        List<Device> deviceList = hospitalDeviceMapper.selectDeviceTypeDetails(deviceTypeId, user.getHospitalId());
         List<DeviceDetailsVo> deviceDetailsVos = new ArrayList<>();
         DeviceStatisticsVo deviceStatisticsVo = new DeviceStatisticsVo();
         //遍历分割详细地址，赋值后返回数据
         deviceList.stream().forEach(map -> {
-            Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(hospitalUser.getHospitalId());
+            Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(user.getHospitalId());
             DeviceDetailsVo deviceDetailsVo = new DeviceDetailsVo();
             String device_full_address = map.getDeviceFullAddress();
             if (!device_full_address.equals("0")) {
@@ -109,15 +107,18 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             }
         });
         List<UserLeaseOrderVo> leaseOrderVos = new ArrayList<>();
+        List<String> deviceNumbers = new ArrayList<>();
         deviceDetailsVos.stream().forEach(map->{
-            List<UserLeaseOrder> userLeaseOrder = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
-            userLeaseOrder.stream().forEach(i->{
+            deviceNumbers.add(map.getDeviceNumber());
+        });
+        if (deviceNumbers.size()!=0){
+            List<UserLeaseOrder> userLeaseOrders = hospitalDeviceMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
+            userLeaseOrders.stream().forEach(i->{
                 UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
                 BeanUtils.copyProperties(i,userLeaseOrderVo);
-                userLeaseOrderVo.setNetAmount(i.getNetAmount());
                 leaseOrderVos.add(userLeaseOrderVo);
             });
-        });
+        }
         BigDecimal reduce = leaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         deviceStatisticsVo.setDeviceAmount(reduce);
         if (!deviceDepartment.equals("")){
@@ -130,14 +131,16 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             deviceDetailsVos.clear();
             deviceDetailsVos.addAll(collect);
             List<UserLeaseOrderVo> userLeaseOrderVos = new ArrayList<>();
+            List<String> deviceNumberList = new ArrayList<>();
             deviceDetailsVos.stream().forEach(map->{
-                List<UserLeaseOrder> userLeaseOrder = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
-                userLeaseOrder.stream().forEach(i->{
-                    UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
-                    BeanUtils.copyProperties(i,userLeaseOrderVo);
-                    userLeaseOrderVo.setNetAmount(i.getNetAmount());
-                    userLeaseOrderVos.add(userLeaseOrderVo);
-                });
+                deviceNumberList.add(map.getDeviceNumber());
+            });
+            List<UserLeaseOrder> userLeaseOrder = hospitalDeviceMapper.selectUserLeaseOrderByDevices(deviceNumberList, String.valueOf(userId));
+            userLeaseOrder.stream().forEach(i->{
+                UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
+                BeanUtils.copyProperties(i,userLeaseOrderVo);
+                userLeaseOrderVo.setNetAmount(i.getNetAmount());
+                userLeaseOrderVos.add(userLeaseOrderVo);
             });
             BigDecimal bigDecimal = userLeaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
             deviceStatisticsVo.setDeviceAmount(bigDecimal);
@@ -199,11 +202,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     @Override
     public List<String> selectDepartment(Long userId) {
         SysUser sysUser = sysUserMapper.selectUserById(userId);
-        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
-        if (hospitalUser==null){
-            return null;
-        }
-        List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(hospitalUser.getHospitalId());
+        List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(sysUser.getHospitalId());
         List<String> deviceDepartment = new ArrayList<>();
         deviceList.stream().forEach(map -> {
             String device_full_address = map.getDeviceFullAddress();
@@ -220,9 +219,16 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     @Override
     public List<String> selectDeviceTypeName(Long userId) {
         List<String> deviceType = new ArrayList<>();
-        List<DeviceType> deviceTypes = hospitalDeviceMapper.selectDeviceType(userId);
-        deviceTypes.stream().forEach(map->{
-            deviceType.add(map.getDeviceTypeName());
+        SysUser sysUser = sysUserMapper.selectUserById(userId);
+        List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(sysUser.getHospitalId());
+        List<Long> deviceTypeId = new ArrayList<>();
+        deviceList.stream().forEach(map->{
+            deviceTypeId.add(map.getDeviceTypeId());
+        });
+        List<Long> collect = deviceTypeId.stream().distinct().collect(Collectors.toList());
+        collect.stream().forEach(map->{
+            DeviceType type = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map);
+            deviceType.add(type.getDeviceTypeName());
         });
         return deviceType;
     }
@@ -230,18 +236,14 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     @Override
     public List<UserLeaseOrderVo> selectLeaseOrder(Long userId,String deviceDepartment,String deviceTypeName,String orderNumber) {
         SysUser sysUser = sysUserMapper.selectUserById(userId);
-        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
-        if (hospitalUser==null){
-            return null;
-        }
         List<String> numberList = new ArrayList<>();
-        List<Device> devices = hospitalDeviceMapper.selectDeviceByHospitalId(hospitalUser.getHospitalId());
+        List<Device> devices = hospitalDeviceMapper.selectDeviceByHospitalId(sysUser.getHospitalId());
         devices.stream().forEach(map->{
             numberList.add(map.getDeviceNumber());
         });
         List<UserLeaseOrder> leaseOrders = new ArrayList<>();
         if (!orderNumber.equals("")){
-            List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(orderNumber);
+            List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(orderNumber, sysUser.getHospitalId());
             numberList.stream().forEach(map->{
                 List<UserLeaseOrder> collect = userLeaseOrders.stream().filter(i -> i.getDeviceNumber().equals(map)).collect(Collectors.toList());
                 leaseOrders.addAll(collect);
@@ -567,141 +569,137 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
 
     @Override
     public TotalVo selectRevenueStatistics(String userName, int statistics) {
-        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(userName);
-        List<String> deviceNumberList = hospitalDeviceMapper.selectDeviceNumberByHospitalId(hospitalUser.getHospitalId());
+        SysUser sysUser = sysUserMapper.selectUserByUserName(userName);
         TotalVo totalVo = new TotalVo();
-        if (deviceNumberList.size()!=0){
-            SysUser sysUser = sysUserMapper.selectUserByUserName(userName);
-            List<OrderVo> orderVos = new ArrayList<>();
-            if (statistics == 1) {
-                List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectRevenueStatistics(deviceNumberList);
-                Date dNow = new Date();   //当前时间
-                Date dBefore = new Date();
-                Calendar calendar = Calendar.getInstance(); //得到日历
-                calendar.setTime(dNow);//把当前时间赋给日历
-                calendar.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
-                dBefore = calendar.getTime();   //得到前一天的时间
-                SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
-                String defaultStartDate = sdf.format(dBefore);    //格式化前一天
-                String now = sdf.format(dNow);
-                List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
-                try {
-                    //使用SimpleDateFormat的parse()方法生成Date
-                    Date date = sdf.parse(defaultStartDate);
-                    Date parse = sdf.parse(now);
-                    List<UserLeaseOrder> userLeaseOrder = userLeaseOrderList.stream()
-                            .filter(s->s.getLeaseTime().getTime()<parse.getTime())
-                            .filter(s->s.getLeaseTime().getTime()>date.getTime())
-                            .collect(Collectors.toList());
-                    userLeaseOrders.addAll(userLeaseOrder);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                userLeaseOrders.stream().forEach(map->{
-                    OrderVo orderVo = new OrderVo();
-                    orderVo.setOrderNumber(map.getOrderNumber());
-                    BigDecimal decimal = map.getNetAmount();
-                    orderVo.setNetAmount(decimal);
-                    orderVo.setDividendRatio(map.getHospitalProportion());
-                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
-                    orderVos.add(orderVo);
-                });
-                totalVo.setEffectiveOrder(orderVos.size());
-                BigDecimal orderAmount = orderVos.stream().map(OrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                BigDecimal dividendAmount = orderVos.stream().map(OrderVo::getIncomeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                totalVo.setOrderAmount(orderAmount);
-                totalVo.setDividendAmount(dividendAmount);
-                totalVo.setOrderVos(orderVos);
-            } else if (statistics == 2) {
-                List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectRevenueStatistics(deviceNumberList);
-                Date dNow = new Date();   //当前时间
-                SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
-                String format = sdf.format(dNow);
-                List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
-                try {
-                    //使用SimpleDateFormat的parse()方法生成Date
-                    Date date = sdf.parse(format);
-                    List<UserLeaseOrder> userLeaseOrder = userLeaseOrderList.stream()
-                            .filter(s->s.getLeaseTime().getTime()>=date.getTime())
-                            .collect(Collectors.toList());
-                    userLeaseOrders.addAll(userLeaseOrder);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                userLeaseOrders.stream().forEach(map->{
-                    OrderVo orderVo = new OrderVo();
-                    orderVo.setOrderNumber(map.getOrderNumber());
-                    BigDecimal decimal = map.getNetAmount();
-                    orderVo.setNetAmount(decimal);
-                    orderVo.setDividendRatio(map.getHospitalProportion());
-                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
-                    orderVos.add(orderVo);
-                });
-                totalVo.setEffectiveOrder(orderVos.size());
-                BigDecimal orderAmount = orderVos.stream().map(OrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                BigDecimal dividendAmount = orderVos.stream().map(OrderVo::getIncomeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                totalVo.setOrderAmount(orderAmount);
-                totalVo.setDividendAmount(dividendAmount);
-                totalVo.setOrderVos(orderVos);
-            } else if (statistics == 3) {
-                List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectRevenueStatistics(deviceNumberList);
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-                // 获取前月的第一天
-                Calendar cale = Calendar.getInstance();
-                cale.add(Calendar.MONTH, 0);
-                cale.set(Calendar.DAY_OF_MONTH, 1);
-                String firstDay = format.format(cale.getTime());
-                // 获取前月的最后一天
-                cale = Calendar.getInstance();
-                cale.add(Calendar.MONTH, 1);
-                cale.set(Calendar.DAY_OF_MONTH, 0);
-                String lastDay = format.format(cale.getTime());
-                List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
-                try {
-                    //使用SimpleDateFormat的parse()方法生成Date
-                    Date first = format.parse(firstDay);
-                    Date last = format.parse(lastDay);
-                    List<UserLeaseOrder> userLeaseOrder = userLeaseOrderList.stream()
-                            .filter(s->s.getLeaseTime().getTime()>=first.getTime())
-                            .filter(s->s.getLeaseTime().getTime()<=last.getTime())
-                            .collect(Collectors.toList());
-                    userLeaseOrders.addAll(userLeaseOrder);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                userLeaseOrders.stream().forEach(map->{
-                    OrderVo orderVo = new OrderVo();
-                    orderVo.setOrderNumber(map.getOrderNumber());
-                    BigDecimal decimal = map.getNetAmount();
-                    orderVo.setNetAmount(decimal);
-                    orderVo.setDividendRatio(map.getHospitalProportion());
-                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
-                    orderVos.add(orderVo);
-                });
-                totalVo.setEffectiveOrder(orderVos.size());
-                BigDecimal orderAmount = orderVos.stream().map(OrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                BigDecimal dividendAmount = orderVos.stream().map(OrderVo::getIncomeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                totalVo.setOrderAmount(orderAmount);
-                totalVo.setDividendAmount(dividendAmount);
-                totalVo.setOrderVos(orderVos);
-            } else {
-                List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectRevenueStatistics(deviceNumberList);
-                userLeaseOrderList.stream().forEach(map->{
-                    OrderVo orderVo = new OrderVo();
-                    orderVo.setOrderNumber(map.getOrderNumber());
-                    BigDecimal decimal = map.getNetAmount();
-                    orderVo.setNetAmount(decimal);
-                    orderVo.setDividendRatio(map.getHospitalProportion());
-                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
-                    orderVos.add(orderVo);
-                });
-                totalVo.setEffectiveOrder(orderVos.size());
-                BigDecimal orderAmount = orderVos.stream().map(OrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                BigDecimal dividendAmount = orderVos.stream().map(OrderVo::getIncomeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-                totalVo.setOrderAmount(orderAmount);
-                totalVo.setDividendAmount(dividendAmount);
-                totalVo.setOrderVos(orderVos);
+        List<OrderVo> orderVos = new ArrayList<>();
+        if (statistics == 1) {
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(sysUser.getUserId()));
+            Date dNow = new Date();   //当前时间
+            Date dBefore = new Date();
+            Calendar calendar = Calendar.getInstance(); //得到日历
+            calendar.setTime(dNow);//把当前时间赋给日历
+            calendar.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
+            dBefore = calendar.getTime();   //得到前一天的时间
+            SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
+            String defaultStartDate = sdf.format(dBefore);    //格式化前一天
+            String now = sdf.format(dNow);
+            List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
+            try {
+                //使用SimpleDateFormat的parse()方法生成Date
+                Date date = sdf.parse(defaultStartDate);
+                Date parse = sdf.parse(now);
+                List<UserLeaseOrder> userLeaseOrder = userLeaseOrderList.stream()
+                        .filter(s->s.getLeaseTime().getTime()<parse.getTime())
+                        .filter(s->s.getLeaseTime().getTime()>date.getTime())
+                        .collect(Collectors.toList());
+                userLeaseOrders.addAll(userLeaseOrder);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
+            userLeaseOrders.stream().forEach(map->{
+                OrderVo orderVo = new OrderVo();
+                orderVo.setOrderNumber(map.getOrderNumber());
+                BigDecimal decimal = map.getNetAmount();
+                orderVo.setNetAmount(decimal);
+                orderVo.setDividendRatio(map.getHospitalProportion());
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVos.add(orderVo);
+            });
+            totalVo.setEffectiveOrder(orderVos.size());
+            BigDecimal orderAmount = orderVos.stream().map(OrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal dividendAmount = orderVos.stream().map(OrderVo::getIncomeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            totalVo.setOrderAmount(orderAmount);
+            totalVo.setDividendAmount(dividendAmount);
+            totalVo.setOrderVos(orderVos);
+        } else if (statistics == 2) {
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(sysUser.getUserId()));
+            Date dNow = new Date();   //当前时间
+            SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
+            String format = sdf.format(dNow);
+            List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
+            try {
+                //使用SimpleDateFormat的parse()方法生成Date
+                Date date = sdf.parse(format);
+                List<UserLeaseOrder> userLeaseOrder = userLeaseOrderList.stream()
+                        .filter(s->s.getLeaseTime().getTime()>=date.getTime())
+                        .collect(Collectors.toList());
+                userLeaseOrders.addAll(userLeaseOrder);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            userLeaseOrders.stream().forEach(map->{
+                OrderVo orderVo = new OrderVo();
+                orderVo.setOrderNumber(map.getOrderNumber());
+                BigDecimal decimal = map.getNetAmount();
+                orderVo.setNetAmount(decimal);
+                orderVo.setDividendRatio(map.getHospitalProportion());
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVos.add(orderVo);
+            });
+            totalVo.setEffectiveOrder(orderVos.size());
+            BigDecimal orderAmount = orderVos.stream().map(OrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal dividendAmount = orderVos.stream().map(OrderVo::getIncomeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            totalVo.setOrderAmount(orderAmount);
+            totalVo.setDividendAmount(dividendAmount);
+            totalVo.setOrderVos(orderVos);
+        } else if (statistics == 3) {
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(sysUser.getUserId()));
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            // 获取前月的第一天
+            Calendar cale = Calendar.getInstance();
+            cale.add(Calendar.MONTH, 0);
+            cale.set(Calendar.DAY_OF_MONTH, 1);
+            String firstDay = format.format(cale.getTime());
+            // 获取前月的最后一天
+            cale = Calendar.getInstance();
+            cale.add(Calendar.MONTH, 1);
+            cale.set(Calendar.DAY_OF_MONTH, 0);
+            String lastDay = format.format(cale.getTime());
+            List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
+            try {
+                //使用SimpleDateFormat的parse()方法生成Date
+                Date first = format.parse(firstDay);
+                Date last = format.parse(lastDay);
+                List<UserLeaseOrder> userLeaseOrder = userLeaseOrderList.stream()
+                        .filter(s->s.getLeaseTime().getTime()>=first.getTime())
+                        .filter(s->s.getLeaseTime().getTime()<=last.getTime())
+                        .collect(Collectors.toList());
+                userLeaseOrders.addAll(userLeaseOrder);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            userLeaseOrders.stream().forEach(map->{
+                OrderVo orderVo = new OrderVo();
+                orderVo.setOrderNumber(map.getOrderNumber());
+                BigDecimal decimal = map.getNetAmount();
+                orderVo.setNetAmount(decimal);
+                orderVo.setDividendRatio(map.getHospitalProportion());
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVos.add(orderVo);
+            });
+            totalVo.setEffectiveOrder(orderVos.size());
+            BigDecimal orderAmount = orderVos.stream().map(OrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal dividendAmount = orderVos.stream().map(OrderVo::getIncomeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            totalVo.setOrderAmount(orderAmount);
+            totalVo.setDividendAmount(dividendAmount);
+            totalVo.setOrderVos(orderVos);
+        } else {
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(sysUser.getUserId()));
+            userLeaseOrderList.stream().forEach(map->{
+                OrderVo orderVo = new OrderVo();
+                orderVo.setOrderNumber(map.getOrderNumber());
+                BigDecimal decimal = map.getNetAmount();
+                orderVo.setNetAmount(decimal);
+                orderVo.setDividendRatio(map.getHospitalProportion());
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVos.add(orderVo);
+            });
+            totalVo.setEffectiveOrder(orderVos.size());
+            BigDecimal orderAmount = orderVos.stream().map(OrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal dividendAmount = orderVos.stream().map(OrderVo::getIncomeAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+            totalVo.setOrderAmount(orderAmount);
+            totalVo.setDividendAmount(dividendAmount);
+            totalVo.setOrderVos(orderVos);
         }
         return totalVo;
     }
@@ -802,9 +800,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     public IndexVo indexPage(Long userId) {
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         IndexVo indexVo = new IndexVo();
-        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
-        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(hospitalUser.getHospitalId());
-        List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(hospitalUser.getHospitalId());
+        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(sysUser.getHospitalId());
+        List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(sysUser.getHospitalId());
         List<UserLeaseOrderVo> userLeaseOrderVos = new ArrayList<>();
         deviceList.stream().forEach(map->{
             List<UserLeaseOrder> userLeaseOrder = hospitalDeviceMapper.selectLeaseOrderByDeviceNumber(map.getDeviceNumber());
@@ -821,10 +818,9 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
             deviceTypes.add(deviceType);
         });
-        List<DeviceType> collect = deviceTypes.stream().distinct().collect(Collectors.toList());
         indexVo.setDeviceAmount(decimal);
         indexVo.setHospitalName(hospital.getHospitalName());
-        indexVo.setSum(collect.size());
+        indexVo.setSum(deviceList.size());
         indexVo.setProportion(sysUser.getProportion());
         return indexVo;
     }
@@ -839,12 +835,11 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     public PersonalCenterVo selectPersonalCenter(Long userId) {
         PersonalCenterVo personalCenterVo = new PersonalCenterVo();
         SysUser sysUser = sysUserMapper.selectUserById(userId);
-        HospitalUser hospitalUser = hospitalDeviceMapper.selectHospitalbyUserName(sysUser.getUserName());
-        List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(hospitalUser.getHospitalId());
+        List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(sysUser.getHospitalId());
         List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
         List<UserLeaseOrderVo> userLeaseOrderVos = new ArrayList<>();
         deviceList.stream().forEach(map->{
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber());
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber(), String.valueOf(map.getHospitalId()));
             userLeaseOrders.addAll(userLeaseOrderList);
         });
         userLeaseOrders.stream().forEach(map->{

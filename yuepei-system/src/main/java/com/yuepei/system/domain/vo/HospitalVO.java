@@ -3,6 +3,8 @@ package com.yuepei.system.domain.vo;
 import com.yuepei.common.annotation.Excel;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class HospitalVO {
     /** 主键 */
@@ -20,4 +22,6 @@ public class HospitalVO {
     private String type;
 
     private String deviceSum;
+
+    private List<String> departmentList;
 }

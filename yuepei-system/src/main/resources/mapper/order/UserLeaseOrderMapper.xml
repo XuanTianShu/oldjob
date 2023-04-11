@@ -34,11 +34,14 @@
         <result property="deviceMac" column="device_mac"/>
         <result property="rows" column="rows"/>
         <result property="deviceRule" column="device_rule"/>
-        <result property="investorProportion" column="investor_proportion"/>
-        <result property="agentProportion" column="agent_proportion"/>
-        <result property="hospitalProportion" column="hospital_proportion"/>
-        <result property="platformProportion" column="platform_proportion"/>
+        <result property="investorProportion" column="investorProportion"/>
+        <result property="agentProportion" column="agentProportion"/>
+        <result property="hospitalProportion" column="hospitalProportion"/>
+        <result property="platformProportion" column="platformProportion"/>
         <result property="isValid" column="is_valid"/>
+        <result property="hospitalId" column="hospitalId"/>
+        <result property="investorId" column="investorId"/>
+        <result property="agentId" column="agentId"/>
     </resultMap>
 
     <resultMap id="LeaseOrderResult" type="LeaseOrderVO">
@@ -80,7 +83,7 @@
         select id, openid, order_number, device_number, device_type, lease_time,
                lease_address, restore_time, restore_address, price, pay_type,
                net_amount, coupon_price, status, play_time,create_time,child,choose,investorProportion,
-               agentProportion,hospitalProportion,platformProportion,device_rule,deposit,time_price,fixed_price
+               agentProportion,hospitalProportion,platformProportion,device_rule,deposit,time_price,fixed_price,hospitalId,investorId,agentId
         from user_lease_order
     </sql>
 
@@ -345,9 +348,10 @@
     <select id="selectRevenueStatistics" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where status=2
+        and hospitalId=#{hospitalId}
         and device_number in
-        <foreach item="device_number" collection="list" index="index" open="(" separator="," close=")">
-            #{device_number}
+        <foreach item="deviceNumber" collection="deviceNumber" index="index" open="(" separator="," close=")">
+            #{deviceNumber}
         </foreach>
     </select>
 
@@ -386,17 +390,20 @@
         <include refid="selectUserLeaseOrderVo"/>
         where status=2
         and device_number=#{deviceNumber}
+        and hospitalId = #{hospitalId}
     </select>
     <select id="selectUseDevice" resultType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
-        select distinct device_number from user_lease_order where device_number=#{deviceNumber} and status=0
+        select distinct device_number from user_lease_order where device_number=#{deviceNumber} and status=0 and hospitalId=#{hospitalId}
     </select>
     <select id="selectUserLeaseOrderByOrderNumber" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where CONCAT(IFNULL(order_number,''),IFNULL(device_number,'')) LIKE concat('%',#{orderNumber},'%')
+        and hospitalId=#{hospitalId}
     </select>
     <select id="selectUserLeaseOrderByDevice" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where device_number =#{deviceNumber}
+        and hospitalId=#{hospitalId}
     </select>
     <select id="selectUserOrderByDeviceNumber" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM user_lease_order WHERE device_number = #{deviceNumber} and
@@ -446,5 +453,17 @@
                `restore_time`,`restore_address`,`time_price`,`fixed_price`,`price`,`investorProportion`,`hospitalProportion`,`agentProportion`,
                `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
         FROM `user_lease_order` where device_number = #{deviceNumber} and `status` = 0
+    </select>
+    <select id="selectUserLeaseOrderByInvestorId" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where investorId like concat('%"',#{userId},'"%')
+    </select>
+    <select id="selectUserLeaseOrderByAgentId"  parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where agentId=#{userId}
+    </select>
+    <select id="selectUserLeaseOrderByHospitalId" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where hospitalId=#{userId}
     </select>
 </mapper>

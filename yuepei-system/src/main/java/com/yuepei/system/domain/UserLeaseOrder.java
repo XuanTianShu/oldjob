@@ -123,6 +123,12 @@ public class UserLeaseOrder extends BaseEntity {
 
     private Long isValid;
 
+    private String hospitalId;
+
+    private String investorId;
+
+    private String agentId;
+
     private String userName;
 
     private String hospitalName;

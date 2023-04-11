@@ -12,7 +12,6 @@ import java.util.List;
  * @date 2023/2/10 10:19
  */
 public interface HospitalDeviceMapper {
-    List<DeviceType> selectDeviceType(@Param("userId") Long userId);
 
     List<Device> selectDeviceTypeDetails(@Param("deviceTypeId") Long deviceTypeId, @Param("hospitalId")Long hospitalId);
 
@@ -28,35 +27,17 @@ public interface HospitalDeviceMapper {
 
     Goods selectGoodsByGoodsName(@Param("goodsId") Long goodsId);
 
-    List<String> selectDeviceNumber(@Param("userId") Long userId);
-
-    HospitalUser selectHospitalbyUserName(@Param("userName") String userName);
-
-    DeviceType selectDeviceByType(@Param("deviceType") String deviceType);
-
     List<Hospital> selectHospitalByParentId(@Param("hospitalId") Long hospitalId);
 
     Device selectDeviceByTypeNumber(@Param("deviceNumber") String deviceNumber);
 
     List<Device> selectDeviceByHospitalId(@Param("hospitalId") Long hospitalId);
 
-    List<DeviceType> selectDeviceTypeName();
-
     List<UserLeaseOrder> selectLeaseOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber);
 
-    List<Hospital> selectHospitalByDepartment(@Param("deviceDepartment") String deviceDepartment);
+    List<Device> selectInvestorId(@Param("userId") Long userId);
 
-    HospitalUser selectHospitalByHospitalUserName(@Param("hospitalId") Long hospitalId);
+    List<UserLeaseOrder> selectUserLeaseOrderByDevices(@Param("deviceNumber") List<String> deviceNumbers,@Param("hospitalId") String hospitalId);
 
-    Hospital selectHospitalByHospitalId(@Param("hospitalName")String hospitalName);
-
-    List<Hospital> selectHospitalList();
-
-    List<Device> selectDeviceByHospitalIdLike(@Param("userId") Long userId,@Param("numberOrAddress") String numberOrAddress);
-
-    void insertHospital(Hospital hospital);
-
-    void insertHospitalUser(@Param("userName")String userName,@Param("hospitalId") Long hospitalId);
-
-    List<String> selectDeviceNumberByHospitalId(@Param("hospitalId")Long hospitalId);
+    List<Hospital> selectHospitalByHospitalIds(@Param("hospitalIdList") List<Long> hospitalIdList);
 }

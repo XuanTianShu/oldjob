@@ -3,6 +3,7 @@ package com.yuepei.investor.mapper;
 import com.yuepei.investor.domain.vo.InvestorHospitalVO;
 import com.yuepei.investor.domain.vo.InvestorOrderVO;
 import com.yuepei.investor.domain.vo.InvestorRevenueVO;
+import com.yuepei.system.domain.UserLeaseOrder;
 import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
@@ -96,4 +97,6 @@ public interface AppletInvestorMapper {
      * @return
      */
     List<InvestorOrderVO> accumulativeRevenueList(@Param("userId") Long userId, @Param("hospitalId") Long hospitalId);
+
+    List<UserLeaseOrder> selectUserLeaseOrderByDevices(@Param("deviceNumber") List<String> deviceNumbers,@Param("investorId") String investorId);
 }

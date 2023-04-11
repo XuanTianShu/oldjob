@@ -50,6 +50,16 @@ public class Hospital extends TreeEntity {
 
     private Long proportion;
 
+    private Long type;
+
+    public Long getType(){
+        return type;
+    }
+
+    public void setType(Long type){
+        this.type = type;
+    }
+
     public void setProportion(Long proportion){
         this.proportion = proportion;
     }

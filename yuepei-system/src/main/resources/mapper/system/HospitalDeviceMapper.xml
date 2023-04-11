@@ -4,20 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.HospitalDeviceMapper">
 
-    <sql id="DeviceTypeVo">
-        select dt.device_type_name from device_type dt
-        left join device d on dt.device_type_id=d.device_type_id
-        left join hospital h on d.hospital_id=h.hospital_id
-        left join hospital_user hu on h.hospital_id=hu.hospital_id
-        left join sys_user su on hu.user_name=su.user_name
-    </sql>
-    <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
-        insert into hospital(hospital_name,parent_id)
-        values (#{hospitalName},#{parentId})
-    </insert>
-    <insert id="insertHospitalUser" parameterType="HospitalUser">
-        insert into hospital_user (hospital_id,user_name) values (#{hospitalId},#{userName})
-    </insert>
+
 
     <resultMap type="UserLeaseOrder" id="UserLeaseOrderResult">
         <result property="id"    column="id"    />
@@ -48,11 +35,6 @@
         <result property="deviceTypeDeposit" column="device_type_deposit"></result>
     </resultMap>
 
-    <resultMap id="HospitalUserResult" type="HospitalUser">
-        <result property="hospitalId" column="hospital_id"></result>
-        <result property="userName" column="user_name"></result>
-    </resultMap>
-
     <sql id="DeviceDetails">
         select COUNT(d.device_type_id),h.hospital_id,h.hospital_name,d.device_number,d.device_full_address from device d
         left join hospital h on d.hospital_id=h.hospital_id
@@ -66,6 +48,7 @@
         <result property="deviceTypeId" column="device_type_id"></result>
         <result property="hospitalId" column="hospital_id"></result>
         <result property="deviceDeposit" column="device_deposit"></result>
+        <result property="investorId" column="investor_id"></result>
         <result property="billingId" column="billing_id"></result>
         <result property="deviceQrCode" column="device_qR_code"></result>
         <result property="deviceAddress" column="device_address"></result>
@@ -128,12 +111,6 @@
         select goods_id,goods_type_id,goods_name,goods_url,goods_price,goods_all_stock,create_time from Goods
     </sql>
 
-    <select id="selectDeviceType" parameterType="DeviceType" resultMap="DeviceTypeResult">
-        <include refid="DeviceTypeVo"/>
-        where su.user_id=#{userId}
-        group by dt.device_type_name
-    </select>
-
     <select id="selectDeviceTypeDetails" parameterType="Device" resultMap="DeviceTypeDetailsResult">
         select hospital_id,device_number,device_full_address,status
         from device
@@ -179,17 +156,6 @@
         <include refid="GoodsSql"/>
         where goods_id = #{goodsId}
     </select>
-
-    <select id="selectDeviceNumber" resultType="java.lang.String">
-        select device_number from device where user_id = #{userId}
-    </select>
-
-    <select id="selectHospitalbyUserName" parameterType="HospitalUser" resultMap="HospitalUserResult">
-        select hospital_id,user_name from hospital_user where user_name=#{userName}
-    </select>
-    <select id="selectDeviceByType" parameterType="DeviceType" resultMap="DeviceTypeResult">
-        select device_type_id,device_type_name,device_type_deposit from device_type where device_type_name=#{deviceType}
-    </select>
     <select id="selectHospitalByParentId" parameterType="Hospital" resultMap="HospitalResult">
         select hospital_id,hospital_name,parent_id from hospital where parent_id=#{hospitalId}
     </select>
@@ -201,34 +167,28 @@
         <include refid="selectDevice"/>
         where hospital_id = #{hospitalId}
     </select>
-    <select id="selectDeviceTypeName" parameterType="DeviceType" resultMap="DeviceTypeResult">
-        select device_type_id,device_type_name from device_type
-    </select>
     <select id="selectLeaseOrderByDeviceNumber" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where device_number = #{deviceNumber}
     </select>
-    <select id="selectHospitalByDepartment" parameterType="Hospital" resultMap="HospitalResult">
-        select hospital_id,hospital_name from hospital where hospital_name=#{deviceDepartment}
-    </select>
-    <select id="selectHospitalByHospitalUserName" parameterType="HospitalUser" resultMap="HospitalUserResult">
-        select hospital_id,user_name from hospital_user where hospital_id=#{hospitalId}
-    </select>
-    <select id="selectHospitalByHospitalId" parameterType="Hospital" resultMap="HospitalResult">
-        <include refid="selectHospital"/>
-        where hospital_name=#{hospitalName}
-    </select>
-    <select id="selectHospitalList" parameterType="Hospital" resultMap="HospitalResult">
-        select hospital_id,hospital_name from hospital where parent_id=0
-    </select>
-    <select id="selectDeviceByHospitalIdLike" parameterType="Device" resultMap="DeviceTypeDetailsResult">
+    <select id="selectInvestorId" parameterType="Device" resultMap="DeviceTypeDetailsResult">
         <include refid="selectDevice"/>
-        where user_id = #{userId}
-        and (device_number=#{numberOrAddress} or device_address=#{numberOrAddress})
+        where investor_id LIKE concat('%"',#{userId},'"%')
     </select>
-    <select id="selectDeviceNumberByHospitalId" resultType="java.lang.String">
-        select device_number from device where hospital_id=#{hospitalId}
+    <select id="selectUserLeaseOrderByDevices" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where status=2
+        and hospitalId=#{hospitalId}
+        and device_number in
+        <foreach item="deviceNumber" collection="deviceNumber" index="index" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
     </select>
-
-
+    <select id="selectHospitalByHospitalIds" parameterType="Hospital" resultMap="HospitalResult">
+        <include refid="selectHospital"/>
+        where hospital_id in
+        <foreach item="hospitalIdList" collection="hospitalIdList" index="index" open="(" separator="," close=")">
+            #{hospitalIdList}
+        </foreach>
+    </select>
 </mapper>
