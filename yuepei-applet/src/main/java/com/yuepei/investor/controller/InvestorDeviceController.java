@@ -66,6 +66,14 @@ public class InvestorDeviceController {
         return AjaxResult.success(appletInvestorService.selectDeviceType(user.getUserId()));
     }
 
+    /**投资人-根据设备类型选择医院*/
+    @GetMapping("/selectDeviceTypeByHospital")
+    public AjaxResult selectDeviceTypeByHospital(HttpServletRequest request,
+                                                 @RequestParam(value = "deviceTypeId",required = false)Long deviceTypeId){
+        SysUser user = tokenUtils.analysis(request);
+        return AjaxResult.success(appletInvestorService.selectDeviceTypeByHospital(user.getUserId(),deviceTypeId));
+    }
+
     /**投资人-设备管理*/
     @GetMapping("/investorDeviceManage")
     public AjaxResult investorDeviceManage(HttpServletRequest request,
@@ -121,11 +129,12 @@ public class InvestorDeviceController {
     /**投资人-租借订单*/
     @GetMapping("/investorLeaseOrder")
     private AjaxResult investorLeaseOrder(HttpServletRequest request,
+                                          @RequestParam(value = "status",required = false,defaultValue = "") String status,
                                           @RequestParam(value = "deviceDepartment",required = false,defaultValue = "") String deviceDepartment,
                                           @RequestParam(value = "deviceTypeName",required = false,defaultValue = "") String deviceTypeName,
                                           @RequestParam(value = "nameOrNumber",required = false,defaultValue = "") String nameOrNumber){
         SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(appletInvestorService.investorLeaseOrder(user.getUserId(),deviceDepartment,deviceTypeName,nameOrNumber));
+        return AjaxResult.success(appletInvestorService.investorLeaseOrder(user.getUserId(),status,deviceDepartment,deviceTypeName,nameOrNumber));
     }
 
 

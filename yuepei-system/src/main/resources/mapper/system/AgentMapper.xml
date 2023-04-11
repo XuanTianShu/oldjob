@@ -4,4 +4,118 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.AgentMapper">
 
+    <resultMap type="UserLeaseOrder" id="UserLeaseOrderResult">
+        <result property="id"    column="id"    />
+        <result property="openid"    column="openid"    />
+        <result property="outTradeNo" column="out_trade_no"/>
+        <result property="deviceRule" column="device_rule"/>
+        <result property="timePrice" column="time_price"/>
+        <result property="fixedPrice" column="fixed_price"/>
+        <result property="depositNumber" column="deposit_number"/>
+        <result property="orderNumber"    column="order_number"    />
+        <result property="deviceNumber"    column="device_number"    />
+        <result property="deviceType"    column="device_type"    />
+        <result property="leaseTime"    column="lease_time"    />
+        <result property="leaseAddress"    column="lease_address"    />
+        <result property="restoreTime"    column="restore_time"    />
+        <result property="restoreAddress"    column="restore_address"    />
+        <result property="price"    column="price"    />
+        <result property="payType"    column="pay_type"    />
+        <result property="netAmount"    column="net_amount"    />
+        <result property="couponPrice"    column="coupon_price"    />
+        <result property="status"    column="status"    />
+        <result property="deposit"    column="deposit"    />
+        <result property="playTime"    column="play_time"    />
+        <result property="createTime" column="create_time"/>
+        <result property="rule"       column="rule"/>
+        <result property="choose" column="choose"/>
+        <result property="child" column="child"/>
+        <result property="deviceAddress" column="device_address"/>
+        <result property="deviceMac" column="device_mac"/>
+        <result property="rows" column="rows"/>
+        <result property="deviceRule" column="device_rule"/>
+        <result property="investorProportion" column="investorProportion"/>
+        <result property="agentProportion" column="agentProportion"/>
+        <result property="hospitalProportion" column="hospitalProportion"/>
+        <result property="platformProportion" column="platformProportion"/>
+        <result property="isValid" column="is_valid"/>
+        <result property="hospitalId" column="hospitalId"/>
+        <result property="investorId" column="investorId"/>
+        <result property="agentId" column="agentId"/>
+    </resultMap>
+
+    <resultMap id="HospitalResult" type="Hospital">
+        <result property="hospitalId" column="hospital_id"></result>
+        <result property="hospitalName" column="hospital_name"></result>
+        <result property="parentId" column="parent_id"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="updateTime" column="update_time"></result>
+        <result property="hospitalRule" column="hospital_rule"></result>
+    </resultMap>
+
+    <resultMap id="DeviceTypeDetailsResult" type="Device">
+        <result property="deviceId" column="device_id"></result>
+        <result property="deviceNumber" column="device_number"></result>
+        <result property="deviceMac" column="device_mac"></result>
+        <result property="deviceIotNumber" column="device_iot_number"></result>
+        <result property="deviceTypeId" column="device_type_id"></result>
+        <result property="hospitalId" column="hospital_id"></result>
+        <result property="deviceDeposit" column="device_deposit"></result>
+        <result property="investorId" column="investor_id"></result>
+        <result property="billingId" column="billing_id"></result>
+        <result property="deviceQrCode" column="device_qR_code"></result>
+        <result property="deviceAddress" column="device_address"></result>
+        <result property="deviceFullAddress" column="device_full_address"></result>
+        <result property="rows" column="rows"></result>
+        <result property="heartTime" column="heart_time"></result>
+        <result property="createTime" column="create_time"></result>
+        <result property="status" column="status"></result>
+        <result property="content" column="content"></result>
+    </resultMap>
+
+    <sql id="selectUserLeaseOrderVo">
+        select id, openid, order_number, device_number, device_type, lease_time,
+               lease_address, restore_time, restore_address, price, pay_type,
+               net_amount, coupon_price, status, play_time,create_time,child,choose,investorProportion,
+               agentProportion,hospitalProportion,platformProportion,device_rule,deposit,time_price,fixed_price,hospitalId,investorId,agentId
+        from user_lease_order
+    </sql>
+
+    <sql id="selectHospital">
+        select hospital_id,hospital_name,parent_id,create_time,update_time,hospital_rule from hospital
+    </sql>
+
+    <sql id="selectDevice">
+        select device_id,device_number,device_mac,device_iot_number,device_type_id,hospital_id,device_deposit,billing_id,investor_id,device_qR_code,device_address,device_full_address,rows,heart_time,create_time,status,content from device
+    </sql>
+
+    <select id="selectUserLeaseOrderByDevices" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where status=2
+        and agentId=#{agentId}
+        and device_number in
+        <foreach item="deviceNumber" collection="deviceNumber" index="index" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </select>
+
+    <select id="selectHospitalByHospitalId" parameterType="Hospital" resultMap="HospitalResult">
+        <include refid="selectHospital"/>
+        where hospital_name=#{hospitalName}
+    </select>
+
+    <select id="selectHospitalList" parameterType="Hospital" resultMap="HospitalResult">
+        select hospital_id,hospital_name from hospital where parent_id=0
+    </select>
+
+    <select id="selectDeviceByHospitalIdLike" parameterType="Device" resultMap="DeviceTypeDetailsResult">
+        <include refid="selectDevice"/>
+        where user_id = #{userId}
+        and (device_number=#{numberOrAddress} or device_address=#{numberOrAddress})
+    </select>
+
+    <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
+        insert into hospital(hospital_name,parent_id,type)
+        values (#{hospitalName},#{parentId},#{type})
+    </insert>
 </mapper>

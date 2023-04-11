@@ -40,6 +40,8 @@
         <result property="platformProportion" column="platformProportion"/>
         <result property="isValid" column="is_valid"/>
         <result property="hospitalId" column="hospitalId"/>
+        <result property="investorId" column="investorId"/>
+        <result property="agentId" column="agentId"/>
     </resultMap>
 
     <resultMap id="LeaseOrderResult" type="LeaseOrderVO">
@@ -82,7 +84,7 @@
         select id, openid, order_number, device_number, device_type, lease_time,
                lease_address, restore_time, restore_address, price, pay_type,
                net_amount, coupon_price, status, play_time,create_time,child,choose,investorProportion,
-               agentProportion,hospitalProportion,platformProportion,device_rule,deposit,time_price,fixed_price,hospitalId
+               agentProportion,hospitalProportion,platformProportion,device_rule,deposit,time_price,fixed_price,hospitalId,investorId,agentId
         from user_lease_order
     </sql>
 
@@ -407,5 +409,17 @@
                `restore_time`,`restore_address`,`time_price`,`fixed_price`,`price`,`investorProportion`,`hospitalProportion`,`agentProportion`,
                `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
         FROM `user_lease_order` where child = #{substring1} and `status` = 0 and is_valid = 1
+    </select>
+    <select id="selectUserLeaseOrderByInvestorId" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where investorId like concat('%"',#{userId},'"%')
+    </select>
+    <select id="selectUserLeaseOrderByAgentId"  parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where agentId=#{userId}
+    </select>
+    <select id="selectUserLeaseOrderByHospitalId" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where hospitalId=#{userId}
     </select>
 </mapper>

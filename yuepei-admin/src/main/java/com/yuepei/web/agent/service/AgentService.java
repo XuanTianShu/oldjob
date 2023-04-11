@@ -60,4 +60,6 @@ public interface AgentService {
     List<Hospital> selectAgentHospitalList(Long userId);
 
     List<Device> selectDeviceNumberList(Long userId);
+
+    List<HospitalVO> selectDeviceTypeByHospital(Long userId, Long deviceTypeId);
 }

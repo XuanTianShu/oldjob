@@ -1,6 +1,7 @@
 package com.yuepei.web.agent.controller;
 
 import com.yuepei.common.core.domain.AjaxResult;
+import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.vo.FeedbackInfoVo;
 import com.yuepei.system.domain.vo.HospitalAgentVo;
 import com.yuepei.system.domain.vo.SubAccountVo;
@@ -9,6 +10,8 @@ import com.yuepei.utils.TokenUtils;
 import com.yuepei.web.agent.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -146,6 +149,13 @@ public class AgentController {
     @GetMapping("/selectAgentByDevice/{userId}")
     private AjaxResult selectAgentByDevice(@PathVariable(value = "userId")Long userId){
         return AjaxResult.success(agentService.selectAgentByDevice(userId));
+    }
+
+    /**代理端-根据设备类型选择医院*/
+    @GetMapping("/selectDeviceTypeByHospital")
+    public AjaxResult selectDeviceTypeByHospital(@RequestParam(value = "userId") Long userId,
+                                                 @RequestParam(value = "deviceTypeId",required = false)Long deviceTypeId){
+        return AjaxResult.success(agentService.selectDeviceTypeByHospital(userId,deviceTypeId));
     }
 
     /**代理端-设备详情-没有选择医院*/

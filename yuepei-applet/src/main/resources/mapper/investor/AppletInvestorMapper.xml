@@ -174,4 +174,60 @@
             SELECT device_number FROM device_investor WHERE investor_id = #{userId})
         </where>
     </select>
+
+    <resultMap type="UserLeaseOrder" id="UserLeaseOrderResult">
+        <result property="id"    column="id"    />
+        <result property="openid"    column="openid"    />
+        <result property="outTradeNo" column="out_trade_no"/>
+        <result property="deviceRule" column="device_rule"/>
+        <result property="timePrice" column="time_price"/>
+        <result property="fixedPrice" column="fixed_price"/>
+        <result property="depositNumber" column="deposit_number"/>
+        <result property="orderNumber"    column="order_number"    />
+        <result property="deviceNumber"    column="device_number"    />
+        <result property="deviceType"    column="device_type"    />
+        <result property="leaseTime"    column="lease_time"    />
+        <result property="leaseAddress"    column="lease_address"    />
+        <result property="restoreTime"    column="restore_time"    />
+        <result property="restoreAddress"    column="restore_address"    />
+        <result property="price"    column="price"    />
+        <result property="payType"    column="pay_type"    />
+        <result property="netAmount"    column="net_amount"    />
+        <result property="couponPrice"    column="coupon_price"    />
+        <result property="status"    column="status"    />
+        <result property="deposit"    column="deposit"    />
+        <result property="playTime"    column="play_time"    />
+        <result property="createTime" column="create_time"/>
+        <result property="rule"       column="rule"/>
+        <result property="choose" column="choose"/>
+        <result property="child" column="child"/>
+        <result property="deviceAddress" column="device_address"/>
+        <result property="deviceMac" column="device_mac"/>
+        <result property="rows" column="rows"/>
+        <result property="deviceRule" column="device_rule"/>
+        <result property="investorProportion" column="investorProportion"/>
+        <result property="agentProportion" column="agentProportion"/>
+        <result property="hospitalProportion" column="hospitalProportion"/>
+        <result property="platformProportion" column="platformProportion"/>
+        <result property="isValid" column="is_valid"/>
+        <result property="hospitalId" column="hospitalId"/>
+        <result property="investorId" column="investorId"/>
+        <result property="agentId" column="agentId"/>
+    </resultMap>
+    <sql id="selectUserLeaseOrderVo">
+        select id, openid, order_number, device_number, device_type, lease_time,
+               lease_address, restore_time, restore_address, price, pay_type,
+               net_amount, coupon_price, status, play_time,create_time,child,choose,investorProportion,
+               agentProportion,hospitalProportion,platformProportion,device_rule,deposit,time_price,fixed_price,hospitalId,investorId,agentId
+        from user_lease_order
+    </sql>
+    <select id="selectUserLeaseOrderByDevices" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where status=2
+        and investorId=#{investorId}
+        and device_number in
+        <foreach item="deviceNumber" collection="deviceNumber" index="index" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </select>
 </mapper>

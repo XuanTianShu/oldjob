@@ -30,6 +30,8 @@ public interface AppletInvestorService {
 
     List<DeviceType> selectDeviceType(Long userId);
 
+    List<HospitalVO> selectDeviceTypeByHospital(Long userId, Long deviceTypeId);
+
     InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate,Long deviceTypeId);
 
     PersonalCenterVo investorPersonalCenter(Long userId);
@@ -44,7 +46,7 @@ public interface AppletInvestorService {
 
     FeedbackInfoVo investorUploadsFileListDetails(Long feedbackId);
 
-    List<UserLeaseOrderVo> investorLeaseOrder(Long userId, String deviceDepartment, String deviceTypeName, String nameOrNumber);
+    List<UserLeaseOrderVo> investorLeaseOrder(Long userId, String status, String deviceDepartment, String deviceTypeName, String nameOrNumber);
 
     UserLeaseOrderVo investorLeaseOrderDetails(String orderNumber, Long userId);
 }

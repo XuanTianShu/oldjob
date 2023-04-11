@@ -27,31 +27,17 @@ public interface HospitalDeviceMapper {
 
     Goods selectGoodsByGoodsName(@Param("goodsId") Long goodsId);
 
-    List<Device> selectDeviceNumber(@Param("userId") Long userId);
-
-    DeviceType selectDeviceByType(@Param("deviceType") String deviceType);
-
     List<Hospital> selectHospitalByParentId(@Param("hospitalId") Long hospitalId);
 
     Device selectDeviceByTypeNumber(@Param("deviceNumber") String deviceNumber);
 
     List<Device> selectDeviceByHospitalId(@Param("hospitalId") Long hospitalId);
 
-    List<DeviceType> selectDeviceTypeName();
-
     List<UserLeaseOrder> selectLeaseOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber);
 
-    List<Hospital> selectHospitalByDepartment(@Param("deviceDepartment") String deviceDepartment);
-
-    Hospital selectHospitalByHospitalId(@Param("hospitalName")String hospitalName);
-
-    List<Hospital> selectHospitalList();
-
-    List<Device> selectDeviceByHospitalIdLike(@Param("userId") Long userId,@Param("numberOrAddress") String numberOrAddress);
-
-    void insertHospital(Hospital hospital);
-
-    List<String> selectDeviceNumberByHospitalId(@Param("hospitalId")Long hospitalId);
-
     List<Device> selectInvestorId(@Param("userId") Long userId);
+
+    List<UserLeaseOrder> selectUserLeaseOrderByDevices(@Param("deviceNumber") List<String> deviceNumbers,@Param("hospitalId") String hospitalId);
+
+    List<Hospital> selectHospitalByHospitalIds(@Param("hospitalIdList") List<Long> hospitalIdList);
 }
