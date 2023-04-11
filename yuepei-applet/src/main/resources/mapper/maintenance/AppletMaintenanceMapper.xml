@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yuepei.maintenance.mapper.AppletMaintenanceMapper">
+
+    <resultMap id="maintenanceHomeListResult" type="com.yuepei.maintenance.domain.vo.HomeVO">
+        <result property="deviceNumber" column="device_number"/>
+        <result property="status" column="status"/>
+        <result property="rows" column="rows"/>
+        <result property="deviceAddress" column="device_address"/>
+        <result property="electric" column="electric"/>
+        <result property="deviceFullAddress" column="device_full_address"/>
+        <result property="deviceTypeName" column="device_type_name"/>
+        <result property="deviceTypeId" column="device_type_id"/>
+    </resultMap>
+
+    <resultMap id="maintenanceStockListResult" type="com.yuepei.maintenance.domain.vo.StockVO">
+        <result property="deviceTypeId" column="device_type_id"/>
+        <result property="deviceTypeName" column="device_type_name"/>
+        <result property="deviceAddress" column="device_address"/>
+        <result property="rows" column="rows"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="hospitalName" column="hospital_name"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <select id="selectAppletMaintenanceList" parameterType="Long" resultMap="maintenanceHomeListResult">
+        SELECT d.device_number,d.`device_type_id`,d.`device_address`,
+        d.`device_full_address`,d.`rows`,d.`electric`,dt.device_type_name,
+        d.`status` FROM hospital_user AS hu
+        INNER JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
+        INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
+        INNER JOIN device_type AS dt ON dt.device_type_id = d.`device_type_id`
+        WHERE hu.`user_name` = #{userId}
+    </select>
+    <select id="selectAppletMaintenanceDeviceCount" resultType="java.lang.Integer">
+        SELECT ifnull(count(1),0) FROM hospital_user AS hu
+        INNER JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
+        INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
+        INNER JOIN device_type AS dt ON dt.device_type_id = d.`device_type_id`
+        WHERE hu.`user_name` = #{userId}
+    </select>
+    <select id="selectAppletMaintenanceStockCount" resultType="java.lang.Integer">
+        SELECT ifnull(count(1),0) FROM hospital_user AS hu
+        INNER JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
+        INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
+        INNER JOIN device_type AS dt ON dt.device_type_id = d.`device_type_id`
+        WHERE hu.`user_name` = #{userId} and d.status = 3
+    </select>
+    <select id="selectAppletMaintenanceStockList" resultMap="maintenanceStockListResult">
+        SELECT d.device_number,d.`device_type_id`,h.`hospital_name`,
+        d.`device_address`,d.`status`,d.`rows`,dt.`device_type_name` FROM hospital_user AS hu
+        INNER JOIN hospital AS h ON hu.`hospital_id` = h.`hospital_id`
+        INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
+        INNER JOIN device_type AS dt ON dt.`device_type_id` = d.`device_type_id`
+        <where>
+            hu.`user_name` = #{userId} AND d.`status` = 3
+            <if test="deviceNumber != null">
+                AND (d.`device_number` like concat('%',#{deviceNumber},'%') OR d.`device_address` like concat('%',#{deviceNumber},'%'))
+            </if>
+        </where>
+    </select>
+    <select id="selectAppletMaintenanceStockCountByDeviceNumber" resultType="java.lang.Integer">
+        SELECT ifnull(count(1),0) FROM hospital_user AS hu
+        INNER JOIN hospital AS h ON hu.`hospital_id` = h.`hospital_id`
+        INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
+        INNER JOIN device_type AS dt ON dt.`device_type_id` = d.`device_type_id`
+        <where>
+            hu.`user_name` = #{userId} AND d.`status` = 3
+            <if test="deviceNumber != null">
+                AND (d.`device_number` like concat('%',#{deviceNumber},'%') OR d.`device_address` like concat('%',#{deviceNumber},'%'))
+            </if>
+        </where>
+    </select>
+    <select id="selectAppletMaintenanceMalfunctionList"
+            resultType="com.yuepei.maintenance.domain.vo.MalfunctionVO">
+        SELECT suf.feedback_id,suf.device_number,d.`device_address`,
+               suf.feedback_type,suf.status,suf.feedback_info,suf.feedback_url
+        FROM hospital_user AS hu
+                 INNER JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
+                 INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
+                 INNER JOIN sys_user_feedback AS suf ON suf.device_number = d.`device_number`
+        <where>
+            hu.`user_name` = #{userId}
+            <if test="deviceNumber != null">
+                and (d.device_address like concat('%',#{deviceNumber},'%') or suf.deviceNumber like concat('%',#{deviceNumber},'%'))
+            </if>
+        </where>
+    </select>
+    <select id="selectAppletMaintenanceMalfunctionCount" resultType="java.lang.Integer">
+        select ifnull(count(DISTINCT(suf.device_number)),0)
+        from hospital_user as hu
+        inner join hospital as h on h.`hospital_id` = hu.`hospital_id`
+        inner join device as d on d.`hospital_id` = h.`hospital_id`
+        inner join sys_user_feedback as suf on suf.device_number = d.`device_number`
+        <where>
+            hu.`user_name` = #{userId}
+            <if test="deviceNumber != null">
+                and (d.device_address like concat('%',#{deviceNumber},'%') or suf.deviceNumber like concat('%',#{deviceNumber},'%'))
+            </if>
+        </where>
+    </select>
+</mapper>
