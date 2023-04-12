@@ -113,7 +113,7 @@ public interface UserLeaseOrderMapper {
 
     UserLeaseOrder selectUseDevice(@Param("deviceNumber") String deviceNumber,@Param("hospitalId") Long hospitalId);
 
-    List<UserLeaseOrder> selectUserLeaseOrderByOrderNumber(@Param("orderNumber") String orderNumber,@Param("hospitalId") Long hospitalId);
+    List<UserLeaseOrder> selectUserLeaseOrderByOrderNumber(@Param("orderNumber") String orderNumber,@Param("hospitalId") String hospitalId);
 
     List<UserLeaseOrder> selectUserLeaseOrderByDevice(@Param("deviceNumber") String deviceNumber,@Param("hospitalId") String hospitalId);
 

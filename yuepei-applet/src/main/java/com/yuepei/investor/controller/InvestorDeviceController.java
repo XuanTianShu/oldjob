@@ -78,7 +78,7 @@ public class InvestorDeviceController {
     @GetMapping("/investorDeviceManage")
     public AjaxResult investorDeviceManage(HttpServletRequest request,
                                            @RequestParam(value = "hospitalId",required = false)Long hospitalId,
-                                           @RequestParam(value = "departmentName",required = false)String departmentName,
+                                           @RequestParam(value = "departmentName",required = false,defaultValue = "")String departmentName,
                                            @RequestParam(value = "utilizationRate",required = false)Long utilizationRate,
                                            @RequestParam(value = "deviceTypeId",required = false)Long deviceTypeId){
         SysUser user = tokenUtils.analysis(request);
