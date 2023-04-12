@@ -351,7 +351,7 @@ public class AgentServiceImpl implements AgentService {
         List<UserLeaseOrder> leaseOrders = new ArrayList<>();
         deviceList.stream().forEach(map->{
             if (!nameOrNumber.equals("")){
-                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber,map.getHospitalId());
+                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber,String.valueOf(map.getHospitalId()));
                 List<UserLeaseOrder> collect = userLeaseOrders.stream().filter(j -> j.getDeviceNumber().equals(map.getDeviceNumber())).collect(Collectors.toList());
                 leaseOrders.addAll(collect);
             }else {

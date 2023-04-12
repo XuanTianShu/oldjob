@@ -243,7 +243,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         });
         List<UserLeaseOrder> leaseOrders = new ArrayList<>();
         if (!orderNumber.equals("")){
-            List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(orderNumber, sysUser.getHospitalId());
+            List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(orderNumber, String.valueOf(sysUser.getHospitalId()));
             numberList.stream().forEach(map->{
                 List<UserLeaseOrder> collect = userLeaseOrders.stream().filter(i -> i.getDeviceNumber().equals(map)).collect(Collectors.toList());
                 leaseOrders.addAll(collect);
