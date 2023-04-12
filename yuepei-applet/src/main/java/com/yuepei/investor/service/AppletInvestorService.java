@@ -38,6 +38,8 @@ public interface AppletInvestorService {
 
     SysUser investorPersonalData(Long userId);
 
+    Long selectProportion(Long userId);
+
     List<SubAccountManageVo> investorSubAccount(Long userId);
 
     int investorUploadsFile(FeedbackInfoVo feedbackInfoVo);

@@ -214,6 +214,22 @@
         <result property="investorId" column="investorId"/>
         <result property="agentId" column="agentId"/>
     </resultMap>
+
+    <resultMap id="OrderProportionDetailVoResult" type="OrderProportionDetailVo">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="proportion" column="proportion"/>
+        <result property="netAmount" column="net_amount"/>
+        <result property="leaseTime" column="lease_time"/>
+    </resultMap>
+
+    <sql id="selectOrderProportionDetail">
+        select opd.user_id,opd.order_number,opd.proportion,ulo.net_amount,ulo.lease_time
+        from order_proportion_detail opd
+        left join user_lease_order ulo on opd.order_number = ulo.order_number
+    </sql>
+
     <sql id="selectUserLeaseOrderVo">
         select id, openid, order_number, device_number, device_type, lease_time,
                lease_address, restore_time, restore_address, price, pay_type,
@@ -224,10 +240,14 @@
     <select id="selectUserLeaseOrderByDevices" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where status=2
-        and investorId=#{investorId}
+        and investorId LIKE concat('%"',#{userId},'"%')
         and device_number in
         <foreach item="deviceNumber" collection="deviceNumber" index="index" open="(" separator="," close=")">
             #{deviceNumber}
         </foreach>
+    </select>
+    <select id="selectOrderProtionDetail" parameterType="OrderProportionDetailVo" resultMap="OrderProportionDetailVoResult">
+        <include refid="selectOrderProportionDetail"/>
+        where opd.user_id=#{userId}
     </select>
 </mapper>

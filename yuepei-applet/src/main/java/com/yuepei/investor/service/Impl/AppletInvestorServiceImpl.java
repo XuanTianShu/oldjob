@@ -177,11 +177,11 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
 
     @Override
     public TotalVo selectRevenueStatistics(Long userId, int statistics) {
-        SysUser user = sysUserMapper.selectUserById(userId);
         TotalVo totalVo = new TotalVo();
         List<OrderVo> orderVos = new ArrayList<>();
         if (statistics == 1) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByInvestorId(String.valueOf(userId));
+//            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByInvestorId(String.valueOf(userId));
+            List<OrderProportionDetailVo> orders = appletInvestorMapper.selectOrderProtionDetail(userId);
             Date dNow = new Date();   //当前时间
             Date dBefore = new Date();
             Calendar calendar = Calendar.getInstance(); //得到日历
@@ -191,12 +191,12 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
             String defaultStartDate = sdf.format(dBefore);    //格式化前一天
             String now = sdf.format(dNow);
-            List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
+            List<OrderProportionDetailVo> userLeaseOrders = new ArrayList<>();
             try {
                 //使用SimpleDateFormat的parse()方法生成Date
                 Date date = sdf.parse(defaultStartDate);
                 Date parse = sdf.parse(now);
-                List<UserLeaseOrder> userLeaseOrder = userLeaseOrderList.stream()
+                List<OrderProportionDetailVo> userLeaseOrder = orders.stream()
                         .filter(s->s.getLeaseTime().getTime()<parse.getTime())
                         .filter(s->s.getLeaseTime().getTime()>date.getTime())
                         .collect(Collectors.toList());
@@ -209,8 +209,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setNetAmount(decimal);
-                orderVo.setDividendRatio(map.getHospitalProportion());
-                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -220,15 +220,15 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else if (statistics == 2) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByInvestorId(String.valueOf(userId));
+            List<OrderProportionDetailVo> orders = appletInvestorMapper.selectOrderProtionDetail(userId);
             Date dNow = new Date();   //当前时间
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
             String format = sdf.format(dNow);
-            List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
+            List<OrderProportionDetailVo> userLeaseOrders = new ArrayList<>();
             try {
                 //使用SimpleDateFormat的parse()方法生成Date
                 Date date = sdf.parse(format);
-                List<UserLeaseOrder> userLeaseOrder = userLeaseOrderList.stream()
+                List<OrderProportionDetailVo> userLeaseOrder = orders.stream()
                         .filter(s->s.getLeaseTime().getTime()>=date.getTime())
                         .collect(Collectors.toList());
                 userLeaseOrders.addAll(userLeaseOrder);
@@ -240,8 +240,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setNetAmount(decimal);
-                orderVo.setDividendRatio(map.getHospitalProportion());
-                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -251,7 +251,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else if (statistics == 3) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByInvestorId(String.valueOf(userId));
+            List<OrderProportionDetailVo> orders = appletInvestorMapper.selectOrderProtionDetail(userId);
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             // 获取前月的第一天
             Calendar cale = Calendar.getInstance();
@@ -263,12 +263,12 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             cale.add(Calendar.MONTH, 1);
             cale.set(Calendar.DAY_OF_MONTH, 0);
             String lastDay = format.format(cale.getTime());
-            List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
+            List<OrderProportionDetailVo> userLeaseOrders = new ArrayList<>();
             try {
                 //使用SimpleDateFormat的parse()方法生成Date
                 Date first = format.parse(firstDay);
                 Date last = format.parse(lastDay);
-                List<UserLeaseOrder> userLeaseOrder = userLeaseOrderList.stream()
+                List<OrderProportionDetailVo> userLeaseOrder = orders.stream()
                         .filter(s->s.getLeaseTime().getTime()>=first.getTime())
                         .filter(s->s.getLeaseTime().getTime()<=last.getTime())
                         .collect(Collectors.toList());
@@ -281,8 +281,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setNetAmount(decimal);
-                orderVo.setDividendRatio(map.getHospitalProportion());
-                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -292,14 +292,14 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByInvestorId(String.valueOf(userId));
-            userLeaseOrderList.stream().forEach(map->{
+            List<OrderProportionDetailVo> orders = appletInvestorMapper.selectOrderProtionDetail(userId);
+            orders.stream().forEach(map->{
                 OrderVo orderVo = new OrderVo();
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setNetAmount(decimal);
-                orderVo.setDividendRatio(map.getHospitalProportion());
-                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getHospitalProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -489,6 +489,20 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     @Override
     public SysUser investorPersonalData(Long userId) {
         return sysUserMapper.selectUserById(userId);
+    }
+
+    @Override
+    public Long selectProportion(Long userId) {
+        List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
+        Long proportion = 50L;
+        if (sysUsers.size()==0){
+            return proportion;
+        }else {
+            for (SysUser sysUser : sysUsers) {
+                proportion = proportion - sysUser.getProportion();
+            }
+            return proportion;
+        }
     }
 
     @Override

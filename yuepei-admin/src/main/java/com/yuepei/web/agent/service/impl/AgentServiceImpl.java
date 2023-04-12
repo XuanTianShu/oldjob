@@ -272,27 +272,15 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public Long selectProportion(Long userId) {
-        SysUser sysUser = sysUserMapper.selectUserById(userId);
-        if (sysUser.getParentId()!=0){
-            List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
-            if (sysUsers.size()==0){
-                return sysUser.getProportion();
-            }else {
-                sysUsers.stream().forEach(map->{
-                    sysUser.setProportion(sysUser.getProportion()-map.getProportion());
-                });
-                return sysUser.getProportion();
-            }
+        List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
+        Long proportion = 50L;
+        if (sysUsers.size()==0){
+            return proportion;
         }else {
-            List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
-            if (sysUsers.size()==0){
-                return sysUser.getProportion();
-            }else {
-                sysUsers.stream().forEach(map->{
-                    sysUser.setProportion(sysUser.getProportion()-map.getProportion());
-                });
-                return sysUser.getProportion();
+            for (SysUser sysUser : sysUsers) {
+                proportion = proportion - sysUser.getProportion();
             }
+            return proportion;
         }
     }
 

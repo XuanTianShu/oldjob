@@ -99,6 +99,12 @@ public class InvestorDeviceController {
         return AjaxResult.success(appletInvestorService.investorPersonalData(user.getUserId()));
     }
 
+    /**查询可分配分成比例*/
+    @GetMapping("/selectProportion")
+    private AjaxResult selectProportion(HttpServletRequest request){
+        SysUser user = tokenUtils.analysis(request);
+        return AjaxResult.success(appletInvestorService.selectProportion(user.getUserId()));
+    }
 
     /**投资人-子账户管理列表*/
     @GetMapping("/investorSubAccount")
