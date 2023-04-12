@@ -112,7 +112,8 @@
     <sql id="selectDeviceVo">
         select device_id, device_type_id, device_number,device_iot_number,device_mac,
                device_deposit, billing_id,hospital_id, device_qR_code, device_address,content,
-    device_full_address,`rows`,heart_time, create_time, status,investor_id,electric,electric_early,user_id,telecom_id,masterKey,productId from device
+    device_full_address,`rows`,heart_time, create_time, status,investor_id,electric,electric_early,
+               user_id,telecom_id,masterKey,productId from device
     </sql>
 
     <select id="selectDeviceList" parameterType="Device" resultMap="DeviceByPersonnelResult">

@@ -5,6 +5,7 @@ import com.yuepei.maintenance.domain.vo.MalfunctionVO;
 import com.yuepei.maintenance.domain.vo.StockVO;
 import com.yuepei.maintenance.mapper.AppletMaintenanceMapper;
 import com.yuepei.maintenance.service.AppletMaintenanceService;
+import com.yuepei.system.domain.SysUserFeedback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,5 +50,10 @@ public class AppletMaintenanceServiceImpl implements AppletMaintenanceService {
     @Override
     public int selectAppletMaintenanceMalfunctionCount(Long userId, String deviceNumber) {
         return appletMaintenanceMapper.selectAppletMaintenanceMalfunctionCount(userId,deviceNumber);
+    }
+
+    @Override
+    public int insertMaintenanceRecord(SysUserFeedback sysUserFeedback) {
+        return appletMaintenanceMapper.insertMaintenanceRecord(sysUserFeedback);
     }
 }

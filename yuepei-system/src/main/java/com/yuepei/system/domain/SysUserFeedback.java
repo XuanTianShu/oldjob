@@ -74,4 +74,6 @@ public class SysUserFeedback extends BaseEntity {
     private String devicePicture;
 
     private String deviceAddress;
+
+    private Long feedbackUserId;
 }

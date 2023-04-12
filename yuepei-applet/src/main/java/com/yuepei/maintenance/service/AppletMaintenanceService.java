@@ -3,6 +3,7 @@ package com.yuepei.maintenance.service;
 import com.yuepei.maintenance.domain.vo.HomeVO;
 import com.yuepei.maintenance.domain.vo.MalfunctionVO;
 import com.yuepei.maintenance.domain.vo.StockVO;
+import com.yuepei.system.domain.SysUserFeedback;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface AppletMaintenanceService {
     List<MalfunctionVO> selectAppletMaintenanceMalfunctionList(Long userId, String deviceNumber);
 
     int selectAppletMaintenanceMalfunctionCount(Long userId, String deviceNumber);
+
+    int insertMaintenanceRecord(SysUserFeedback sysUserFeedback);
 }

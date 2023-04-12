@@ -43,7 +43,7 @@ public class SysUser extends BaseEntity
 
     /** 用户余额 */
     @Excel(name = "用户余额")
-    private Long balance;
+    private BigDecimal balance;
 
     /** 用户积分 */
     @Excel(name = "用户积分")

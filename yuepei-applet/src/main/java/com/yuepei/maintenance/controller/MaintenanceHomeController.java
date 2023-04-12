@@ -6,9 +6,12 @@ import com.yuepei.maintenance.domain.vo.HomeVO;
 import com.yuepei.maintenance.domain.vo.MalfunctionVO;
 import com.yuepei.maintenance.domain.vo.StockVO;
 import com.yuepei.maintenance.service.AppletMaintenanceService;
+import com.yuepei.system.domain.SysUserFeedback;
 import com.yuepei.utils.TokenUtils;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -81,4 +84,20 @@ public class MaintenanceHomeController {
         map.put("malfunctionCount",malfunctionCount);
         return AjaxResult.success(map);
     }
+
+
+    /**
+     * 填写维修记录
+     * @param sysUserFeedback
+     * @param request
+     * @return
+     */
+    @PostMapping("/insertMaintenanceRecord")
+    public AjaxResult insertMaintenanceRecord(SysUserFeedback sysUserFeedback,HttpServletRequest request){
+        SysUser user = tokenUtils.analysis(request);
+        sysUserFeedback.setFeedbackUserId(user.getUserId());
+        return AjaxResult.success(appletMaintenanceService.insertMaintenanceRecord(sysUserFeedback));
+    }
+
+//    @GetMapping("/")
 }

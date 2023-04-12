@@ -126,6 +126,9 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     userLeaseOrder.setLeaseTime(new Date());
                     int proportionCount = 100-(totalProportionVO.getHProportion() + totalProportionVO.getDiProportion() + totalProportionVO.getSuProportion());
                     userLeaseOrder.setPlatformProportion(Long.parseLong(String.valueOf(proportionCount)));
+                    userLeaseOrder.setHospitalId(String.valueOf(device.getHospitalId()));
+                    userLeaseOrder.setAgentId(String.valueOf(device.getUserId()));
+                    userLeaseOrder.setInvestorId(device.getInvestorId());
                     userLeaseOrder.setAgentProportion(Long.parseLong(String.valueOf(totalProportionVO.getSuProportion())));
                     userLeaseOrder.setHospitalProportion(Long.parseLong(String.valueOf(totalProportionVO.getHProportion())));
                     userLeaseOrder.setInvestorProportion(Long.parseLong(String.valueOf(totalProportionVO.getDiProportion())));
@@ -138,7 +141,7 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     userLeaseOrder.setDeviceRule(userLeaseOrder.getRule());
                     userLeaseOrder.setDeposit(new BigDecimal(String.valueOf(deviceType.getDeviceTypeDeposit())).longValue());
 
-                    redisServer.setCacheObject(orderValid+orderNumber,userLeaseOrder,300,TimeUnit.SECONDS);
+//                    redisServer.setCacheObject(orderValid+orderNumber,userLeaseOrder,300,TimeUnit.SECONDS);
                     System.out.println(userLeaseOrder.getRule()+"--前端传的--");
                     //将订单信息存放到redis
 //                    System.out.println("新增内容");

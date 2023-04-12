@@ -17,4 +17,6 @@ public class MalfunctionVO {
     private String feedbackInfo;
 
     private String feedbackUrl;
+
+    private String devicePicture;
 }

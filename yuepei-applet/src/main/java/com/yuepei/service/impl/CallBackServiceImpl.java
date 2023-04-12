@@ -196,7 +196,7 @@ public class CallBackServiceImpl implements CallBackService {
                         SysUser user = new SysUser();
                         user.setIntegral(payTypes.get(i).getIntegral());
 //                        user.setBalance(Long.parseLong(String.valueOf(new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100),2))));
-                        user.setBalance(Long.parseLong(price.toString()));
+                        user.setBalance(new BigDecimal(price.toString()));
                         user.setOpenid(openid.toString());
                         if(userMapper.updateUserIntegralByOpenid(user)>0){
                             //赠送积分成功  记录 赠送积分明细
@@ -382,24 +382,28 @@ public class CallBackServiceImpl implements CallBackService {
         log.info(openid+"----"+couponId+"----"+userLeaseOrder.getPrice()+"-----"+userLeaseOrder.getOrderNumber()+"-----"+userLeaseOrder.getDeviceNumber());
         //根据 openId 查用户余额
         SysUser user = userMapper.selectUserByOpenid(openid);
-        Long price = 0L;
+        BigDecimal price = new BigDecimal(0.00);
         UserDiscount userDiscount = null;
         if (couponId != null){
             //根据优惠券 id 查优惠券金额
             userDiscount = userDiscountMapper.selectUserCouponById(couponId);
             //记录优惠券金额
             userLeaseOrder.setCouponPrice(userDiscount.getPrice().longValue());
-            BigDecimal subtract = userLeaseOrder.getPrice().subtract(userDiscount.getPrice());
-            price = subtract.longValue();
-            if(user.getBalance() < price) {
-                return AjaxResult.error("余额不足");
-            }
+            price = userLeaseOrder.getPrice().subtract(userDiscount.getPrice());
+//            price = subtract;
+        }else {
+            price = userLeaseOrder.getPrice();
         }
-        user.setBalance(user.getBalance() - price);
+        if(user.getBalance().compareTo(price) < 0) {
+            return AjaxResult.error("余额不足");
+        }
+        log.info("余额:{}",user.getBalance());
+        user.setBalance(user.getBalance().subtract(price));
         userMapper.updateUser(user);
+        log.info("实付金额：{}",price);
 
         //实付金额
-        userLeaseOrder.setNetAmount(new BigDecimal(price));
+        userLeaseOrder.setNetAmount(price);
         //付款时间
         userLeaseOrder.setCreateTime(DateUtils.getNowDate());
         //订单号

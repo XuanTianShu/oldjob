@@ -23,6 +23,28 @@
         <result property="status" column="status"/>
     </resultMap>
 
+    <resultMap id="maintenanceMalfunctionResult" type="com.yuepei.maintenance.domain.vo.MalfunctionVO">
+        <result property="status" column="status"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="deviceAddress" column="device_address"/>
+        <result property="devicePicture" column="device_picture"/>
+        <result property="feedbackId" column="feedback_id"/>
+        <result property="feedbackInfo" column="feedback_info"/>
+        <result property="feedbackType" column="feedback_type"/>
+        <result property="feedbackUrl" column="feedback_url"/>
+    </resultMap>
+
+    <update id="insertMaintenanceRecord" parameterType="com.yuepei.system.domain.SysUserFeedback">
+        update sys_user_feedback
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="feedbackUserId != null">feedback_user_id = #{feedbackUserId},</if>
+            <if test="feedbackDescribe != null">feedback_describe = #{feedbackDescribe},</if>
+            <if test="devicePicture != null">device_picture = #{devicePicture},</if>
+            `status` = 1
+        </trim>
+        where feedback_id = #{feedbackId}
+    </update>
+
     <select id="selectAppletMaintenanceList" parameterType="Long" resultMap="maintenanceHomeListResult">
         SELECT d.device_number,d.`device_type_id`,d.`device_address`,
         d.`device_full_address`,d.`rows`,d.`electric`,dt.device_type_name,
@@ -72,9 +94,10 @@
         </where>
     </select>
     <select id="selectAppletMaintenanceMalfunctionList"
-            resultType="com.yuepei.maintenance.domain.vo.MalfunctionVO">
+            resultMap="maintenanceMalfunctionResult">
         SELECT suf.feedback_id,suf.device_number,d.`device_address`,
-               suf.feedback_type,suf.status,suf.feedback_info,suf.feedback_url
+               suf.feedback_type,suf.status,suf.feedback_info,suf.feedback_url,
+               suf.device_picture
         FROM hospital_user AS hu
                  INNER JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
                  INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`

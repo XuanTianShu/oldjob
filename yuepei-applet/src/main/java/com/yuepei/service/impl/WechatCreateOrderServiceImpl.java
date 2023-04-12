@@ -215,7 +215,9 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
         SysUser user = userMapper.selectUserByOpenid(openid);
         HashMap<String, String> pay = wxPayUtils.withdrawal(openid, amount, remark, bankMemo);
         System.out.println("pay======================================"+pay);
-        if (user.getBalance() < amount * 100) {
+        BigDecimal bigDecimal = new BigDecimal(amount);
+        BigDecimal multiply = bigDecimal.multiply(new BigDecimal(100));
+        if (user.getBalance().compareTo(multiply) < 0) {
             return AjaxResult.error("提现金额不能大于余额");
         }
         return AjaxResult.success(pay);
