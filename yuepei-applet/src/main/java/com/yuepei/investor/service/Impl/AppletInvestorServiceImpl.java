@@ -205,7 +205,11 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 e.printStackTrace();
             }
             userLeaseOrders.stream().forEach(map->{
+                UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectUserLeaseOrderByOpenId(map.getOrderNumber());
+                Device device = hospitalDeviceMapper.selectDeviceByTypeNumber(userLeaseOrder.getDeviceNumber());
+                Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(device.getHospitalId());
                 OrderVo orderVo = new OrderVo();
+                orderVo.setHospitalName(hospital.getHospitalName());
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setNetAmount(decimal);
@@ -313,20 +317,27 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     }
 
     @Override
-    public List<String> selectDepartment(Long userId) {
+    public List<List<String>> selectDepartment(Long userId) {
+        List<List<String>> lists = new ArrayList<>();
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         List<Device> deviceList = hospitalDeviceMapper.selectInvestorId(sysUser.getUserId());
         List<String> deviceDepartment = new ArrayList<>();
+        List<String> deviceType = new ArrayList<>();
         deviceList.stream().forEach(map -> {
             String device_full_address = map.getDeviceFullAddress();
             if (!device_full_address.equals("0")) {
                 String[] array = JSON.parseArray(device_full_address).toArray(new String[0]);
                 Hospital Department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
+                DeviceType typeName = hospitalDeviceMapper.selectDeviceByTypeName(map.getDeviceTypeId());
                 deviceDepartment.add(Department.getHospitalName());
+                deviceType.add(typeName.getDeviceTypeName());
             }
         });
         List<String> collect = deviceDepartment.stream().distinct().collect(Collectors.toList());
-        return collect;
+        List<String> collect1 = deviceType.stream().distinct().collect(Collectors.toList());
+        lists.add(collect);
+        lists.add(collect1);
+        return lists;
     }
 
     @Override
@@ -394,7 +405,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     }
 
     @Override
-    public InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate, Long deviceTypeId) {
+    public InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate) {
         InvestorDeviceManageVo deviceManageVo = new InvestorDeviceManageVo();
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         List<Device> device = hospitalDeviceMapper.selectInvestorId(userId);
@@ -424,11 +435,6 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             List<DeviceDetailsVo> collect = deviceDetailsVos.stream()
                     .filter(map -> map.getHospitalId()!=null)
                     .filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
-            deviceDetailsVos.clear();
-            deviceDetailsVos.addAll(collect);
-        }
-        if (deviceTypeId!=null){
-            List<DeviceDetailsVo> collect = deviceDetailsVos.stream().filter(map -> map.getDeviceTypeId().equals(deviceTypeId)).collect(Collectors.toList());
             deviceDetailsVos.clear();
             deviceDetailsVos.addAll(collect);
         }

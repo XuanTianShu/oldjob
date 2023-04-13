@@ -82,12 +82,6 @@ public class AgentController {
         return AjaxResult.success(agentService.selectHospitalAdministration(userId,hospitalId,utilizationRate));
     }
 
-    /**查询可分配分成比例*/
-    @GetMapping("/selectProportion/{userId}")
-    private AjaxResult selectProportion(@PathVariable(value = "userId")Long userId){
-        return AjaxResult.success(agentService.selectProportion(userId));
-    }
-
     /**医院下拉框*/
     @GetMapping("/selectHospitalList")
     private AjaxResult selectHospitalList(){
@@ -110,6 +104,13 @@ public class AgentController {
     @GetMapping("/selectDeviceNumberList/{userId}")
     private AjaxResult selectDeviceNumberList(@PathVariable(value = "userId")Long userId){
         return AjaxResult.success(agentService.selectDeviceNumberList(userId));
+    }
+
+    /**子账户可分配分成比例*/
+    @GetMapping("/selectProportion")
+    private AjaxResult selectProportion(@RequestParam(value = "userId")Long userId,
+                                        @RequestParam(value = "status")int status){
+        return AjaxResult.success(agentService.selectProportion(userId,status));
     }
 
     /**代理端-添加医院*/

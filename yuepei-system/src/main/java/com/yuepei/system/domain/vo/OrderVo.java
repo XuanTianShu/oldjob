@@ -15,6 +15,9 @@ public class OrderVo {
     /** 订单编号 */
     private String orderNumber;
 
+    /**医院名称*/
+    private String hospitalName;
+
     /** 实付金额 */
     private BigDecimal netAmount;
 

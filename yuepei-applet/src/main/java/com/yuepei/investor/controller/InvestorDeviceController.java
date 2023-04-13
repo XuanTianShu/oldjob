@@ -79,10 +79,9 @@ public class InvestorDeviceController {
     public AjaxResult investorDeviceManage(HttpServletRequest request,
                                            @RequestParam(value = "hospitalId",required = false)Long hospitalId,
                                            @RequestParam(value = "departmentName",required = false,defaultValue = "")String departmentName,
-                                           @RequestParam(value = "utilizationRate",required = false)Long utilizationRate,
-                                           @RequestParam(value = "deviceTypeId",required = false)Long deviceTypeId){
+                                           @RequestParam(value = "utilizationRate",required = false)Long utilizationRate){
         SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(appletInvestorService.investorDeviceManage(user.getUserId(),hospitalId,departmentName,utilizationRate,deviceTypeId));
+        return AjaxResult.success(appletInvestorService.investorDeviceManage(user.getUserId(),hospitalId,departmentName,utilizationRate));
     }
 
     /**投资人-个人中心*/

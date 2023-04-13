@@ -271,14 +271,30 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public Long selectProportion(Long userId) {
+    public Long selectProportion(Long userId, int status) {
+        Long proportion = 100L;
         List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
-        Long proportion = 50L;
-        if (sysUsers.size()==0){
-            return proportion;
+        if (status==0){
+            Long proportion1 = 50L;
+            for (SysUser user : sysUsers) {
+                proportion1=proportion1-user.getProportion();
+            }
+            return proportion1;
         }else {
-            for (SysUser sysUser : sysUsers) {
-                proportion = proportion - sysUser.getProportion();
+            List<Long> hospitalId = new ArrayList<>();
+            List<Device> deviceList = hospitalDeviceMapper.selectInvestorId(userId);
+            deviceList.stream().forEach(map->{
+                hospitalId.add(map.getHospitalId());
+            });
+            List<Long> hospitalIds = hospitalId.stream().distinct().collect(Collectors.toList());
+            for (SysUser user : sysUsers) {
+                proportion=proportion-user.getProportion();
+            }
+            if (hospitalIds.size()!=0){
+                List<SysUser> hospitalUser = sysUserMapper.selectUserByHospitalIds(hospitalIds);
+                for (SysUser user : hospitalUser) {
+                    proportion=proportion-user.getProportion();
+                }
             }
             return proportion;
         }
