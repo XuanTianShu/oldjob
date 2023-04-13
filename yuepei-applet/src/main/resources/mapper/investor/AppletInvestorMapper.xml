@@ -240,7 +240,7 @@
     <select id="selectUserLeaseOrderByDevices" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where status=2
-        and investorId LIKE concat('%"',#{userId},'"%')
+        and investorId LIKE concat('%"',#{investorId},'"%')
         and device_number in
         <foreach item="deviceNumber" collection="deviceNumber" index="index" open="(" separator="," close=")">
             #{deviceNumber}
