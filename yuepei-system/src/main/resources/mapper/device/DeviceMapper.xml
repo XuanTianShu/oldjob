@@ -28,6 +28,7 @@
         <result property="telecomId" column="telecom_id"/>
         <result property="masterKey" column="masterKey"/>
         <result property="productId" column="productId"/>
+        <result property="type" column="type"/>
     </resultMap>
 
     <resultMap id="DeviceRuleResult" type="com.yuepei.system.domain.vo.DeviceVO">
@@ -323,6 +324,7 @@
             <if test="telecomId != null">telecom_id = #{telecomId},</if>
             <if test="masterKey != null">masterKey = #{masterKey},</if>
             <if test="productId != null">productId = #{productId},</if>
+            <if test="time != null">`time` = #{time},</if>
         </trim>
         where device_number = #{deviceNumber}
     </update>
@@ -385,11 +387,16 @@
         WHERE d.device_number = #{deviceNumber}
     </select>
     <select id="totalProportion" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
-        SELECT (100-IFNULL(h.`proportion`,0)) AS totalProportion
+        SELECT (100-IFNULL(dh.`proportion`,0)-IFNULL(d.`investor_proportion`,0) -
+        IFNULL(su.proportion,0)) AS totalProportion
         FROM device AS d
         LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
         LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
+        LEFT JOIN device_hospital AS dh ON dh.`device_number` = d.`device_number`
         WHERE d.device_number = #{deviceNumber}
+        <if test="type != null">
+            and h.type = #{type}
+        </if>
     </select>
     <select id="agentPersonnel" parameterType="String" resultMap="agentPersonnelResult">
         SELECT su.`user_id`,su.`user_name`,su.`nick_name`,
@@ -421,6 +428,35 @@
         left JOIN device AS d ON d.`user_id` = su.`user_id`
         left JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
         WHERE su.`user_id` = #{userId}
+    </select>
+    <select id="checkDevice" resultMap="DeviceResult">
+        SELECT d.device_number FROM hospital_user AS hu
+        INNER JOIN device AS d ON d.`hospital_id` = hu.`hospital_id`
+        WHERE hu.user_name = #{userId} AND d.`device_number` = #{deviceNumber}
+    </select>
+    <select id="selectDeviceByDeviceNumbers" resultMap="DeviceResult" parameterType="String">
+        SELECT d.device_id, d.device_type_id, d.device_number,
+               d.device_iot_number,d.device_mac,
+               d.device_deposit, d.billing_id,d.hospital_id,
+               d.device_qR_code, d.device_address,content,
+               d.device_full_address,d.`rows`,d.heart_time,
+               d.create_time, d.status,d.investor_id,d.electric,
+               d.electric_early,d.user_id,d.investor_proportion,d.telecom_id,
+               su.`proportion` AS agentProportion FROM device AS d
+                                                           LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+        WHERE d.device_number = #{deviceNumber}
+    </select>
+    <select id="selectInvestorProportionByDeviceNumber" resultMap="DeviceResult">
+        SELECT d.`device_number`,d.`hospital_id`,h.`type`,
+               d.`user_id`,d.`investor_proportion` FROM device AS d
+                                                            LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
+        WHERE d.device_number = #{deviceNumber}
+    </select>
+    <select id="totalProportion2" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
+        SELECT (100 - IFNULL(SUM(proportion),0)) AS totalProportion
+        FROM sys_user
+        WHERE parent_id = (SELECT user_id FROM device
+        WHERE device_number = #{deviceNumber})
     </select>
 
 </mapper>

@@ -12,6 +12,7 @@
         <result property="proportion" column="proportion"/>
         <result property="createTime"    column="create_time"    />
         <result property="updateTime"    column="update_time"    />
+        <result property="type" column="type"/>
     </resultMap>
 
     <resultMap type="com.yuepei.system.domain.vo.HospitalVO" id="HospitalResultVO">
@@ -80,7 +81,7 @@
     </resultMap>
 
     <sql id="selectHospitalVo">
-        select hospital_id, hospital_name, parent_id, hospital_rule, create_time,proportion, update_time from hospital
+        select hospital_id, hospital_name, parent_id, hospital_rule, create_time,proportion, update_time,`type` from hospital
     </sql>
 
     <select id="selectHospitalList" parameterType="Hospital" resultMap="HospitalResult">

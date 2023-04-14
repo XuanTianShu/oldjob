@@ -2,6 +2,7 @@ package com.yuepei.system.mapper;
 
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.Device;
+import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.DeviceRule;
 import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.pojo.DevicePo;
@@ -136,4 +137,12 @@ public interface DeviceMapper {
     TotalProportionVO getAgentProportion(@Param("userId") Long userId);
 
     void updateDeviceStatus(Device device);
+
+    Device checkDevice(@Param("userId") Long userId, @Param("deviceNumber") String deviceNumber);
+
+    Device selectDeviceByDeviceNumbers(@Param("deviceNumber") String deviceNumber);
+
+    Device selectInvestorProportionByDeviceNumber(DeviceInvestor deviceInvestor);
+
+    TotalProportionVO totalProportion2(Device device);
 }

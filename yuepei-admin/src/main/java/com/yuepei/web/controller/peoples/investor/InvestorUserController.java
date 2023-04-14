@@ -19,6 +19,7 @@ import com.yuepei.system.mapper.SysUserMapper;
 import com.yuepei.system.service.DeviceInvestorService;
 import com.yuepei.system.service.IInvestorUserService;
 import com.yuepei.system.service.ISysUserService;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,6 +34,7 @@ import java.util.List;
  * @author ohy
  * @date 2023-02-14
  */
+@Slf4j
 @RestController
 @RequestMapping("/system/investorUser")
 public class InvestorUserController extends BaseController
@@ -58,6 +60,11 @@ public class InvestorUserController extends BaseController
         return getDataTable(list);
     }
 
+    /**
+     * 投资设备
+     * @param deviceInvestor
+     * @return
+     */
     @GetMapping("/totalProportion")
     public AjaxResult totalProportion(DeviceInvestor deviceInvestor){
         TotalProportionVO totalProportion = investorUserService.totalProportion(deviceInvestor);
@@ -187,6 +194,9 @@ public class InvestorUserController extends BaseController
      */
     @PostMapping("/addDevice")
     public AjaxResult addDevice(@RequestBody DeviceInvestor deviceInvestor){
+        if (Integer.parseInt(deviceInvestor.getProportion()) <= 0){
+            return AjaxResult.error("无可分配比例");
+        }
         TotalProportionVO totalProportion = investorUserService.totalProportion(deviceInvestor);
         if (totalProportion.getTotalProportion() < Integer.parseInt(deviceInvestor.getProportion())){
             return AjaxResult.error("超过可分配比例");
@@ -201,7 +211,11 @@ public class InvestorUserController extends BaseController
      */
     @PutMapping("/updateDevice")
     public AjaxResult updateDevice(@RequestBody DeviceInvestor deviceInvestor){
+        if (Integer.parseInt(deviceInvestor.getProportion()) <= 0){
+            return AjaxResult.error("无可分配比例");
+        }
         TotalProportionVO totalProportion = investorUserService.totalProportion(deviceInvestor);
+        log.info("{}",totalProportion.getTotalProportion());
         if (totalProportion.getTotalProportion() < Integer.parseInt(deviceInvestor.getProportion())){
             return AjaxResult.error("超过可分配比例");
         }

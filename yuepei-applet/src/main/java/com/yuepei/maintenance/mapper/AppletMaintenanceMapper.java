@@ -1,8 +1,6 @@
 package com.yuepei.maintenance.mapper;
 
-import com.yuepei.maintenance.domain.vo.HomeVO;
-import com.yuepei.maintenance.domain.vo.MalfunctionVO;
-import com.yuepei.maintenance.domain.vo.StockVO;
+import com.yuepei.maintenance.domain.vo.*;
 import com.yuepei.system.domain.SysUserFeedback;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,4 +22,14 @@ public interface AppletMaintenanceMapper {
     int selectAppletMaintenanceMalfunctionCount(@Param("userId") Long userId, @Param("deviceNumber") String deviceNumber);
 
     int insertMaintenanceRecord(SysUserFeedback sysUserFeedback);
+
+    List<LeaseDeviceListVO> leaseDeviceList(@Param("deviceNumber") String deviceNumber, @Param("userId") Long userId);
+
+    LeaseDeviceDetailsVO leaseDeviceDetails(@Param("deviceNumber") String deviceNumber, @Param("userId") Long userId);
+
+    int leaseDeviceCount(@Param("deviceNumber") String deviceNumber, @Param("userId") Long userId);
+
+    TestDeviceVO testDevice(@Param("deviceNumber") String deviceNumber);
+
+    MalfunctionDetailVO getDetail(@Param("feedbackId") Long feedbackId);
 }

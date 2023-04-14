@@ -390,6 +390,8 @@ public class CallBackServiceImpl implements CallBackService {
             //记录优惠券金额
             userLeaseOrder.setCouponPrice(userDiscount.getPrice().longValue());
             price = userLeaseOrder.getPrice().subtract(userDiscount.getPrice());
+            userDiscount.setStatus(1L);
+            userDiscountMapper.updateUserDiscount(userDiscount);
 //            price = subtract;
         }else {
             price = userLeaseOrder.getPrice();
@@ -402,6 +404,19 @@ public class CallBackServiceImpl implements CallBackService {
         userMapper.updateUser(user);
         log.info("实付金额：{}",price);
 
+        //添加余额消费明细
+        UserIntegralBalanceDepositVo userIntegralBalanceDepositVo = new UserIntegralBalanceDepositVo();
+        userIntegralBalanceDepositVo.setOpenid(openid);
+        userIntegralBalanceDepositVo.setSum(price);
+        userIntegralBalanceDepositVo.setStatus(1);
+        userIntegralBalanceDepositVo.setCreateTime(new Date());
+        userBalanceDetailMapper.insertUserBalanceDetail(userIntegralBalanceDepositVo);
+
+        //TODO 计算分成
+        UserLeaseOrder userLeaseOrder1 = userLeaseOrderMapper.selectLeaseOrderDetails(userLeaseOrder.getOrderNumber());
+
+
+
         //实付金额
         userLeaseOrder.setNetAmount(price);
         //付款时间
@@ -410,6 +425,10 @@ public class CallBackServiceImpl implements CallBackService {
         userLeaseOrder.setOrderNumber(userLeaseOrder.getOrderNumber());
         //修改状态
         userLeaseOrder.setStatus("2");
+        //支付方式
+        userLeaseOrder.setPayType("2");
+        //押金订单
+        userLeaseOrder.setDepositNumber("0");
         //修改用户租赁信息
         return AjaxResult.success(userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder));
     }
@@ -443,6 +462,7 @@ public class CallBackServiceImpl implements CallBackService {
                 Device device1 = new Device();
                 device1.setDeviceNumber(deviceNumber);
                 device1.setTelecomId(deviceId);
+                device1.setTime(new Date());
                 deviceMapper.updateDeviceStatus(device1);
                 /**
                  * 长度为 16 位字符，eg：”timestamp”:
@@ -736,12 +756,13 @@ public class CallBackServiceImpl implements CallBackService {
                     usrDemo.httpPostExample(string1,deviceNumber.getProductId(),deviceNumber.getMasterKey(),deviceNumber.getTelecomId(),secret,application,domain);
                     log.info("post结束");
 
+                    Device device = new Device();
+                    device.setDeviceNumber(deviceNumber.getDeviceNumber());
                     if (productId != null){
-                        Device device = new Device();
-                        device.setDeviceNumber(deviceNumber.getDeviceNumber());
                         device.setProductId(productId);
-                        deviceMapper.updateDeviceStatus(device);
                     }
+                    device.setTime(new Date());
+                    deviceMapper.updateDeviceStatus(device);
                 }else if (substring1.equals("0200")){
                     log.info("位置信息汇报");
                     //锁状态
@@ -863,16 +884,18 @@ public class CallBackServiceImpl implements CallBackService {
                                 if (productId != null){
                                     device1.setProductId(productId);
                                 }
+                                device1.setTime(new Date());
                                 deviceMapper.updateDeviceStatus(device1);
                             }
                             log.info("开锁");
                         }else if (substring27.equals("0111")){
+                            Device device = new Device();
+                            device.setDeviceNumber(deviceNumber.getDeviceNumber());
                             if (productId != null){
-                                Device device = new Device();
-                                device.setDeviceNumber(deviceNumber.getDeviceNumber());
                                 device.setProductId(productId);
-                                deviceMapper.updateDeviceStatus(device);
                             }
+                            device.setTime(new Date());
+                            deviceMapper.updateDeviceStatus(device);
                             //TODO 设备在线
                             log.info("唤醒");
                         }else if (substring27.equals("0010")){
@@ -971,11 +994,13 @@ public class CallBackServiceImpl implements CallBackService {
                                     if (productId != null){
                                         device1.setProductId(productId);
                                     }
+                                    device1.setTime(new Date());
                                     deviceMapper.updateDeviceStatus(device1);
                             }else {
                                 Device device1 = new Device();
                                 device1.setDeviceNumber(substring35);
                                 device1.setStatus(0L);
+                                device1.setTime(new Date());
                                 deviceMapper.updateDeviceStatus(device1);
                             }
                             log.info("关锁");
@@ -1177,6 +1202,7 @@ public class CallBackServiceImpl implements CallBackService {
                             Device device1 = new Device();
                             device1.setDeviceNumber(substring35);
                             device1.setStatus(1L);
+                            device1.setTime(new Date());
                             deviceMapper.updateDeviceStatus(device1);
                         }
                         log.info("开锁");
@@ -1285,11 +1311,13 @@ public class CallBackServiceImpl implements CallBackService {
                             Device device1 = new Device();
                             device1.setDeviceNumber(substring35);
                             device1.setStatus(1L);
+                            device1.setTime(new Date());
                             deviceMapper.updateDeviceStatus(device1);
                         }else {
                             Device device1 = new Device();
                             device1.setDeviceNumber(substring35);
                             device1.setStatus(0L);
+                            device1.setTime(new Date());
                             deviceMapper.updateDeviceStatus(device1);
                         }
                         log.info("关锁");

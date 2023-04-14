@@ -126,6 +126,8 @@ public class DeviceServiceImpl implements DeviceService {
             deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
             deviceInvestorMapper.insert(list.toArray(longs),device.getDeviceNumber());
         }
+        //TODO 代理商分成比例
+        //TODO 医院分成比例
         try{
             //二维码是否跳转小程序暂定
             String enCode = QrCodeUtil.enCode(device.getDeviceNumber(),"https://www.yp10000.com/"+"?deviceNumber="+device.getDeviceNumber(), profile, true);
@@ -142,9 +144,18 @@ public class DeviceServiceImpl implements DeviceService {
                     deviceList.add(i-1,jsonObject);
                 }
                 device.setRows(deviceList.toString());
-            }else if(device.getDeviceTypeId()==4 || device.getDeviceTypeId()==5){
+            }else if(device.getDeviceTypeId()==4){
                 // 新增 格子柜 设备柜口
                 for (int i = 1; i < 6; i++) {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("index",i);
+                    jsonObject.put("status",0);
+                    deviceList.add(i-1,jsonObject);
+                }
+                device.setRows(deviceList.toString());
+            }else if (device.getDeviceTypeId()==5){
+                // 新增 格子柜 设备柜口
+                for (int i = 1; i < 4; i++) {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("index",i);
                     jsonObject.put("status",0);
@@ -233,14 +244,18 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public int updateDevice(Device device)
     {
+        log.info("type:{}",device.getType());
         Long[] longs = new Long[]{};
         JSONArray objects = JSON.parseArray(device.getInvestorId());
         List<Long> list = objects.toJavaList(Long.class);
+        log.info("{}",device.getInvestorId());
         if (list.size() > 0){
-            deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
+            System.out.println("执行");
+            int i = deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
             deviceInvestorMapper.insert(list.toArray(longs), device.getDeviceNumber());
+            log.info(Arrays.toString(list.toArray(longs)) +"----"+device.getDeviceNumber());
         }
-        deviceInvestorMapper.updateProportion(device.getDeviceNumber());
+        //TODO 代理商分成比例
         if (device.getUserId() != null){
             SysUser user = new SysUser();
             user.setUserId(device.getUserId());
@@ -248,14 +263,18 @@ public class DeviceServiceImpl implements DeviceService {
             sysUserMapper.updateUser(user);
         }
         if (device.getHospitalId() != 0 && device.getHospitalId() != null){
+            Device device1 = deviceMapper.selectDeviceByDeviceId(device.getDeviceId());
+            deviceInvestorMapper.deleteByInvestorId(device1.getDeviceNumber());
+            deviceHospitalMapper.del(String.valueOf(device.getDeviceNumber()));
             DeviceHospital deviceHospital = new DeviceHospital();
-            deviceHospital.setDeviceNumber(String.valueOf(device.getDeviceId()));
+            deviceHospital.setDeviceNumber(String.valueOf(device1.getDeviceNumber()));
             deviceHospital.setHospitalId(String.valueOf(device.getHospitalId()));
             deviceHospital.setProportion(device.getHospitalProportion());
             deviceHospitalMapper.insert(deviceHospital);
         }else {
-            deviceHospitalMapper.del(String.valueOf(device.getDeviceId()));
+            deviceHospitalMapper.del(String.valueOf(device.getDeviceNumber()));
         }
+        deviceInvestorMapper.updateProportion(device.getDeviceNumber());
         return deviceMapper.updateDevice(device);
     }
 
@@ -380,6 +399,21 @@ public class DeviceServiceImpl implements DeviceService {
     public TotalProportionVO getAgentProportion(Long userId) {
         System.out.println(userId);
         return deviceMapper.getAgentProportion(userId);
+    }
+
+    @Override
+    public Device checkDevice(Long userId, String deviceNumber) {
+        return deviceMapper.checkDevice(userId,deviceNumber);
+    }
+
+    @Override
+    public Device selectDeviceByDeviceNumber(String deviceNumber) {
+        return deviceMapper.selectDeviceByDeviceNumbers(deviceNumber);
+    }
+
+    @Override
+    public TotalProportionVO totalProportion2(Device device) {
+        return deviceMapper.totalProportion2(device);
     }
 
 }

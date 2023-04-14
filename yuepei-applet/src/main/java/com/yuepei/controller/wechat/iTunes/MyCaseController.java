@@ -24,14 +24,14 @@ public class MyCaseController {
     private UserCaseMapper userCaseMapper;
 
     @PostMapping("/insertUserCase")
-    public AjaxResult insertUserCase(HttpServletRequest request,UserCase userCase){
+    public AjaxResult insertUserCase(HttpServletRequest request,@RequestBody UserCase userCase){
         SysUser user = tokenUtils.analysis(request);
         userCase.setUserId(user.getUserId());
-        if(userCaseMapper.selectUserCaseByUserId(user.getUserId())==null){
+//        if(userCaseMapper.selectUserCaseByUserId(user.getUserId())==null){
             return AjaxResult.success(userCaseMapper.insertUserCase(userCase));
-        }else {
-            return AjaxResult.success(userCaseMapper.updateUserCase(userCase));
-        }
+//        }else {
+//            return AjaxResult.success(userCaseMapper.updateUserCase(userCase));
+//        }
     }
 
     @GetMapping("/selectUserCaseByUserId")

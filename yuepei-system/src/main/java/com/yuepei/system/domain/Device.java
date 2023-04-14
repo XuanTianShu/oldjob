@@ -5,6 +5,7 @@ import com.yuepei.common.core.domain.BaseEntity;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -123,4 +124,8 @@ public class Device extends BaseEntity {
     private String masterKey;
 
     private String productId;
+
+    private Date time;
+
+    private String type;
 }

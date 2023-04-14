@@ -10,8 +10,10 @@ import com.yuepei.domain.Item;
 import com.yuepei.service.MyLeaseOrderService;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.DeviceType;
+import com.yuepei.system.domain.OrderProportionDetail;
 import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.*;
+import com.yuepei.system.mapper.DeviceInvestorMapper;
 import com.yuepei.system.mapper.DeviceMapper;
 import com.yuepei.system.mapper.DeviceTypeMapper;
 import com.yuepei.system.mapper.UserLeaseOrderMapper;
@@ -71,6 +73,9 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
     @Autowired
     private RedisServer redisServer;
 
+    @Autowired
+    private DeviceInvestorMapper deviceInvestorMapper;
+
     @Value("${coupon.valid}")
     private String orderValid;
 
@@ -82,6 +87,19 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
     @Transactional
     @Override
     public AjaxResult insertUserLeaseOrder(String openid, String rows, UserLeaseOrder userLeaseOrder) {
+
+        if (userLeaseOrder.getChoose() == 0){
+            UserLeaseOrder selectLeaseOrderByDeviceNumber = userLeaseOrderMapper.selectLeaseOrderByDeviceNumber(userLeaseOrder.getDeviceNumber());
+            if (selectLeaseOrderByDeviceNumber != null){
+                return AjaxResult.error("该设备已被租赁！");
+            }
+        }else {
+            int i = userLeaseOrderMapper.selectUSerLeaseOrderByChild(userLeaseOrder);
+            if (i > 0){
+                return AjaxResult.error("该设备已被租赁！");
+            }
+        }
+
         log.info(userLeaseOrder.getDeviceNumber());
         try {
             //修改该设备状态
@@ -114,11 +132,15 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     System.out.println("借床");
                     String uuid = String.format("%040d", new BigInteger(UUID.randomUUID().toString().replace("-", ""), 16));
                     String orderNumber = uuid.substring(uuid.length() - 16);
+//                    List<OrderProportionDetail> orderProportionDetailList = deviceInvestorMapper.selectInvestorListByDeviceNumber(userLeaseOrder.getDeviceNumber());
+//                    userLeaseOrderMapper.insertOrderProportionDeatail(orderNumber,orderProportionDetailList);
+
+                    //TODO 详细订单分成比例
 
                     //计算订单代理商、投资人、医院分成比例
                     TotalProportionVO totalProportionVO = deviceMapper.selectDeviceProportionDetail(userLeaseOrder.getDeviceNumber());
 
-                    //TODO 记录订单分成比例详情
+                    //记录订单分成比例详情
                     Device device = deviceMapper.selectDeviceByDeviceNumber(userLeaseOrder.getDeviceNumber());
                     DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(device.getDeviceTypeId());
                     AgentAndHospitalNameVO agentAndHospitalNameVO = userLeaseOrderMapper.selectUserNameAndHospitalName(userLeaseOrder.getDeviceNumber());

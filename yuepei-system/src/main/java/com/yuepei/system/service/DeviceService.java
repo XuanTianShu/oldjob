@@ -132,5 +132,11 @@ public interface DeviceService {
     TotalProportionVO getDeviceProportion(String deviceNumber);
 
     TotalProportionVO getAgentProportion(Long userId);
+
+    Device checkDevice(Long userId, String deviceNumber);
+
+    Device selectDeviceByDeviceNumber(String deviceNumber);
+
+    TotalProportionVO totalProportion2(Device device);
 }
 

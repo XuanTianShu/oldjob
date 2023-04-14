@@ -12,10 +12,7 @@ import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.vo.TotalProportionVO;
 import com.yuepei.system.mapper.CarouselMapper;
 import com.yuepei.system.mapper.InstructionsMapper;
-import com.yuepei.system.service.DeviceService;
-import com.yuepei.system.service.HospitalDeviceService;
-import com.yuepei.system.service.ServicePhoneService;
-import com.yuepei.system.service.VideoManagementService;
+import com.yuepei.system.service.*;
 import com.yuepei.utils.DictionaryEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -93,6 +90,9 @@ public class DeviceController extends BaseController {
 
     @Autowired
     private UnlockingService unlockingService;
+
+    @Autowired
+    private HospitalService hospitalService;
 
 
     //修改接口路径
@@ -319,13 +319,24 @@ public class DeviceController extends BaseController {
     }
 
     /**
-     * 获取可分成比例
+     * 绑定平台医院可分成比例
      * @param device
      * @return
      */
     @GetMapping("/totalProportion")
     public AjaxResult totalProportion(Device device){
         TotalProportionVO totalProportionVO = deviceService.totalProportion(device);
+        return AjaxResult.success(totalProportionVO);
+    }
+
+    /**
+     * 绑定代理商医院可分成比例
+     * @param device
+     * @return
+     */
+    @GetMapping("/totalProportion2")
+    public AjaxResult totalProportion2(Device device){
+        TotalProportionVO totalProportionVO = deviceService.totalProportion2(device);
         return AjaxResult.success(totalProportionVO);
     }
 

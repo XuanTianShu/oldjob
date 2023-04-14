@@ -34,12 +34,10 @@
     <insert id="insertUserInsurance" parameterType="UserInsurance">
         insert into user_insurance
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">id,</if>
             <if test="userId != null">user_id,</if>
             <if test="urlRows != null">url_rows,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">#{id},</if>
             <if test="userId != null">#{userId},</if>
             <if test="urlRows != null">#{urlRows},</if>
         </trim>

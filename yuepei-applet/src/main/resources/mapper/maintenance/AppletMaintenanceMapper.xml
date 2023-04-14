@@ -32,6 +32,45 @@
         <result property="feedbackInfo" column="feedback_info"/>
         <result property="feedbackType" column="feedback_type"/>
         <result property="feedbackUrl" column="feedback_url"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <resultMap id="leaseDeviceListResult" type="com.yuepei.maintenance.domain.vo.LeaseDeviceListVO">
+        <result property="deviceNumber" column="device_number"/>
+        <result property="deviceAddress" column="device_address"/>
+        <result property="deviceTypeName" column="device_type_name"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <resultMap id="LeaseDeviceDetailsResult" type="com.yuepei.maintenance.domain.vo.LeaseDeviceDetailsVO">
+        <result property="status" column="status"/>
+        <result property="deviceTypeName" column="device_type_name"/>
+        <result property="deviceAddress" column="device_address"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="time" column="time"/>
+        <result property="hospitalName" column="hospital_name"/>
+        <result property="electric" column="electric"/>
+        <result property="platTime" column="platTime"/>
+        <result property="deviceFullAddress" column="device_full_address"/>
+    </resultMap>
+
+    <resultMap id="TestDeviceResult" type="com.yuepei.maintenance.domain.vo.TestDeviceVO">
+        <result property="hospitalName" column="hospital_name"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="deviceAddress" column="device_address"/>
+        <result property="deviceTypeName" column="device_type_name"/>
+        <result property="rows" column="rows"/>
+        <result property="deviceTypeId" column="device_type_id"/>
+    </resultMap>
+
+    <resultMap id="FeedbackDetailResult" type="com.yuepei.maintenance.domain.vo.MalfunctionDetailVO">
+        <result property="feedbackId" column="feedback_id"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="status" column="status"/>
+        <result property="deviceAddress" column="device_address"/>
+        <result property="feedbackUrl" column="feedback_url"/>
+        <result property="feedbackType" column="feedback_type"/>
+        <result property="feedbackInfo" column="feedback_info"/>
     </resultMap>
 
     <update id="insertMaintenanceRecord" parameterType="com.yuepei.system.domain.SysUserFeedback">
@@ -40,6 +79,7 @@
             <if test="feedbackUserId != null">feedback_user_id = #{feedbackUserId},</if>
             <if test="feedbackDescribe != null">feedback_describe = #{feedbackDescribe},</if>
             <if test="devicePicture != null">device_picture = #{devicePicture},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
             `status` = 1
         </trim>
         where feedback_id = #{feedbackId}
@@ -49,29 +89,29 @@
         SELECT d.device_number,d.`device_type_id`,d.`device_address`,
         d.`device_full_address`,d.`rows`,d.`electric`,dt.device_type_name,
         d.`status` FROM hospital_user AS hu
-        INNER JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
+        left JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
         INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
         INNER JOIN device_type AS dt ON dt.device_type_id = d.`device_type_id`
         WHERE hu.`user_name` = #{userId}
     </select>
     <select id="selectAppletMaintenanceDeviceCount" resultType="java.lang.Integer">
         SELECT ifnull(count(1),0) FROM hospital_user AS hu
-        INNER JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
+        left JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
         INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
         INNER JOIN device_type AS dt ON dt.device_type_id = d.`device_type_id`
         WHERE hu.`user_name` = #{userId}
     </select>
     <select id="selectAppletMaintenanceStockCount" resultType="java.lang.Integer">
         SELECT ifnull(count(1),0) FROM hospital_user AS hu
-        INNER JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
+        left JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
         INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
         INNER JOIN device_type AS dt ON dt.device_type_id = d.`device_type_id`
         WHERE hu.`user_name` = #{userId} and d.status = 3
     </select>
     <select id="selectAppletMaintenanceStockList" resultMap="maintenanceStockListResult">
-        SELECT d.device_number,d.`device_type_id`,h.`hospital_name`,
+        SELECT d.device_number,d.`device_type_id`,ifnull(h.`hospital_name`,'无') as hospital_name,
         d.`device_address`,d.`status`,d.`rows`,dt.`device_type_name` FROM hospital_user AS hu
-        INNER JOIN hospital AS h ON hu.`hospital_id` = h.`hospital_id`
+        left JOIN hospital AS h ON hu.`hospital_id` = h.`hospital_id`
         INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
         INNER JOIN device_type AS dt ON dt.`device_type_id` = d.`device_type_id`
         <where>
@@ -83,7 +123,7 @@
     </select>
     <select id="selectAppletMaintenanceStockCountByDeviceNumber" resultType="java.lang.Integer">
         SELECT ifnull(count(1),0) FROM hospital_user AS hu
-        INNER JOIN hospital AS h ON hu.`hospital_id` = h.`hospital_id`
+        left JOIN hospital AS h ON hu.`hospital_id` = h.`hospital_id`
         INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
         INNER JOIN device_type AS dt ON dt.`device_type_id` = d.`device_type_id`
         <where>
@@ -95,31 +135,77 @@
     </select>
     <select id="selectAppletMaintenanceMalfunctionList"
             resultMap="maintenanceMalfunctionResult">
-        SELECT suf.feedback_id,suf.device_number,d.`device_address`,
+        SELECT suf.feedback_id,d.device_number,d.`device_address`,
                suf.feedback_type,suf.status,suf.feedback_info,suf.feedback_url,
-               suf.device_picture
+               suf.device_picture,suf.create_time
         FROM hospital_user AS hu
-                 INNER JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
+                 left JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
                  INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
                  INNER JOIN sys_user_feedback AS suf ON suf.device_number = d.`device_number`
         <where>
             hu.`user_name` = #{userId}
             <if test="deviceNumber != null">
-                and (d.device_address like concat('%',#{deviceNumber},'%') or suf.deviceNumber like concat('%',#{deviceNumber},'%'))
+                and (d.device_address like concat('%',#{deviceNumber},'%') or d.device_number like concat('%',#{deviceNumber},'%'))
             </if>
         </where>
+        ORDER BY suf.`feedback_time` DESC
     </select>
     <select id="selectAppletMaintenanceMalfunctionCount" resultType="java.lang.Integer">
-        select ifnull(count(DISTINCT(suf.device_number)),0)
+        select ifnull(count(DISTINCT(d.device_number)),0)
         from hospital_user as hu
-        inner join hospital as h on h.`hospital_id` = hu.`hospital_id`
+        left join hospital as h on h.`hospital_id` = hu.`hospital_id`
         inner join device as d on d.`hospital_id` = h.`hospital_id`
         inner join sys_user_feedback as suf on suf.device_number = d.`device_number`
         <where>
             hu.`user_name` = #{userId}
             <if test="deviceNumber != null">
-                and (d.device_address like concat('%',#{deviceNumber},'%') or suf.deviceNumber like concat('%',#{deviceNumber},'%'))
+                and (d.device_address like concat('%',#{deviceNumber},'%') or d.device_number like concat('%',#{deviceNumber},'%'))
             </if>
         </where>
+    </select>
+    <select id="leaseDeviceList" resultMap="leaseDeviceListResult">
+        SELECT dt.`device_type_name`,d.device_number,d.`device_address`,d.`status` FROM hospital_user AS hu
+        INNER JOIN device AS d ON d.`hospital_id` = hu.`hospital_id`
+        INNER JOIN device_type AS dt ON dt.`device_type_id` = d.`device_type_id`
+        <where>
+            hu.`user_name` = #{userId}
+            <if test="deviceNumber != null and deviceNumber != ''">
+                AND (d.`device_number` like concat('%',#{deviceNumber},'%') OR d.`device_address` like concat('%',#{deviceNumber},'%'))
+            </if>
+        </where>
+    </select>
+    <select id="leaseDeviceDetails" resultMap="LeaseDeviceDetailsResult">
+        SELECT dt.`device_type_name`,d.device_number,d.`device_address`,d.`device_full_address`,
+        ifnull(h.`hospital_name`,'无') as hospital_name,d.`status`,d.`electric`,d.`time`,IFNULL(SUM(ulo.play_time),0) AS platTime FROM hospital_user AS hu
+        left JOIN hospital AS h ON h.`hospital_id` = hu.`hospital_id`
+        INNER JOIN device AS d ON d.`hospital_id` = h.`hospital_id`
+        INNER JOIN device_type AS dt ON dt.`device_type_id` = d.`device_type_id`
+        LEFT JOIN user_lease_order AS ulo ON ulo.`hospitalId` = hu.`hospital_id`
+        WHERE hu.`user_name` = #{userId} AND d.device_number = #{deviceNumber}
+    </select>
+    <select id="leaseDeviceCount" resultType="java.lang.Integer">
+        SELECT ifnull(count(1),0) FROM hospital_user AS hu
+        INNER JOIN device AS d ON d.`hospital_id` = hu.`hospital_id`
+        INNER JOIN device_type AS dt ON dt.`device_type_id` = d.`device_type_id`
+        <where>
+            hu.`user_name` = #{userId}
+            <if test="deviceNumber != null and deviceNumber != ''">
+                AND (d.`device_number` like concat('%',#{deviceNumber},'%') OR d.`device_address` like concat('%',#{deviceNumber},'%'))
+            </if>
+        </where>
+    </select>
+    <select id="testDevice" parameterType="String" resultMap="TestDeviceResult">
+        SELECT d.`device_number`,dt.`device_type_name`,IFNULL(h.`hospital_name`,'无') AS hospital_name,d.`device_address`,
+        d.`rows`,d.`device_type_id` FROM device AS d
+        INNER JOIN device_type AS dt ON dt.`device_type_id` = d.`device_type_id`
+        LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
+        WHERE d.device_number = #{deviceNumber}
+    </select>
+    <select id="getDetail" parameterType="Long" resultMap="FeedbackDetailResult">
+        SELECT suf.feedback_id,suf.device_number,suf.feedback_info,
+               suf.feedback_url,suf.feedback_type,d.device_address,suf.`status`
+        FROM sys_user_feedback AS suf
+                 INNER JOIN device AS d ON d.`device_number` = suf.`device_number`
+        WHERE suf.`feedback_id` = #{feedbackId}
     </select>
 </mapper>

@@ -101,12 +101,18 @@
         INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`-->
         SELECT lo.id,u.`nick_name`,u.`phone_number`, lo.order_number,
         lo.device_number, lo.device_type, lo.lease_time,
-        lo.lease_address,lo.choose,lo.child,IFNULL(lo.`hospital_name`,'无') AS hospitalName,
+        lo.lease_address,lo.choose,lo.child,
+        IFNULL(h.`hospital_name`,'无') AS hospitalName,
         lo.restore_time, lo.restore_address, lo.price, lo.pay_type,
-        lo.net_amount, lo.coupon_price, lo.`status`,IFNULL(lo.`user_name`,'无') AS agentName,
-        lo.play_time,lo.create_time,lo.investorProportion,lo.agentProportion
-        ,lo.hospitalProportion,lo.platformProportion FROM user_lease_order AS lo
+        lo.net_amount, lo.coupon_price, lo.`status`,
+        IFNULL(su.`user_name`,'无') AS agentName,
+        lo.play_time,lo.create_time,lo.investorProportion,
+        lo.agentProportion
+        ,lo.hospitalProportion,lo.platformProportion
+        FROM user_lease_order AS lo
         INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`
+        LEFT JOIN hospital AS h ON h.`hospital_id` = lo.`hospitalId`
+        LEFT JOIN sys_user AS su ON su.`user_id` = lo.`agentId`
     </sql>
 
     <select id="leaseOrderList" parameterType="LeaseOrderVO" resultMap="LeaseOrderResult">
@@ -193,6 +199,9 @@
             <if test="depositNumber != null">deposit_number,</if>
             <if test="rule != null">device_rule,</if>
             <if test="isValid != null">is_valid,</if>
+            <if test="investorId != null">investorId,</if>
+            <if test="hospitalId != null">hospitalId,</if>
+            <if test="agentId != null">agentId,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="openid != null">#{openid},</if>
@@ -220,7 +229,16 @@
             <if test="depositNumber != null">#{depositNumber},</if>
             <if test="rule != null">#{rule},</if>
             <if test="isValid != null">#{isValid},</if>
+            <if test="investorId != null">#{investorId},</if>
+            <if test="hospitalId != null">#{hospitalId},</if>
+            <if test="agentId != null">#{agentId},</if>
         </trim>
+    </insert>
+    <insert id="insertOrderProportionDeatail">
+        insert into order_proportion_detail(order_number,user_id,proportion) values
+        <foreach item="item" index="index" collection="orderProportionDetailList" separator=",">
+            (#{orderNumber},#{item.userId},#{item.proportion})
+        </foreach>
     </insert>
 
     <update id="updateUserLeaseOrder" parameterType="UserLeaseOrder">
@@ -465,5 +483,8 @@
     <select id="selectUserLeaseOrderByHospitalId" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where hospitalId=#{userId}
+    </select>
+    <select id="selectUSerLeaseOrderByChild" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM user_lease_order WHERE device_number = #{deviceNumber} AND choose = #{choose} AND child = #{child} AND `status` = 0
     </select>
 </mapper>

@@ -1,6 +1,7 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.DeviceInvestor;
+import com.yuepei.system.domain.OrderProportionDetail;
 import com.yuepei.system.domain.vo.DeviceInvestorVO;
 import org.apache.ibatis.annotations.Param;
 
@@ -22,4 +23,6 @@ public interface DeviceInvestorMapper {
     DeviceInvestor getDeviceById(@Param("id") Long id);
 
     void updateProportion(@Param("deviceNumber") String deviceNumber);
+
+    List<OrderProportionDetail> selectInvestorListByDeviceNumber(@Param("deviceNumber") String deviceNumber);
 }

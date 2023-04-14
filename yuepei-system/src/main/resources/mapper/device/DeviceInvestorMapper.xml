@@ -14,6 +14,13 @@
         <result property="deviceId" column="device_id"/>
     </resultMap>
 
+    <resultMap id="orderProportionDetailResult" type="com.yuepei.system.domain.OrderProportionDetail">
+        <result property="id" column="Id"/>
+        <result property="proportion" column="proportion"/>
+        <result property="userId" column="user_id"/>
+        <result property="orderNumber" column="order_number"/>
+    </resultMap>
+
     <sql id="deviceInvestorVO">
         SELECT Id,device_number,investor_id,proportion,create_time FROM device_investor
     </sql>
@@ -57,5 +64,9 @@
     <select id="getDeviceById" parameterType="long" resultMap="deviceInvestorQuery">
         <include refid="deviceInvestorVO"></include>
         where id = #{id}
+    </select>
+    <select id="selectInvestorListByDeviceNumber" parameterType="String" resultMap="orderProportionDetailResult">
+        SELECT investor_id AS user_id,proportion FROM device_investor
+        WHERE device_number = #{deviceNumber}
     </select>
 </mapper>
