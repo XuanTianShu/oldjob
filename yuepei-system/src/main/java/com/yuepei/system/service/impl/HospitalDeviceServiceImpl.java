@@ -835,22 +835,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     public PersonalCenterVo selectPersonalCenter(Long userId) {
         PersonalCenterVo personalCenterVo = new PersonalCenterVo();
         SysUser sysUser = sysUserMapper.selectUserById(userId);
-        List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(sysUser.getHospitalId());
-        List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
-        List<UserLeaseOrderVo> userLeaseOrderVos = new ArrayList<>();
-        deviceList.stream().forEach(map->{
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByDeviceNumber(map.getDeviceNumber(), String.valueOf(map.getHospitalId()));
-            userLeaseOrders.addAll(userLeaseOrderList);
-        });
-        userLeaseOrders.stream().forEach(map->{
-            UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
-            BeanUtils.copyProperties(map,userLeaseOrderVo);
-            userLeaseOrderVo.setNetAmount(map.getNetAmount());
-            userLeaseOrderVos.add(userLeaseOrderVo);
-        });
-        BigDecimal reduce = userLeaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal decimal = new BigDecimal(sysUser.getProportion());
-        personalCenterVo.setAmount(reduce.multiply(decimal).divide(new BigDecimal(100)));
+        personalCenterVo.setAmount(new BigDecimal(sysUser.getBalance()));
         personalCenterVo.setUserName(sysUser.getUserName());
         personalCenterVo.setAvatar(sysUser.getAvatar());
         return personalCenterVo;

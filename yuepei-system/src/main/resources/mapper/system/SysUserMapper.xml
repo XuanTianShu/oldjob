@@ -341,4 +341,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		from sys_user
 		where parent_id=#{userId}
 	</select>
+    <select id="selectUserByHospitalIds" parameterType="SysUser" resultMap="SysUserResult">
+		select user_id, dept_id, user_name, balance, openid, integral, nick_name, email, avatar, phone_number, password, sex, status, del_flag, login_ip, login_date, create_by, create_time, remark,user_type,proportion,parent_id
+		from sys_user
+		where hospital_id in
+		<foreach item="hospitalIds" collection="list" index="index" open="(" separator="," close=")">
+			#{hospitalIds}
+		</foreach>
+	</select>
 </mapper>

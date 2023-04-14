@@ -79,10 +79,9 @@ public class InvestorDeviceController {
     public AjaxResult investorDeviceManage(HttpServletRequest request,
                                            @RequestParam(value = "hospitalId",required = false)Long hospitalId,
                                            @RequestParam(value = "departmentName",required = false,defaultValue = "")String departmentName,
-                                           @RequestParam(value = "utilizationRate",required = false)Long utilizationRate,
-                                           @RequestParam(value = "deviceTypeId",required = false)Long deviceTypeId){
+                                           @RequestParam(value = "utilizationRate",required = false)Long utilizationRate){
         SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(appletInvestorService.investorDeviceManage(user.getUserId(),hospitalId,departmentName,utilizationRate,deviceTypeId));
+        return AjaxResult.success(appletInvestorService.investorDeviceManage(user.getUserId(),hospitalId,departmentName,utilizationRate));
     }
 
     /**投资人-个人中心*/
@@ -99,6 +98,12 @@ public class InvestorDeviceController {
         return AjaxResult.success(appletInvestorService.investorPersonalData(user.getUserId()));
     }
 
+    /**查询可分配分成比例*/
+    @GetMapping("/selectProportion")
+    private AjaxResult selectProportion(HttpServletRequest request){
+        SysUser user = tokenUtils.analysis(request);
+        return AjaxResult.success(appletInvestorService.selectProportion(user.getUserId()));
+    }
 
     /**投资人-子账户管理列表*/
     @GetMapping("/investorSubAccount")

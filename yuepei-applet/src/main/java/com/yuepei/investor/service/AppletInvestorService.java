@@ -26,17 +26,19 @@ public interface AppletInvestorService {
 
     TotalVo selectRevenueStatistics(Long userId, int statistics);
 
-    List<String> selectDepartment(Long userId);
+    List<List<String>> selectDepartment(Long userId);
 
     List<DeviceType> selectDeviceType(Long userId);
 
     List<HospitalVO> selectDeviceTypeByHospital(Long userId, Long deviceTypeId);
 
-    InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate,Long deviceTypeId);
+    InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate);
 
     PersonalCenterVo investorPersonalCenter(Long userId);
 
     SysUser investorPersonalData(Long userId);
+
+    Long selectProportion(Long userId);
 
     List<SubAccountManageVo> investorSubAccount(Long userId);
 

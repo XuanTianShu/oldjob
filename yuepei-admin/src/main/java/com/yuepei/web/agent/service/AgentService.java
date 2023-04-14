@@ -19,7 +19,7 @@ public interface AgentService {
 
     DeviceManageVo selectHospitalAdministration(Long userId, Long hospitalId, Long utilizationRate);
 
-    Long selectProportion(Long userId);
+    Long selectProportion(Long userId, int status);
 
     String insertHospitalByAgent(HospitalAgentVo hospitalAgentVo);
 
