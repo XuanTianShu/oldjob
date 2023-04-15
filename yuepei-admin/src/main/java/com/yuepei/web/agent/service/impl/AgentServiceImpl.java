@@ -165,15 +165,11 @@ public class AgentServiceImpl implements AgentService {
         devices.stream().forEach(map->{
             Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(map.getHospitalId());
             if (hospital!=null){
-                SysUser sysUser = sysUserMapper.selectUserByHospital(map.getHospitalId());
                 HospitalManagementVo hospitalManagementVo = new HospitalManagementVo();
                 hospitalManagementVo.setHospitalId(hospital.getHospitalId());
                 hospitalManagementVo.setHospitalName(hospital.getHospitalName());
                 hospitalManagementVo.setDeviceNum(devices.size());
                 hospitalManagementVo.setDeviceAddress(map.getDeviceAddress());
-                if (sysUser!=null){
-                    hospitalManagementVo.setProportion(sysUser.getProportion());
-                }
                 hospitalManagementVos.add(hospitalManagementVo);
             }
         });
@@ -449,9 +445,6 @@ public class AgentServiceImpl implements AgentService {
         sysUser.setParentId(subAccountVo.getUserId());
         sysUser.setNickName(subAccountVo.getAgentName());
         sysUserMapper.insertUser(sysUser);
-        SysUser userById = sysUserMapper.selectUserById(subAccountVo.getUserId());
-        userById.setProportion(userById.getProportion()-sysUser.getProportion());
-        sysUserMapper.updateUser(userById);
         return "添加成功";
     }
 
@@ -988,8 +981,16 @@ public class AgentServiceImpl implements AgentService {
     public TotalVo revenueStatistics(SysUser user,int statistics){
         TotalVo totalVo = new TotalVo();
         List<OrderVo> orderVos = new ArrayList<>();
+        List<Long> hospitals = hospitalDeviceMapper.selectAgentAddHospital(user.getUserId());
         if (statistics == 1) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(String.valueOf(user.getUserId()));
+            List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
+            if (hospitals.size()!=0){
+                List<String> deviceNumbers = deviceMapper.selectDeviceByHospitalIds(hospitals);
+                if (deviceNumbers.size()!=0){
+                    List<UserLeaseOrder> leaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(deviceNumbers,String.valueOf(user.getUserId()));
+                    userLeaseOrderList.addAll(leaseOrderList);
+                }
+            }
             Date dNow = new Date();   //当前时间
             Date dBefore = new Date();
             Calendar calendar = Calendar.getInstance(); //得到日历
@@ -1028,7 +1029,14 @@ public class AgentServiceImpl implements AgentService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else if (statistics == 2) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(String.valueOf(user.getUserId()));
+            List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
+            if (hospitals.size()!=0){
+                List<String> deviceNumbers = deviceMapper.selectDeviceByHospitalIds(hospitals);
+                if (deviceNumbers.size()!=0){
+                    List<UserLeaseOrder> leaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(deviceNumbers,String.valueOf(user.getUserId()));
+                    userLeaseOrderList.addAll(leaseOrderList);
+                }
+            }
             Date dNow = new Date();   //当前时间
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
             String format = sdf.format(dNow);
@@ -1059,7 +1067,14 @@ public class AgentServiceImpl implements AgentService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else if (statistics == 3) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(String.valueOf(user.getUserId()));
+            List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
+            if (hospitals.size()!=0){
+                List<String> deviceNumbers = deviceMapper.selectDeviceByHospitalIds(hospitals);
+                if (deviceNumbers.size()!=0){
+                    List<UserLeaseOrder> leaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(deviceNumbers,String.valueOf(user.getUserId()));
+                    userLeaseOrderList.addAll(leaseOrderList);
+                }
+            }
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             // 获取前月的第一天
             Calendar cale = Calendar.getInstance();
@@ -1100,7 +1115,14 @@ public class AgentServiceImpl implements AgentService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(String.valueOf(user.getUserId()));
+            List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
+            if (hospitals.size()!=0){
+                List<String> deviceNumbers = deviceMapper.selectDeviceByHospitalIds(hospitals);
+                if (deviceNumbers.size()!=0){
+                    List<UserLeaseOrder> leaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(deviceNumbers,String.valueOf(user.getUserId()));
+                    userLeaseOrderList.addAll(leaseOrderList);
+                }
+            }
             userLeaseOrderList.stream().forEach(map->{
                 OrderVo orderVo = new OrderVo();
                 orderVo.setOrderNumber(map.getOrderNumber());
@@ -1134,7 +1156,7 @@ public class AgentServiceImpl implements AgentService {
                 BeanUtils.copyProperties(total,totalVo);
                 orderVo.addAll(total.getOrderVos());
                 totalVo.setOrderAmount(orderAmount.add(total.getOrderAmount()));
-                totalVo.setDividendAmount(dividendAmount.add(total.getDividendAmount()));
+                totalVo.setDividendAmount(dividendAmount.add(total.getDividendAmount().multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100))));
                 effectiveOrder.add(total.getEffectiveOrder());
                 int sum = 0;
                 for (Integer integer : effectiveOrder) {
@@ -1144,41 +1166,27 @@ public class AgentServiceImpl implements AgentService {
                 totalVo.setOrderVos(orderVo);
             }
         }else {
-            List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
-            if (sysUsers.size()==0){
-                List<OrderVo> orderVo = new ArrayList<>();
-                BigDecimal orderAmount = new BigDecimal(0);
-                BigDecimal dividendAmount = new BigDecimal(0);
-                List<Integer> effectiveOrder = new ArrayList<>();
-                TotalVo total = revenueStatistics(sysUser,statistics);
-                if (total!=null){
-                    BeanUtils.copyProperties(total,totalVo);
-                    orderVo.addAll(total.getOrderVos());
-                    totalVo.setOrderAmount(orderAmount.add(total.getOrderAmount()));
-                    totalVo.setDividendAmount(dividendAmount.add(total.getDividendAmount()));
-                    effectiveOrder.add(total.getEffectiveOrder());
-                    int sum = 0;
-                    for (Integer integer : effectiveOrder) {
-                        sum+=integer;
-                    }
-                    totalVo.setEffectiveOrder(sum);
-                    totalVo.setOrderVos(orderVo);
+            List<Long> hospitalIds = new ArrayList<>();
+            List<Device> deviceList = deviceMapper.selectDeviceByUserId(sysUser.getUserId());
+            deviceList.stream().forEach(map->{
+                hospitalIds.add(map.getHospitalId());
+            });
+            List<Long> collect = hospitalIds.stream().distinct().collect(Collectors.toList());
+            List<SysUser> sysUsers = sysUserMapper.selectUserByHospitalIds(collect);
+            List<OrderVo> orderVo = new ArrayList<>();
+            BigDecimal orderAmount = BigDecimal.ZERO;
+            BigDecimal dividendAmount = BigDecimal.ZERO;
+            List<Integer> effectiveOrder = new ArrayList<>();
+            TotalVo total = revenueStatistics(sysUser,statistics);
+            if (total!=null){
+                for (SysUser user : sysUsers) {
+                    dividendAmount=dividendAmount.add(total.getDividendAmount().multiply(new BigDecimal(user.getProportion())).divide(new BigDecimal(100)));
                 }
-            }else {
-                sysUsers.add(sysUser);
-                List<OrderVo> orderVo = new ArrayList<>();
-                BigDecimal orderAmount = new BigDecimal(0);
-                BigDecimal dividendAmount = new BigDecimal(0);
-                List<Integer> effectiveOrder = new ArrayList<>();
-                sysUsers.stream().forEach(map->{
-                    TotalVo total = revenueStatistics(map,statistics);
-                    if (total!=null){
-                        orderVo.addAll(total.getOrderVos());
-                        totalVo.setOrderAmount(orderAmount.add(total.getOrderAmount()));
-                        totalVo.setDividendAmount(dividendAmount.add(total.getDividendAmount()));
-                        effectiveOrder.add(total.getEffectiveOrder());
-                    }
-                });
+                BeanUtils.copyProperties(total,totalVo);
+                orderVo.addAll(total.getOrderVos());
+                totalVo.setOrderAmount(orderAmount.add(total.getOrderAmount()));
+                totalVo.setDividendAmount(total.getDividendAmount().subtract(dividendAmount));
+                effectiveOrder.add(total.getEffectiveOrder());
                 int sum = 0;
                 for (Integer integer : effectiveOrder) {
                     sum+=integer;

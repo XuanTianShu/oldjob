@@ -124,4 +124,6 @@ public interface DeviceMapper {
     void updateInvestorDevice(@Param("list") List<DeviceInvestorVO> list);
 
     TotalProportionVO selectDeviceProportionDetail(@Param("deviceNumber") String deviceNumber);
+
+    List<String> selectDeviceByHospitalIds(@Param("hospitals") List<Long> hospitals);
 }

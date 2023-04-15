@@ -460,7 +460,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         for (BigDecimal price : decimals) {
             decimal=decimal.add(price);
         }
-        deviceManageVo.setDeviceAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+//        deviceManageVo.setDeviceAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+        deviceManageVo.setDeviceAmount(decimal);
         deviceManageVo.setDeviceSum(deviceDetailsVos.size());
         deviceManageVo.setUtilizationRate(0L);
         deviceManageVo.setDeviceDetails(deviceDetailsVos);

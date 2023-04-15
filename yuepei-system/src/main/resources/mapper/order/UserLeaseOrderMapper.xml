@@ -417,9 +417,13 @@
     <select id="selectUserLeaseOrderByAgentId"  parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where agentId=#{userId}
+        and device_number in
+        <foreach collection="deviceNumbers" item="deviceNumbers" index="index" open="(" separator="," close=")">
+            #{deviceNumbers}
+        </foreach>
     </select>
     <select id="selectUserLeaseOrderByHospitalId" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
-        where hospitalId=#{userId}
+        where hospitalId=#{hospitalId}
     </select>
 </mapper>

@@ -164,4 +164,6 @@ public interface SysUserMapper
     int checkUserOldPhoneNumber(@Param("oldPhoneNumber") String oldPhoneNumber, @Param("userId") Long userId);
 
     List<SysUser> selectUserByHospitalIds(List<Long> hospitalIds);
+
+    SysUser selectParentIdByUserId(@Param("userId") Long userId);
 }

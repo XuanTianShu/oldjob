@@ -112,7 +112,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             deviceNumbers.add(map.getDeviceNumber());
         });
         if (deviceNumbers.size()!=0){
-            List<UserLeaseOrder> userLeaseOrders = hospitalDeviceMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
+            List<UserLeaseOrder> userLeaseOrders = hospitalDeviceMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(user.getHospitalId()));
             userLeaseOrders.stream().forEach(i->{
                 UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
                 BeanUtils.copyProperties(i,userLeaseOrderVo);
@@ -259,7 +259,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             BeanUtils.copyProperties(a, b);
             return b;
         }).collect(Collectors.toList());
-        if (leaseOrders==null){
+        if (leaseOrders.size()==0){
             return userLeaseOrderList;
         }
         userLeaseOrderList.stream().forEach(map->{
@@ -572,8 +572,9 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         SysUser sysUser = sysUserMapper.selectUserByUserName(userName);
         TotalVo totalVo = new TotalVo();
         List<OrderVo> orderVos = new ArrayList<>();
+        Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(sysUser.getHospitalId());
         if (statistics == 1) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(sysUser.getUserId()));
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(hospital.getHospitalId()));
             Date dNow = new Date();   //当前时间
             Date dBefore = new Date();
             Calendar calendar = Calendar.getInstance(); //得到日历
@@ -612,7 +613,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else if (statistics == 2) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(sysUser.getUserId()));
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(hospital.getHospitalId()));
             Date dNow = new Date();   //当前时间
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
             String format = sdf.format(dNow);
@@ -643,7 +644,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else if (statistics == 3) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(sysUser.getUserId()));
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(hospital.getHospitalId()));
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             // 获取前月的第一天
             Calendar cale = Calendar.getInstance();
@@ -684,7 +685,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(sysUser.getUserId()));
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(hospital.getHospitalId()));
             userLeaseOrderList.stream().forEach(map->{
                 OrderVo orderVo = new OrderVo();
                 orderVo.setOrderNumber(map.getOrderNumber());
