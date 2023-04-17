@@ -419,23 +419,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                 }else {
                     String start = String.valueOf(jsonObject.get("startTime"));
                     String end = String.valueOf(jsonObject.get("endTime"));
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-                    Date date1 = new Date();
-                    String format = dateFormat.format(userLeaseOrder.getLeaseTime());
-                    String format1 = dateFormat.format(date1);
-                    try {
-                        Date parse = dateFormat.parse(format);
-                        Date now = dateFormat.parse(format1);
-                        Long time2 = new Date(now.getTime() - parse.getTime()).getTime();
-                        Long minute2 = time2 / 1000 / 60 % 60 ;
-                        if (minute2<10){
-                            userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+BigDecimal.ZERO);
-                        }else {
-                            userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+userLeaseOrder.getFixedPrice().add(userLeaseOrder.getTimePrice()));
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+                    BigDecimal price = (BigDecimal) jsonObject.get("price");
+                    userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+price);
                 }
             }
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
@@ -476,27 +461,10 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                     BigDecimal price = (BigDecimal) jsonObject.get("price");
                     userLeaseOrderVo.setContent(price+device.getContent());
                 }else {
-                    BigDecimal price = (BigDecimal) jsonObject.get("price");
-                    userLeaseOrderVo.setContent(price+device.getContent());
                     String start = String.valueOf(jsonObject.get("startTime"));
                     String end = String.valueOf(jsonObject.get("endTime"));
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-                    Date date1 = new Date();
-                    String format = dateFormat.format(userLeaseOrder.getLeaseTime());
-                    String format1 = dateFormat.format(date1);
-                    try {
-                        Date parse = dateFormat.parse(format);
-                        Date now = dateFormat.parse(format1);
-                        Long time2 = new Date(now.getTime() - parse.getTime()).getTime();
-                        Long minute2 = time2 / 1000 / 60 % 60 ;
-                        if (minute2<10){
-                            userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+BigDecimal.ZERO);
-                        }else {
-                            userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+userLeaseOrder.getFixedPrice().add(userLeaseOrder.getTimePrice()));
-                        }
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
+                    BigDecimal price = (BigDecimal) jsonObject.get("price");
+                    userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+price);
                 }
             }
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
