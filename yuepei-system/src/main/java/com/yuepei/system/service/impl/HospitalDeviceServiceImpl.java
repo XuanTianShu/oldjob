@@ -250,7 +250,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             });
         }else {
             if (numberList.size()!=0){
-                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(sysUser.getHospitalId()));
+                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByHospitalIdAndStatus(String.valueOf(sysUser.getHospitalId()));
                 leaseOrders.addAll(userLeaseOrders);
             }
         }

@@ -143,4 +143,6 @@ public interface UserLeaseOrderMapper {
     void insertOrderProportionDeatail(@Param("orderNumber") String orderNumber, @Param("orderProportionDetailList") List<OrderProportionDetail> orderProportionDetailList);
 
     List<UserLeaseOrder> selectUserLeaseOrderByAgentIdAndStatus(@Param("userId") String userId);
+
+    List<UserLeaseOrder> selectUserLeaseOrderByHospitalIdAndStatus(@Param("hospitalId") String hospitalId);
 }
