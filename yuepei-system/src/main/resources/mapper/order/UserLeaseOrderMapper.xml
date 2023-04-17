@@ -367,12 +367,12 @@
     <select id="selectUserLeaseOrderByOrderNumber" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where CONCAT(IFNULL(order_number,''),IFNULL(device_number,'')) LIKE concat('%',#{orderNumber},'%')
-        and hospitalId=#{hospitalId}
+        and agentId=#{agentId}
     </select>
     <select id="selectUserLeaseOrderByDevice" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where device_number =#{deviceNumber}
-        and hospitalId=#{hospitalId}
+        and agentId=#{agentId}
     </select>
     <select id="selectUserOrderByDeviceNumber" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM user_lease_order WHERE device_number = #{deviceNumber} and

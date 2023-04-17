@@ -335,18 +335,20 @@ public class AgentServiceImpl implements AgentService {
     public List<UserLeaseOrderVo> selectLeaseOrderList(Long userId,String deviceDepartment,String deviceTypeName,String nameOrNumber){
         List<UserLeaseOrderVo> userLeaseOrderVoList = new ArrayList<>();
         SysUser sysUser = sysUserMapper.selectUserById(userId);
-        List<Device> deviceList = deviceMapper.selectDeviceByUserId(sysUser.getUserId());
         List<UserLeaseOrder> leaseOrders = new ArrayList<>();
-        deviceList.stream().forEach(map->{
-            if (!nameOrNumber.equals("")){
-                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber,String.valueOf(map.getHospitalId()));
-                List<UserLeaseOrder> collect = userLeaseOrders.stream().filter(j -> j.getDeviceNumber().equals(map.getDeviceNumber())).collect(Collectors.toList());
-                leaseOrders.addAll(collect);
-            }else {
-                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByDevice(map.getDeviceNumber(),String.valueOf(map.getHospitalId()));
-                leaseOrders.addAll(userLeaseOrders);
-            }
-        });
+        if (sysUser!=null){
+            List<Device> deviceList = deviceMapper.selectDeviceByUserId(sysUser.getUserId());
+            deviceList.stream().forEach(map->{
+                if (!nameOrNumber.equals("")){
+                    List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber,String.valueOf(sysUser.getUserId()));
+                    List<UserLeaseOrder> collect = userLeaseOrders.stream().filter(j -> j.getDeviceNumber().equals(map.getDeviceNumber())).collect(Collectors.toList());
+                    leaseOrders.addAll(collect);
+                }else {
+                    List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByDevice(map.getDeviceNumber(),String.valueOf(sysUser.getUserId()));
+                    leaseOrders.addAll(userLeaseOrders);
+                }
+            });
+        }
         List<UserLeaseOrderVo> userLeaseOrderList = leaseOrders.stream().map(a -> {
             UserLeaseOrderVo b = new UserLeaseOrderVo();
             BeanUtils.copyProperties(a, b);
