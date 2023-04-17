@@ -28,11 +28,11 @@ public interface AppletInvestorService {
 
     List<List<String>> selectDepartment(Long userId);
 
-    List<DeviceType> selectDeviceType(Long userId, Long deviceTypeId);
+    List<DeviceType> selectDeviceType(Long userId);
 
     List<HospitalVO> selectDeviceTypeByHospital(Long userId, Long deviceTypeId);
 
-    InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate);
+    InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate, Long deviceTypeId);
 
     PersonalCenterVo investorPersonalCenter(Long userId);
 

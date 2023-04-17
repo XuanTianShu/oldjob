@@ -61,10 +61,9 @@ public class InvestorDeviceController {
 
     /**投资人-设备信息*/
     @GetMapping("/selectDeviceType")
-    public AjaxResult selectHospital(HttpServletRequest request,
-                                     @RequestParam(value = "deviceTypeId",required = false)Long deviceTypeId){
+    public AjaxResult selectHospital(HttpServletRequest request){
         SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(appletInvestorService.selectDeviceType(user.getUserId(),deviceTypeId));
+        return AjaxResult.success(appletInvestorService.selectDeviceType(user.getUserId()));
     }
 
     /**投资人-根据设备类型选择医院*/
@@ -80,9 +79,10 @@ public class InvestorDeviceController {
     public AjaxResult investorDeviceManage(HttpServletRequest request,
                                            @RequestParam(value = "hospitalId",required = false)Long hospitalId,
                                            @RequestParam(value = "departmentName",required = false,defaultValue = "")String departmentName,
+                                           @RequestParam(value = "deviceTypeId",required = false)Long deviceTypeId,
                                            @RequestParam(value = "utilizationRate",required = false)Long utilizationRate){
         SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(appletInvestorService.investorDeviceManage(user.getUserId(),hospitalId,departmentName,utilizationRate));
+        return AjaxResult.success(appletInvestorService.investorDeviceManage(user.getUserId(),hospitalId,departmentName,utilizationRate,deviceTypeId));
     }
 
     /**投资人-个人中心*/

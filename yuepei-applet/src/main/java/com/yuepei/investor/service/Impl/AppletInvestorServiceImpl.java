@@ -341,7 +341,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     }
 
     @Override
-    public List<DeviceType> selectDeviceType(Long userId, Long deviceTypeId) {
+    public List<DeviceType> selectDeviceType(Long userId) {
         List<DeviceType> deviceTypes = new ArrayList<>();
         List<Device> deviceList = hospitalDeviceMapper.selectInvestorId(userId);
         deviceList.stream().forEach(map->{
@@ -349,12 +349,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             deviceTypes.add(deviceType);
         });
         List<DeviceType> collect = deviceTypes.stream().distinct().collect(Collectors.toList());
-        if (deviceTypeId!=null){
-            List<DeviceType> types = collect.stream().filter(map -> map.getDeviceTypeId() == deviceTypeId).collect(Collectors.toList());
-            deviceTypes.clear();
-            deviceTypes.addAll(types);
-        }
-        return deviceTypes;
+        return collect;
     }
 
     @Override
@@ -410,7 +405,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     }
 
     @Override
-    public InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate) {
+    public InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate, Long deviceTypeId) {
         InvestorDeviceManageVo deviceManageVo = new InvestorDeviceManageVo();
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         List<Device> device = hospitalDeviceMapper.selectInvestorId(userId);
@@ -436,6 +431,14 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             detailsVo.setDeviceTypeId(map.getDeviceTypeId());
             deviceDetailsVos.add(detailsVo);
         });
+        if (deviceTypeId!=null){
+            List<DeviceDetailsVo> collect = deviceDetailsVos.stream()
+                    .filter(map -> map.getDeviceTypeId()!=null)
+                    .filter(map -> map.getDeviceTypeId().equals(deviceTypeId)).collect(Collectors.toList());
+            deviceDetailsVos.clear();
+            deviceDetailsVos.addAll(collect);
+
+        }
         if (hospitalId!=null){
             List<DeviceDetailsVo> collect = deviceDetailsVos.stream()
                     .filter(map -> map.getHospitalId()!=null)
