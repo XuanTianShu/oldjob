@@ -275,7 +275,13 @@ public class AgentServiceImpl implements AgentService {
                 proportion=proportion-user.getProportion();
             }
             if (hospitalIds.size()!=0){
-                List<SysUser> hospitalUser = sysUserMapper.selectUserByHospitalIds(hospitalIds);
+                List<Hospital> hospitals = hospitalDeviceMapper.selectHospitalByHospitalIds(hospitalIds);
+                List<Hospital> collect = hospitals.stream().filter(map -> map.getType() == 1).collect(Collectors.toList());
+                List<Long> hospitalList = new ArrayList<>();
+                collect.stream().forEach(map->{
+                    hospitalList.add(map.getHospitalId());
+                });
+                List<SysUser> hospitalUser = sysUserMapper.selectUserByHospitalIds(hospitalList);
                 for (SysUser user : hospitalUser) {
                     proportion=proportion-user.getProportion();
                 }
@@ -337,17 +343,13 @@ public class AgentServiceImpl implements AgentService {
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         List<UserLeaseOrder> leaseOrders = new ArrayList<>();
         if (sysUser!=null){
-            List<Device> deviceList = deviceMapper.selectDeviceByUserId(sysUser.getUserId());
-            deviceList.stream().forEach(map->{
-                if (!nameOrNumber.equals("")){
-                    List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber,String.valueOf(sysUser.getUserId()));
-                    List<UserLeaseOrder> collect = userLeaseOrders.stream().filter(j -> j.getDeviceNumber().equals(map.getDeviceNumber())).collect(Collectors.toList());
-                    leaseOrders.addAll(collect);
-                }else {
-                    List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByDevice(map.getDeviceNumber(),String.valueOf(sysUser.getUserId()));
-                    leaseOrders.addAll(userLeaseOrders);
-                }
-            });
+            if (!nameOrNumber.equals("")){
+                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber,String.valueOf(sysUser.getUserId()));
+                leaseOrders.addAll(userLeaseOrders);
+            }else {
+                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByAgentIdAndStatus(String.valueOf(sysUser.getUserId()));
+                leaseOrders.addAll(userLeaseOrders);
+            }
         }
         List<UserLeaseOrderVo> userLeaseOrderList = leaseOrders.stream().map(a -> {
             UserLeaseOrderVo b = new UserLeaseOrderVo();
@@ -811,16 +813,8 @@ public class AgentServiceImpl implements AgentService {
     public TotalVo revenueStatistics(SysUser user,int statistics){
         TotalVo totalVo = new TotalVo();
         List<OrderVo> orderVos = new ArrayList<>();
-        List<Long> hospitals = hospitalDeviceMapper.selectAgentAddHospital(user.getUserId());
         if (statistics == 1) {
-            List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
-            if (hospitals.size()!=0){
-                List<String> deviceNumbers = deviceMapper.selectDeviceByHospitalIds(hospitals);
-                if (deviceNumbers.size()!=0){
-                    List<UserLeaseOrder> leaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(deviceNumbers,String.valueOf(user.getUserId()));
-                    userLeaseOrderList.addAll(leaseOrderList);
-                }
-            }
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(String.valueOf(user.getUserId()));
             Date dNow = new Date();   //当前时间
             Date dBefore = new Date();
             Calendar calendar = Calendar.getInstance(); //得到日历
@@ -859,14 +853,7 @@ public class AgentServiceImpl implements AgentService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else if (statistics == 2) {
-            List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
-            if (hospitals.size()!=0){
-                List<String> deviceNumbers = deviceMapper.selectDeviceByHospitalIds(hospitals);
-                if (deviceNumbers.size()!=0){
-                    List<UserLeaseOrder> leaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(deviceNumbers,String.valueOf(user.getUserId()));
-                    userLeaseOrderList.addAll(leaseOrderList);
-                }
-            }
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(String.valueOf(user.getUserId()));
             Date dNow = new Date();   //当前时间
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
             String format = sdf.format(dNow);
@@ -897,14 +884,7 @@ public class AgentServiceImpl implements AgentService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else if (statistics == 3) {
-            List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
-            if (hospitals.size()!=0){
-                List<String> deviceNumbers = deviceMapper.selectDeviceByHospitalIds(hospitals);
-                if (deviceNumbers.size()!=0){
-                    List<UserLeaseOrder> leaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(deviceNumbers,String.valueOf(user.getUserId()));
-                    userLeaseOrderList.addAll(leaseOrderList);
-                }
-            }
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(String.valueOf(user.getUserId()));
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             // 获取前月的第一天
             Calendar cale = Calendar.getInstance();
@@ -945,14 +925,7 @@ public class AgentServiceImpl implements AgentService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else {
-            List<UserLeaseOrder> userLeaseOrderList = new ArrayList<>();
-            if (hospitals.size()!=0){
-                List<String> deviceNumbers = deviceMapper.selectDeviceByHospitalIds(hospitals);
-                if (deviceNumbers.size()!=0){
-                    List<UserLeaseOrder> leaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(deviceNumbers,String.valueOf(user.getUserId()));
-                    userLeaseOrderList.addAll(leaseOrderList);
-                }
-            }
+            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(String.valueOf(user.getUserId()));
             userLeaseOrderList.stream().forEach(map->{
                 OrderVo orderVo = new OrderVo();
                 orderVo.setOrderNumber(map.getOrderNumber());

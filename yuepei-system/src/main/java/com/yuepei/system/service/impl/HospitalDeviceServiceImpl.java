@@ -250,7 +250,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             });
         }else {
             if (numberList.size()!=0){
-                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrder(numberList);
+                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByHospitalId(String.valueOf(sysUser.getHospitalId()));
                 leaseOrders.addAll(userLeaseOrders);
             }
         }
@@ -380,48 +380,12 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                     e.printStackTrace();
                 }
             }
-            /*Date date1 = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-            String format = dateFormat.format(date1);
-            JSONArray deviceRule = JSON.parseArray(userLeaseOrder.getDeviceRule());
-            for (int i = 0; i < deviceRule.size(); i++) {
-                JSONObject jsonObject = deviceRule.getJSONObject(i);
-                try {
-                    Date parse = dateFormat.parse(format);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }*/
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
             userLeaseOrderVo.setLeaseTime(userLeaseOrder.getLeaseTime());
             userLeaseOrderVo.setLeaseAddress(userLeaseOrder.getLeaseAddress());
             userLeaseOrderVo.setOrderNumber(userLeaseOrder.getOrderNumber());
         }
         if (userLeaseOrder.getStatus().equals("1")){
-            /*Date leaseTime = userLeaseOrderVo.getLeaseTime();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-            String format = dateFormat.format(leaseTime);
-            String hospitalRule = hospital.getHospitalRule();
-            JSONArray jsonArray = JSON.parseArray(hospitalRule);
-            for (int i = 0; i < jsonArray.size(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String startTime = (String) jsonObject.get("startTime");
-                String endTime = (String) jsonObject.get("endTime");
-                try {
-                    Date parse = dateFormat.parse(format);
-                    Date start = dateFormat.parse(startTime);
-                    Date end = dateFormat.parse(endTime);
-                    if (start.compareTo(parse)==1&&end.compareTo(parse)==-1){
-                        String price = (String) jsonObject.get("price");
-                        userLeaseOrderVo.setEstimateAmount(new BigDecimal(price));
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }*/
-//            Long restoreTime = userLeaseOrderVo.getRestoreTime().getTime();
-//            Long leaseTimeTime = leaseTime.getTime();
-//            Long time = new Date(restoreTime - leaseTimeTime).getTime();
             Long time = Long.valueOf(userLeaseOrderVo.getPlayTime());
             Long day = time/1000/60/60/24;
             Long hour = time/1000/60/60%24;
@@ -481,30 +445,6 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrderVo.setNetAmount(userLeaseOrder.getNetAmount());
         }
         if (userLeaseOrder.getStatus().equals("2")){
-            /*Date leaseTime = userLeaseOrderVo.getLeaseTime();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-            String format = dateFormat.format(leaseTime);
-            String hospitalRule = hospital.getHospitalRule();
-            JSONArray jsonArray = JSON.parseArray(hospitalRule);
-            for (int i = 0; i < jsonArray.size(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String startTime = (String) jsonObject.get("startTime");
-                String endTime = (String) jsonObject.get("endTime");
-                try {
-                    Date parse = dateFormat.parse(format);
-                    Date start = dateFormat.parse(startTime);
-                    Date end = dateFormat.parse(endTime);
-                    if (start.compareTo(parse)==1&&end.compareTo(parse)==-1){
-                        String price = (String) jsonObject.get("price");
-                        userLeaseOrderVo.setEstimateAmount(new BigDecimal(price));
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            }*/
-//            Long restoreTime = userLeaseOrderVo.getRestoreTime().getTime();
-//            Long leaseTimeTime = leaseTime.getTime();
-//            Long time = new Date(restoreTime - leaseTimeTime).getTime();
             Long time = Long.valueOf(userLeaseOrderVo.getPlayTime());
             Long day = time/1000/60/60/24;
             Long hour = time/1000/60/60%24;
@@ -802,19 +742,17 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         IndexVo indexVo = new IndexVo();
         Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(sysUser.getHospitalId());
-        List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(sysUser.getHospitalId());
         List<UserLeaseOrderVo> userLeaseOrderVos = new ArrayList<>();
-        deviceList.stream().forEach(map->{
-            List<UserLeaseOrder> userLeaseOrder = hospitalDeviceMapper.selectLeaseOrderByDeviceNumber(map.getDeviceNumber());
-            userLeaseOrder.stream().forEach(i->{
-                UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
-                BeanUtils.copyProperties(i,userLeaseOrderVo);
-                userLeaseOrderVo.setNetAmount(i.getNetAmount());
-                userLeaseOrderVos.add(userLeaseOrderVo);
-            });
+        List<UserLeaseOrder> userLeaseOrder = hospitalDeviceMapper.selectUserLeaseOrderByHospitalId(String.valueOf(sysUser.getHospitalId()));
+        userLeaseOrder.stream().forEach(i->{
+            UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
+            BeanUtils.copyProperties(i,userLeaseOrderVo);
+            userLeaseOrderVo.setNetAmount(i.getNetAmount());
+            userLeaseOrderVos.add(userLeaseOrderVo);
         });
         BigDecimal decimal = userLeaseOrderVos.stream().map(UserLeaseOrderVo::getNetAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
         List<DeviceType> deviceTypes = new ArrayList<>();
+        List<Device> deviceList = hospitalDeviceMapper.selectDeviceByHospitalId(sysUser.getHospitalId());
         deviceList.stream().forEach(map->{
             DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
             deviceTypes.add(deviceType);

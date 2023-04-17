@@ -418,10 +418,9 @@
         where CONCAT(IFNULL(order_number,''),IFNULL(device_number,'')) LIKE concat('%',#{orderNumber},'%')
         and agentId=#{agentId}
     </select>
-    <select id="selectUserLeaseOrderByDevice" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+    <select id="selectUserLeaseOrderByInvestor" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
-        where device_number =#{deviceNumber}
-        and agentId=#{agentId}
+        where investorId LIKE concat('%"',#{investorId},'"%')
     </select>
     <select id="selectUserOrderByDeviceNumber" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM user_lease_order WHERE device_number = #{deviceNumber} and
@@ -472,23 +471,21 @@
                `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
         FROM `user_lease_order` where device_number = #{deviceNumber} and `status` = 0
     </select>
-    <select id="selectUserLeaseOrderByInvestorId" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
-        <include refid="selectUserLeaseOrderVo"/>
-        where investorId like concat('%"',#{userId},'"%')
-    </select>
     <select id="selectUserLeaseOrderByAgentId"  parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
-        where agentId=#{userId}
-        and device_number in
-        <foreach collection="deviceNumbers" item="deviceNumbers" index="index" open="(" separator="," close=")">
-            #{deviceNumbers}
-        </foreach>
+        where status = 2
+        and agentId=#{userId}
     </select>
     <select id="selectUserLeaseOrderByHospitalId" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
-        where hospitalId=#{hospitalId}
+        where status = 2
+        and hospitalId=#{hospitalId}
     </select>
     <select id="selectUSerLeaseOrderByChild" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM user_lease_order WHERE device_number = #{deviceNumber} AND choose = #{choose} AND child = #{child} AND `status` = 0
+    </select>
+    <select id="selectUserLeaseOrderByAgentIdAndStatus" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where agentId=#{userId}
     </select>
 </mapper>

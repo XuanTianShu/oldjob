@@ -249,5 +249,11 @@
     <select id="selectOrderProtionDetail" parameterType="OrderProportionDetailVo" resultMap="OrderProportionDetailVoResult">
         <include refid="selectOrderProportionDetail"/>
         where opd.user_id=#{userId}
+        and ulo.status=2
+    </select>
+    <select id="selectUserLeaseOrderByOrderNumber" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where CONCAT(IFNULL(order_number,''),IFNULL(device_number,'')) LIKE concat('%',#{nameOrNumber},'%')
+        and investorId = #{investorId}
     </select>
 </mapper>
