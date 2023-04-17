@@ -315,6 +315,11 @@ public class DeviceController extends BaseController {
     @DeleteMapping("/{deviceIds}")
     public AjaxResult remove(@PathVariable Long[] deviceIds)
     {
+        //绑定医院
+        int count = hospitalService.selectBindHospitalCount(deviceIds);
+        if (count > 0){
+            return AjaxResult.error("存在绑定的医院无法删除！");
+        }
         return toAjax(deviceService.deleteDeviceByDeviceIds(deviceIds));
     }
 

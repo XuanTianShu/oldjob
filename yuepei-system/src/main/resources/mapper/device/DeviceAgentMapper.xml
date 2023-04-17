@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yuepei.system.mapper.DeviceAgentMapper">
+    <resultMap id="deviceAgentResult" type="com.yuepei.system.domain.DeviceAgent">
+        <result property="id" column="Id"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="proportion" column="proportion"/>
+        <result property="agentId" column="user_id"/>
+        <result property="parentId" column="parent_id"/>
+    </resultMap>
+    <insert id="insert">
+        insert into device_agent
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceNumber != null">device_number,</if>
+            <if test="userId != null">agent_id,</if>
+            <if test="agentProportion != null">proportion,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceNumber != null">#{deviceNumber},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="agentProportion != null">#{agentProportion},</if>
+        </trim>
+    </insert>
+    <delete id="del">
+        delete from device_agent where device_number = #{deviceNumber}
+    </delete>
+    <delete id="deleteByDeviceNumber">
+        delete from device_agent where device_number = #{deviceNumber}
+    </delete>
+    <delete id="deleteByDeviceNumbers">
+        delete from device_agent where device_number in
+        <foreach collection="deviceNumber" item="deviceNumber" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </delete>
+    <select id="selectAgentListByDeviceNumber" parameterType="String" resultMap="deviceAgentResult">
+        SELECT d.`device_number`,su.user_id,su.proportion FROM device AS d
+        INNER JOIN sys_user AS su ON su.user_id = d.`user_id`
+        WHERE d.`device_number` = #{deviceNumber}
+    </select>
+    <select id="selectAgentAccountList" parameterType="String" resultMap="deviceAgentResult">
+        SELECT su.user_id,su.proportion,su.parent_id FROM sys_user AS su
+        WHERE su.parent_id =(
+            SELECT user_id FROM device WHERE device_number = #{deviceNumber})
+    </select>
+</mapper>

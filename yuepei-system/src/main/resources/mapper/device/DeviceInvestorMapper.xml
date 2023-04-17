@@ -25,7 +25,7 @@
         SELECT Id,device_number,investor_id,proportion,create_time FROM device_investor
     </sql>
 
-    <insert id="insert" parameterType="String">
+    <insert id="insert">
         insert into device_investor(`investor_id`,`device_number`) values
         <foreach item="discountRecord" collection="toArray" index="index"  separator=",">
             (#{discountRecord},#{deviceNumber})

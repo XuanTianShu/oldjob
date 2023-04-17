@@ -7,6 +7,8 @@
         <result property="hospitalId" column="hospital_id"/>
         <result property="deviceNumber" column="device_number"/>
         <result property="proportion" column="proportion"/>
+        <result property="type" column="type"/>
+        <result property="userId" column="user_name"/>
     </resultMap>
 
     <insert id="insert">
@@ -25,4 +27,21 @@
     <delete id="del">
         delete from device_hospital where device_number = #{deviceNumber}
     </delete>
+    <delete id="deleteByDeviceNumber">
+        delete from device_hospital where device_number = #{deviceNumber}
+    </delete>
+    <delete id="deleteByDeviceNumbers">
+        delete from device_hospital where device_number in
+        <foreach collection="deviceNumber" item="deviceNumber" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </delete>
+    <select id="selectHospitalListByDeviceNumber" parameterType="String" resultMap="deviceHospitalResult">
+        SELECT d.`device_number`,d.`hospital_id`,IFNULL(dh.proportion,0) AS proportion,
+        h.`type`,hu.user_name FROM device AS d
+        LEFT JOIN device_hospital AS dh ON dh.device_number = d.`device_number`
+        LEFT JOIN hospital AS h ON h.`hospital_id` = dh.hospital_id
+        LEFT JOIN hospital_user AS hu ON hu.hospital_id = h.`hospital_id`
+        WHERE d.`device_number` = #{deviceNumber}
+    </select>
 </mapper>

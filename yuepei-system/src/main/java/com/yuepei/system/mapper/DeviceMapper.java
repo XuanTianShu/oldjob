@@ -145,4 +145,8 @@ public interface DeviceMapper {
     Device selectInvestorProportionByDeviceNumber(DeviceInvestor deviceInvestor);
 
     TotalProportionVO totalProportion2(Device device);
+
+    void updateDeviceByHospitalIds(List<String> list);
+
+    void updateDeviceByHospitalId(@Param("hospitalId") Long hospitalId);
 }

@@ -336,9 +336,9 @@ public class CallBackServiceImpl implements CallBackService {
             log.info("流水号：{}",out_trade_no);
             if ("SUCCESS".equals(parseObject.get("trade_state"))) {
                 Map<String, Object> cacheMap = redisCache.getCacheMap(out_trade_no);
-                Long couponPrice = (Long) cacheMap.get("couponPrice");
+                BigDecimal couponPrice = new BigDecimal(String.valueOf(cacheMap.get("couponPrice")));
                 //记录优惠券金额
-                userLeaseOrder.setCouponPrice(couponPrice);
+                userLeaseOrder.setCouponPrice(couponPrice.longValue());
                 //实付金额
                 userLeaseOrder.setNetAmount(new BigDecimal(price).divide(new BigDecimal(100),MathContext.DECIMAL64));
                 //付款时间
@@ -357,7 +357,7 @@ public class CallBackServiceImpl implements CallBackService {
                     //扣除 优惠券
                     UserDiscount userDiscount = new UserDiscount();
                     userDiscount.setStatus(1L);
-                    userDiscount.setUserId((Long) cacheMap.get("couponId"));
+                    userDiscount.setUserId(Long.parseLong(String.valueOf(cacheMap.get("couponId"))));
                     userDiscountMapper.updateUserDiscount(userDiscount);
                 }
                 //响应接口
@@ -389,7 +389,9 @@ public class CallBackServiceImpl implements CallBackService {
             userDiscount = userDiscountMapper.selectUserCouponById(couponId);
             //记录优惠券金额
             userLeaseOrder.setCouponPrice(userDiscount.getPrice().longValue());
-            price = userLeaseOrder.getPrice().subtract(userDiscount.getPrice());
+//            price = userLeaseOrder.getPrice().subtract(userDiscount.getPrice());
+            price = userLeaseOrder.getPrice();
+            userLeaseOrder.setPrice(userLeaseOrder.getPrice().add(userDiscount.getPrice()));
             userDiscount.setStatus(1L);
             userDiscountMapper.updateUserDiscount(userDiscount);
 //            price = subtract;
@@ -400,6 +402,7 @@ public class CallBackServiceImpl implements CallBackService {
             return AjaxResult.error("余额不足");
         }
         log.info("余额:{}",user.getBalance());
+
         user.setBalance(user.getBalance().subtract(price));
         userMapper.updateUser(user);
         log.info("实付金额：{}",price);
@@ -446,7 +449,7 @@ public class CallBackServiceImpl implements CallBackService {
             Map<String,Object> map1 = (Map<String, Object>) map.get("data");
             //锁状态上报
             if (serviceType.equals("VehicleDetectorBasic")){
-                int status = Integer.parseInt(map1.get("status").toString());
+                String status = (String)map1.get("status");
                 /**
                  * 当 status==‘0’；temperature 用来指示开锁方式：
                  * NB 开锁：temperature == 2；
@@ -479,7 +482,7 @@ public class CallBackServiceImpl implements CallBackService {
                     String substring2 = timestamp.substring(4, 16);
                     log.info("子锁柜号：{}",substring1);
                     log.info("子锁唯一标识：{}",substring2);
-                    if (status == 0){
+                    if (status.equals("0")){
                         System.out.println("借床");
                         if (substring.equals("D")) {
                             if (temperature == 2 || temperature == 3){
@@ -559,7 +562,7 @@ public class CallBackServiceImpl implements CallBackService {
                                 log.info("借床异常");
                             }
                         }
-                    }else if (status == 1){
+                    }else if (status.equals("1")){
                         if (temperature == 0){
                             System.out.println("异常还床");
                         }else if (temperature == 1){
@@ -1124,6 +1127,7 @@ public class CallBackServiceImpl implements CallBackService {
                     String s = byte1 + byte2;
                     //磁铁的状态  1： 开启，0 : 闭合
                     String substring26 = s.substring(11, 12);
+
                     /**
                      * 0000：表示定时上传，
                      * 0001：表示开锁上传，
@@ -1138,7 +1142,6 @@ public class CallBackServiceImpl implements CallBackService {
                     String substring27 = s.substring(7, 11);
                     //锁梁状态  1: 关 0：开
                     String substring31 = s.substring(3, 4);
-
                     log.info("锁状态：{}",s);
                     log.info("锁状态：{}",substring27);
                     log.info("磁铁的状态：{}",substring26);
@@ -1210,7 +1213,7 @@ public class CallBackServiceImpl implements CallBackService {
                         //TODO 设备在线
                         log.info("唤醒");
                     }else if (substring27.equals("0010")){
-//                        UserLeaseOrder userLeaseOrder = new UserLeaseOrder();
+                        //                        UserLeaseOrder userLeaseOrder = new UserLeaseOrder();
 //                        userLeaseOrder.setStatus("1");
 //                        userLeaseOrder.setDeviceNumber(substring35);
 //                        userLeaseOrderMapper.updateUserLeaseOrderByDeviceNumber(userLeaseOrder);
@@ -1307,13 +1310,13 @@ public class CallBackServiceImpl implements CallBackService {
                             redisServer.deleteObject(orderPrefix+userLeaseOrder.getOrderNumber());
 
                             System.out.println("正常还床");
-
                             Device device1 = new Device();
                             device1.setDeviceNumber(substring35);
-                            device1.setStatus(1L);
+                            device1.setStatus(0L);
                             device1.setTime(new Date());
                             deviceMapper.updateDeviceStatus(device1);
                         }else {
+                            //空闲
                             Device device1 = new Device();
                             device1.setDeviceNumber(substring35);
                             device1.setStatus(0L);
@@ -1321,6 +1324,8 @@ public class CallBackServiceImpl implements CallBackService {
                             deviceMapper.updateDeviceStatus(device1);
                         }
                         log.info("关锁");
+                    }else if (substring27.equals("0000")){
+
                     }
                     String result = substring+"80010005"+substring3+substring4+substring4+substring1+"00"+substring21+substring22;
                     String substring24 = result.substring(2, 40);

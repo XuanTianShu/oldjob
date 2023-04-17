@@ -50,6 +50,7 @@
         <result property="proportion"   column="proportion"/>
         <result property="parentId" column="parent_id"/>
         <result property="hospitalId" column="hospital_id"/>
+        <result property="price" column="price"/>
         <association property="dept"    column="dept_id" javaType="com.yuepei.common.core.domain.entity.SysDept" resultMap="deptResult" />
         <collection  property="roles"   javaType="java.util.List"           resultMap="RoleResult" />
     </resultMap>
@@ -78,6 +79,18 @@
         <result property="hospitalId" column="hospital_id"/>
         <result property="proportion" column="proportion"/>
         <result property="deviceNumber" column="device_number"/>
+    </resultMap>
+
+    <resultMap id="deviceInvestorVOResult" type="deviceInvestorVO">
+        <result property="deviceNumber" column="device_number"/>
+        <result property="deviceId" column="device_id"/>
+    </resultMap>
+
+    <resultMap id="deviceInvestorResult" type="com.yuepei.system.domain.DeviceInvestor">
+        <result property="id" column="Id"/>
+        <result property="proportion" column="proportion"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="investorId" column="investor_id"/>
     </resultMap>
 
     <sql id="selectHospitalVo">
@@ -134,8 +147,10 @@
     <select id="userList" parameterType="com.yuepei.common.core.domain.entity.SysUser" resultMap="SysUserResult">
         select u.user_id, u.dept_id, u.openid, u.nick_name,u.proportion, u.user_name, u.balance,
         u.integral, u.email, u.avatar, u.phone_number, u.sex, u.status, u.del_flag, u.login_ip,
-        u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader,u.parent_id from sys_user u
+        u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader,u.parent_id,
+        h.`price` from sys_user u
         left join sys_dept d on u.dept_id = d.dept_id
+        LEFT JOIN hospital AS h ON h.`hospital_id` = u.`hospital_id`
         where u.del_flag = '0'
         <if test="hospitalId != null">
             and u.hospital_id = #{hospitalId}
@@ -195,14 +210,41 @@
     <select id="selectUserByHospital" resultType="java.lang.Integer">
         select count(1) from sys_user where hospital_id = #{ids}
     </select>
-    <select id="totalProportion" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
-
+    <select id="totalProportion2" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
+        SELECT (100 - IFNULL(d.investor_proportion,0) -
+        IFNULL(dg.`proportion`,0)) AS totalProportion FROM device AS d
+        LEFT JOIN device_agent AS dg ON dg.`device_number` = d.`device_number`
+        WHERE d.device_number = #{deviceNumber}
     </select>
     <select id="deviceProportionList" parameterType="DeviceHospital" resultMap="deviceHospitalResult">
         SELECT dh.Id,d.device_number,dh.hospital_id,dh.proportion
         FROM device_hospital AS dh
-                 INNER JOIN device AS d ON d.`device_id` = dh.`device_number`
+        INNER JOIN device AS d ON d.`device_number` = dh.`device_number`
         WHERE dh.hospital_id = #{hospitalId}
+        ORDER BY Id
+    </select>
+    <select id="unbound" resultMap="deviceInvestorVOResult">
+        SELECT device_id,device_number FROM device
+        WHERE hospital_id = 0
+    </select>
+    <select id="getDetail" parameterType="Long" resultMap="deviceInvestorResult">
+        SELECT Id,device_number,hospital_id,proportion FROM device_hospital WHERE Id = #{id}
+    </select>
+    <select id="selectHospitalIdList" resultType="java.lang.String">
+        select hospital_id from device_hospital where Id in
+        <foreach item="deviceNumber" collection="array" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </select>
+    <select id="selectHospital" parameterType="Long" resultMap="deviceInvestorResult">
+        select hospital_id as investor_id from device_hospital where Id = #{id}
+    </select>
+    <select id="selectBindHospitalCount" resultType="java.lang.Integer">
+        SELECT count(1) FROM device
+        WHERE hospital_id != 0 AND device_id IN
+        <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
+            #{hospitalId}
+        </foreach>
     </select>
 
     <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
@@ -224,6 +266,19 @@
             <if test="proportion != null">#{proportion},</if>
         </trim>
     </insert>
+    <insert id="binding">
+        insert into device_hospital
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceNumber != null">device_number,</if>
+            <if test="hospitalId != null">hospital_id,</if>
+            <if test="proportion != null">proportion,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceNumber != null">#{deviceNumber},</if>
+            <if test="hospitalId != null">#{hospitalId},</if>
+            <if test="proportion != null">#{proportion},</if>
+        </trim>
+    </insert>
 
     <update id="updateHospital" parameterType="Hospital">
         update hospital
@@ -239,6 +294,13 @@
         </trim>
         where hospital_id = #{hospitalId}
     </update>
+    <update id="updateDeviceProportionById">
+        update device_hospital
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="proportion != null">proportion = #{proportion},</if>
+        </trim>
+        where Id = #{id}
+    </update>
 
     <delete id="deleteHospitalByHospitalId" parameterType="Long">
         delete from hospital where hospital_id = #{hospitalId}
@@ -249,5 +311,14 @@
         <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
             #{hospitalId}
         </foreach>
+    </delete>
+    <delete id="deleteDeviceByIds">
+        delete from device_hospital where Id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteDeviceById">
+        delete from device_hospital where Id = #{id}
     </delete>
 </mapper>

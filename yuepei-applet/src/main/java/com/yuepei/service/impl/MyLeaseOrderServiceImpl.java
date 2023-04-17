@@ -1,22 +1,17 @@
 package com.yuepei.service.impl;
-import aj.org.objectweb.asm.TypeReference;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.domain.Item;
 import com.yuepei.service.MyLeaseOrderService;
-import com.yuepei.system.domain.Device;
-import com.yuepei.system.domain.DeviceType;
-import com.yuepei.system.domain.OrderProportionDetail;
-import com.yuepei.system.domain.UserLeaseOrder;
+import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.vo.*;
-import com.yuepei.system.mapper.DeviceInvestorMapper;
-import com.yuepei.system.mapper.DeviceMapper;
-import com.yuepei.system.mapper.DeviceTypeMapper;
-import com.yuepei.system.mapper.UserLeaseOrderMapper;
+import com.yuepei.system.mapper.*;
+import com.yuepei.system.service.DeviceAgentService;
 import com.yuepei.system.utils.RedisServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,6 +71,15 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
     @Autowired
     private DeviceInvestorMapper deviceInvestorMapper;
 
+    @Autowired
+    private DeviceHospitalMapper deviceHospitalMapper;
+
+    @Autowired
+    private DeviceAgentMapper deviceAgentMapper;
+
+    @Autowired
+    private OrderProportionMapper orderProportionMapper;
+
     @Value("${coupon.valid}")
     private String orderValid;
 
@@ -132,10 +136,46 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     System.out.println("借床");
                     String uuid = String.format("%040d", new BigInteger(UUID.randomUUID().toString().replace("-", ""), 16));
                     String orderNumber = uuid.substring(uuid.length() - 16);
-//                    List<OrderProportionDetail> orderProportionDetailList = deviceInvestorMapper.selectInvestorListByDeviceNumber(userLeaseOrder.getDeviceNumber());
-//                    userLeaseOrderMapper.insertOrderProportionDeatail(orderNumber,orderProportionDetailList);
+                    //添加投资人订单分成明细
+                    //投资人子账户
+                    List<OrderProportionDetail> orderProportionDetailList = deviceInvestorMapper.selectInvestorListByDeviceNumber(userLeaseOrder.getDeviceNumber());
+                    if (orderProportionDetailList.size() > 0){
+                        List<DeviceInvestorAccount> deviceInvestorAccountList = orderProportionMapper.selectInvestorAccount(orderProportionDetailList);
+                        if (deviceInvestorAccountList.size() > 0){
+                            orderProportionMapper.insertAgentAccountProportion(orderNumber,deviceInvestorAccountList);
+                        }
+                        userLeaseOrderMapper.insertOrderProportionDeatail(orderNumber,orderProportionDetailList);
+                    }
 
-                    //TODO 详细订单分成比例
+
+                    //添加医院分成比例
+                    DeviceHospital deviceHospital = deviceHospitalMapper.selectHospitalListByDeviceNumber(userLeaseOrder.getDeviceNumber());
+                    if (deviceHospital != null){
+                        if (deviceHospital.getType() != null){
+                            if (deviceHospital.getType().equals("0")){
+                                userLeaseOrder.setHospitalProportion(Long.parseLong(deviceHospital.getProportion()));
+                            }else {
+                                userLeaseOrder.setAgentHospitalProportion(deviceHospital.getProportion());
+                                orderProportionMapper.insertAgentHospitalProportion(orderNumber,deviceHospital.getHospitalId(),deviceHospital.getUserId(),deviceHospital.getProportion());
+                            }
+                            userLeaseOrder.setHospitalId(deviceHospital.getHospitalId());
+                        }
+                    }
+
+
+                    //添加代理商分成比例
+                    //代理商子账户
+                    DeviceAgent deviceAgent = deviceAgentMapper.selectAgentListByDeviceNumber(userLeaseOrder.getDeviceNumber());
+                    if (deviceAgent != null){
+                        userLeaseOrder.setAgentId(deviceAgent.getAgentId());
+                        userLeaseOrder.setAgentProportion(Long.parseLong(deviceAgent.getProportion()));
+                        List<DeviceAgent> deviceAgentList = deviceAgentMapper.selectAgentAccountList(userLeaseOrder.getDeviceNumber());
+                        if (deviceAgentList.size() > 0){
+                            orderProportionMapper.insertAgentProportion(orderNumber,deviceAgentList);
+                        }
+                    }
+
+
 
                     //计算订单代理商、投资人、医院分成比例
                     TotalProportionVO totalProportionVO = deviceMapper.selectDeviceProportionDetail(userLeaseOrder.getDeviceNumber());
@@ -146,14 +186,15 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     AgentAndHospitalNameVO agentAndHospitalNameVO = userLeaseOrderMapper.selectUserNameAndHospitalName(userLeaseOrder.getDeviceNumber());
                     userLeaseOrder.setDeviceType(deviceType.getDeviceTypeName());
                     userLeaseOrder.setLeaseTime(new Date());
-                    int proportionCount = 100-(totalProportionVO.getHProportion() + totalProportionVO.getDiProportion() + totalProportionVO.getSuProportion());
+                    int proportionCount = 100-(Integer.parseInt(String.valueOf(userLeaseOrder.getHospitalProportion()))
+                            + totalProportionVO.getDiProportion() + Integer.parseInt(String.valueOf(userLeaseOrder.getAgentProportion())));
                     userLeaseOrder.setPlatformProportion(Long.parseLong(String.valueOf(proportionCount)));
-                    userLeaseOrder.setHospitalId(String.valueOf(device.getHospitalId()));
-                    userLeaseOrder.setAgentId(String.valueOf(device.getUserId()));
+//                    userLeaseOrder.setHospitalId(String.valueOf(device.getHospitalId()));
+//                    userLeaseOrder.setAgentId(String.valueOf(device.getUserId()));
                     userLeaseOrder.setInvestorId(device.getInvestorId());
-                    userLeaseOrder.setAgentProportion(Long.parseLong(String.valueOf(totalProportionVO.getSuProportion())));
-                    userLeaseOrder.setHospitalProportion(Long.parseLong(String.valueOf(totalProportionVO.getHProportion())));
-                    userLeaseOrder.setInvestorProportion(Long.parseLong(String.valueOf(totalProportionVO.getDiProportion())));
+//                    userLeaseOrder.setAgentProportion(Long.parseLong(String.valueOf(totalProportionVO.getSuProportion())));
+//                    userLeaseOrder.setHospitalProportion(Long.parseLong(String.valueOf(totalProportionVO.getHProportion())));
+//                    userLeaseOrder.setInvestorProportion(Long.parseLong(String.valueOf(totalProportionVO.getDiProportion())));
                     userLeaseOrder.setOrderNumber(orderNumber);
                     userLeaseOrder.setOpenid(openid);
                     userLeaseOrder.setUserName(agentAndHospitalNameVO.getUserName());
@@ -215,7 +256,7 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     if (!rows.equals("1")){
                         ObjectMapper objectMapper = new ObjectMapper();
                         List<Item> itemList;
-                        itemList = objectMapper.readValue(rows, new com.fasterxml.jackson.core.type.TypeReference<List<Item>>() {
+                        itemList = objectMapper.readValue(rows, new TypeReference<List<Item>>() {
                         });
                         for (int i = Objects.requireNonNull(itemList).size() - 1; i >= 0; i--) {
                             //0可用1故障2租赁中
@@ -240,7 +281,7 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                         Device device1 = new Device();
                         device1.setDeviceNumber(userLeaseOrder.getDeviceNumber());
                         device1.setStatus(1L);
-                        deviceMapper.updateDevice(device1);
+                        deviceMapper.updateDeviceStatus(device1);
                         userLeaseOrder.setIsValid(1L);
                     }
                     log.info("参数：{}",userLeaseOrder.getIsValid());

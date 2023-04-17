@@ -66,6 +66,9 @@ public class DeviceServiceImpl implements DeviceService {
     @Autowired
     private DeviceTypeMapper deviceTypeMapper;
 
+    @Autowired
+    private DeviceAgentMapper deviceAgentMapper;
+
 
     @Value("${yuepei.profile}")
     private String profile;
@@ -126,8 +129,10 @@ public class DeviceServiceImpl implements DeviceService {
             deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
             deviceInvestorMapper.insert(list.toArray(longs),device.getDeviceNumber());
         }
-        //TODO 代理商分成比例
-        //TODO 医院分成比例
+        //代理商分成比例
+        if (device.getUserId() != null){
+            deviceAgentMapper.insert(device.getDeviceNumber(),device.getUserId(),device.getAgentProportion());
+        }
         try{
             //二维码是否跳转小程序暂定
             String enCode = QrCodeUtil.enCode(device.getDeviceNumber(),"https://www.yp10000.com/"+"?deviceNumber="+device.getDeviceNumber(), profile, true);
@@ -251,20 +256,27 @@ public class DeviceServiceImpl implements DeviceService {
         log.info("{}",device.getInvestorId());
         if (list.size() > 0){
             System.out.println("执行");
-            int i = deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
-            deviceInvestorMapper.insert(list.toArray(longs), device.getDeviceNumber());
+            deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
+            int insert = deviceInvestorMapper.insert(list.toArray(longs), device.getDeviceNumber());
+            log.info("insert:{}",insert);
             log.info(Arrays.toString(list.toArray(longs)) +"----"+device.getDeviceNumber());
         }
-        //TODO 代理商分成比例
+        //代理商分成比例
         if (device.getUserId() != null){
-            SysUser user = new SysUser();
-            user.setUserId(device.getUserId());
-            user.setProportion(Long.parseLong(device.getAgentProportion()));
-            sysUserMapper.updateUser(user);
+            System.out.println("-----------------");
+            deviceAgentMapper.del(device.getDeviceNumber());
+            deviceAgentMapper.insert(device.getDeviceNumber(),device.getUserId(),device.getAgentProportion());
+//            SysUser user = new SysUser();
+//            user.setUserId(device.getUserId());
+//            user.setProportion(Long.parseLong(device.getAgentProportion()));
+//            sysUserMapper.updateUser(user);
+        }else {
+            device.setUserId(0L);
+            deviceAgentMapper.del(device.getDeviceNumber());
         }
         if (device.getHospitalId() != 0 && device.getHospitalId() != null){
             Device device1 = deviceMapper.selectDeviceByDeviceId(device.getDeviceId());
-            deviceInvestorMapper.deleteByInvestorId(device1.getDeviceNumber());
+//            deviceInvestorMapper.deleteByInvestorId(device1.getDeviceNumber());
             deviceHospitalMapper.del(String.valueOf(device.getDeviceNumber()));
             DeviceHospital deviceHospital = new DeviceHospital();
             deviceHospital.setDeviceNumber(String.valueOf(device1.getDeviceNumber()));
@@ -290,6 +302,9 @@ public class DeviceServiceImpl implements DeviceService {
     {
         List<String> list = deviceMapper.selectDeviceByDeviceIds(deviceIds);
         deviceInvestorMapper.deleteByInvestorIds(list);
+        //批量删除绑定代理商和医院的分成
+        deviceAgentMapper.deleteByDeviceNumbers(list);
+        deviceHospitalMapper.deleteByDeviceNumbers(list);
         return deviceMapper.deleteDeviceByDeviceIds(deviceIds);
     }
 
@@ -305,6 +320,9 @@ public class DeviceServiceImpl implements DeviceService {
     {
         Device device = deviceMapper.selectDeviceByDeviceId(deviceId);
         deviceInvestorMapper.deleteByInvestorId(device.getDeviceNumber());
+        deviceAgentMapper.deleteByDeviceNumber(device.getDeviceNumber());
+        deviceHospitalMapper.deleteByDeviceNumber(device.getDeviceNumber());
+        //删除绑定代理商和医院的分成
         return deviceMapper.deleteDeviceByDeviceId(deviceId);
     }
 

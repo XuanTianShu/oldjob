@@ -71,6 +71,7 @@
         <result property="feedbackUrl" column="feedback_url"/>
         <result property="feedbackType" column="feedback_type"/>
         <result property="feedbackInfo" column="feedback_info"/>
+        <result property="createTime" column="create_time"/>
     </resultMap>
 
     <update id="insertMaintenanceRecord" parameterType="com.yuepei.system.domain.SysUserFeedback">
@@ -202,8 +203,9 @@
         WHERE d.device_number = #{deviceNumber}
     </select>
     <select id="getDetail" parameterType="Long" resultMap="FeedbackDetailResult">
-        SELECT suf.feedback_id,suf.device_number,suf.feedback_info,
-               suf.feedback_url,suf.feedback_type,d.device_address,suf.`status`
+        SELECT suf.feedback_id,suf.device_number,suf.`feedback_describe` AS feedback_info,
+               suf.`device_picture` AS feedback_url,suf.feedback_type,d.device_address,
+               suf.`status`,suf.`create_time`
         FROM sys_user_feedback AS suf
                  INNER JOIN device AS d ON d.`device_number` = suf.`device_number`
         WHERE suf.`feedback_id` = #{feedbackId}

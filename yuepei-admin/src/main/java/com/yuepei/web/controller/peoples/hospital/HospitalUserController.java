@@ -145,9 +145,9 @@ public class HospitalUserController extends BaseController {
     /**
      * 分成比例
      */
-    @GetMapping("/totalProportion/{hospitalId}")
-    public AjaxResult updateHospital(@PathVariable("hospitalId") Long hospitalId){
-        TotalProportionVO totalProportionVO = hospitalService.totalProportion(hospitalId);
-        return AjaxResult.success(totalProportionVO);
-    }
+//    @GetMapping("/totalProportion/{hospitalId}")
+//    public AjaxResult updateHospital(@PathVariable("hospitalId") Long hospitalId){
+//        TotalProportionVO totalProportionVO = hospitalService.totalProportion(hospitalId);
+//        return AjaxResult.success(totalProportionVO);
+//    }
 }

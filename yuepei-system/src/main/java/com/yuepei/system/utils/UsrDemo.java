@@ -171,7 +171,7 @@ public class UsrDemo {
 		//请求BODY,到文档中心->使能平台API文档打开要调用的api中，在“请求BODY”中查看
 		String bodyString = "{\"content\": {\"jtMessageId\":\"8001\",\"jtMessageType\":\"00\"," +
 				"\"dataType\":2,\"payload\":\""+hexBinary+"\"},\"deviceId\":\""+deviceId+"\"," +
-				"\"operator\":\"string\",\"productId\":"+productId+",\"ttl\":7200,\"deviceGroupId\": 100,\"level\": 1}";
+				"\"operator\":\"string\",\"productId\":"+productId+",\"ttl\":0,\"deviceGroupId\": 100,\"level\": 1}";
 		CloseableHttpClient httpClient = null;
 		HttpResponse response = null;
 		httpClient = HttpClientBuilder.create().build();

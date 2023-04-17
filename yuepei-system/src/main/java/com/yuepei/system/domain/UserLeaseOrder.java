@@ -132,4 +132,6 @@ public class UserLeaseOrder extends BaseEntity {
     private String userName;
 
     private String hospitalName;
+
+    private String agentHospitalProportion;
 }

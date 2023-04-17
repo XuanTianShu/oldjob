@@ -2,6 +2,8 @@ package com.yuepei.maintenance.domain.vo;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class MalfunctionDetailVO {
     private String feedbackId;
@@ -17,4 +19,6 @@ public class MalfunctionDetailVO {
     private String feedbackInfo;
 
     private String feedbackUrl;
+
+    private Date createTime;
 }

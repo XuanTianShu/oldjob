@@ -148,7 +148,7 @@
     </select>
 
     <select id="selectDeviceByDeviceId" parameterType="Long" resultMap="DeviceResult">
-        SELECT d.device_id, d.device_type_id, d.device_number,
+        <!--SELECT d.device_id, d.device_type_id, d.device_number,
                d.device_iot_number,d.device_mac,
                d.device_deposit, d.billing_id,d.hospital_id,
                d.device_qR_code, d.device_address,content,
@@ -156,7 +156,17 @@
                d.create_time, d.status,d.investor_id,d.electric,
                d.electric_early,d.user_id,d.investor_proportion,d.telecom_id,
                su.`proportion` AS agentProportion FROM device AS d
-        LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+        LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`-->
+        SELECT d.device_id, d.device_type_id, d.device_number,
+        d.device_iot_number,d.device_mac,
+        d.device_deposit, d.billing_id,d.hospital_id,
+        d.device_qR_code, d.device_address,content,
+        d.device_full_address,d.`rows`,d.heart_time,
+        d.create_time, d.status,d.investor_id,d.electric,
+        d.electric_early,d.user_id,d.investor_proportion,d.telecom_id,
+        dg.`proportion` AS agentProportion FROM device AS d
+        LEFT JOIN device_agent AS dg ON dg.`device_number` = d.`device_number`
+        LEFT JOIN sys_user AS su ON su.`user_id` = dg.`agent_id`
         where d.device_id = #{deviceId}
     </select>
 
@@ -263,7 +273,7 @@
             <if test="deviceQrCode != null">device_qR_code = #{deviceQrCode},</if>
             <if test="deviceAddress != null">device_address = #{deviceAddress},</if>
             <if test="deviceFullAddress != null">device_full_address = #{deviceFullAddress},</if>
-            <if test=" rows!= null">`rows` = #{rows},</if>
+            <if test="rows!= null">`rows` = #{rows},</if>
             <if test="heartTime != null">heart_time = #{heartTime},</if>
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="status != null">status = #{status},</if>
@@ -325,8 +335,20 @@
             <if test="masterKey != null">masterKey = #{masterKey},</if>
             <if test="productId != null">productId = #{productId},</if>
             <if test="time != null">`time` = #{time},</if>
+            <if test="investorId != null">investor_id = #{investorId},</if>
         </trim>
         where device_number = #{deviceNumber}
+    </update>
+    <update id="updateDeviceByHospitalIds">
+        update device set hospital_id = 0
+        where hospital_id in
+        <foreach collection="deviceNumber" item="deviceNumber" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </update>
+    <update id="updateDeviceByHospitalId">
+        update device set hospital_id = 0
+        where hospital_id = #{hospitalId}
     </update>
 
     <delete id="deleteDeviceByDeviceId" parameterType="Long">
@@ -379,10 +401,11 @@
     </select>
     <select id="selectDeviceProportionDetail" parameterType="String" resultMap="deviceProportionResult">
         SELECT IFNULL(su.`proportion`,0) AS suProportion,
-               IFNULL(h.`proportion`,0) AS hProportion,IFNULL(SUM(di.`proportion`),0) AS diProportion
+               IFNULL(h.`proportion`,0) AS hProportion,
+               IFNULL(SUM(di.`proportion`),0) AS diProportion
         FROM device AS d
-                 LEFT JOIN sys_user AS su ON d.`user_id` = su.`user_id`
-                 LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
+                 LEFT JOIN device_agent AS su ON d.`user_id` = su.`agent_id`
+                 LEFT JOIN device_hospital AS h ON h.`device_number` = d.`device_number`
                  LEFT JOIN device_investor AS di ON di.`device_number` = d.`device_number`
         WHERE d.device_number = #{deviceNumber}
     </select>
@@ -401,18 +424,22 @@
     <select id="agentPersonnel" parameterType="String" resultMap="agentPersonnelResult">
         SELECT su.`user_id`,su.`user_name`,su.`nick_name`,
                su.`proportion`,su.`phone_number` FROM device AS d
-                                                          LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+                                                          LEFT JOIN device_agent AS dg ON dg.`device_number` = d.`device_number`
+                                                          LEFT JOIN sys_user AS su ON su.`user_id` = dg.`agent_id`
         WHERE d.`device_number` = #{deviceNumber} AND su.`parent_id` = 0
     </select>
     <select id="hospitalPersonnel" parameterType="String" resultMap="hospitalPersonnelResult">
-        SELECT h.hospital_id,h.hospital_name,h.proportion,su.`user_name`,su.`nick_name`,IFNULL(d.`investor_proportion`,0) AS investorProportion FROM device AS d
-        LEFT JOIN hospital AS h ON d.`hospital_id` = h.hospital_id
-        LEFT JOIN hospital_user AS hu ON hu.hospital_id = h.hospital_id
-        LEFT JOIN sys_user AS su ON su.`user_name` = hu.user_name
-        WHERE d.`device_number` = #{deviceNumber}
+        SELECT h.hospital_id,h.hospital_name,h.proportion,
+        su.`user_name`,su.`nick_name`,
+        IFNULL(d.`investor_proportion`,0) AS investorProportion FROM device AS d
+        INNER JOIN device_hospital AS dh ON d.`device_number` = dh.device_number
+        INNER JOIN hospital AS h ON h.`hospital_id` = dh.hospital_id
+        INNER JOIN hospital_user AS hu ON hu.`hospital_id` = h.`hospital_id`
+        INNER JOIN sys_user AS su ON su.`user_id` = hu.`user_name`
+        WHERE d.`device_number` = #{deviceNumber} AND su.`user_type` = '04'
     </select>
     <select id="investorPersonnel" parameterType="String" resultMap="investorPersonnelResult">
-        SELECT su.user_id,su.`user_name`,su.`nick_name`,su.`proportion`,
+        SELECT su.user_id,su.`user_name`,su.`nick_name`,di.`proportion`,
         su.`phone_number` FROM device AS d
         INNER JOIN device_investor AS di ON di.device_number = d.`device_number`
         INNER JOIN sys_user AS su ON su.`user_id` = di.investor_id
@@ -448,7 +475,7 @@
     </select>
     <select id="selectInvestorProportionByDeviceNumber" resultMap="DeviceResult">
         SELECT d.`device_number`,d.`hospital_id`,h.`type`,
-               d.`user_id`,d.`investor_proportion` FROM device AS d
+               d.`user_id`,IFNULL(d.`investor_proportion`,0) AS investor_proportion FROM device AS d
                                                             LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
         WHERE d.device_number = #{deviceNumber}
     </select>

@@ -127,6 +127,8 @@ public class SysUser extends BaseEntity
 
     private Long hospitalId;
 
+    private BigDecimal price;
+
     public SysUser()
     {
 

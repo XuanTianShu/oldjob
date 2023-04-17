@@ -6,6 +6,8 @@ import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.DeviceHospital;
 import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.Hospital;
+import com.yuepei.system.domain.vo.BindingHospitalVO;
+import com.yuepei.system.domain.vo.DeviceInvestorVO;
 import com.yuepei.system.domain.vo.HospitalVO;
 import com.yuepei.system.domain.vo.TotalProportionVO;
 import com.yuepei.system.mapper.DeviceMapper;
@@ -13,6 +15,7 @@ import com.yuepei.system.mapper.HospitalMapper;
 import com.yuepei.system.service.HospitalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -211,12 +214,60 @@ public class HospitalServiceImpl implements HospitalService {
     }
 
     @Override
-    public TotalProportionVO totalProportion(Long hospitalId) {
-        return hospitalMapper.totalProportion(hospitalId);
+    public TotalProportionVO totalProportion2(DeviceInvestor deviceInvestor) {
+        return hospitalMapper.totalProportion2(deviceInvestor);
     }
 
     @Override
     public List<DeviceInvestor> deviceProportionList(DeviceHospital deviceHospital) {
         return hospitalMapper.deviceProportionList(deviceHospital);
+    }
+
+    @Override
+    public List<DeviceInvestorVO> unbound() {
+        return hospitalMapper.unbound();
+    }
+
+    @Transactional
+    @Override
+    public int binding(BindingHospitalVO bindingHospitalVO) {
+        Device device = new Device();
+        device.setDeviceNumber(bindingHospitalVO.getDeviceNumber());
+        device.setHospitalId(Long.parseLong(bindingHospitalVO.getHospitalId()));
+        deviceMapper.updateDeviceStatus(device);
+        return hospitalMapper.binding(bindingHospitalVO);
+    }
+
+    @Override
+    public DeviceInvestor getDetail(Long id) {
+        return hospitalMapper.getDetail(id);
+    }
+
+    @Override
+    public int updateDeviceProportionById(BindingHospitalVO bindingHospitalVO) {
+        return hospitalMapper.updateDeviceProportionById(bindingHospitalVO);
+    }
+
+    @Transactional
+    @Override
+    public int deleteDeviceByIds(Long[] ids) {
+        List<String> list = hospitalMapper.selectHospitalIdList(ids);
+        //TODO 批量更新设备
+        deviceMapper.updateDeviceByHospitalIds(list);
+        return hospitalMapper.deleteDeviceByIds(ids);
+    }
+
+    @Transactional
+    @Override
+    public int deleteDeviceById(Long id) {
+        DeviceInvestor deviceInvestor = hospitalMapper.selectHospital(id);
+        //TODO 更新设备
+        deviceMapper.updateDeviceByHospitalId(deviceInvestor.getInvestorId());
+        return hospitalMapper.deleteDeviceById(id);
+    }
+
+    @Override
+    public int selectBindHospitalCount(Long[] deviceIds) {
+        return hospitalMapper.selectBindHospitalCount(deviceIds);
     }
 }

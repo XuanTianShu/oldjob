@@ -111,15 +111,17 @@
         where id = #{id}
     </select>
     <select id="totalProportion" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
-        SELECT
-            (IFNULL(d.investor_proportion,0) - SUM(di.proportion)) AS totalProportion
-        FROM device AS d
-                 LEFT JOIN device_investor AS di ON di.`device_number` = d.`device_number`
-                 LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
-        WHERE d.`device_number` = #{deviceNumber}
+        SELECT (IFNULL(d.investor_proportion,0) -
+        (SELECT IFNULL(SUM(di.proportion),0) FROM
+        device_investor AS di WHERE di.`device_number` = #{deviceNumber}
         <if test="id != null">
             AND di.Id != #{id}
-        </if>
+        </if>))
+        AS totalProportion
+        FROM device AS d
+        LEFT JOIN device_investor AS di ON di.`device_number` = d.`device_number`
+        LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+        WHERE d.`device_number` = #{deviceNumber}
     </select>
     <select id="totalProportion2" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
         SELECT (100 - IFNULL(dh.`proportion`,0) - IFNULL(su.`proportion`,0))

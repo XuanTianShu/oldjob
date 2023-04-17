@@ -9,7 +9,10 @@ import com.yuepei.maintenance.domain.vo.StockVO;
 import com.yuepei.maintenance.service.AppletMaintenanceService;
 import com.yuepei.service.UnlockingService;
 import com.yuepei.system.domain.Device;
+import com.yuepei.system.domain.OrderProportionDetail;
 import com.yuepei.system.domain.SysUserFeedback;
+import com.yuepei.system.mapper.DeviceInvestorMapper;
+import com.yuepei.system.mapper.UserLeaseOrderMapper;
 import com.yuepei.system.service.DeviceService;
 import com.yuepei.utils.TokenUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.math.BigInteger;
+import java.util.*;
 
 /**
  * 小程序运维/补货端
@@ -42,6 +43,24 @@ public class MaintenanceHomeController {
 
     @Autowired
     private UnlockingService unlockingService;
+
+    @Autowired
+    private DeviceInvestorMapper deviceInvestorMapper;
+
+    @Autowired
+    private UserLeaseOrderMapper userLeaseOrderMapper;
+
+    @GetMapping("/test/{deviceNumber}")
+    public AjaxResult test(@PathVariable("deviceNumber") String deviceNumber){
+        String uuid = String.format("%040d", new BigInteger(UUID.randomUUID().toString().replace("-", ""), 16));
+        String orderNumber = uuid.substring(uuid.length() - 16);
+        //添加投资人订单分成明细
+        List<OrderProportionDetail> orderProportionDetailList = deviceInvestorMapper.selectInvestorListByDeviceNumber(deviceNumber);
+        if (orderProportionDetailList.size() > 0){
+            userLeaseOrderMapper.insertOrderProportionDeatail(orderNumber,orderProportionDetailList);
+        }
+        return AjaxResult.success();
+    }
 
     /**
      * 首页
@@ -87,10 +106,10 @@ public class MaintenanceHomeController {
      */
     @GetMapping("/malfunction")
     public AjaxResult malfunction(HttpServletRequest request,String deviceNumber){
-        SysUser user = tokenUtils.analysis(request);
+//        SysUser user = tokenUtils.analysis(request);
         Map<String,Object> map = new HashMap<>();
-        List<MalfunctionVO> list = appletMaintenanceService.selectAppletMaintenanceMalfunctionList(user.getUserId(),deviceNumber);
-        int malfunctionCount = appletMaintenanceService.selectAppletMaintenanceMalfunctionCount(user.getUserId(),deviceNumber);
+        List<MalfunctionVO> list = appletMaintenanceService.selectAppletMaintenanceMalfunctionList(201L,deviceNumber);
+        int malfunctionCount = appletMaintenanceService.selectAppletMaintenanceMalfunctionCount(201L,deviceNumber);
         map.put("list",list);
         map.put("malfunctionCount",malfunctionCount);
         return AjaxResult.success(map);

@@ -12,4 +12,8 @@ public class DeviceHospital {
     private String proportion;
 
     private String deviceNumber;
+
+    private String type;
+
+    private String userId;
 }

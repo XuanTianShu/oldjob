@@ -835,7 +835,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
     public PersonalCenterVo selectPersonalCenter(Long userId) {
         PersonalCenterVo personalCenterVo = new PersonalCenterVo();
         SysUser sysUser = sysUserMapper.selectUserById(userId);
-        personalCenterVo.setAmount(new BigDecimal(sysUser.getBalance()));
+        personalCenterVo.setAmount(new BigDecimal(String.valueOf(sysUser.getBalance())));
         personalCenterVo.setUserName(sysUser.getUserName());
         personalCenterVo.setAvatar(sysUser.getAvatar());
         return personalCenterVo;

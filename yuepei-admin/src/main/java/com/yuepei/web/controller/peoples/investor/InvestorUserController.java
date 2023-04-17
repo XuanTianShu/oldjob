@@ -90,7 +90,6 @@ public class InvestorUserController extends BaseController
      */
     @GetMapping("/deviceByInvestorId/{investorId}")
     public TableDataInfo deviceByInvestorId(@PathVariable("investorId") Long investorId){
-        startPage();
         List<DeviceInvestorVO> list = deviceInvestorService.deviceByInvestorId(investorId);
         return getDataTable(list);
     }
@@ -215,7 +214,6 @@ public class InvestorUserController extends BaseController
             return AjaxResult.error("无可分配比例");
         }
         TotalProportionVO totalProportion = investorUserService.totalProportion(deviceInvestor);
-        log.info("{}",totalProportion.getTotalProportion());
         if (totalProportion.getTotalProportion() < Integer.parseInt(deviceInvestor.getProportion())){
             return AjaxResult.error("超过可分配比例");
         }
