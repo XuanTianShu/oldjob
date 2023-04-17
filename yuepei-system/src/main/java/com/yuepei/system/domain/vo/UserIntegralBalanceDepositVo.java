@@ -48,4 +48,6 @@ public class UserIntegralBalanceDepositVo extends BaseEntity {
 
     /** 0 - 缴纳   1 - 退回 */
     private Integer status;
+
+    private String orderNumber;
 }

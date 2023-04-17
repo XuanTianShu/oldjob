@@ -42,6 +42,7 @@
             <if test="createTime != null">create_time,</if>
             <if test="status != null">status,</if>
             <if test="updateTime != null">update_time,</if>
+            <if test="orderNumber != null">order_number,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="openid != null">#{openid},</if>
@@ -49,6 +50,7 @@
             <if test="createTime != null">#{createTime},</if>
             <if test="status != null">#{status},</if>
             <if test="updateTime != null">#{updateTime},</if>
+            <if test="orderNumber != null">#{orderNumber},</if>
         </trim>
     </insert>
 

@@ -9,6 +9,7 @@ import com.yuepei.common.utils.DateUtils;
 import com.yuepei.common.utils.StringUtils;
 import com.yuepei.common.utils.uuid.UUID;
 import com.yuepei.domain.Amount;
+import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.UserDepositVO;
 import com.yuepei.system.domain.vo.UserOrderVO;
 import com.yuepei.service.UserRefundService;
@@ -190,6 +191,7 @@ public class UserRefundServiceImpl implements UserRefundService {
                 UserIntegralBalanceDepositVo userIntegralBalanceDepositVo = new UserIntegralBalanceDepositVo();
                 userIntegralBalanceDepositVo.setOpenid(userDepositOrder.getOpenid());
                 userIntegralBalanceDepositVo.setStatus(1);
+                userIntegralBalanceDepositVo.setOrderNumber(out_trade_no);
                 //有问题
                 userIntegralBalanceDepositVo.setSum(new BigDecimal(price.toString()).divide(new BigDecimal(100)));
 
@@ -321,6 +323,105 @@ public class UserRefundServiceImpl implements UserRefundService {
         return null;
     }
 
+    @Override
+    public AjaxResult orderRefund(UserLeaseOrder userLeaseOrder) {
+        long l = new BigDecimal(String.valueOf(userLeaseOrder.getNetAmount())).multiply(BigDecimal.valueOf(100)).longValue();
+        if (l > 0){
+            UserDepositOrder userDepositOrder1 = new UserDepositOrder();
+            userDepositOrder1.setOrderNumber(userLeaseOrder.getOrderNumber());
+            userDepositOrder1.setStatus(4);
+            userDepositOrderMapper.updateUserDepositOrder(userDepositOrder1);
+        }else {
+            String outTradeNo = UUID.randomUUID().toString().replace("-", "");
+            HashMap<Object, Object> payMap = new HashMap<>();
+            payMap.put("out_trade_no", userLeaseOrder.getOrderNumber());
+            payMap.put("out_refund_no", outTradeNo);
+            payMap.put("reason", "订单退款");
+            payMap.put("notify_url","https://www.yp10000.com/prod-api/wechat/user/refund/orderRefundCallBack");
+            Amount amount = new Amount();
+            amount.setTotal(l);
+            amount.setRefund(l);
+            amount.setCurrency("CNY");
+            payMap.put("amount", amount);
+
+            //请求地址
+            HttpPost httpPost = new HttpPost("https://api.mch.weixin.qq.com/v3/refund/domestic/refunds");
+            // 请求数据
+            Gson gson = new Gson();
+            String json = gson.toJson(payMap);
+            //设置请求信息
+            StringEntity stringEntity = new StringEntity(json, "utf-8");
+            stringEntity.setContentType("application/json");
+            httpPost.setEntity(stringEntity);
+            httpPost.setHeader("Accept", "application/json");
+            // 3.完成签名并执行请求
+            CloseableHttpResponse response = null;
+            try {
+                response = wxPayClient.execute(httpPost);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // 4.解析response对象
+            HashMap<String, String> resultMap = resolverResponse(response);
+            if(resultMap != null) {
+                //将订单修改为退款中，防止重复操作
+                UserDepositOrder userDepositOrder1 = new UserDepositOrder();
+                userDepositOrder1.setOrderNumber(userLeaseOrder.getOrderNumber());
+                userDepositOrder1.setStatus(3);
+                userDepositOrderMapper.updateUserDepositOrder(userDepositOrder1);
+                //微信退款单号   --  等待后续操作
+                String refund_id = resultMap.get("refund_id");
+                String transaction_id = resultMap.get("transaction_id");
+                String out_trade_no = resultMap.get("out_trade_no");
+                String status = resultMap.get("status");
+                System.out.println(userLeaseOrder.getOrderNumber() + "--" + out_trade_no + "--" + status);
+//            userDepositOrder.setDeviceStatus("1");
+//            userDepositOrderMapper.updateUserDepositOrder(userDepositOrder);
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public HashMap<String, String> orderRefundCallBack(HttpServletRequest request) throws GeneralSecurityException {
+        System.out.println("退款");
+        HashMap params = requestUtils.requestParams(request);
+        Map resource = (Map) params.get("resource");
+
+        Object stringBuffer = params.get("stringBuffer");
+        String associated_data = (String) resource.get("associated_data");
+        String nonce = (String) resource.get("nonce");
+        String ciphertext = (String) resource.get("ciphertext");
+
+        JSONObject parseObject;
+        boolean isTrue = wxCallBackUtils.parseWXCallBack(request, stringBuffer.toString());
+        if (isTrue) {
+            AesUtil aesUtil = new AesUtil(mchKey.getBytes());
+            parseObject = JSONObject.parseObject(
+                    aesUtil.decryptToString(associated_data.getBytes(), nonce.getBytes(), ciphertext)
+            );
+            //商户订单号
+            String out_trade_no = (String) parseObject.get("out_trade_no");
+            Object amount = parseObject.get("amount");
+            JSONObject jsonObject1 = JSONObject.parseObject(amount.toString());
+            Object price = jsonObject1.get("payer_refund");
+            UserLeaseOrder userLeaseOrder = new UserLeaseOrder();
+            userLeaseOrder.setOrderNumber(out_trade_no);
+            userLeaseOrder.setStatus("4");
+            userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
+            //响应接口
+            hashMap.put("code", "SUCCESS");
+            hashMap.put("message", "成功");
+            return hashMap;
+        }else {
+            hashMap.put("code", "FAIL");
+            hashMap.put("message", "失败");
+            return hashMap;
+        }
+    }
+
+
     public static String getAllRequestParam2(HttpServletRequest request) throws IOException {
         BufferedReader br = request.getReader();
         String str;
@@ -330,6 +431,8 @@ public class UserRefundServiceImpl implements UserRefundService {
         }
         return wholeStr.toString();
     }
+
+
 
 
     /**

@@ -272,6 +272,7 @@ public class CallBackServiceImpl implements CallBackService {
                 JSONObject jsonObject1 = JSONObject.parseObject(amount.toString());
                 Object price = jsonObject1.get("payer_total");
                 //记录用户押金详细
+                userIntegralBalanceDepositVo.setOrderNumber(out_trade_no);
                 userIntegralBalanceDepositVo.setOpenid(openid.toString());
 //                userIntegralBalanceDepositVo.setSum(new BigDecimal(price.toString()));
                 userIntegralBalanceDepositVo.setSum(new BigDecimal(price.toString()).divide(new BigDecimal(100)));

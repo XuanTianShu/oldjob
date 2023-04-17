@@ -4,14 +4,12 @@ import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.service.UserRefundService;
 import com.yuepei.system.domain.Device;
+import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.service.DeviceService;
 import com.yuepei.utils.TokenUtils;
 import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.GeneralSecurityException;
@@ -78,6 +76,16 @@ public class WechatRefundController {
         return userRefundService.userRefundCallBack(request);
     }
 
+    /**
+     * 后台手动退款回调
+     * @param request
+     * @return
+     */
+    @PostMapping("/orderRefundCallBack")
+    public HashMap<String,String> orderRefundCallBack(HttpServletRequest request) throws GeneralSecurityException {
+        return userRefundService.orderRefundCallBack(request);
+    }
+
 
     /**
      * 用户押金退款
@@ -90,8 +98,6 @@ public class WechatRefundController {
         return AjaxResult.success(userRefundService.userDepositRefund(user.getOpenid()));
 //        return AjaxResult.success(userRefundService.userDepositRefund("oc0od5efCnYrfiuqEmMj3gfNXdPg"));
     }
-
-    //TODO 后台处理用户退款申请
 
     /**
      * 后台开锁回调

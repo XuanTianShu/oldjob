@@ -19,6 +19,17 @@
         <result property="createTime" column="create_time"/>
     </resultMap>
 
+    <resultMap id="depositListResult" type="com.yuepei.system.domain.vo.OrderDepositListVO">
+        <result property="id" column="id"/>
+        <result property="deviceNumber"  column="device_number"/>
+        <result property="createTime" column="create_time"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="depositStatus" column="status"/>
+        <result property="depositNum" column="sum"/>
+    </resultMap>
+
     <sql id="selectOrderVo">
         select id,order_number, user_id, device_number, pay_type, pay_time, pay_amount, coupon_amount, net_amount, pay_rows, status,create_time from user_order
     </sql>
@@ -41,6 +52,39 @@
     <select id="selectOrderByOrderId" parameterType="Long" resultMap="OrderResult">
         <include refid="selectOrderVo"/>
         where order_id = #{orderId}
+    </select>
+    <select id="depositList" resultMap="depositListResult">
+        SELECT udo.`id`,udo.`order_number`,su.`nick_name`,
+        su.`phone_number`,udo.sum,udo.status,
+        udo.`create_time` FROM user_deposit_detail AS udo
+        INNER JOIN sys_user AS su ON su.`openid` = udo.`openid`
+        <where>
+            <if test="depositStatus != null">
+                and udo.status = #{depositStatus}
+            </if>
+            <if test="nickName != null">
+                and su.`nick_name` like concat('%', #{nickName}, '%')
+            </if>
+            <if test="phoneNumber != null">
+                and su.`phone_number` = #{phoneNumber}
+            </if>
+        </where>
+        order by udo.`create_time` desc
+    </select>
+    <select id="depositSum" resultType="java.lang.String">
+        SELECT SUM(udo.`sum`) AS orderSum FROM user_deposit_detail AS udo
+        INNER JOIN sys_user AS su ON su.`openid` = udo.`openid`
+        <where>
+            <if test="depositStatus != null">
+                and udo.status = #{depositStatus}
+            </if>
+            <if test="nickName != null">
+                and su.`nick_name` like concat('%', #{nickName}, '%')
+            </if>
+            <if test="phoneNumber != null">
+                and su.`phone_number` = #{phoneNumber}
+            </if>
+        </where>
     </select>
 
     <update id="updateOrder" parameterType="com.yuepei.system.domain.Order">

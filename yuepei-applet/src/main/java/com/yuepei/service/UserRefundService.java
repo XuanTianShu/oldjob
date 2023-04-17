@@ -1,6 +1,7 @@
 package com.yuepei.service;
 
 import com.yuepei.common.core.domain.AjaxResult;
+import com.yuepei.system.domain.UserLeaseOrder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.GeneralSecurityException;
@@ -41,4 +42,8 @@ public interface UserRefundService {
     AjaxResult userDepositRefund(String openid);
 
     AjaxResult unlocking(HttpServletRequest request);
+
+    AjaxResult orderRefund(UserLeaseOrder userLeaseOrder);
+
+    HashMap<String, String> orderRefundCallBack(HttpServletRequest request) throws GeneralSecurityException;
 }

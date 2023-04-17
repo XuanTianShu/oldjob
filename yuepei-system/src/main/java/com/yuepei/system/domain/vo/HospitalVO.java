@@ -24,4 +24,6 @@ public class HospitalVO {
     private String deviceSum;
 
     private List<String> departmentList;
+
+    private String userId;
 }

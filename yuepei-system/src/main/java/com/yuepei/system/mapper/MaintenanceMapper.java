@@ -9,4 +9,10 @@ public interface MaintenanceMapper {
     List<HospitalVO> getHospital(@Param("userId") Long userId);
 
     List<HospitalVO> getBinding(@Param("userId") Long userId);
+
+    int add(HospitalVO hospitalVO);
+
+    int deleteHospitalByHospitalIds(Long[] ids);
+
+    int deleteHospitalByHospitalId(@Param("ids") Long ids);
 }

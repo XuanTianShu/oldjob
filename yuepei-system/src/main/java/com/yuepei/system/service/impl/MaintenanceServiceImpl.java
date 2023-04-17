@@ -23,4 +23,19 @@ public class MaintenanceServiceImpl implements MaintenanceService {
     public List<HospitalVO> getBinding(Long userId) {
         return maintenanceMapper.getBinding(userId);
     }
+
+    @Override
+    public int add(HospitalVO hospitalVO) {
+        return maintenanceMapper.add(hospitalVO);
+    }
+
+    @Override
+    public int deleteHospitalByHospitalIds(Long[] ids) {
+        return maintenanceMapper.deleteHospitalByHospitalIds(ids);
+    }
+
+    @Override
+    public int deleteHospitalByHospitalId(Long ids) {
+        return maintenanceMapper.deleteHospitalByHospitalId(ids);
+    }
 }

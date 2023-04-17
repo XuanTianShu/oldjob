@@ -1,6 +1,7 @@
 package com.yuepei.system.service;
 
 import com.yuepei.system.domain.Order;
+import com.yuepei.system.domain.vo.OrderDepositListVO;
 
 import java.util.List;
 
@@ -55,4 +56,8 @@ public interface OrderService {
      * @return 结果
      */
     public int updateOrder(Order order);
+
+    List<OrderDepositListVO> depositList(OrderDepositListVO orderDepositListVO);
+
+    String depositSum(OrderDepositListVO orderDepositListVO);
 }

@@ -8,6 +8,7 @@ import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.common.enums.BusinessType;
 import com.yuepei.common.utils.poi.ExcelUtil;
 import com.yuepei.system.domain.InvestorUser;
+import com.yuepei.system.domain.vo.HospitalVO;
 import com.yuepei.system.service.IInvestorUserService;
 import com.yuepei.system.service.ISysUserService;
 import com.yuepei.system.service.MaintenanceService;
@@ -119,5 +120,28 @@ public class maintenanceUserController extends BaseController {
     @GetMapping("/getBinding/{userId}")
     public AjaxResult getBinding(@PathVariable("userId") Long userId){
         return AjaxResult.success(maintenanceService.getBinding(userId));
+    }
+
+    @PostMapping("/add")
+    public AjaxResult add(@RequestBody HospitalVO hospitalVO){
+        return AjaxResult.success(maintenanceService.add(hospitalVO));
+    }
+
+    /**
+     * 删除医院
+     */
+    @DeleteMapping("/deleteHospitalByHospitalIds/{ids}")
+    public AjaxResult deleteHospitalByHospitalIds(@PathVariable Long[] ids)
+    {
+        return toAjax(maintenanceService.deleteHospitalByHospitalIds(ids));
+    }
+
+    /**
+     * 删除医院
+     */
+    @DeleteMapping("/deleteHospitalByHospitalId/{ids}")
+    public AjaxResult deleteHospitalByHospitalId(@PathVariable Long ids)
+    {
+        return toAjax(maintenanceService.deleteHospitalByHospitalId(ids));
     }
 }

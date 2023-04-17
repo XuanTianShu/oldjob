@@ -3,16 +3,20 @@ package com.yuepei.web.controller.order;
 import com.yuepei.common.annotation.Log;
 import com.yuepei.common.core.controller.BaseController;
 import com.yuepei.common.core.domain.AjaxResult;
+import com.yuepei.common.core.domain.R;
 import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.common.enums.BusinessType;
 import com.yuepei.service.MyLeaseOrderService;
+import com.yuepei.service.UserRefundService;
 import com.yuepei.system.domain.Order;
 import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.ConditionOrderVO;
 import com.yuepei.system.domain.vo.LeaseOrderVO;
+import com.yuepei.system.domain.vo.OrderDepositListVO;
 import com.yuepei.system.domain.vo.OrderSumAndMoneyVO;
 import com.yuepei.system.mapper.UserLeaseOrderMapper;
 import com.yuepei.system.service.OrderService;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -58,6 +62,9 @@ public class OrderController extends BaseController {
 
     @Autowired
     private MyLeaseOrderService myLeaseOrderService;
+
+    @Autowired
+    private UserRefundService userRefundService;
 
     /**
      * 查询商品订单列表
@@ -112,5 +119,26 @@ public class OrderController extends BaseController {
     public AjaxResult edit(@RequestBody Order order)
     {
         return toAjax(orderService.updateOrder(order));
+    }
+
+    /**
+     * 押金列表
+     * @return
+     */
+    @GetMapping("/depositList")
+    public TableDataInfo depositList(OrderDepositListVO orderDepositListVO){
+        startPage();
+        return getDataTable(orderService.depositList(orderDepositListVO));
+    }
+
+    @GetMapping("/depositSum")
+    public AjaxResult depositSum(OrderDepositListVO orderDepositListVO){
+        return AjaxResult.success(orderService.depositSum(orderDepositListVO));
+    }
+
+    //TODO 后台处理用户退款申请
+    @PostMapping("/orderRefund")
+    public AjaxResult orderRefund(@RequestBody UserLeaseOrder userLeaseOrder){
+        return AjaxResult.success(userRefundService.orderRefund(userLeaseOrder));
     }
 }

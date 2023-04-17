@@ -8,6 +8,26 @@
         <result property="deviceSum" column="device_sum"/>
         <result property="hospitalId" column="hospital_id"/>
     </resultMap>
+    <insert id="add">
+        insert into hospital_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="hospitalId != null">hospital_id,</if>
+            <if test="userId != null">user_name,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="hospitalId != null">#{hospitalId},</if>
+            <if test="userId != null">#{userId},</if>
+        </trim>
+    </insert>
+    <delete id="deleteHospitalByHospitalId">
+        delete from hospital_user where hospital_id = #{ids}
+    </delete>
+    <delete id="deleteHospitalByHospitalIds" parameterType="Long">
+        delete from hospital_user where hospital_id in
+        <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
+            #{hospitalId}
+        </foreach>
+    </delete>
 
     <select id="getHospital" parameterType="Long" resultMap="maintenanceHospitalResult">
         SELECT h.`hospital_id`,h.`hospital_name`,h.`type`,devices.device_sum FROM hospital_user AS hu
