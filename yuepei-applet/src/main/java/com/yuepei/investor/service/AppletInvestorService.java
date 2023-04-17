@@ -32,7 +32,7 @@ public interface AppletInvestorService {
 
     List<HospitalVO> selectDeviceTypeByHospital(Long userId, Long deviceTypeId);
 
-    InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate);
+    InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate, Long deviceTypeId);
 
     PersonalCenterVo investorPersonalCenter(Long userId);
 

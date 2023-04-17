@@ -405,7 +405,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     }
 
     @Override
-    public InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate) {
+    public InvestorDeviceManageVo investorDeviceManage(Long userId, Long hospitalId, String departmentName, Long utilizationRate, Long deviceTypeId) {
         InvestorDeviceManageVo deviceManageVo = new InvestorDeviceManageVo();
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         List<Device> device = hospitalDeviceMapper.selectInvestorId(userId);
@@ -431,12 +431,21 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             detailsVo.setDeviceTypeId(map.getDeviceTypeId());
             deviceDetailsVos.add(detailsVo);
         });
+        if (deviceTypeId!=null){
+            List<DeviceDetailsVo> collect = deviceDetailsVos.stream()
+                    .filter(map -> map.getDeviceTypeId()!=null)
+                    .filter(map -> map.getDeviceTypeId().equals(deviceTypeId)).collect(Collectors.toList());
+            deviceDetailsVos.clear();
+            deviceDetailsVos.addAll(collect);
+
+        }
         if (hospitalId!=null){
             List<DeviceDetailsVo> collect = deviceDetailsVos.stream()
                     .filter(map -> map.getHospitalId()!=null)
                     .filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
             deviceDetailsVos.clear();
             deviceDetailsVos.addAll(collect);
+
         }
         if (!departmentName.equals("")){
             List<DeviceDetailsVo> collect = deviceDetailsVos.stream()
