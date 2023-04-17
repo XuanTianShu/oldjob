@@ -479,6 +479,13 @@
                                                             LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
         WHERE d.device_number = #{deviceNumber}
     </select>
+    <select id="selectDeviceByHospitalIds" resultType="java.lang.String">
+        select device_number from device
+        where hospital_id in
+        <foreach collection="hospitals" item="hospitals" index="index" open="(" separator="," close=")">
+            #{hospitals}
+        </foreach>
+    </select>
     <select id="totalProportion2" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
         SELECT (100 - IFNULL(SUM(proportion),0)) AS totalProportion
         FROM sys_user

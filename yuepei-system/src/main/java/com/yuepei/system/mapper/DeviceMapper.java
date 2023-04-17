@@ -149,4 +149,6 @@ public interface DeviceMapper {
     void updateDeviceByHospitalIds(List<String> list);
 
     void updateDeviceByHospitalId(@Param("hospitalId") Long hospitalId);
+
+    List<String> selectDeviceByHospitalIds(@Param("hospitals") List<Long> hospitals);
 }

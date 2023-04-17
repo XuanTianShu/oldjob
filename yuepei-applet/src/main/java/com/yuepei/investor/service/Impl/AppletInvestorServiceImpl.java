@@ -460,7 +460,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         for (BigDecimal price : decimals) {
             decimal=decimal.add(price);
         }
-        deviceManageVo.setDeviceAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+//        deviceManageVo.setDeviceAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+        deviceManageVo.setDeviceAmount(decimal);
         deviceManageVo.setDeviceSum(deviceDetailsVos.size());
         deviceManageVo.setUtilizationRate(0L);
         deviceManageVo.setDeviceDetails(deviceDetailsVos);
@@ -584,11 +585,11 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         List<UserLeaseOrder> leaseOrders = new ArrayList<>();
         deviceList.stream().forEach(map->{
             if (!nameOrNumber.equals("")){
-                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber,String.valueOf(map.getHospitalId()));
+                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber,String.valueOf(sysUser.getUserId()));
                 List<UserLeaseOrder> collect = userLeaseOrders.stream().filter(j -> j.getDeviceNumber().equals(map.getDeviceNumber())).collect(Collectors.toList());
                 leaseOrders.addAll(collect);
             }else {
-                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByDevice(map.getDeviceNumber(),String.valueOf(map.getHospitalId()));
+                List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByDevice(map.getDeviceNumber(),String.valueOf(sysUser.getUserId()));
                 leaseOrders.addAll(userLeaseOrders);
             }
         });
@@ -603,7 +604,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         userLeaseOrderList.stream().forEach(map->{
             Device device = hospitalDeviceMapper.selectDeviceByTypeNumber(map.getDeviceNumber());
             String deviceFullAddress = device.getDeviceFullAddress();
-            if (!deviceFullAddress.isEmpty()) {
+            if (!deviceFullAddress.equals("0")) {
                 String[] array = JSON.parseArray(deviceFullAddress).toArray(new String[0]);
                 Hospital department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
                 map.setDepartment(department.getHospitalName());
@@ -631,18 +632,13 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             userLeaseOrderVoList.addAll(userLeaseOrderVos);
         }else {
             List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
-            if (sysUsers.size()==0){
-                List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(userId, deviceDepartment, deviceTypeName, nameOrNumber);
-                userLeaseOrderVoList.addAll(userLeaseOrderVos);
-            }else {
-                sysUsers.add(sysUser);
-                sysUsers.stream().forEach(map->{
-                    List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(map.getUserId(), deviceDepartment, deviceTypeName, nameOrNumber);
-                    if (userLeaseOrderVos.size()!=0){
-                        userLeaseOrderVoList.addAll(userLeaseOrderVos);
-                    }
-                });
-            }
+            sysUsers.add(sysUser);
+            sysUsers.stream().forEach(map->{
+                List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(map.getUserId(), deviceDepartment, deviceTypeName, nameOrNumber);
+                if (userLeaseOrderVos.size()!=0){
+                    userLeaseOrderVoList.addAll(userLeaseOrderVos);
+                }
+            });
         }
         if (status.equals("")){
             List<UserLeaseOrderVo> collect = userLeaseOrderVoList.stream().sorted(Comparator.comparing(UserLeaseOrderVo::getLeaseTime).reversed()).collect(Collectors.toList());
