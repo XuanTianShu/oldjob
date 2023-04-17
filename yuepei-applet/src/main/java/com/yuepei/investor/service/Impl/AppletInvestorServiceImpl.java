@@ -713,6 +713,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                             Long minute1 = time2 / 1000 / 60 / 60;
                             Long minute2 = time2 / 1000 / 60 % 60 ;
                             BigDecimal price = (BigDecimal) jsonObject.get("price");
+                            userLeaseOrderVo.setContent(price+device.getContent());
                             price1=price1.add(price);
                             if (minute2<10){
                                 userLeaseOrderVo.setEvaluate(price.multiply(new BigDecimal(minute1)));
@@ -725,6 +726,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                                 Long minute1 = time2 / 1000 / 60 / 60;
                                 Long minute2 = time2 / 1000 / 60 % 60 ;
                                 BigDecimal price = (BigDecimal) jsonObject.get("price");
+                                userLeaseOrderVo.setContent(price+device.getContent());
                                 if (minute2<10){
                                     userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1)).add(price));
                                 }else {
@@ -732,6 +734,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                                 }
                             }else {
                                 BigDecimal price = (BigDecimal) jsonObject.get("price");
+                                userLeaseOrderVo.setContent(price+device.getContent());
                                 userLeaseOrderVo.setEvaluate(price);
                             }
                         }
@@ -741,6 +744,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                             Long minute1 = time2 / 1000 / 60 /60 ;
                             Long minute2 = time2 / 1000 / 60 % 60 ;
                             BigDecimal price = (BigDecimal) jsonObject.get("price");
+                            userLeaseOrderVo.setContent(price+device.getContent());
                             price1=price1.add(price);
                             if (minute2<10){
                                 userLeaseOrderVo.setEvaluate(price.multiply(new BigDecimal(minute1)));
