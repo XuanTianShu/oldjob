@@ -61,9 +61,10 @@ public class InvestorDeviceController {
 
     /**投资人-设备信息*/
     @GetMapping("/selectDeviceType")
-    public AjaxResult selectHospital(HttpServletRequest request){
+    public AjaxResult selectHospital(HttpServletRequest request,
+                                     @RequestParam(value = "deviceTypeId",required = false)Long deviceTypeId){
         SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(appletInvestorService.selectDeviceType(user.getUserId()));
+        return AjaxResult.success(appletInvestorService.selectDeviceType(user.getUserId(),deviceTypeId));
     }
 
     /**投资人-根据设备类型选择医院*/

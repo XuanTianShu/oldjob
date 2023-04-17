@@ -341,7 +341,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     }
 
     @Override
-    public List<DeviceType> selectDeviceType(Long userId) {
+    public List<DeviceType> selectDeviceType(Long userId, Long deviceTypeId) {
         List<DeviceType> deviceTypes = new ArrayList<>();
         List<Device> deviceList = hospitalDeviceMapper.selectInvestorId(userId);
         deviceList.stream().forEach(map->{
@@ -349,7 +349,12 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             deviceTypes.add(deviceType);
         });
         List<DeviceType> collect = deviceTypes.stream().distinct().collect(Collectors.toList());
-        return collect;
+        if (deviceTypeId!=null){
+            List<DeviceType> types = collect.stream().filter(map -> map.getDeviceTypeId() == deviceTypeId).collect(Collectors.toList());
+            deviceTypes.clear();
+            deviceTypes.addAll(types);
+        }
+        return deviceTypes;
     }
 
     @Override
@@ -437,6 +442,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                     .filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
             deviceDetailsVos.clear();
             deviceDetailsVos.addAll(collect);
+
         }
         if (!departmentName.equals("")){
             List<DeviceDetailsVo> collect = deviceDetailsVos.stream()

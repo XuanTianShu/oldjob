@@ -28,7 +28,7 @@ public interface AppletInvestorService {
 
     List<List<String>> selectDepartment(Long userId);
 
-    List<DeviceType> selectDeviceType(Long userId);
+    List<DeviceType> selectDeviceType(Long userId, Long deviceTypeId);
 
     List<HospitalVO> selectDeviceTypeByHospital(Long userId, Long deviceTypeId);
 
