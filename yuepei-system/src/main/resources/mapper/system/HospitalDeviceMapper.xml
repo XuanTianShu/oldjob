@@ -192,10 +192,6 @@
         <include refid="selectDevice"/>
         where hospital_id = #{hospitalId}
     </select>
-    <select id="selectLeaseOrderByDeviceNumber" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
-        <include refid="selectUserLeaseOrderVo"/>
-        where device_number = #{deviceNumber}
-    </select>
     <select id="selectInvestorId" parameterType="Device" resultMap="DeviceTypeDetailsResult">
         <include refid="selectDevice"/>
         where investor_id LIKE concat('%"',#{userId},'"%')
@@ -221,5 +217,10 @@
         left join device d on d.hospital_id=h.hospital_id
         where h.type = 1
         and d.user_id = #{userId}
+    </select>
+    <select id="selectUserLeaseOrderByHospitalId" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where status=2
+        and hospitalId=#{hospitalId}
     </select>
 </mapper>

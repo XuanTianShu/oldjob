@@ -103,4 +103,6 @@ public interface AppletInvestorMapper {
     List<UserLeaseOrder> selectUserLeaseOrderByDevices(@Param("deviceNumber") List<String> deviceNumbers,@Param("investorId") String investorId);
 
     List<OrderProportionDetailVo> selectOrderProtionDetail(@Param("userId") Long userId);
+
+    List<UserLeaseOrder> selectUserLeaseOrderByOrderNumber(@Param("nameOrNumber") String nameOrNumber,@Param("investorId") String investorId);
 }

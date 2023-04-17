@@ -116,7 +116,7 @@ public interface UserLeaseOrderMapper {
 
     List<UserLeaseOrder> selectUserLeaseOrderByOrderNumber(@Param("orderNumber") String orderNumber,@Param("agentId") String agentId);
 
-    List<UserLeaseOrder> selectUserLeaseOrderByDevice(@Param("deviceNumber") String deviceNumber,@Param("agentId") String agentId);
+    List<UserLeaseOrder> selectUserLeaseOrderByInvestor(@Param("investorId") String investorId);
 
     List<UserOrderVO> selectUserOrderDepositList(@Param("openid") String openid);
 
@@ -128,9 +128,7 @@ public interface UserLeaseOrderMapper {
 
     void deleteUserLeaseOrderByOrderNumber(@Param("orderNumber") String orderNumber);
 
-    List<UserLeaseOrder> selectUserLeaseOrderByInvestorId(@Param("userId") String userId);
-
-    List<UserLeaseOrder> selectUserLeaseOrderByAgentId(@Param("deviceNumbers")List<String> deviceNumbers, @Param("userId") String userId);
+    List<UserLeaseOrder> selectUserLeaseOrderByAgentId(@Param("userId") String userId);
 
     List<UserLeaseOrder> selectUserLeaseOrderByHospitalId(@Param("hospitalId") String hospitalId);
 
@@ -143,4 +141,6 @@ public interface UserLeaseOrderMapper {
     int selectUSerLeaseOrderByChild(UserLeaseOrder userLeaseOrder);
 
     void insertOrderProportionDeatail(@Param("orderNumber") String orderNumber, @Param("orderProportionDetailList") List<OrderProportionDetail> orderProportionDetailList);
+
+    List<UserLeaseOrder> selectUserLeaseOrderByAgentIdAndStatus(@Param("userId") String userId);
 }
