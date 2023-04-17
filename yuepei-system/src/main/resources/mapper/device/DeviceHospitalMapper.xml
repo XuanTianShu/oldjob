@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yuepei.system.mapper.DeviceHospitalMapper">
+
+    <resultMap id="deviceHospitalResult" type="com.yuepei.system.domain.DeviceHospital">
+        <result property="id" column="Id"/>
+        <result property="hospitalId" column="hospital_id"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="proportion" column="proportion"/>
+        <result property="type" column="type"/>
+        <result property="userId" column="user_name"/>
+    </resultMap>
+
+    <insert id="insert">
+        insert into device_hospital
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceNumber != null">device_number,</if>
+            <if test="hospitalId != null">hospital_id,</if>
+            <if test="proportion != null">proportion,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceNumber != null">#{deviceNumber},</if>
+            <if test="hospitalId != null">#{hospitalId},</if>
+            <if test="proportion != null">#{proportion},</if>
+        </trim>
+    </insert>
+    <delete id="del">
+        delete from device_hospital where device_number = #{deviceNumber}
+    </delete>
+    <delete id="deleteByDeviceNumber">
+        delete from device_hospital where device_number = #{deviceNumber}
+    </delete>
+    <delete id="deleteByDeviceNumbers">
+        delete from device_hospital where device_number in
+        <foreach collection="deviceNumber" item="deviceNumber" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </delete>
+    <select id="selectHospitalListByDeviceNumber" parameterType="String" resultMap="deviceHospitalResult">
+        SELECT d.`device_number`,d.`hospital_id`,IFNULL(dh.proportion,0) AS proportion,
+        h.`type`,hu.user_name FROM device AS d
+        LEFT JOIN device_hospital AS dh ON dh.device_number = d.`device_number`
+        LEFT JOIN hospital AS h ON h.`hospital_id` = dh.hospital_id
+        LEFT JOIN hospital_user AS hu ON hu.hospital_id = h.`hospital_id`
+        WHERE d.`device_number` = #{deviceNumber}
+    </select>
+</mapper>

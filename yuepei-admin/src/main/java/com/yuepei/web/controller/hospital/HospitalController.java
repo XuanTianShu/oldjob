@@ -8,7 +8,10 @@ import com.yuepei.common.enums.BusinessType;
 import com.yuepei.common.utils.StringUtils;
 import com.yuepei.common.utils.poi.ExcelUtil;
 import com.yuepei.system.domain.Device;
+import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.Hospital;
+import com.yuepei.system.domain.vo.BindingHospitalVO;
+import com.yuepei.system.domain.vo.TotalProportionVO;
 import com.yuepei.system.service.DeviceService;
 import com.yuepei.system.service.HospitalService;
 import com.yuepei.utils.DictionaryEnum;
@@ -204,5 +207,105 @@ public class HospitalController extends BaseController {
     @GetMapping("/queryTreeByDeviceNumber")
     public AjaxResult queryTreeByDeviceNumber(Device device){
         return AjaxResult.success(hospitalService.queryTreeByDeviceNumber(device));
+    }
+
+
+    /**
+     * 查询未绑定医院的设备
+     * @return
+     */
+    @GetMapping("/unbound")
+    public AjaxResult unbound(){
+        return AjaxResult.success(hospitalService.unbound());
+    }
+
+    /**
+     * 绑定设备的分成比例
+     * @param deviceInvestor
+     * @return
+     */
+    @GetMapping("/totalProportion")
+    public AjaxResult totalProportion(DeviceInvestor deviceInvestor){
+        TotalProportionVO totalProportion = hospitalService.totalProportion2(deviceInvestor);
+        return AjaxResult.success(totalProportion);
+    }
+
+    /**
+     * 添加未绑定医院的设备
+     * @param bindingHospitalVO
+     * @return
+     */
+    @PostMapping("/binding")
+    public AjaxResult binding(@RequestBody BindingHospitalVO bindingHospitalVO){
+        if (Integer.parseInt(bindingHospitalVO.getProportion()) <= 0){
+            return AjaxResult.error("低于最低分配比例！");
+        }
+        if (bindingHospitalVO.getType().equals("0")){
+            DeviceInvestor deviceInvestor = new DeviceInvestor();
+            deviceInvestor.setDeviceNumber(bindingHospitalVO.getDeviceNumber());
+            TotalProportionVO totalProportion = hospitalService.totalProportion2(deviceInvestor);
+            if (totalProportion.getTotalProportion() < Integer.parseInt(bindingHospitalVO.getProportion())){
+                return AjaxResult.error("超过最大分配比例");
+            }
+        }else {
+            if (Integer.parseInt(bindingHospitalVO.getType()) > 100){
+                return AjaxResult.error("超过最大分配比例");
+            }
+        }
+        return AjaxResult.success(hospitalService.binding(bindingHospitalVO));
+    }
+
+    /**
+     * 获取详细信息
+     * @param id
+     * @return
+     */
+    @GetMapping("/getDetail/{id}")
+    public AjaxResult getDetail(@PathVariable("id") Long id){
+        return AjaxResult.success(hospitalService.getDetail(id));
+    }
+
+
+    /**
+     * 修改分成比例
+     * @param bindingHospitalVO
+     * @return
+     */
+    @PostMapping("/updateDeviceProportionById")
+    public AjaxResult updateDeviceProportionById(@RequestBody BindingHospitalVO bindingHospitalVO){
+        if (Integer.parseInt(bindingHospitalVO.getProportion()) <= 0){
+            return AjaxResult.error("低于最低分配比例！");
+        }
+        if (bindingHospitalVO.getType().equals("0")){
+            DeviceInvestor deviceInvestor = new DeviceInvestor();
+            deviceInvestor.setDeviceNumber(bindingHospitalVO.getDeviceNumber());
+            TotalProportionVO totalProportion = hospitalService.totalProportion2(deviceInvestor);
+            if (totalProportion.getTotalProportion() < Integer.parseInt(bindingHospitalVO.getProportion())){
+                return AjaxResult.error("超过最大分配比例");
+            }
+        }else {
+            if (Integer.parseInt(bindingHospitalVO.getType()) > 100){
+                return AjaxResult.error("超过最大分配比例");
+            }
+        }
+        return AjaxResult.success(hospitalService.updateDeviceProportionById(bindingHospitalVO));
+    }
+
+    /**
+     * 删除设备比例
+     */
+    @DeleteMapping("/delDevices/{ids}")
+    public AjaxResult delDevice(@PathVariable Long[] ids)
+    {
+        return toAjax(hospitalService.deleteDeviceByIds(ids));
+    }
+
+    /**
+     * 删除设备比例
+     */
+    @DeleteMapping("/delDevice/{id}")
+    public AjaxResult delDevice(@PathVariable Long id)
+    {
+        return toAjax(hospitalService.deleteDeviceById(id));
     }
 }

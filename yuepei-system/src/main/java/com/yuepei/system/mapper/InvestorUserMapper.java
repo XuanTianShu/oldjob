@@ -73,4 +73,10 @@ public interface InvestorUserMapper
     int deleteDeviceByIds(Long[] ids);
 
     int deleteDeviceById(@Param("id") Long id);
+
+    TotalProportionVO totalProportion2(DeviceInvestor deviceInvestor);
+
+    TotalProportionVO totalProportion3(DeviceInvestor deviceInvestor);
+
+    TotalProportionVO totalProportion4(DeviceInvestor deviceInvestor);
 }

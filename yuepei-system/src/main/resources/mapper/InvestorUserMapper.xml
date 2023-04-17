@@ -111,19 +111,52 @@
         where id = #{id}
     </select>
     <select id="totalProportion" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
-        SELECT (100 - IFNULL(SUM(su.`proportion`), 0) -
-                IFNULL(SUM(di.`proportion`), 0) -
-                IFNULL(SUM(h.`proportion`), 0)) AS totalProportion FROM device AS d
-                LEFT JOIN device_investor AS di ON d.`device_number` = di.`device_number`
-                LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
-                LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
-        <where>
-            and d.device_number = #{deviceNumber}
-            <if test="id != null">
-                and di.id = #{id}
-            </if>
-        </where>
-
+        SELECT (IFNULL(d.investor_proportion,0) -
+        (SELECT IFNULL(SUM(di.proportion),0) FROM
+        device_investor AS di WHERE di.`device_number` = #{deviceNumber}
+        <if test="id != null">
+            AND di.Id != #{id}
+        </if>))
+        AS totalProportion
+        FROM device AS d
+        LEFT JOIN device_investor AS di ON di.`device_number` = d.`device_number`
+        LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+        WHERE d.`device_number` = #{deviceNumber}
+    </select>
+    <select id="totalProportion2" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
+        SELECT (100 - IFNULL(dh.`proportion`,0) - IFNULL(su.`proportion`,0))
+        AS totalProportion FROM device AS d
+        LEFT JOIN device_hospital AS dh ON dh.`device_number` = d.`device_number`
+        LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+        LEFT JOIN hospital AS h ON h.hospital_id = dh.`hospital_id`
+        WHERE d.`device_number` = #{deviceNumber}
+        <if test="id != null">
+            AND di.Id != #{id}
+        </if>
+        LIMIT 1
+    </select>
+    <select id="totalProportion3" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
+        SELECT
+        (100 - IFNULL(su.`proportion`,0)) AS totalProportion FROM device AS d
+        LEFT JOIN device_investor AS di ON di.`device_number` = d.`device_number`
+        LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+        WHERE d.`device_number` = #{deviceNumber}
+        <if test="id != null">
+            AND di.Id != #{id}
+        </if>
+        LIMIT 1
+    </select>
+    <select id="totalProportion4" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
+        SELECT (100 - IFNULL(dh.`proportion`,0))
+                   AS totalProportion FROM device AS d
+            LEFT JOIN device_hospital AS dh ON dh.`device_number` = d.`device_number`
+            LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+            LEFT JOIN hospital AS h ON h.hospital_id = dh.`hospital_id`
+            WHERE d.`device_number` = #{deviceNumber}
+        <if test="id != null">
+            AND di.Id != #{id}
+        </if>
+            LIMIT 1
     </select>
 
     <insert id="insertInvestorUser" parameterType="com.yuepei.system.domain.InvestorUser" useGeneratedKeys="true" keyProperty="id">

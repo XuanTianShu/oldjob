@@ -54,7 +54,6 @@
         <result property="couponPrice" column="coupon_price"/>
         <result property="deviceType" column="device_type"/>
         <result property="deviceTypeId" column="device_type_id"/>
-        <result property="hospitalName" column="hospital_name"/>
         <result property="leaseAddress" column="lease_address"/>
         <result property="phoneNumber" column="phone_number"/>
         <result property="netAmount" column="net_amount"/>
@@ -90,18 +89,6 @@
 
     <sql id="selectLeaseOrderVO">
         <!--SELECT lo.id,u.`nick_name`,u.`phone_number`,d.`device_type_id`, lo.order_number,
-               lo.device_number, lo.device_type, lo.lease_time,
-               lo.lease_address, h.`hospital_name`,lo.choose,lo.child,
-               lo.restore_time, lo.restore_address, lo.price, lo.pay_type,
-               lo.net_amount, lo.coupon_price, lo.`status`,su.`nick_name` AS agentName,
-               lo.play_time,lo.create_time,lo.investorProportion,lo.agentProportion
-               ,lo.hospitalProportion,lo.platformProportion FROM user_lease_order AS lo
-               INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`
-               INNER JOIN device AS d ON d.`device_number` = lo.`device_number`
-               INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
-               INNER JOIN agent_hospital AS ah ON ah.`hospital_id` = h.`hospital_id`
-               INNER JOIN sys_user AS su ON su.`user_id` = ah.`agent_id`-->
-        SELECT lo.id,u.`nick_name`,u.`phone_number`,d.`device_type_id`, lo.order_number,
         lo.device_number, lo.device_type, lo.lease_time,
         lo.lease_address, h.`hospital_name`,lo.choose,lo.child,
         lo.restore_time, lo.restore_address, lo.price, lo.pay_type,
@@ -111,7 +98,21 @@
         INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`
         INNER JOIN device AS d ON d.`device_number` = lo.`device_number`
         INNER JOIN sys_user AS su ON su.`user_id` = d.`user_id`
-        INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
+        INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`-->
+        SELECT lo.id,u.`nick_name`,u.`phone_number`, lo.order_number,
+        lo.device_number, lo.device_type, lo.lease_time,
+        lo.lease_address,lo.choose,lo.child,
+        IFNULL(h.`hospital_name`,'无') AS hospitalName,
+        lo.restore_time, lo.restore_address, lo.price, lo.pay_type,
+        lo.net_amount, lo.coupon_price, lo.`status`,
+        IFNULL(su.`user_name`,'无') AS agentName,
+        lo.play_time,lo.create_time,lo.investorProportion,
+        lo.agentProportion
+        ,lo.hospitalProportion,lo.platformProportion
+        FROM user_lease_order AS lo
+        INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`
+        LEFT JOIN hospital AS h ON h.`hospital_id` = lo.`hospitalId`
+        LEFT JOIN sys_user AS su ON su.`user_id` = lo.`agentId`
     </sql>
 
     <select id="leaseOrderList" parameterType="LeaseOrderVO" resultMap="LeaseOrderResult">
@@ -160,7 +161,7 @@
         a.`investorProportion`,a.`hospitalProportion`,a.`agentProportion`,a.`platformProportion`,
         a.`pay_type`,a.`net_amount`,a.`coupon_price`,a.`status`,a.`play_time`,a.`choose`,a.`deposit`,
         a.`child`,a.`create_time`,a.`deposit_number`,b.rule,d.`device_mac`,d.`rows`,d.`device_address`,
-        a.is_valid
+        a.is_valid,a.`pay_type`
         FROM user_lease_order a
         LEFT JOIN device_rule b ON a.`device_number` =  b.`device_number`
         INNER JOIN device d ON d.`device_number` = a.`device_number`
@@ -197,6 +198,10 @@
             <if test="platformProportion != null">platformProportion,</if>
             <if test="depositNumber != null">deposit_number,</if>
             <if test="rule != null">device_rule,</if>
+            <if test="isValid != null">is_valid,</if>
+            <if test="investorId != null">investorId,</if>
+            <if test="hospitalId != null">hospitalId,</if>
+            <if test="agentId != null">agentId,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="openid != null">#{openid},</if>
@@ -223,7 +228,17 @@
             <if test="platformProportion != null">#{platformProportion},</if>
             <if test="depositNumber != null">#{depositNumber},</if>
             <if test="rule != null">#{rule},</if>
+            <if test="isValid != null">#{isValid},</if>
+            <if test="investorId != null">#{investorId},</if>
+            <if test="hospitalId != null">#{hospitalId},</if>
+            <if test="agentId != null">#{agentId},</if>
         </trim>
+    </insert>
+    <insert id="insertOrderProportionDeatail">
+        insert into order_proportion_detail(order_number,user_id,proportion) values
+        <foreach item="item" index="index" collection="orderProportionDetailList" separator=",">
+            (#{orderNumber},#{item.userId},#{item.proportion})
+        </foreach>
     </insert>
 
     <update id="updateUserLeaseOrder" parameterType="UserLeaseOrder">
@@ -286,6 +301,40 @@
             <if test="depositNumber != null">deposit_number = #{depositNumber},</if>
         </trim>
         where order_number = #{orderNumber}
+    </update>
+    <update id="updateUserLeaseOrderByDeviceNumber">
+        update user_lease_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="openid != null">openid = #{openid},</if>
+            <if test="orderNumber != null">order_number = #{orderNumber},</if>
+            <if test="outTradeNo != null">out_trade_no = #{outTradeNo},</if>
+            <if test="deviceRule != null">device_rule = #{deviceRule},</if>
+            <if test="deviceType != null">device_type = #{deviceType},</if>
+            <if test="timePrice != null">time_price = #{timePrice},</if>
+            <if test="fixedPrice != null">fixed_price = #{fixedPrice},</if>
+            <if test="deposit != null">deposit = #{deposit},</if>
+            <if test="deviceNumber != null">device_number = #{deviceNumber},</if>
+            <if test="leaseTime != null">lease_time = #{leaseTime},</if>
+            <if test="leaseAddress != null">lease_address = #{leaseAddress},</if>
+            <if test="restoreTime != null">restore_time = #{restoreTime},</if>
+            <if test="restoreAddress != null">restore_address = #{restoreAddress},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="payType != null">pay_type = #{payType},</if>
+            <if test="netAmount != null">net_amount = #{netAmount},</if>
+            <if test="couponPrice != null">coupon_price = #{couponPrice},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="playTime != null">play_time = #{playTime},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="child != null">child = #{child},</if>
+            <if test="choose != null">choose = #{choose},</if>
+            <if test="investorProportion != null">investorProportion = #{investorProportion},</if>
+            <if test="hospitalProportion != null">hospitalProportion = #{hospitalProportion},</if>
+            <if test="agentProportion != null">agentProportion = #{agentProportion},</if>
+            <if test="platformProportion != null">platformProportion = #{platformProportion},</if>
+            <if test="depositNumber != null">deposit_number = #{depositNumber},</if>
+            <if test="isValid != null">is_valid = #{isValid},</if>
+        </trim>
+        where device_number = #{deviceNumber}
     </update>
 
     <delete id="deleteUserLeaseOrderById" parameterType="Long">
@@ -410,6 +459,19 @@
                `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
         FROM `user_lease_order` where child = #{substring1} and `status` = 0 and is_valid = 1
     </select>
+    <select id="selectUserNameAndHospitalName" resultType="com.yuepei.system.domain.vo.AgentAndHospitalNameVO">
+        SELECT IFNULL(h.`hospital_name`,'无') AS hospitalName,
+        IFNULL(su.`user_name`,'无') AS userName FROM device AS d
+        LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
+        LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
+        WHERE d.device_number = #{deviceNumber}
+    </select>
+    <select id="selectLeaseOrderByDeviceNumber" resultMap="UserLeaseOrderResult">
+        SELECT `id`,`openid`,`order_number`,`device_number`,`out_trade_no`,`device_rule`,`device_type`,`lease_time`,`lease_address`,
+               `restore_time`,`restore_address`,`time_price`,`fixed_price`,`price`,`investorProportion`,`hospitalProportion`,`agentProportion`,
+               `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
+        FROM `user_lease_order` where device_number = #{deviceNumber} and `status` = 0
+    </select>
     <select id="selectUserLeaseOrderByInvestorId" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where investorId like concat('%"',#{userId},'"%')
@@ -425,5 +487,8 @@
     <select id="selectUserLeaseOrderByHospitalId" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where hospitalId=#{hospitalId}
+    </select>
+    <select id="selectUSerLeaseOrderByChild" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM user_lease_order WHERE device_number = #{deviceNumber} AND choose = #{choose} AND child = #{child} AND `status` = 0
     </select>
 </mapper>

@@ -2,6 +2,9 @@ package com.yuepei.system.domain;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 @Data
 public class OrderProportionDetail {
     private Long id;
@@ -11,4 +14,6 @@ public class OrderProportionDetail {
     private Long userId;
 
     private String proportion;
+
+    private BigDecimal price;
 }

@@ -117,14 +117,49 @@ public class InvestorUserServiceImpl implements IInvestorUserService
 
     @Override
     public TotalProportionVO totalProportion(DeviceInvestor deviceInvestor) {
-        return investorUserMapper.totalProportion(deviceInvestor);
+        Device device = deviceMapper.selectInvestorProportionByDeviceNumber(deviceInvestor);
+        Long userId = device.getUserId();
+        Long hospitalId = device.getHospitalId();
+        String type = device.getType();
+        String investorProportion = device.getInvestorProportion();
+        TotalProportionVO totalProportionVO = new TotalProportionVO();
+        if (!investorProportion.equals("0")){
+            totalProportionVO = investorUserMapper.totalProportion(deviceInvestor);
+            System.out.println("1");
+        }else {
+            if (userId != 0 && hospitalId != 0 && type.equals("0")){
+                totalProportionVO = investorUserMapper.totalProportion2(deviceInvestor);
+                System.out.println("2");
+            }else if (userId != 0 && hospitalId == 0){
+                totalProportionVO = investorUserMapper.totalProportion3(deviceInvestor);
+                System.out.println("3");
+            }else if (userId == 0 && hospitalId != 0 && type.equals("0")){
+                totalProportionVO = investorUserMapper.totalProportion4(deviceInvestor);
+                System.out.println("4");
+            }else {
+                System.out.println("5");
+                totalProportionVO.setTotalProportion(100);
+            }
+        }
+        System.out.println("6");
+        return totalProportionVO;
     }
 
     @Transactional
     @Override
     public int addDevice(DeviceInvestor deviceInvestor) {
         deviceInvestor.setCreateTime(new Date());
-        //TODO 修改设备投资人信息
+        //修改设备投资人信息
+        Device device = deviceMapper.selectDeviceByDeviceNumber(deviceInvestor.getDeviceNumber());
+        Long investorId = deviceInvestor.getInvestorId();
+        String deviceInvestorId = device.getInvestorId();
+        Long[] longs = new Long[]{};
+        JSONArray jsonArray = JSON.parseArray(deviceInvestorId);
+        List<Long> list = jsonArray.toJavaList(Long.class);
+        list.add(investorId);
+        device.setInvestorId(Arrays.toString(list.toArray(longs)));
+        device.setInvestorProportion(deviceInvestor.getProportion());
+        deviceMapper.updateDeviceStatus(device);
         return investorUserMapper.addDevice(deviceInvestor);
     }
 
@@ -137,20 +172,22 @@ public class InvestorUserServiceImpl implements IInvestorUserService
     @Override
     public int deleteDeviceByIds(Long[] ids) {
         List<DeviceInvestorVO> list = deviceMapper.selectInvestorDeviceByIds(ids);
-        for (int i = 0; i < list.size(); i++) {
-            String investorId = list.get(i).getInvestorId();
-            String userInvestorId = list.get(i).getUserInvestorId();
-            Long[] longs = new Long[]{};
-            JSONArray objects = JSON.parseArray(investorId);
-            List<Long> toJavaList = objects.toJavaList(Long.class);
-            for (int k = toJavaList.size() - 1; k >= 0; k--) {
-                if (toJavaList.get(k).equals(Long.parseLong(userInvestorId))){
-                    toJavaList.remove(k);
+        if (list.size() > 0){
+            for (int i = 0; i < list.size(); i++) {
+                String investorId = list.get(i).getInvestorId();
+                String userInvestorId = list.get(i).getUserInvestorId();
+                Long[] longs = new Long[]{};
+                JSONArray objects = JSON.parseArray(investorId);
+                List<Long> toJavaList = objects.toJavaList(Long.class);
+                for (int k = toJavaList.size() - 1; k >= 0; k--) {
+                    if (toJavaList.get(k).equals(Long.parseLong(userInvestorId))){
+                        toJavaList.remove(k);
+                    }
                 }
+                list.get(i).setInvestorId(Arrays.toString(toJavaList.toArray(longs)));
             }
-            list.get(i).setInvestorId(Arrays.toString(toJavaList.toArray(longs)));
+            deviceMapper.updateInvestorDevice(list);
         }
-        deviceMapper.updateInvestorDevice(list);
         return investorUserMapper.deleteDeviceByIds(ids);
     }
 
@@ -158,20 +195,22 @@ public class InvestorUserServiceImpl implements IInvestorUserService
     @Override
     public int deleteDeviceById(Long id) {
         List<DeviceInvestorVO> list = deviceMapper.selectInvestorDeviceById(id);
-        for (int i = 0; i < list.size(); i++) {
-            String investorId = list.get(i).getInvestorId();
-            String userInvestorId = list.get(i).getUserInvestorId();
-            Long[] longs = new Long[]{};
-            JSONArray objects = JSON.parseArray(investorId);
-            List<Long> toJavaList = objects.toJavaList(Long.class);
-            for (int k = toJavaList.size() - 1; k >= 0; k--) {
-                if (toJavaList.get(k).equals(Long.parseLong(userInvestorId))){
-                    toJavaList.remove(k);
+        if (list.size() > 0){
+            for (int i = 0; i < list.size(); i++) {
+                String investorId = list.get(i).getInvestorId();
+                String userInvestorId = list.get(i).getUserInvestorId();
+                Long[] longs = new Long[]{};
+                JSONArray objects = JSON.parseArray(investorId);
+                List<Long> toJavaList = objects.toJavaList(Long.class);
+                for (int k = toJavaList.size() - 1; k >= 0; k--) {
+                    if (toJavaList.get(k).equals(Long.parseLong(userInvestorId))){
+                        toJavaList.remove(k);
+                    }
                 }
+                list.get(i).setInvestorId(Arrays.toString(toJavaList.toArray(longs)));
             }
-            list.get(i).setInvestorId(Arrays.toString(toJavaList.toArray(longs)));
+            deviceMapper.updateInvestorDevice(list);
         }
-        deviceMapper.updateInvestorDevice(list);
         return investorUserMapper.deleteDeviceById(id);
     }
 }

@@ -1,5 +1,6 @@
 package com.yuepei.system.mapper;
 
+import com.yuepei.system.domain.OrderProportionDetail;
 import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.*;
 import org.apache.ibatis.annotations.Param;
@@ -132,4 +133,14 @@ public interface UserLeaseOrderMapper {
     List<UserLeaseOrder> selectUserLeaseOrderByAgentId(@Param("deviceNumbers")List<String> deviceNumbers, @Param("userId") String userId);
 
     List<UserLeaseOrder> selectUserLeaseOrderByHospitalId(@Param("hospitalId") String hospitalId);
+
+    AgentAndHospitalNameVO selectUserNameAndHospitalName(@Param("deviceNumber") String deviceNumber);
+
+    void updateUserLeaseOrderByDeviceNumber(UserLeaseOrder userLeaseOrder);
+
+    UserLeaseOrder selectLeaseOrderByDeviceNumber(@Param("deviceNumber") String deviceNumber);
+
+    int selectUSerLeaseOrderByChild(UserLeaseOrder userLeaseOrder);
+
+    void insertOrderProportionDeatail(@Param("orderNumber") String orderNumber, @Param("orderProportionDetailList") List<OrderProportionDetail> orderProportionDetailList);
 }

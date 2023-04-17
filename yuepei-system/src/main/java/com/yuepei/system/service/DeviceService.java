@@ -3,7 +3,8 @@ package com.yuepei.system.service;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.pojo.DevicePo;
-import com.yuepei.system.domain.vo.DeviceVO;
+import com.yuepei.system.domain.vo.*;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -119,5 +120,23 @@ public interface DeviceService {
      * @return
      */
     boolean checkDeviceNumber(Device device);
+
+    TotalProportionVO totalProportion(Device device);
+
+    List<AgentPersonnelVO> agentPersonnel(String deviceNumber);
+
+    List<HospitalPersonnelVO> hospitalPersonnel(String deviceNumber);
+
+    List<InvestorPersonnelVO> investorPersonnel(String deviceNumber);
+
+    TotalProportionVO getDeviceProportion(String deviceNumber);
+
+    TotalProportionVO getAgentProportion(Long userId);
+
+    Device checkDevice(Long userId, String deviceNumber);
+
+    Device selectDeviceByDeviceNumber(String deviceNumber);
+
+    TotalProportionVO totalProportion2(Device device);
 }
 

@@ -81,5 +81,5 @@ public interface UserCaseMapper {
      */
     public int deleteUserCaseByIds(Long[] ids);
 
-    UserCase selectUserCaseByUserId(Long userId);
+    List<UserCase> selectUserCaseByUserId(Long userId);
 }

@@ -53,7 +53,7 @@ public class UserDiscountController extends BaseController
      */
     @PostMapping("/selectMyDiscountByOpenId")
     public TableDataInfo selectMyDiscountByOpenId(HttpServletRequest request, UserDiscount userDiscount){
-        startPage();
+//        startPage();
         System.out.println("========================================================");
         SysUser user = tokenUtils.analysis(request);
         System.out.println(user.getOpenid()+"-----------------");

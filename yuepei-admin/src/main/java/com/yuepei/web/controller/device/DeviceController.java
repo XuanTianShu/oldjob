@@ -1,26 +1,42 @@
 package com.yuepei.web.controller.device;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import com.yuepei.common.annotation.Log;
 import com.yuepei.common.core.controller.BaseController;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.common.enums.BusinessType;
 import com.yuepei.common.utils.poi.ExcelUtil;
+import com.yuepei.service.UnlockingService;
 import com.yuepei.system.domain.Device;
+import com.yuepei.system.domain.vo.TotalProportionVO;
 import com.yuepei.system.mapper.CarouselMapper;
 import com.yuepei.system.mapper.InstructionsMapper;
-import com.yuepei.system.service.DeviceService;
-import com.yuepei.system.service.HospitalDeviceService;
-import com.yuepei.system.service.ServicePhoneService;
-import com.yuepei.system.service.VideoManagementService;
+import com.yuepei.system.service.*;
 import com.yuepei.utils.DictionaryEnum;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+
+import javax.net.ssl.SSLSocketFactory;
 import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 　　　　 ┏┓       ┏┓+ +
@@ -49,6 +65,7 @@ import java.util.List;
  * @author ：AK
  * @create ：2022/11/14 14:18
  **/
+@Slf4j
 @RestController
 @RequestMapping("/system/device")
 public class DeviceController extends BaseController {
@@ -70,6 +87,12 @@ public class DeviceController extends BaseController {
 
     @Autowired
     private VideoManagementService videoManagementService;
+
+    @Autowired
+    private UnlockingService unlockingService;
+
+    @Autowired
+    private HospitalService hospitalService;
 
 
     //修改接口路径
@@ -263,6 +286,9 @@ public class DeviceController extends BaseController {
         if (b){
             return AjaxResult.error(DictionaryEnum.CHECK_DEVICE_NUMBER.getName());
         }
+        if (Double.parseDouble(device.getInvestorProportion())+Double.parseDouble(device.getAgentProportion()) > 100){
+            return AjaxResult.error("该设备分成比例超过100%");
+        }
         return deviceService.insertDevice(device);
     }
 
@@ -289,6 +315,81 @@ public class DeviceController extends BaseController {
     @DeleteMapping("/{deviceIds}")
     public AjaxResult remove(@PathVariable Long[] deviceIds)
     {
+        //绑定医院
+        int count = hospitalService.selectBindHospitalCount(deviceIds);
+        if (count > 0){
+            return AjaxResult.error("存在绑定的医院无法删除！");
+        }
         return toAjax(deviceService.deleteDeviceByDeviceIds(deviceIds));
+    }
+
+    /**
+     * 绑定平台医院可分成比例
+     * @param device
+     * @return
+     */
+    @GetMapping("/totalProportion")
+    public AjaxResult totalProportion(Device device){
+        TotalProportionVO totalProportionVO = deviceService.totalProportion(device);
+        return AjaxResult.success(totalProportionVO);
+    }
+
+    /**
+     * 绑定代理商医院可分成比例
+     * @param device
+     * @return
+     */
+    @GetMapping("/totalProportion2")
+    public AjaxResult totalProportion2(Device device){
+        TotalProportionVO totalProportionVO = deviceService.totalProportion2(device);
+        return AjaxResult.success(totalProportionVO);
+    }
+
+    /**
+     * 获取设备人员详情
+     * @param deviceNumber
+     * @return
+     */
+    @GetMapping("/getPersonnelDetails")
+    public AjaxResult getPersonnelDetails(@RequestParam("deviceNumber") String deviceNumber){
+        Map<String,Object> map = new HashMap<>();
+        map.put("agentPersonnel",deviceService.agentPersonnel(deviceNumber));
+        map.put("hospitalPersonnel",deviceService.hospitalPersonnel(deviceNumber));
+        map.put("investorPersonnel",deviceService.investorPersonnel(deviceNumber));
+        return AjaxResult.success(map);
+    }
+
+    /**
+     * 获取设备剩余分成比例(绑定医院)
+     * @param deviceNumber
+     * @return
+     */
+    @GetMapping("/getDeviceProportion")
+    public AjaxResult getDeviceProportion(@RequestParam("deviceNumber") String deviceNumber){
+        TotalProportionVO totalProportionVO = deviceService.getDeviceProportion(deviceNumber);
+        return AjaxResult.success(totalProportionVO);
+    }
+
+    /**
+     * 获取设备分成比例(代理商)
+     * @param userId
+     * @return
+     */
+    @GetMapping("/getAgentProportion/{userId}")
+    public AjaxResult getAgentProportion(@PathVariable("userId") Long userId){
+        TotalProportionVO totalProportionVO = deviceService.getAgentProportion(userId);
+        return AjaxResult.success(totalProportionVO);
+    }
+
+    /**
+     * 设备开锁
+     * @param device 设备信息
+     * @return
+     */
+    @PostMapping("/unlocking")
+    public AjaxResult unlocking(@RequestBody Device device){
+        Device device1 = deviceService.selectDeviceByDeviceId(device.getDeviceId());
+        device1.setLock(device.getLock());
+        return unlockingService.unlocking(device1);
     }
 }

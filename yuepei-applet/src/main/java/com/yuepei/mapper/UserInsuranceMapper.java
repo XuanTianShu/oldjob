@@ -80,5 +80,5 @@ public interface UserInsuranceMapper {
      */
     public int deleteUserInsuranceByIds(Long[] ids);
 
-    public UserInsurance selectUserInsuranceByUserId(Long userId);
+    public List<UserInsurance> selectUserInsuranceByUserId(Long userId);
 }

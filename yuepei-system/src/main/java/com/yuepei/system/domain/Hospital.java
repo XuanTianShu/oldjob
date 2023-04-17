@@ -106,6 +106,7 @@ public class Hospital extends TreeEntity {
                 .append("createTime", getCreateTime())
                 .append("updateTime", getUpdateTime())
                 .append("proportion",getProportion())
+                .append("type",getType())
                 .toString();
     }
 }

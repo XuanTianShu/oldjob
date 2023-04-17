@@ -1,8 +1,14 @@
 package com.yuepei.system.service;
 
+import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.Device;
+import com.yuepei.system.domain.DeviceHospital;
+import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.Hospital;
+import com.yuepei.system.domain.vo.BindingHospitalVO;
+import com.yuepei.system.domain.vo.DeviceInvestorVO;
 import com.yuepei.system.domain.vo.HospitalVO;
+import com.yuepei.system.domain.vo.TotalProportionVO;
 
 import java.util.List;
 import java.util.Map;
@@ -86,4 +92,34 @@ public interface HospitalService {
     Map<String,Object> queryTreeByDeviceNumber(Device device);
 
     List<HospitalVO> selectHospitalListVO(HospitalVO hospital);
+
+    List<SysUser> userList(SysUser sysUser);
+
+    Hospital selectHospitalById(Long hospitalId);
+
+    int selectDeviceByHospitals(Long[] ids);
+
+    int selectUserByHospitals(Long[] ids);
+
+    int selectDeviceByHospital(Long ids);
+
+    int selectUserByHospital(Long ids);
+
+    TotalProportionVO totalProportion2(DeviceInvestor deviceInvestor);
+
+    List<DeviceInvestor> deviceProportionList(DeviceHospital deviceHospital);
+
+    List<DeviceInvestorVO> unbound();
+
+    int binding(BindingHospitalVO bindingHospitalVO);
+
+    DeviceInvestor getDetail(Long id);
+
+    int updateDeviceProportionById(BindingHospitalVO bindingHospitalVO);
+
+    int deleteDeviceByIds(Long[] ids);
+
+    int deleteDeviceById(Long id);
+
+    int selectBindHospitalCount(Long[] deviceIds);
 }

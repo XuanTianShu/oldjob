@@ -2,12 +2,11 @@ package com.yuepei.system.mapper;
 
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.system.domain.Device;
+import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.DeviceRule;
 import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.pojo.DevicePo;
-import com.yuepei.system.domain.vo.DeviceInvestorVO;
-import com.yuepei.system.domain.vo.DeviceVO;
-import com.yuepei.system.domain.vo.TotalProportionVO;
+import com.yuepei.system.domain.vo.*;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.security.core.parameters.P;
@@ -126,4 +125,30 @@ public interface DeviceMapper {
     TotalProportionVO selectDeviceProportionDetail(@Param("deviceNumber") String deviceNumber);
 
     List<String> selectDeviceByHospitalIds(@Param("hospitals") List<Long> hospitals);
+
+    TotalProportionVO totalProportion(Device device);
+
+    List<AgentPersonnelVO> agentPersonnel(@Param("deviceNumber") String deviceNumber);
+
+    List<HospitalPersonnelVO> hospitalPersonnel(@Param("deviceNumber") String deviceNumber);
+
+    List<InvestorPersonnelVO> investorPersonnel(@Param("deviceNumber") String deviceNumber);
+
+    TotalProportionVO getDeviceProportion(@Param("deviceNumber") String deviceNumber);
+
+    TotalProportionVO getAgentProportion(@Param("userId") Long userId);
+
+    void updateDeviceStatus(Device device);
+
+    Device checkDevice(@Param("userId") Long userId, @Param("deviceNumber") String deviceNumber);
+
+    Device selectDeviceByDeviceNumbers(@Param("deviceNumber") String deviceNumber);
+
+    Device selectInvestorProportionByDeviceNumber(DeviceInvestor deviceInvestor);
+
+    TotalProportionVO totalProportion2(Device device);
+
+    void updateDeviceByHospitalIds(List<String> list);
+
+    void updateDeviceByHospitalId(@Param("hospitalId") Long hospitalId);
 }

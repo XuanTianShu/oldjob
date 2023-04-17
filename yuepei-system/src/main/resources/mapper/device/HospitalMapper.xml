@@ -12,6 +12,7 @@
         <result property="proportion" column="proportion"/>
         <result property="createTime"    column="create_time"    />
         <result property="updateTime"    column="update_time"    />
+        <result property="type" column="type"/>
     </resultMap>
 
     <resultMap type="com.yuepei.system.domain.vo.HospitalVO" id="HospitalResultVO">
@@ -19,10 +20,81 @@
         <result property="hospitalName"    column="hospital_name"    />
         <result property="parentId"    column="parent_id"    />
         <result property="proportion" column="proportion"/>
+        <result property="type" column="type"/>
+        <result property="deviceSum" column="device_sum"/>
+    </resultMap>
+
+    <resultMap type="com.yuepei.common.core.domain.entity.SysUser" id="SysUserResult">
+        <id     property="userId"       column="user_id"      />
+        <result property="deptId"       column="dept_id"      />
+        <result property="userName"     column="user_name"    />
+        <result property="nickName"     column="nick_name"    />
+        <result property="openid"     column="openid"    />
+        <result property="balance"     column="balance"    />
+        <result property="integral"     column="integral"    />
+        <result property="email"        column="email"        />
+        <result property="phoneNumber"  column="phone_number"  />
+        <result property="sex"          column="sex"          />
+        <result property="avatar"       column="avatar"       />
+        <result property="password"     column="password"     />
+        <result property="status"       column="status"       />
+        <result property="delFlag"      column="del_flag"     />
+        <result property="loginIp"      column="login_ip"     />
+        <result property="loginDate"    column="login_date"   />
+        <result property="createBy"     column="create_by"    />
+        <result property="createTime"   column="create_time"  />
+        <result property="updateBy"     column="update_by"    />
+        <result property="updateTime"   column="update_time"  />
+        <result property="remark"       column="remark"       />
+        <result property="userType"		column="user_type"	  />
+        <result property="proportion"   column="proportion"/>
+        <result property="parentId" column="parent_id"/>
+        <result property="hospitalId" column="hospital_id"/>
+        <result property="price" column="price"/>
+        <association property="dept"    column="dept_id" javaType="com.yuepei.common.core.domain.entity.SysDept" resultMap="deptResult" />
+        <collection  property="roles"   javaType="java.util.List"           resultMap="RoleResult" />
+    </resultMap>
+
+    <resultMap id="deptResult" type="com.yuepei.common.core.domain.entity.SysDept">
+        <id     property="deptId"    column="dept_id"     />
+        <result property="parentId"  column="parent_id"   />
+        <result property="deptName"  column="dept_name"   />
+        <result property="ancestors" column="ancestors"   />
+        <result property="orderNum"  column="order_num"   />
+        <result property="leader"    column="leader"      />
+        <result property="status"    column="dept_status" />
+    </resultMap>
+
+    <resultMap id="RoleResult" type="com.yuepei.common.core.domain.entity.SysRole">
+        <id     property="roleId"       column="role_id"        />
+        <result property="roleName"     column="role_name"      />
+        <result property="roleKey"      column="role_key"       />
+        <result property="roleSort"     column="role_sort"      />
+        <result property="dataScope"     column="data_scope"    />
+        <result property="status"       column="role_status"    />
+    </resultMap>
+
+    <resultMap id="deviceHospitalResult" type="com.yuepei.system.domain.DeviceHospital">
+        <result property="id" column="Id"/>
+        <result property="hospitalId" column="hospital_id"/>
+        <result property="proportion" column="proportion"/>
+        <result property="deviceNumber" column="device_number"/>
+    </resultMap>
+
+    <resultMap id="deviceInvestorVOResult" type="deviceInvestorVO">
+        <result property="deviceNumber" column="device_number"/>
+        <result property="deviceId" column="device_id"/>
+    </resultMap>
+
+    <resultMap id="deviceInvestorResult" type="com.yuepei.system.domain.DeviceInvestor">
+        <result property="id" column="Id"/>
+        <result property="proportion" column="proportion"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="investorId" column="investor_id"/>
     </resultMap>
 
     <sql id="selectHospitalVo">
-        select hospital_id, hospital_name, parent_id, hospital_rule, create_time,proportion, update_time from hospital
+        select hospital_id, hospital_name, parent_id, hospital_rule, create_time,proportion, update_time,`type` from hospital
     </sql>
 
     <select id="selectHospitalList" parameterType="Hospital" resultMap="HospitalResult">
@@ -59,12 +131,120 @@
         </where>
     </select>
     <select id="selectHospitalListVO" parameterType="com.yuepei.system.domain.vo.HospitalVO" resultMap="HospitalResultVO">
-        select hospital_id, hospital_name, parent_id,proportion from hospital
+        SELECT h.hospital_id, h.hospital_name, h.parent_id, h.proportion, h.`type`, IFNULL(devices.device_sum, 0) AS device_sum
+        FROM hospital AS h
+        LEFT JOIN (
+        SELECT hospital_id, COUNT(`device_number`) AS device_sum
+        FROM device
+        GROUP BY hospital_id
+        ) AS devices ON h.hospital_id = devices.hospital_id
         <where>
-            <if test="hospitalId != null"> and hospital_id = #{hospitalId}</if>
-            <if test="hospitalName != null  and hospitalName != ''"> and hospital_name like concat('%', #{hospitalName}, '%')</if>
-            <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="hospitalId != null"> and h.hospital_id = #{hospitalId}</if>
+            <if test="hospitalName != null  and hospitalName != ''"> and h.hospital_name like concat('%', #{hospitalName}, '%')</if>
+            <if test="parentId != null "> and h.parent_id = #{parentId}</if>
         </where>
+    </select>
+    <select id="userList" parameterType="com.yuepei.common.core.domain.entity.SysUser" resultMap="SysUserResult">
+        select u.user_id, u.dept_id, u.openid, u.nick_name,u.proportion, u.user_name, u.balance,
+        u.integral, u.email, u.avatar, u.phone_number, u.sex, u.status, u.del_flag, u.login_ip,
+        u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader,u.parent_id,
+        h.`price` from sys_user u
+        left join sys_dept d on u.dept_id = d.dept_id
+        LEFT JOIN hospital AS h ON h.`hospital_id` = u.`hospital_id`
+        where u.del_flag = '0'
+        <if test="hospitalId != null">
+            and u.hospital_id = #{hospitalId}
+        </if>
+        <if test="userId != null and userId != 0">
+            AND u.user_id = #{userId}
+        </if>
+        <if test="userType != null and userType != ''">
+            and u.user_type = #{userType}
+        </if>
+        <if test="parentId != null">
+            and u.parent_id = #{parentId}
+        </if>
+        <if test="userName != null and userName != ''">
+            AND u.user_name like concat('%', #{userName}, '%')
+        </if>
+        <if test="status != null and status != ''">
+            AND u.status = #{status}
+        </if>
+        <if test="phoneNumber != null and phoneNumber != ''">
+            AND u.phone_number like concat('%', #{phoneNumber}, '%')
+        </if>
+        <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+            AND date_format(u.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+        </if>
+        <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+            AND date_format(u.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+        </if>
+        <if test="deptId != null and deptId != 0">
+            AND (u.dept_id = #{deptId} OR u.dept_id IN ( SELECT t.dept_id FROM sys_dept t WHERE find_in_set(#{deptId}, ancestors) ))
+        </if>
+        <!-- 数据范围过滤 -->
+        ${params.dataScope}
+    </select>
+    <select id="selectHospitalById" parameterType="Long" resultMap="HospitalResult">
+        SELECT hospital_id,hospital_name,parent_id,hospital_rule,proportion,`type`,
+               create_time,update_time
+        FROM hospital WHERE hospital_id = #{hospitalId}
+    </select>
+    <select id="selectDeviceByHospitals" resultType="java.lang.Integer">
+        SELECT count(1) FROM device
+        WHERE hospital_id IN
+        <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
+            #{hospitalId}
+        </foreach>
+    </select>
+    <select id="selectUserByHospitals" resultType="java.lang.Integer">
+        SELECT count(1) FROM sys_user
+        WHERE hospital_id IN
+        <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
+            #{hospitalId}
+        </foreach>
+    </select>
+    <select id="selectDeviceByHospital" resultType="java.lang.Integer">
+        select count(1) from device where hospital_id = #{ids}
+    </select>
+    <select id="selectUserByHospital" resultType="java.lang.Integer">
+        select count(1) from sys_user where hospital_id = #{ids}
+    </select>
+    <select id="totalProportion2" resultType="com.yuepei.system.domain.vo.TotalProportionVO">
+        SELECT (100 - IFNULL(d.investor_proportion,0) -
+        IFNULL(dg.`proportion`,0)) AS totalProportion FROM device AS d
+        LEFT JOIN device_agent AS dg ON dg.`device_number` = d.`device_number`
+        WHERE d.device_number = #{deviceNumber}
+    </select>
+    <select id="deviceProportionList" parameterType="DeviceHospital" resultMap="deviceHospitalResult">
+        SELECT dh.Id,d.device_number,dh.hospital_id,dh.proportion
+        FROM device_hospital AS dh
+        INNER JOIN device AS d ON d.`device_number` = dh.`device_number`
+        WHERE dh.hospital_id = #{hospitalId}
+        ORDER BY Id
+    </select>
+    <select id="unbound" resultMap="deviceInvestorVOResult">
+        SELECT device_id,device_number FROM device
+        WHERE hospital_id = 0
+    </select>
+    <select id="getDetail" parameterType="Long" resultMap="deviceInvestorResult">
+        SELECT Id,device_number,hospital_id,proportion FROM device_hospital WHERE Id = #{id}
+    </select>
+    <select id="selectHospitalIdList" resultType="java.lang.String">
+        select hospital_id from device_hospital where Id in
+        <foreach item="deviceNumber" collection="array" open="(" separator="," close=")">
+            #{deviceNumber}
+        </foreach>
+    </select>
+    <select id="selectHospital" parameterType="Long" resultMap="deviceInvestorResult">
+        select hospital_id as investor_id from device_hospital where Id = #{id}
+    </select>
+    <select id="selectBindHospitalCount" resultType="java.lang.Integer">
+        SELECT count(1) FROM device
+        WHERE hospital_id != 0 AND device_id IN
+        <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
+            #{hospitalId}
+        </foreach>
     </select>
 
     <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
@@ -86,6 +266,19 @@
             <if test="proportion != null">#{proportion},</if>
         </trim>
     </insert>
+    <insert id="binding">
+        insert into device_hospital
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="deviceNumber != null">device_number,</if>
+            <if test="hospitalId != null">hospital_id,</if>
+            <if test="proportion != null">proportion,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="deviceNumber != null">#{deviceNumber},</if>
+            <if test="hospitalId != null">#{hospitalId},</if>
+            <if test="proportion != null">#{proportion},</if>
+        </trim>
+    </insert>
 
     <update id="updateHospital" parameterType="Hospital">
         update hospital
@@ -101,6 +294,13 @@
         </trim>
         where hospital_id = #{hospitalId}
     </update>
+    <update id="updateDeviceProportionById">
+        update device_hospital
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="proportion != null">proportion = #{proportion},</if>
+        </trim>
+        where Id = #{id}
+    </update>
 
     <delete id="deleteHospitalByHospitalId" parameterType="Long">
         delete from hospital where hospital_id = #{hospitalId}
@@ -111,5 +311,14 @@
         <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
             #{hospitalId}
         </foreach>
+    </delete>
+    <delete id="deleteDeviceByIds">
+        delete from device_hospital where Id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteDeviceById">
+        delete from device_hospital where Id = #{id}
     </delete>
 </mapper>

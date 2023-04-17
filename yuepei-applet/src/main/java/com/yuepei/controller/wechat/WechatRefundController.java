@@ -92,4 +92,14 @@ public class WechatRefundController {
     }
 
     //TODO 后台处理用户退款申请
+
+    /**
+     * 后台开锁回调
+     * @param request
+     * @return
+     */
+    @PostMapping("/unlocking")
+    public AjaxResult unlocking(HttpServletRequest request){
+        return userRefundService.unlocking(request);
+    }
 }

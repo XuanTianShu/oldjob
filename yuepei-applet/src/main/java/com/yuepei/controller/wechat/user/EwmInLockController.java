@@ -12,10 +12,7 @@ import com.yuepei.system.service.DeviceService;
 import com.yuepei.utils.TokenUtils;
 import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -98,11 +95,10 @@ public class EwmInLockController {
 
     /**
      * 创建设备开锁指令
-     * 未使用
      * @return
      */
     @PostMapping("/unlocking")
-    public AjaxResult unlocking(){
-        return unlockingService.unlocking();
+    public AjaxResult unlocking(@RequestBody Device device){
+        return unlockingService.unlocking(device);
     }
 }

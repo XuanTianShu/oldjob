@@ -159,6 +159,7 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
             UserLeaseOrder userLeaseOrder1 = new UserLeaseOrder();
             userLeaseOrder1.setOrderNumber(userLeaseOrder.getOrderNumber());
             userLeaseOrder1.setCouponPrice(new BigDecimal(String.valueOf(userDiscount1.getPrice())).multiply(new BigDecimal(100)).longValue());
+            userLeaseOrder1.setPrice(userLeaseOrder.getPrice().add(userDiscount1.getPrice()));
             userLeaseOrderMapper.updateUserLeaseOrder(userLeaseOrder1);
 
 //            redisServer.deleteObject(couponPre+couponId);
@@ -199,7 +200,7 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
             //付款时间
             userLeaseOrder.setCreateTime(new Date());
             //支付方式
-            userLeaseOrder.setPayType("1");
+            userLeaseOrder.setPayType("0");
             //修改状态
             userLeaseOrder.setStatus("2");
             //支付成功押金订单为0
@@ -215,7 +216,9 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
         SysUser user = userMapper.selectUserByOpenid(openid);
         HashMap<String, String> pay = wxPayUtils.withdrawal(openid, amount, remark, bankMemo);
         System.out.println("pay======================================"+pay);
-        if (user.getBalance() < amount * 100) {
+        BigDecimal bigDecimal = new BigDecimal(amount);
+        BigDecimal multiply = bigDecimal.multiply(new BigDecimal(100));
+        if (user.getBalance().compareTo(multiply) < 0) {
             return AjaxResult.error("提现金额不能大于余额");
         }
         return AjaxResult.success(pay);

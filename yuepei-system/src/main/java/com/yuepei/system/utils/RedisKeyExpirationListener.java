@@ -151,22 +151,20 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                 log.info("开始修改优惠券状态");
                 int index = key.indexOf(userCouponPrefix);
                 String userCoupon = key.substring(index + userCouponPrefix.length());
-                if (userCoupon.length() > 2 && userCoupon.charAt(1) == '_') {
-                    String substring = userCoupon.substring(2);
-                    log.info("用户编号:{}",substring);
-                    userCouponMapper.batchUpdateUserCoupon(substring);
-                }
+                int indexOf = userCoupon.indexOf("_");
+                String substring = userCoupon.substring(indexOf + 1);
+                log.info("用户编号:{}",substring);
+                userCouponMapper.batchUpdateUserCoupon(substring);
                 log.info("过期值：{}",userCoupon);
                 log.info("结束修改优惠券状态");
             } else if (key.startsWith(JYBPrefix)){
                 log.info("开始修改兑换券状态");
                 int index = key.indexOf(JYBPrefix);
                 String JYB = key.substring(index + JYBPrefix.length());
-                if (JYB.length() > 2 && JYB.charAt(1) == '_'){
-                    String substring = JYB.substring(2);
-                    log.info("用户编号:{}",substring);
-                    userCouponMapper.batchUpdateUserCoupon(substring);
-                }
+                int indexOf = JYB.indexOf('_'); //获取下划线的索引位置
+                String result = JYB.substring(indexOf+1); //截取下划线之后的字符串
+                log.info("用户编号:{}",result);
+                userCouponMapper.batchUpdateUserCoupon(result);
                 log.info("JYB:{}",JYB);
                 log.info("过期值：{}",JYB);
                 log.info("结束修改兑换券状态");

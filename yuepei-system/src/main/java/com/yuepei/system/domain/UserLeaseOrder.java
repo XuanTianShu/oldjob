@@ -128,4 +128,10 @@ public class UserLeaseOrder extends BaseEntity {
     private String investorId;
 
     private String agentId;
+
+    private String userName;
+
+    private String hospitalName;
+
+    private String agentHospitalProportion;
 }

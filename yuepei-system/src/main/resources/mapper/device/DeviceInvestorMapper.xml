@@ -14,16 +14,26 @@
         <result property="deviceId" column="device_id"/>
     </resultMap>
 
+    <resultMap id="orderProportionDetailResult" type="com.yuepei.system.domain.OrderProportionDetail">
+        <result property="id" column="Id"/>
+        <result property="proportion" column="proportion"/>
+        <result property="userId" column="user_id"/>
+        <result property="orderNumber" column="order_number"/>
+    </resultMap>
+
     <sql id="deviceInvestorVO">
         SELECT Id,device_number,investor_id,proportion,create_time FROM device_investor
     </sql>
 
-    <insert id="insert" parameterType="String">
+    <insert id="insert">
         insert into device_investor(`investor_id`,`device_number`) values
         <foreach item="discountRecord" collection="toArray" index="index"  separator=",">
             (#{discountRecord},#{deviceNumber})
         </foreach>
     </insert>
+    <update id="updateProportion">
+        UPDATE device_investor SET proportion = 0 WHERE device_number = #{deviceNumber}
+    </update>
 
     <delete id="delByInvestorId" parameterType="String">
         delete from device_investor where device_number = #{deviceNumber}
@@ -54,5 +64,9 @@
     <select id="getDeviceById" parameterType="long" resultMap="deviceInvestorQuery">
         <include refid="deviceInvestorVO"></include>
         where id = #{id}
+    </select>
+    <select id="selectInvestorListByDeviceNumber" parameterType="String" resultMap="orderProportionDetailResult">
+        SELECT investor_id AS user_id,proportion FROM device_investor
+        WHERE device_number = #{deviceNumber}
     </select>
 </mapper>

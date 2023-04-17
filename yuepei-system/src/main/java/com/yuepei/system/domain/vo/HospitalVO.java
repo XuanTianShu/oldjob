@@ -19,5 +19,9 @@ public class HospitalVO {
     @Excel(name = "名称")
     private String hospitalName;
 
+    private String type;
+
+    private String deviceSum;
+
     private List<String> departmentList;
 }
