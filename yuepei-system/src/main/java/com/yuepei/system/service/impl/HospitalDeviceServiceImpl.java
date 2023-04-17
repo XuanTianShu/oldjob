@@ -340,6 +340,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                             Long minute1 = time2 / 1000 / 60 / 60;
                             Long minute2 = time2 / 1000 / 60 % 60 ;
                             BigDecimal price = (BigDecimal) jsonObject.get("price");
+                            userLeaseOrderVo.setContent(price+device.getContent());
                             price1=price1.add(price);
                             if (minute2<10){
                                 userLeaseOrderVo.setEvaluate(price.multiply(new BigDecimal(minute1)));
@@ -352,6 +353,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                                 Long minute1 = time2 / 1000 / 60 / 60;
                                 Long minute2 = time2 / 1000 / 60 % 60 ;
                                 BigDecimal price = (BigDecimal) jsonObject.get("price");
+                                userLeaseOrderVo.setContent(price+device.getContent());
                                 if (minute2<10){
                                     userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1)).add(price));
                                 }else {
@@ -359,6 +361,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                                 }
                             }else {
                                 BigDecimal price = (BigDecimal) jsonObject.get("price");
+                                userLeaseOrderVo.setContent(price+device.getContent());
                                 userLeaseOrderVo.setEvaluate(price);
                             }
                         }
@@ -368,6 +371,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                             Long minute1 = time2 / 1000 / 60 /60 ;
                             Long minute2 = time2 / 1000 / 60 % 60 ;
                             BigDecimal price = (BigDecimal) jsonObject.get("price");
+                            userLeaseOrderVo.setContent(price+device.getContent());
                             price1=price1.add(price);
                             if (minute2<10){
                                 userLeaseOrderVo.setEvaluate(price.multiply(new BigDecimal(minute1)));
@@ -472,6 +476,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                     BigDecimal price = (BigDecimal) jsonObject.get("price");
                     userLeaseOrderVo.setContent(price+device.getContent());
                 }else {
+                    BigDecimal price = (BigDecimal) jsonObject.get("price");
+                    userLeaseOrderVo.setContent(price+device.getContent());
                     String start = String.valueOf(jsonObject.get("startTime"));
                     String end = String.valueOf(jsonObject.get("endTime"));
                     SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
