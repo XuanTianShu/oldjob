@@ -15,4 +15,6 @@ public class HospitalPersonnelVO {
     private String nickName;
 
     private String investorProportion;
+
+    private String phoneNumber;
 }

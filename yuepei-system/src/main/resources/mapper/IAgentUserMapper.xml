@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yuepei.system.mapper.IAgentUserMapper">
+
+    <resultMap id="AgentHospitalResult" type="com.yuepei.system.domain.vo.HospitalVO">
+        <result property="type" column="type"/>
+        <result property="hospitalId" column="hospital_id"/>
+        <result property="deviceSum" column="device_sum"/>
+        <result property="hospitalName" column="hospital_name"/>
+    </resultMap>
+    <delete id="deleteHospitalByHospitalIds">
+        delete from agent_hospital where hospital_id in
+        <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
+            #{hospitalId}
+        </foreach>
+    </delete>
+    <delete id="deleteHospitalByHospitalId">
+        delete from agent_hospital where hospital_id = #{hospitalId}
+    </delete>
+
+    <select id="getHospital" resultType="Long" resultMap="AgentHospitalResult">
+        SELECT h.hospital_id,h.`hospital_name`,
+               h.`type`,IFNULL(devices.device_sum, 0) AS device_sum
+        FROM agent_hospital AS ag
+                 INNER JOIN hospital AS h ON h.`hospital_id` = ag.`hospital_id`
+                 LEFT JOIN (
+            SELECT hospital_id,COUNT(device_number) AS device_sum FROM device
+            GROUP BY hospital_id
+        ) AS devices ON ag.hospital_id = devices.hospital_id
+        WHERE ag.`agent_id` = #{userId}
+    </select>
+</mapper>

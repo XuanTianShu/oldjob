@@ -138,5 +138,7 @@ public interface DeviceService {
     Device selectDeviceByDeviceNumber(String deviceNumber);
 
     TotalProportionVO totalProportion2(Device device);
+
+    int updateProportion(Device device);
 }
 

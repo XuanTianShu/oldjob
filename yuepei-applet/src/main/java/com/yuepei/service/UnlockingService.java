@@ -5,4 +5,6 @@ import com.yuepei.system.domain.Device;
 
 public interface UnlockingService {
     AjaxResult unlocking(Device device);
+
+    AjaxResult AllUnlocking(Device device);
 }

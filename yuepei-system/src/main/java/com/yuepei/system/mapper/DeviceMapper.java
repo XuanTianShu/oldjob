@@ -151,4 +151,6 @@ public interface DeviceMapper {
     void updateDeviceByHospitalId(@Param("hospitalId") Long hospitalId);
 
     List<String> selectDeviceByHospitalIds(@Param("hospitals") List<Long> hospitals);
+
+    int updateProportion(Device device);
 }

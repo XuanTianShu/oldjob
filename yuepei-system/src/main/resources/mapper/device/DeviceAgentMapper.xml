@@ -29,7 +29,7 @@
     </delete>
     <delete id="deleteByDeviceNumbers">
         delete from device_agent where device_number in
-        <foreach collection="deviceNumber" item="deviceNumber" open="(" separator="," close=")">
+        <foreach item="deviceNumber" collection="list" open="(" separator="," close=")">
             #{deviceNumber}
         </foreach>
     </delete>

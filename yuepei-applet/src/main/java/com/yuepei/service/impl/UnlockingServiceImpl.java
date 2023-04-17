@@ -50,4 +50,16 @@ public class UnlockingServiceImpl implements UnlockingService {
         }
         return AjaxResult.success();
     }
+
+    @Override
+    public AjaxResult AllUnlocking(Device device) {
+        log.info("设备信息：{}",device.getTelecomId());
+        try {
+            CreateDeviceCommand.unlocking(device);
+            return AjaxResult.success();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return AjaxResult.success();
+    }
 }

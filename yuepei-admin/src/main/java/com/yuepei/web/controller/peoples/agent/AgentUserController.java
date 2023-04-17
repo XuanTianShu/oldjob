@@ -8,6 +8,7 @@ import com.yuepei.common.core.page.TableDataInfo;
 import com.yuepei.common.enums.BusinessType;
 import com.yuepei.common.utils.poi.ExcelUtil;
 import com.yuepei.system.domain.InvestorUser;
+import com.yuepei.system.service.IAgentUserService;
 import com.yuepei.system.service.IInvestorUserService;
 import com.yuepei.system.service.ISysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,10 @@ import java.util.List;
 public class AgentUserController extends BaseController {
     @Autowired
     private IInvestorUserService investorUserService;
+
+    @Autowired
+    private IAgentUserService agentUserService;
+
 
     @Autowired
     private ISysUserService userService;
@@ -98,5 +103,15 @@ public class AgentUserController extends BaseController {
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(investorUserService.deleteInvestorUserByIds(ids));
+    }
+
+    /**
+     * 获取代理商医院
+     * @param userId
+     * @return
+     */
+    @GetMapping("/getHospital/{userId}")
+    public AjaxResult getHospital(@PathVariable("userId") Long userId){
+        return AjaxResult.success(agentUserService.getHospital(userId));
     }
 }

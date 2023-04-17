@@ -382,7 +382,7 @@ public class DeviceController extends BaseController {
     }
 
     /**
-     * 设备开锁
+     * 设备单个开锁
      * @param device 设备信息
      * @return
      */
@@ -391,5 +391,24 @@ public class DeviceController extends BaseController {
         Device device1 = deviceService.selectDeviceByDeviceId(device.getDeviceId());
         device1.setLock(device.getLock());
         return unlockingService.unlocking(device1);
+    }
+
+    /**
+     * 打开设备所有锁
+     */
+    @PostMapping("/AllUnlocking")
+    public AjaxResult AllUnlocking(@RequestBody Device device){
+        Device device1 = deviceService.selectDeviceByDeviceId(device.getDeviceId());
+        return unlockingService.AllUnlocking(device1);
+    }
+
+    /**
+     * 修改总比例
+     * @param device
+     * @return
+     */
+    @PostMapping("/updateProportion")
+    public AjaxResult updateProportion(@RequestBody Device device){
+        return AjaxResult.success(deviceService.updateProportion(device));
     }
 }

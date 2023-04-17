@@ -100,6 +100,7 @@
         <result property="hospitalName" column="hospital_name"/>
         <result property="hospitalId" column="hospital_id"/>
         <result property="investorProportion" column="investorProportion"/>
+        <result property="phoneNumber" column="phone_number"/>
     </resultMap>
 
     <resultMap id="investorPersonnelResult" type="investorPersonnelVO">
@@ -350,6 +351,10 @@
         update device set hospital_id = 0
         where hospital_id = #{hospitalId}
     </update>
+    <update id="updateProportion">
+        update device set investor_proportion = #{investorProportion}
+        where device_number = #{deviceNumber}
+    </update>
 
     <delete id="deleteDeviceByDeviceId" parameterType="Long">
         delete from device where device_id = #{deviceId}
@@ -429,7 +434,7 @@
         WHERE d.`device_number` = #{deviceNumber} AND su.`parent_id` = 0
     </select>
     <select id="hospitalPersonnel" parameterType="String" resultMap="hospitalPersonnelResult">
-        SELECT h.hospital_id,h.hospital_name,h.proportion,
+        SELECT h.hospital_id,h.hospital_name,h.proportion,su.`phone_number`,
         su.`user_name`,su.`nick_name`,
         IFNULL(d.`investor_proportion`,0) AS investorProportion FROM device AS d
         INNER JOIN device_hospital AS dh ON d.`device_number` = dh.device_number

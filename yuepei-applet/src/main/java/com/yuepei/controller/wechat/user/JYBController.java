@@ -42,7 +42,6 @@ public class JYBController {
     @PostMapping("/assignUser")
     public AjaxResult assignUser(Long discountId, HttpServletRequest request) {
         SysUser user = tokenUtils.analysis(request);
-//        SysUser user = sysUserMapper.selectUserByOpenid("oc0od5fazQUUOnkUbxreEkeYopfI");
         return discountService.updateUserIntegral(discountId,user);
     }
 }

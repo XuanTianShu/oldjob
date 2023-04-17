@@ -149,6 +149,10 @@ public class DiscountServiceImpl implements IDiscountService
             System.out.println(sysUser.getIntegral()+"用户积分");
             System.out.println(discount.getIntegral()+"兑换券积分");
 
+            if (sysUser.getIntegral() <= 0){
+                return AjaxResult.error("积分不足");
+            }
+
             int num = Integer.parseInt(String.valueOf(sysUser.getIntegral() - discount.getIntegral())) ;
             if (num >= 0){
                 //添加兑换记录

@@ -336,9 +336,6 @@ public class CallBackServiceImpl implements CallBackService {
             log.info("流水号：{}",out_trade_no);
             if ("SUCCESS".equals(parseObject.get("trade_state"))) {
                 Map<String, Object> cacheMap = redisCache.getCacheMap(out_trade_no);
-                BigDecimal couponPrice = new BigDecimal(String.valueOf(cacheMap.get("couponPrice")));
-                //记录优惠券金额
-                userLeaseOrder.setCouponPrice(couponPrice.longValue());
                 //实付金额
                 userLeaseOrder.setNetAmount(new BigDecimal(price).divide(new BigDecimal(100),MathContext.DECIMAL64));
                 //付款时间

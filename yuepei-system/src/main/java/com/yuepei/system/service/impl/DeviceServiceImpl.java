@@ -275,6 +275,7 @@ public class DeviceServiceImpl implements DeviceService {
             deviceAgentMapper.del(device.getDeviceNumber());
         }
         if (device.getHospitalId() != 0 && device.getHospitalId() != null){
+            device.setDeviceFullAddress("0");
             Device device1 = deviceMapper.selectDeviceByDeviceId(device.getDeviceId());
 //            deviceInvestorMapper.deleteByInvestorId(device1.getDeviceNumber());
             deviceHospitalMapper.del(String.valueOf(device.getDeviceNumber()));
@@ -284,6 +285,7 @@ public class DeviceServiceImpl implements DeviceService {
             deviceHospital.setProportion(device.getHospitalProportion());
             deviceHospitalMapper.insert(deviceHospital);
         }else {
+            device.setDeviceFullAddress("0");
             deviceHospitalMapper.del(String.valueOf(device.getDeviceNumber()));
         }
         deviceInvestorMapper.updateProportion(device.getDeviceNumber());
@@ -432,6 +434,13 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public TotalProportionVO totalProportion2(Device device) {
         return deviceMapper.totalProportion2(device);
+    }
+
+    @Transactional
+    @Override
+    public int updateProportion(Device device) {
+        deviceInvestorMapper.updateProportion(device.getDeviceNumber());
+        return deviceMapper.updateProportion(device);
     }
 
 }

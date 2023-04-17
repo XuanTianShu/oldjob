@@ -237,7 +237,6 @@ public class UserRefundServiceImpl implements UserRefundService {
         }
         List<String> list = new ArrayList<>();
         if (userDepositVOList.size() != 0){
-            //TODO 批量更新押金状态，防止重复操作
             System.out.println("更新状态");
             userDepositOrderMapper.bathUpdateUserDeposit(userDepositVOList);
             System.out.println("更新成功");
@@ -298,9 +297,14 @@ public class UserRefundServiceImpl implements UserRefundService {
             }else {
                 userDepositOrderMapper.bathUpdateUserDeposits(userDepositVOList);
             }
-            return AjaxResult.success();
+            if (userOrderVOList.size() > 0){
+                return AjaxResult.success("有正在租赁中的订单，完成订单后可申请退回押金，已完成的订单已申请退回押金");
+            }else {
+                return AjaxResult.success("已申请退回押金，请注意查收");
+            }
+        }else {
+            return AjaxResult.error("暂无可退押金！");
         }
-        return AjaxResult.error("暂无可退押金！");
     }
 
     @Override

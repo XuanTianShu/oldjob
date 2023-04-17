@@ -1,4 +1,4 @@
-package com.yuepei.domain;
+package com.yuepei.system.domain;
 
 public class Item {
     private int index;

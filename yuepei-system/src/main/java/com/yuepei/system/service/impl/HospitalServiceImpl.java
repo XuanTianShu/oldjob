@@ -12,6 +12,7 @@ import com.yuepei.system.domain.vo.HospitalVO;
 import com.yuepei.system.domain.vo.TotalProportionVO;
 import com.yuepei.system.mapper.DeviceMapper;
 import com.yuepei.system.mapper.HospitalMapper;
+import com.yuepei.system.mapper.IAgentUserMapper;
 import com.yuepei.system.service.HospitalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,9 @@ public class HospitalServiceImpl implements HospitalService {
 
     @Autowired
     private DeviceMapper deviceMapper;
+
+    @Autowired
+    private IAgentUserMapper agentUserMapper;
 
     /**
      * 查询医院
@@ -113,9 +117,12 @@ public class HospitalServiceImpl implements HospitalService {
      * @param hospitalIds 需要删除的医院主键
      * @return 结果
      */
+    @Transactional
     @Override
     public int deleteHospitalByHospitalIds(Long[] hospitalIds)
     {
+        //删除代理商医院绑定关系
+        agentUserMapper.deleteHospitalByHospitalIds(hospitalIds);
         return hospitalMapper.deleteHospitalByHospitalIds(hospitalIds);
     }
 
@@ -125,9 +132,12 @@ public class HospitalServiceImpl implements HospitalService {
      * @param hospitalId 医院主键
      * @return 结果
      */
+    @Transactional
     @Override
     public int deleteHospitalByHospitalId(Long hospitalId)
     {
+        //删除代理商医院绑定关系
+        agentUserMapper.deleteHospitalByHospitalId(hospitalId);
         return hospitalMapper.deleteHospitalByHospitalId(hospitalId);
     }
 

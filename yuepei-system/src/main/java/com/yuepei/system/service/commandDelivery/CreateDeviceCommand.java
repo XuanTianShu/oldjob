@@ -1,7 +1,10 @@
 package com.yuepei.system.service.commandDelivery;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yuepei.system.domain.Device;
+import com.yuepei.system.domain.Item;
 import com.yuepei.system.utils.Constant;
 import com.yuepei.system.utils.HttpsUtil;
 import com.yuepei.system.utils.JsonUtil;
@@ -9,7 +12,9 @@ import com.yuepei.system.utils.StreamClosedHttpResponse;
 import org.apache.http.HttpResponse;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Create Device Command :
@@ -54,7 +59,25 @@ public class CreateDeviceCommand {
         String method_CLEAR_GETDATA = "SET_DEVICE_LEVEL";
         String serviceId_streetLight = "VehicleDetectorBasic";
         String method_CONTROL_STREETLIGHT = "CONTROL_STREETLIGHT";
-        ObjectNode paras_1 = JsonUtil.convertObject2ObjectNode("{\"value\":\""+device.getLock()+"\"}");
+        ObjectNode paras_1 = null;
+        if (device.getLock() != null){
+            paras_1  = JsonUtil.convertObject2ObjectNode("{\"value\":\""+device.getLock()+"\"}");
+        }else {
+            //TODO 打开所有锁（一拖五专用）
+            if (device.getDeviceTypeId() == 5 || device.getDeviceTypeId() == 4){
+                String rows = device.getRows();
+                ObjectMapper objectMapper = new ObjectMapper();
+                List<Item> itemList;
+                itemList = objectMapper.readValue(rows, new TypeReference<List<Item>>() {
+                });
+                for (int i = Objects.requireNonNull(itemList).size() - 1; i >= 0; i--) {
+                    //0可用1故障2租赁中
+                    if (itemList.get(i).getStatus() == 0){
+
+                    }
+                }
+            }
+        }
         ObjectNode paras_0 = JsonUtil.convertObject2ObjectNode("{\"value\":\"0\"}");
 
         Map<String, Object> paramCommand = new HashMap<>();
