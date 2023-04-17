@@ -275,7 +275,13 @@ public class AgentServiceImpl implements AgentService {
                 proportion=proportion-user.getProportion();
             }
             if (hospitalIds.size()!=0){
-                List<SysUser> hospitalUser = sysUserMapper.selectUserByHospitalIds(hospitalIds);
+                List<Hospital> hospitals = hospitalDeviceMapper.selectHospitalByHospitalIds(hospitalIds);
+                List<Hospital> collect = hospitals.stream().filter(map -> map.getType() == 1).collect(Collectors.toList());
+                List<Long> hospitalList = new ArrayList<>();
+                collect.stream().forEach(map->{
+                    hospitalList.add(map.getHospitalId());
+                });
+                List<SysUser> hospitalUser = sysUserMapper.selectUserByHospitalIds(hospitalList);
                 for (SysUser user : hospitalUser) {
                     proportion=proportion-user.getProportion();
                 }
