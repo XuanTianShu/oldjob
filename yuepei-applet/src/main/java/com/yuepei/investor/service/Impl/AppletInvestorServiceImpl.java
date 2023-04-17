@@ -632,18 +632,13 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             userLeaseOrderVoList.addAll(userLeaseOrderVos);
         }else {
             List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
-            if (sysUsers.size()==0){
-                List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(userId, deviceDepartment, deviceTypeName, nameOrNumber);
-                userLeaseOrderVoList.addAll(userLeaseOrderVos);
-            }else {
-                sysUsers.add(sysUser);
-                sysUsers.stream().forEach(map->{
-                    List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(map.getUserId(), deviceDepartment, deviceTypeName, nameOrNumber);
-                    if (userLeaseOrderVos.size()!=0){
-                        userLeaseOrderVoList.addAll(userLeaseOrderVos);
-                    }
-                });
-            }
+            sysUsers.add(sysUser);
+            sysUsers.stream().forEach(map->{
+                List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(map.getUserId(), deviceDepartment, deviceTypeName, nameOrNumber);
+                if (userLeaseOrderVos.size()!=0){
+                    userLeaseOrderVoList.addAll(userLeaseOrderVos);
+                }
+            });
         }
         if (status.equals("")){
             List<UserLeaseOrderVo> collect = userLeaseOrderVoList.stream().sorted(Comparator.comparing(UserLeaseOrderVo::getLeaseTime).reversed()).collect(Collectors.toList());
