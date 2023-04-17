@@ -145,4 +145,6 @@ public interface UserLeaseOrderMapper {
     List<UserLeaseOrder> selectUserLeaseOrderByHospitalId(@Param("hospitalId") String hospitalId);
 
     List<UserLeaseOrder> selectUserLeaseOrderByAgentIdAndStatus(@Param("userId") String userId);
+
+    List<UserLeaseOrder> selectUserLeaseOrderByHospitalIdAndStatus(@Param("hospitalId") String hospitalId);
 }

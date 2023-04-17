@@ -489,4 +489,8 @@
         <include refid="selectUserLeaseOrderVo"/>
         where agentId=#{userId}
     </select>
+    <select id="selectUserLeaseOrderByHospitalIdAndStatus" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
+        <include refid="selectUserLeaseOrderVo"/>
+        where hospitalId=#{hospitalId}
+    </select>
 </mapper>
