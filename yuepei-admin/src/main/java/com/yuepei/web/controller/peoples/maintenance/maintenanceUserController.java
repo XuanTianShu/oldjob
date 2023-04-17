@@ -10,6 +10,7 @@ import com.yuepei.common.utils.poi.ExcelUtil;
 import com.yuepei.system.domain.InvestorUser;
 import com.yuepei.system.service.IInvestorUserService;
 import com.yuepei.system.service.ISysUserService;
+import com.yuepei.system.service.MaintenanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,9 @@ public class maintenanceUserController extends BaseController {
 
     @Autowired
     private IInvestorUserService investorUserService;
+
+    @Autowired
+    private MaintenanceService maintenanceService;
 
     @Autowired
     private ISysUserService userService;
@@ -100,5 +104,20 @@ public class maintenanceUserController extends BaseController {
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(investorUserService.deleteInvestorUserByIds(ids));
+    }
+
+    /**
+     *
+     * @param userId
+     * @return
+     */
+    @GetMapping("/getHospital/{userId}")
+    public AjaxResult getHospital(@PathVariable("userId") Long userId){
+        return AjaxResult.success(maintenanceService.getHospital(userId));
+    }
+
+    @GetMapping("/getBinding/{userId}")
+    public AjaxResult getBinding(@PathVariable("userId") Long userId){
+        return AjaxResult.success(maintenanceService.getBinding(userId));
     }
 }

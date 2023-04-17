@@ -11,4 +11,6 @@ public interface IAgentUserMapper {
     void deleteHospitalByHospitalIds(Long[] hospitalIds);
 
     void deleteHospitalByHospitalId(@Param("hospitalId") Long hospitalId);
+
+    int insert(@Param("userId") Long userId, @Param("hospitalId") Long hospitalId);
 }

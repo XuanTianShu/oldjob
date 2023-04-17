@@ -91,11 +91,18 @@ public class HospitalServiceImpl implements HospitalService {
      * @param hospital 医院
      * @return 结果
      */
+    @Transactional
     @Override
     public int insertHospital(Hospital hospital)
     {
         hospital.setCreateTime(DateUtils.getNowDate());
-        return hospitalMapper.insertHospital(hospital);
+        int i = hospitalMapper.insertHospital(hospital);
+        if (hospital.getType() != null){
+            Hospital hospital1 = hospitalMapper.selectHospitalName(hospital.getHospitalName());
+            return agentUserMapper.insert(hospital.getUserId(),hospital1.getHospitalId());
+        }else {
+            return i;
+        }
     }
 
     /**

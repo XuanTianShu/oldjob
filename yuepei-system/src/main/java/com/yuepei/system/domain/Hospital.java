@@ -52,6 +52,16 @@ public class Hospital extends TreeEntity {
 
     private Long type;
 
+    private Long userId;
+
+    public Long getUserId(){
+        return userId;
+    }
+
+    public void setUserId(Long userId){
+        this.userId = userId;
+    }
+
     public Long getType(){
         return type;
     }

@@ -133,4 +133,6 @@ public interface HospitalMapper {
     DeviceInvestor selectHospital(@Param("id") Long id);
 
     int selectBindHospitalCount(Long[] deviceIds);
+
+    Hospital selectHospitalName(@Param("hospitalName") String hospitalName);
 }

@@ -246,6 +246,9 @@
             #{hospitalId}
         </foreach>
     </select>
+    <select id="selectHospitalName" parameterType="String" resultMap="HospitalResult">
+        SELECT * FROM hospital WHERE hospital_name = #{hospitalName} order by hospital_id desc limit 1
+    </select>
 
     <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
         insert into hospital
@@ -256,6 +259,7 @@
             <if test="createTime != null">create_time,</if>
             <if test="updateTime != null">update_time,</if>
             <if test="proportion != null">proportion,</if>
+            <if test="type != null">`type`,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="hospitalName != null">#{hospitalName},</if>
@@ -264,6 +268,7 @@
             <if test="createTime != null">#{createTime},</if>
             <if test="updateTime != null">#{updateTime},</if>
             <if test="proportion != null">#{proportion},</if>
+            <if test="type != null">#{type},</if>
         </trim>
     </insert>
     <insert id="binding">

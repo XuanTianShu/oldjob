@@ -8,6 +8,17 @@
         <result property="deviceSum" column="device_sum"/>
         <result property="hospitalName" column="hospital_name"/>
     </resultMap>
+    <insert id="insert">
+        insert into agent_hospital
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">agent_id,</if>
+            <if test="hospitalId != null">hospital_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="hospitalId != null">#{hospitalId},</if>
+        </trim>
+    </insert>
     <delete id="deleteHospitalByHospitalIds">
         delete from agent_hospital where hospital_id in
         <foreach item="hospitalId" collection="array" open="(" separator="," close=")">
@@ -18,7 +29,7 @@
         delete from agent_hospital where hospital_id = #{hospitalId}
     </delete>
 
-    <select id="getHospital" resultType="Long" resultMap="AgentHospitalResult">
+    <select id="getHospital" parameterType="Long" resultMap="AgentHospitalResult">
         SELECT h.hospital_id,h.`hospital_name`,
                h.`type`,IFNULL(devices.device_sum, 0) AS device_sum
         FROM agent_hospital AS ag

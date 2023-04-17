@@ -117,7 +117,6 @@ public interface UserLeaseOrderMapper {
     List<UserLeaseOrder> selectUserLeaseOrderByOrderNumber(@Param("orderNumber") String orderNumber,@Param("hospitalId") String hospitalId);
 
     List<UserLeaseOrder> selectUserLeaseOrderByInvestor(@Param("investorId") String investorId);
-    List<UserLeaseOrder> selectUserLeaseOrderByDevice(@Param("deviceNumber") String deviceNumber,@Param("hospitalId") String hospitalId);
 
     List<UserOrderVO> selectUserOrderDepositList(@Param("openid") String openid);
 
@@ -132,8 +131,6 @@ public interface UserLeaseOrderMapper {
     List<UserLeaseOrder> selectUserLeaseOrderByAgentId(@Param("userId") String userId);
 
     List<UserLeaseOrder> selectUserLeaseOrderByAgentId(@Param("deviceNumbers")List<String> deviceNumbers, @Param("userId") String userId);
-
-    List<UserLeaseOrder> selectUserLeaseOrderByHospitalId(@Param("hospitalId") String hospitalId);
 
     AgentAndHospitalNameVO selectUserNameAndHospitalName(@Param("deviceNumber") String deviceNumber);
 

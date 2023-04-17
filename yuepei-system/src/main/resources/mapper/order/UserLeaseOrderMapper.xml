@@ -70,6 +70,7 @@
         <result property="agentProportion" column="agentProportion"/>
         <result property="hospitalProportion" column="hospitalProportion"/>
         <result property="platformProportion" column="platformProportion"/>
+        <result property="agentHospitalProportion" column="agentHospitalProportion"/>
     </resultMap>
 
     <resultMap id="UserOrderResult" type="com.yuepei.system.domain.vo.UserOrderVO">
@@ -107,7 +108,7 @@
         lo.net_amount, lo.coupon_price, lo.`status`,
         IFNULL(su.`user_name`,'无') AS agentName,
         lo.play_time,lo.create_time,lo.investorProportion,
-        lo.agentProportion
+        lo.agentProportion,lo.`agentHospitalProportion`
         ,lo.hospitalProportion,lo.platformProportion
         FROM user_lease_order AS lo
         INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`

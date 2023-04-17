@@ -2,4 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.yuepei.system.mapper.MaintenanceMapper">
 
+    <resultMap id="maintenanceHospitalResult" type="com.yuepei.system.domain.vo.HospitalVO">
+        <result property="type" column="type"/>
+        <result property="hospitalName" column="hospital_name"/>
+        <result property="deviceSum" column="device_sum"/>
+        <result property="hospitalId" column="hospital_id"/>
+    </resultMap>
+
+    <select id="getHospital" parameterType="Long" resultMap="maintenanceHospitalResult">
+        SELECT h.`hospital_id`,h.`hospital_name`,h.`type`,devices.device_sum FROM hospital_user AS hu
+                                                                                      LEFT JOIN hospital AS h ON h.`hospital_id` = hu.hospital_id
+                                                                                      LEFT JOIN (
+            SELECT hospital_id,COUNT(device_number) AS device_sum FROM device
+            GROUP BY hospital_id
+        ) AS devices ON h.`hospital_id` = devices.hospital_id
+        WHERE hu.user_name = #{userId}
+    </select>
+    <select id="getBinding" parameterType="Long" resultMap="maintenanceHospitalResult">
+        SELECT hospital_id,hospital_name FROM hospital WHERE parent_id = 0 AND hospital_id NOT IN(
+            SELECT hospital_id FROM hospital_user
+            WHERE user_name = #{userId})
+    </select>
 </mapper>
