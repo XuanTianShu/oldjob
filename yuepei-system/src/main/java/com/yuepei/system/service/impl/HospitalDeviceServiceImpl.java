@@ -341,7 +341,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                     Date parse2 = Format.parse(newDate);
                     if (start.compareTo(parse)==1){
                         if (time1==0){
-                            Long time2 = new Date(parse1.getTime() - parse2.getTime()).getTime();
+                            Long time2 = new Date(parse2.getTime() - parse1.getTime()).getTime();
                             Long minute1 = time2 / 1000 / 60 / 60;
                             Long minute2 = time2 / 1000 / 60 % 60 ;
                             BigDecimal price = (BigDecimal) jsonObject.get("price");
@@ -372,7 +372,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                         }
                     }else {
                         if (time1==0){
-                            Long time2 = new Date(parse1.getTime() - parse2.getTime()).getTime();
+                            Long time2 = new Date(parse2.getTime() - parse1.getTime()).getTime();
                             Long minute1 = time2 / 1000 / 60 /60 ;
                             Long minute2 = time2 / 1000 / 60 % 60 ;
                             BigDecimal price = (BigDecimal) jsonObject.get("price");
