@@ -460,15 +460,15 @@ public class CallBackServiceImpl implements CallBackService {
                         if (investorAccountProportion.size() > 0){
                             for (int i = 0; i < investorProportion.size(); i++) {
                                 String proportion = investorProportion.get(i).getProportion();
-                                BigDecimal multiply1 = new BigDecimal(proportion).divide(new BigDecimal(100), MathContext.DECIMAL64);
-                                BigDecimal multiply4 = multiply1.multiply(multiply3);
-                                log.info("投资人金额：{}",multiply4);
-                                residue = new BigDecimal(residue).subtract(multiply4).longValue();
+//                                BigDecimal multiply1 = new BigDecimal(proportion).divide(new BigDecimal(100), MathContext.DECIMAL64);
+//                                BigDecimal multiply4 = multiply1.multiply(multiply3);
+                                residue = new BigDecimal(residue).subtract(multiply3).longValue();
                                 for (int k = 0; k < investorAccountProportion.size(); k++) {
                                     if (investorProportion.get(i).getUserId().equals(investorAccountProportion.get(k).getParentId())){
-                                        BigDecimal multiply2 = multiply4.multiply(new BigDecimal(investorAccountProportion.get(k).getProportion()).divide(new BigDecimal(100), MathContext.DECIMAL64));
+                                        BigDecimal multiply2 = multiply3.multiply(new BigDecimal(investorAccountProportion.get(k).getProportion()).divide(new BigDecimal(100), MathContext.DECIMAL64));
                                         investorAccountProportion.get(k).setPrice(multiply2);
-                                        multiply4 = multiply4.subtract(multiply2);
+                                        log.info("子账户的分成金额：{}",multiply2);
+                                        multiply3 = multiply3.subtract(multiply2);
                                         SysUser user1 = userMapper.selectUserById(investorAccountProportion.get(k).getUserId());
                                         if (user1 != null){
                                             log.info("投资人子账户原来：{}",user1.getBalance());
@@ -479,10 +479,10 @@ public class CallBackServiceImpl implements CallBackService {
                                         }
                                     }
                                 }
-                                investorProportion.get(i).setPrice(multiply4);
+                                investorProportion.get(i).setPrice(multiply3);
                                 SysUser user1 = userMapper.selectUserById(investorProportion.get(i).getUserId());
                                 log.info("原来：{}",user1.getBalance());
-                                BigDecimal add = user1.getBalance().add(multiply4);
+                                BigDecimal add = user1.getBalance().add(multiply3);
                                 user1.setBalance(add);
                                 list.add(user1);
                                 log.info("现在投资人：{}",add);
