@@ -254,6 +254,6 @@
     <select id="selectUserLeaseOrderByOrderNumber" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
         where CONCAT(IFNULL(order_number,''),IFNULL(device_number,'')) LIKE concat('%',#{nameOrNumber},'%')
-        and investorId = #{investorId}
+        and investorId LIKE concat('%"',#{investorId},'"%')
     </select>
 </mapper>

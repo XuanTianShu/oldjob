@@ -776,7 +776,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             userLeaseOrderVo.setLeaseAddress(userLeaseOrder.getLeaseAddress());
             userLeaseOrderVo.setOrderNumber(userLeaseOrder.getOrderNumber());
         }
-        if (userLeaseOrder.getStatus().equals("1")){
+        else if (userLeaseOrder.getStatus().equals("1")){
             Long time = Long.valueOf(userLeaseOrderVo.getPlayTime());
             Long day = time/1000/60/60/24;
             Long hour = time/1000/60/60%24;
@@ -822,7 +822,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             userLeaseOrderVo.setStatus(userLeaseOrder.getStatus());
             userLeaseOrderVo.setNetAmount(userLeaseOrder.getNetAmount());
         }
-        if (userLeaseOrder.getStatus().equals("2")){
+        else {
             Long time = Long.valueOf(userLeaseOrderVo.getPlayTime());
             Long day = time/1000/60/60/24;
             Long hour = time/1000/60/60%24;
