@@ -321,7 +321,10 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             }
             Date leaseTime = userLeaseOrderVo.getLeaseTime();
             SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+            SimpleDateFormat Format = new SimpleDateFormat("YYYY-MM-DD HH:mm:ss");
             Date date1 = new Date();
+            String leaseTime1 = Format.format(leaseTime);
+            String newDate = Format.format(date1);
             String format = dateFormat.format(leaseTime);
             String format1 = dateFormat.format(date1);
             JSONArray deviceRule = JSON.parseArray(userLeaseOrder.getDeviceRule());
@@ -334,9 +337,11 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                     Date parse = dateFormat.parse(format);
                     Date start = dateFormat.parse(startTime);
                     Date now = dateFormat.parse(format1);
+                    Date parse1 = Format.parse(leaseTime1);
+                    Date parse2 = Format.parse(newDate);
                     if (start.compareTo(parse)==1){
                         if (time1==0){
-                            Long time2 = new Date(now.getTime() - parse.getTime()).getTime();
+                            Long time2 = new Date(parse1.getTime() - parse2.getTime()).getTime();
                             Long minute1 = time2 / 1000 / 60 / 60;
                             Long minute2 = time2 / 1000 / 60 % 60 ;
                             BigDecimal price = (BigDecimal) jsonObject.get("price");
@@ -367,7 +372,7 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                         }
                     }else {
                         if (time1==0){
-                            Long time2 = new Date(now.getTime() - parse.getTime()).getTime();
+                            Long time2 = new Date(parse1.getTime() - parse2.getTime()).getTime();
                             Long minute1 = time2 / 1000 / 60 /60 ;
                             Long minute2 = time2 / 1000 / 60 % 60 ;
                             BigDecimal price = (BigDecimal) jsonObject.get("price");

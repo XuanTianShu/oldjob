@@ -27,4 +27,7 @@ public class OrderVo {
     /**分润比例*/
     private Long dividendRatio;
 
+    /**订单时间*/
+    private String leaseTime;
+
 }
