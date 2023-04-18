@@ -405,12 +405,9 @@
         WHERE di.Id = #{id}
     </select>
     <select id="selectDeviceProportionDetail" parameterType="String" resultMap="deviceProportionResult">
-        SELECT IFNULL(su.`proportion`,0) AS suProportion,
-               IFNULL(h.`proportion`,0) AS hProportion,
-               IFNULL(SUM(di.`proportion`),0) AS diProportion
+        SELECT
+            IFNULL(sum(di.`proportion`),0) AS diProportion
         FROM device AS d
-                 LEFT JOIN device_agent AS su ON d.`user_id` = su.`agent_id`
-                 LEFT JOIN device_hospital AS h ON h.`device_number` = d.`device_number`
                  LEFT JOIN device_investor AS di ON di.`device_number` = d.`device_number`
         WHERE d.device_number = #{deviceNumber}
     </select>

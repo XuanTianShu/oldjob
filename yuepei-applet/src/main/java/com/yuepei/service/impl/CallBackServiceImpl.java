@@ -377,25 +377,28 @@ public class CallBackServiceImpl implements CallBackService {
                 }
 
                 if (divide.longValue() > 0){
+                    log.info("总金额：{}",divide.longValue());
                     //TODO 计算分成
                     UserLeaseOrder userLeaseOrder1 = userLeaseOrderMapper.selectLeaseOrderDetails(userLeaseOrder.getOrderNumber());
                     Long residue = divide.longValue();
                     String agentId = userLeaseOrder1.getAgentId();
                     List<SysUser> list = new ArrayList<>();
+
                     //TODO 计算代理商分成
                     if (!agentId.equals("0")){
                         Long agentProportion = userLeaseOrder1.getAgentProportion();
                         if (agentProportion != 0){
                             //TODO 计算分成金额
-                            BigDecimal netAmount = new BigDecimal(String.valueOf(divide));
-                            BigDecimal bigDecimal = new BigDecimal(userLeaseOrder1.getAgentProportion());
+                            BigDecimal netAmount = new BigDecimal(String.valueOf(price)).divide(new BigDecimal(100),MathContext.DECIMAL64);
+                            BigDecimal bigDecimal = new BigDecimal(userLeaseOrder1.getAgentProportion()).divide(new BigDecimal(100), MathContext.DECIMAL64);
                             BigDecimal multiply = netAmount.multiply(bigDecimal);
                             //TODO 添加分成金额到账号
                             SysUser user1 = userMapper.selectUserById(Long.parseLong(agentId));
-                            if (user1 != null) {
+                            if (user1 != null){
                                 BigDecimal balance = user1.getBalance();
                                 user1.setBalance(balance.add(multiply));
                                 list.add(user1);
+                                log.info("代理商：{}",user1.getBalance());
                             }
 
                             residue = new BigDecimal(residue).subtract(multiply).longValue();
@@ -406,10 +409,12 @@ public class CallBackServiceImpl implements CallBackService {
                                 //TODO 计算子账户分成
                                 for (int i = 0; i < agentAccountProportion.size(); i++) {
                                     SysUser user2 = userMapper.selectUserById(agentAccountProportion.get(i).getUserId());
-                                    if (user2 != null) {
+                                    if (user2 != null){
                                         String proportion = agentAccountProportion.get(i).getProportion();
-                                        BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
-                                        user1.setBalance(user2.getBalance().add(multiply1));
+                                        BigDecimal multiply1 = new BigDecimal(proportion).divide(new BigDecimal(100), MathContext.DECIMAL64);
+                                        BigDecimal multiply2 = multiply1.multiply(multiply);
+                                        user2.setBalance(user2.getBalance().add(multiply2));
+                                        log.info("代理商子账户：{}",user2.getBalance());
                                         agentAccountProportion.get(i).setPrice(multiply1);
                                         list.add(user2);
                                     }
@@ -423,13 +428,15 @@ public class CallBackServiceImpl implements CallBackService {
                             if (agentHospitalProportion.size() > 0) {
                                 for (int i = 0; i < agentHospitalProportion.size(); i++) {
                                     String proportion = agentHospitalProportion.get(i).getProportion();
-                                    BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
+                                    BigDecimal multiply1 = new BigDecimal(proportion).divide(new BigDecimal(100), MathContext.DECIMAL64).multiply(multiply);
                                     agentHospitalProportion.get(i).setPrice(multiply1);
                                     SysUser user2 = userMapper.selectUserById(agentHospitalProportion.get(i).getUserId());
-                                    if (user2 != null) {
+                                    if (user2 != null){
                                         user2.setBalance(user2.getBalance().add(multiply1));
                                         list.add(user2);
+                                        log.info("代理商医院：{}",user2.getBalance());
                                     }
+
                                 }
                                 //TODO 批量更新收益
                                 orderProportionMapper.updateAgentHospitalProportion(agentHospitalProportion);
@@ -442,33 +449,43 @@ public class CallBackServiceImpl implements CallBackService {
                     List<OrderProportionDetail> investorProportion = orderProportionMapper.selectInvestorProportion(userLeaseOrder.getOrderNumber());
                     if (investorProportion.size() > 0) {
                         Long investorProportion1 = userLeaseOrder1.getInvestorProportion();
-                        BigDecimal netAmount = new BigDecimal(String.valueOf(divide));
-                        BigDecimal multiply = new BigDecimal(investorProportion1).multiply(netAmount);
+                        BigDecimal netAmount = new BigDecimal(String.valueOf(price.longValue())).divide(new BigDecimal(100),MathContext.DECIMAL64);
+                        log.info("总金额：{}",netAmount);
+                        BigDecimal multiply = new BigDecimal(investorProportion1).divide(new BigDecimal(100), MathContext.DECIMAL64);
+                        log.info("分成比例：{}",multiply);
+                        BigDecimal multiply3 = multiply.multiply(netAmount);
+                        log.info("分成金额：{}",multiply3);
                         //TODO 投资人子账户
                         List<OrderProportionDetail> investorAccountProportion = orderProportionMapper.selectInvestorAccountProportion(userLeaseOrder.getOrderNumber());
                         if (investorAccountProportion.size() > 0){
                             for (int i = 0; i < investorProportion.size(); i++) {
                                 String proportion = investorProportion.get(i).getProportion();
-                                BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
-                                residue = new BigDecimal(residue).subtract(multiply1).longValue();
+                                BigDecimal multiply1 = new BigDecimal(proportion).divide(new BigDecimal(100), MathContext.DECIMAL64);
+                                BigDecimal multiply4 = multiply1.multiply(multiply3);
+                                log.info("投资人金额：{}",multiply4);
+                                residue = new BigDecimal(residue).subtract(multiply4).longValue();
                                 for (int k = 0; k < investorAccountProportion.size(); k++) {
                                     if (investorProportion.get(i).getUserId().equals(investorAccountProportion.get(k).getParentId())){
-                                        BigDecimal multiply2 = multiply1.multiply(new BigDecimal(investorAccountProportion.get(k).getProportion()));
+                                        BigDecimal multiply2 = multiply4.multiply(new BigDecimal(investorAccountProportion.get(k).getProportion()).divide(new BigDecimal(100), MathContext.DECIMAL64));
                                         investorAccountProportion.get(k).setPrice(multiply2);
-                                        multiply1 = multiply1.subtract(multiply2);
+                                        multiply4 = multiply4.subtract(multiply2);
                                         SysUser user1 = userMapper.selectUserById(investorAccountProportion.get(k).getUserId());
-                                        if (user1 != null) {
-                                            user1.setBalance(user1.getBalance().add(multiply2));
+                                        if (user1 != null){
+                                            log.info("投资人子账户原来：{}",user1.getBalance());
+                                            BigDecimal add = user1.getBalance().add(multiply2);
+                                            user1.setBalance(add);
+                                            log.info("投资人子账户现在：{}",add);
                                             list.add(user1);
                                         }
                                     }
                                 }
-                                investorProportion.get(i).setPrice(multiply1);
+                                investorProportion.get(i).setPrice(multiply4);
                                 SysUser user1 = userMapper.selectUserById(investorProportion.get(i).getUserId());
-                                if (user1 != null) {
-                                    user1.setBalance(user1.getBalance().add(multiply1));
-                                    list.add(user1);
-                                }
+                                log.info("原来：{}",user1.getBalance());
+                                BigDecimal add = user1.getBalance().add(multiply4);
+                                user1.setBalance(add);
+                                list.add(user1);
+                                log.info("现在投资人：{}",add);
                             }
                             //TODO 批量更新收益
                             orderProportionMapper.updateInvestorProportion(investorProportion);
@@ -476,12 +493,16 @@ public class CallBackServiceImpl implements CallBackService {
                         }else {
                             for (int i = 0; i < investorProportion.size(); i++) {
                                 String proportion = investorProportion.get(i).getProportion();
-                                BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
-                                residue = new BigDecimal(residue).subtract(multiply1).longValue();
+                                BigDecimal multiply1 = new BigDecimal(proportion).divide(new BigDecimal(100), MathContext.DECIMAL64);
+                                BigDecimal multiply2 = multiply1.multiply(netAmount);
+                                log.info("没有子账号的代理商：{}",multiply2);
+
+                                residue = new BigDecimal(residue).subtract(multiply2).longValue();
                                 SysUser user1 = userMapper.selectUserById(investorProportion.get(i).getUserId());
-                                if (user1 != null) {
+                                if (user1 != null){
                                     user1.setBalance(user1.getBalance().add(multiply1));
                                     list.add(user1);
+                                    log.info("投资人：{}",user1.getBalance());
                                 }
                             }
                             //TODO 批量更新收益
@@ -494,23 +515,25 @@ public class CallBackServiceImpl implements CallBackService {
                     Long hospitalProportion = userLeaseOrder1.getHospitalProportion();
                     if (!hospitalId.equals("0")){
                         BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                        BigDecimal multiply = bigDecimal.multiply(new BigDecimal(hospitalProportion));
+                        BigDecimal multiply = bigDecimal.multiply(new BigDecimal(hospitalProportion).divide(new BigDecimal(100), MathContext.DECIMAL64));
                         SysUser sysUser = userMapper.selectHospitalProportion(hospitalId);
                         if (sysUser != null){
                             BigDecimal balance = sysUser.getBalance();
                             sysUser.setBalance(balance.add(multiply));
                             list.add(sysUser);
+                            log.info("医院：{}",sysUser.getBalance());
                         }
                     }
-
                     SysUser sysUser = userMapper.selectAdmin(1L);
                     BigDecimal add = sysUser.getBalance().add(new BigDecimal(residue));
-                    if (add.compareTo(BigDecimal.ZERO) == 0 || add.compareTo(BigDecimal.ZERO) > 0) {
+                    if (add.compareTo(BigDecimal.ZERO) == 0 || add.compareTo(BigDecimal.ZERO) > 0){
                         sysUser.setBalance(add);
                         list.add(sysUser);
+                        log.info("平台：{}",sysUser.getBalance());
                     }
 
                     if (list.size() > 0){
+                        log.info("批量更新");
                         //TODO 批量更新
                         userMapper.batchUpdate(list);
                     }
@@ -600,13 +623,15 @@ public class CallBackServiceImpl implements CallBackService {
                 if (agentProportion != 0){
                     //TODO 计算分成金额
                     BigDecimal netAmount = new BigDecimal(String.valueOf(price));
-                    BigDecimal bigDecimal = new BigDecimal(userLeaseOrder1.getAgentProportion());
+                    BigDecimal bigDecimal = new BigDecimal(userLeaseOrder1.getAgentProportion()).divide(new BigDecimal(100), MathContext.DECIMAL64);
+                    log.info("代理商分成：{}",bigDecimal);
                     BigDecimal multiply = netAmount.multiply(bigDecimal);
                     //TODO 添加分成金额到账号
                     SysUser user1 = userMapper.selectUserById(Long.parseLong(agentId));
                     if (user1 != null){
                         BigDecimal balance = user1.getBalance();
-                        user1.setBalance(balance.add(multiply));
+                        BigDecimal add = balance.add(multiply);
+                        user1.setBalance(add);
                         list.add(user1);
                         log.info("代理商：{}",user1.getBalance());
                     }
@@ -621,8 +646,9 @@ public class CallBackServiceImpl implements CallBackService {
                             SysUser user2 = userMapper.selectUserById(agentAccountProportion.get(i).getUserId());
                             if (user2 != null){
                                 String proportion = agentAccountProportion.get(i).getProportion();
-                                BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
-                                user2.setBalance(user2.getBalance().add(multiply1));
+                                BigDecimal multiply1 = new BigDecimal(proportion).divide(new BigDecimal(100), MathContext.DECIMAL64);
+                                BigDecimal multiply2 = multiply1.multiply(multiply);
+                                user2.setBalance(user2.getBalance().add(multiply2));
                                 log.info("代理商子账户：{}",user2.getBalance());
                                 agentAccountProportion.get(i).setPrice(multiply1);
                                 list.add(user2);
@@ -637,7 +663,7 @@ public class CallBackServiceImpl implements CallBackService {
                     if (agentHospitalProportion.size() > 0) {
                         for (int i = 0; i < agentHospitalProportion.size(); i++) {
                             String proportion = agentHospitalProportion.get(i).getProportion();
-                            BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
+                            BigDecimal multiply1 = new BigDecimal(proportion).divide(new BigDecimal(100), MathContext.DECIMAL64).multiply(multiply);
                             agentHospitalProportion.get(i).setPrice(multiply1);
                             SysUser user2 = userMapper.selectUserById(agentHospitalProportion.get(i).getUserId());
                             if (user2 != null){
@@ -659,19 +685,25 @@ public class CallBackServiceImpl implements CallBackService {
             if (investorProportion.size() > 0) {
                 Long investorProportion1 = userLeaseOrder1.getInvestorProportion();
                 BigDecimal netAmount = new BigDecimal(String.valueOf(price.longValue()));
-                BigDecimal multiply = new BigDecimal(investorProportion1).multiply(netAmount);
+                log.info("总金额：{}",netAmount);
+                BigDecimal multiply = new BigDecimal(investorProportion1).divide(new BigDecimal(100), MathContext.DECIMAL64);
+                log.info("分成比例：{}",multiply);
+                BigDecimal multiply3 = multiply.multiply(netAmount);
+                log.info("分成金额：{}",multiply3);
                 //TODO 投资人子账户
                 List<OrderProportionDetail> investorAccountProportion = orderProportionMapper.selectInvestorAccountProportion(userLeaseOrder.getOrderNumber());
                 if (investorAccountProportion.size() > 0){
                     for (int i = 0; i < investorProportion.size(); i++) {
                         String proportion = investorProportion.get(i).getProportion();
-                        BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
-                        residue = new BigDecimal(residue).subtract(multiply1).longValue();
+                        BigDecimal multiply1 = new BigDecimal(proportion).divide(new BigDecimal(100), MathContext.DECIMAL64);
+                        BigDecimal multiply4 = multiply1.multiply(multiply3);
+                        log.info("投资人金额：{}",multiply4);
+                        residue = new BigDecimal(residue).subtract(multiply4).longValue();
                         for (int k = 0; k < investorAccountProportion.size(); k++) {
                             if (investorProportion.get(i).getUserId().equals(investorAccountProportion.get(k).getParentId())){
-                                BigDecimal multiply2 = multiply1.multiply(new BigDecimal(investorAccountProportion.get(k).getProportion()));
+                                BigDecimal multiply2 = multiply4.multiply(new BigDecimal(investorAccountProportion.get(k).getProportion()).divide(new BigDecimal(100), MathContext.DECIMAL64));
                                 investorAccountProportion.get(k).setPrice(multiply2);
-                                multiply1 = multiply1.subtract(multiply2);
+                                multiply4 = multiply4.subtract(multiply2);
                                 SysUser user1 = userMapper.selectUserById(investorAccountProportion.get(k).getUserId());
                                 if (user1 != null){
                                     user1.setBalance(user1.getBalance().add(multiply2));
@@ -680,11 +712,13 @@ public class CallBackServiceImpl implements CallBackService {
                                 }
                             }
                         }
-                        investorProportion.get(i).setPrice(multiply1);
+                        investorProportion.get(i).setPrice(multiply4);
                         SysUser user1 = userMapper.selectUserById(investorProportion.get(i).getUserId());
-                        user1.setBalance(user1.getBalance().add(multiply1));
+                        log.info("原来：{}",user1.getBalance());
+                        BigDecimal add = user1.getBalance().add(multiply4);
+                        user1.setBalance(add);
                         list.add(user1);
-                        log.info("投资人：{}",user1.getBalance());
+                        log.info("投资人现在：{}",add);
                     }
                     //TODO 批量更新收益
                     orderProportionMapper.updateInvestorProportion(investorProportion);
@@ -692,13 +726,18 @@ public class CallBackServiceImpl implements CallBackService {
                 }else {
                     for (int i = 0; i < investorProportion.size(); i++) {
                         String proportion = investorProportion.get(i).getProportion();
-                        BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
-                        residue = new BigDecimal(residue).subtract(multiply1).longValue();
+                        BigDecimal multiply1 = new BigDecimal(proportion).divide(new BigDecimal(100), MathContext.DECIMAL64);
+                        BigDecimal multiply2 = multiply1.multiply(netAmount);
+                        log.info("没有子账号的代理商：{}",multiply2);
+
+                        residue = new BigDecimal(residue).subtract(multiply2).longValue();
                         SysUser user1 = userMapper.selectUserById(investorProportion.get(i).getUserId());
                         if (user1 != null){
-                            user1.setBalance(user1.getBalance().add(multiply1));
+                            log.info("原来：{}",user1.getBalance());
+                            BigDecimal add = user1.getBalance().add(multiply1);
+                            user1.setBalance(add);
                             list.add(user1);
-                            log.info("投资人：{}",user1.getBalance());
+                            log.info("现在投资人：{}",add);
                         }
                     }
                     //TODO 批量更新收益
@@ -711,7 +750,7 @@ public class CallBackServiceImpl implements CallBackService {
             Long hospitalProportion = userLeaseOrder1.getHospitalProportion();
             if (!hospitalId.equals("0")){
                 BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                BigDecimal multiply = bigDecimal.multiply(new BigDecimal(hospitalProportion));
+                BigDecimal multiply = bigDecimal.multiply(new BigDecimal(hospitalProportion).divide(new BigDecimal(100), MathContext.DECIMAL64));
                 SysUser sysUser = userMapper.selectHospitalProportion(hospitalId);
                 if (sysUser != null){
                     BigDecimal balance = sysUser.getBalance();

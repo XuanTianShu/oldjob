@@ -712,30 +712,33 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                             Long time2 = new Date(now.getTime() - parse.getTime()).getTime();
                             Long minute1 = time2 / 1000 / 60 / 60;
                             Long minute2 = time2 / 1000 / 60 % 60 ;
-                            BigDecimal price = (BigDecimal) jsonObject.get("price");
-                            userLeaseOrderVo.setContent(price+device.getContent());
-                            price1=price1.add(price);
+                            Object price = jsonObject .get ("price") ;
+                            BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
+                            userLeaseOrderVo.setContent(bigDecimal+device.getContent());
+                            price1=price1.add(bigDecimal);
                             if (minute2<10){
-                                userLeaseOrderVo.setEvaluate(price.multiply(new BigDecimal(minute1)));
+                                userLeaseOrderVo.setEvaluate(bigDecimal.multiply(new BigDecimal(minute1)));
                             }else {
-                                userLeaseOrderVo.setEvaluate(price.multiply(new BigDecimal(minute1+1)));
+                                userLeaseOrderVo.setEvaluate(bigDecimal.multiply(new BigDecimal(minute1+1)));
                             }
                         }else if (time1==1){
                             if (now.compareTo(start)==1){
                                 Long time2 = new Date(start.getTime() - parse.getTime()).getTime();
                                 Long minute1 = time2 / 1000 / 60 / 60;
                                 Long minute2 = time2 / 1000 / 60 % 60 ;
-                                BigDecimal price = (BigDecimal) jsonObject.get("price");
-                                userLeaseOrderVo.setContent(price+device.getContent());
+                                Object price = jsonObject .get ("price") ;
+                                BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
+                                userLeaseOrderVo.setContent(bigDecimal+device.getContent());
                                 if (minute2<10){
-                                    userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1)).add(price));
+                                    userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1)).add(bigDecimal));
                                 }else {
-                                    userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1+1)).add(price));
+                                    userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1+1)).add(bigDecimal));
                                 }
                             }else {
-                                BigDecimal price = (BigDecimal) jsonObject.get("price");
-                                userLeaseOrderVo.setContent(price+device.getContent());
-                                userLeaseOrderVo.setEvaluate(price);
+                                Object price = jsonObject .get ("price") ;
+                                BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
+                                userLeaseOrderVo.setContent(bigDecimal+device.getContent());
+                                userLeaseOrderVo.setEvaluate(bigDecimal);
                             }
                         }
                     }else {
@@ -743,13 +746,14 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                             Long time2 = new Date(now.getTime() - parse.getTime()).getTime();
                             Long minute1 = time2 / 1000 / 60 /60 ;
                             Long minute2 = time2 / 1000 / 60 % 60 ;
-                            BigDecimal price = (BigDecimal) jsonObject.get("price");
-                            userLeaseOrderVo.setContent(price+device.getContent());
-                            price1=price1.add(price);
+                            Object price = jsonObject .get ("price") ;
+                            BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
+                            userLeaseOrderVo.setContent(bigDecimal+device.getContent());
+                            price1=price1.add(bigDecimal);
                             if (minute2<10){
-                                userLeaseOrderVo.setEvaluate(price.multiply(new BigDecimal(minute1)));
+                                userLeaseOrderVo.setEvaluate(bigDecimal.multiply(new BigDecimal(minute1)));
                             }else {
-                                userLeaseOrderVo.setEvaluate(price.multiply(new BigDecimal(minute1+1)));
+                                userLeaseOrderVo.setEvaluate(bigDecimal.multiply(new BigDecimal(minute1+1)));
                             }
                         }
                     }
@@ -787,13 +791,15 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 JSONObject jsonObject = deviceRule.getJSONObject(i);
                 Integer time1 = (Integer) jsonObject.get("time");
                 if (time1==0){
-                    BigDecimal price = (BigDecimal) jsonObject.get("price");
-                    userLeaseOrderVo.setContent(price+device.getContent());
+                    Object price = jsonObject .get ("price") ;
+                    BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
+                    userLeaseOrderVo.setContent(bigDecimal+device.getContent());
                 }else {
                     String start = String.valueOf(jsonObject.get("startTime"));
                     String end = String.valueOf(jsonObject.get("endTime"));
-                    BigDecimal price = (BigDecimal) jsonObject.get("price");
-                    userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+price);
+                    Object price = jsonObject .get ("price") ;
+                    BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
+                    userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+bigDecimal);
                 }
             }
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
@@ -831,13 +837,15 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 JSONObject jsonObject = deviceRule.getJSONObject(i);
                 Integer time1 = (Integer) jsonObject.get("time");
                 if (time1==0){
-                    BigDecimal price = (BigDecimal) jsonObject.get("price");
-                    userLeaseOrderVo.setContent(price+device.getContent());
+                    Object price = jsonObject .get ("price") ;
+                    BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
+                    userLeaseOrderVo.setContent(bigDecimal+device.getContent());
                 }else {
                     String start = String.valueOf(jsonObject.get("startTime"));
                     String end = String.valueOf(jsonObject.get("endTime"));
-                    BigDecimal price = (BigDecimal) jsonObject.get("price");
-                    userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+price);
+                    Object price = jsonObject .get ("price") ;
+                    BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
+                    userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+bigDecimal);
                 }
             }
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));

@@ -196,6 +196,7 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     log.info("医院：{}",userLeaseOrder.getHospitalProportion());
                     log.info("{}",totalProportionVO.getDiProportion());
                     log.info("代理商：{}",userLeaseOrder.getAgentProportion());
+
                     int proportionCount = 100-(Integer.parseInt(String.valueOf(userLeaseOrder.getHospitalProportion()))
                             + totalProportionVO.getDiProportion() + Integer.parseInt(String.valueOf(userLeaseOrder.getAgentProportion())));
 
@@ -208,6 +209,7 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
 //                    userLeaseOrder.setInvestorProportion(Long.parseLong(String.valueOf(totalProportionVO.getDiProportion())));
                     userLeaseOrder.setOrderNumber(orderNumber);
                     userLeaseOrder.setOpenid(openid);
+                    userLeaseOrder.setInvestorProportion(totalProportionVO.getDiProportion().longValue());
                     userLeaseOrder.setUserName(agentAndHospitalNameVO.getUserName());
                     userLeaseOrder.setHospitalName(agentAndHospitalNameVO.getHospitalName());
                     userLeaseOrder.setDeviceNumber(userLeaseOrder.getDeviceNumber());

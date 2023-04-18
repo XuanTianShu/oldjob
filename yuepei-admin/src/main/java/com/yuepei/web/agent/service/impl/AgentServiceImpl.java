@@ -362,7 +362,7 @@ public class AgentServiceImpl implements AgentService {
         userLeaseOrderList.stream().forEach(map->{
             Device device = hospitalDeviceMapper.selectDeviceByTypeNumber(map.getDeviceNumber());
             String deviceFullAddress = device.getDeviceFullAddress();
-            if (!deviceFullAddress.isEmpty()) {
+            if (!deviceFullAddress.equals("0")) {
                 String[] array = JSON.parseArray(deviceFullAddress).toArray(new String[0]);
                 Hospital department = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(array[1]));
                 map.setDepartment(department.getHospitalName());
