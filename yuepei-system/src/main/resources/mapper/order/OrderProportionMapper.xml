@@ -8,6 +8,15 @@
         <result property="proportion" column="proportion"/>
     </resultMap>
 
+    <resultMap id="OrderProportionDetailResult" type="com.yuepei.system.domain.OrderProportionDetail">
+        <result property="id" column="id"/>
+        <result property="price" column="price"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="userId" column="user_id"/>
+        <result property="proportion" column="proportion"/>
+        <result property="parentId" column="parent_id"/>
+    </resultMap>
+
     <insert id="insertAgentHospitalProportion">
         insert into order_agent_hospital_detail
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -35,11 +44,55 @@
             (#{orderNumber},#{item.userId},#{item.proportion},#{item.parentId})
         </foreach>
     </insert>
+    <update id="updateAgentAccountProportion" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE order_agent_account_detail
+            SET price = #{item.price}
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
+    <update id="updateAgentHospitalProportion" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE order_agent_hospital_detail
+            SET price = #{item.price}
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
+    <update id="updateInvestorProportion" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE order_proportion_detail
+            SET price = #{item.price}
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
+    <update id="updateInvestorAccountProportion" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE order_investor_acount_detail
+            SET price = #{item.price}
+            WHERE id = #{item.id}
+        </foreach>
+    </update>
     <select id="selectInvestorAccount" resultMap="deviceInverstorAccountResult">
         SELECT user_id,proportion,parent_id FROM sys_user
         WHERE parent_id IN
         <foreach item="item" collection="orderProportionDetailList" open="(" separator="," close=")">
             #{item.userId}
         </foreach>
+    </select>
+    <select id="selectInvestorAccountProportion" parameterType="String" resultMap="OrderProportionDetailResult">
+        select id,order_number,user_id,parent_id,proportion,price from `order_investor_acount_detail`
+        where order_number = #{orderNumber}
+    </select>
+    <select id="selectInvestorProportion" parameterType="String" resultMap="OrderProportionDetailResult">
+        SELECT id,order_number,user_id,proportion,price FROM `order_proportion_detail`
+        WHERE order_number = #{orderNumber}
+    </select>
+    <select id="selectAgentAccountProportion" parameterType="String" resultMap="OrderProportionDetailResult">
+        select id,order_number,user_id,proportion,parent_id,price from `order_agent_account_detail`
+        where order_number = #{orderNumber}
+    </select>
+    <select id="selectAgentHospitalProportion" parameterType="String" resultMap="OrderProportionDetailResult">
+        select id,order_number,hospital_id,user_id,proportion,price from `order_agent_hospital_detail`
+        where order_number = #{orderNumber}
     </select>
 </mapper>

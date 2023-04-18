@@ -76,8 +76,14 @@ public class WechatRefundController {
         return userRefundService.userRefundCallBack(request);
     }
 
+    //TODO 后台押金退款回调
+    @PostMapping("/depositRefundCallback")
+    public HashMap<String,String> depositRefundCallback(HttpServletRequest request) throws GeneralSecurityException {
+        return userRefundService.depositRefundCallback(request);
+    }
+
     /**
-     * 后台手动退款回调
+     * 后台订单手动退款回调
      * @param request
      * @return
      */

@@ -1,4 +1,7 @@
 package com.yuepei.service.impl;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yuepei.common.core.domain.AjaxResult;
@@ -17,7 +20,9 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 　　　　 ┏┓       ┏┓+ +
@@ -75,6 +80,9 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
 
     @Value("${coupon.valid}")
     private String orderValid;
+
+    @Value("${coupon.order}")
+    private String orderPrefix;
 
     @Override
     public List<UserLeaseOrder> userLeaseOrder(String openid, Integer status) {
@@ -153,6 +161,9 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                             }
                             userLeaseOrder.setHospitalId(deviceHospital.getHospitalId());
                         }
+                    }else {
+                        userLeaseOrder.setHospitalProportion(0L);
+                        userLeaseOrder.setAgentHospitalProportion("0");
                     }
 
 
@@ -166,6 +177,8 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                         if (deviceAgentList.size() > 0){
                             orderProportionMapper.insertAgentProportion(orderNumber,deviceAgentList);
                         }
+                    }else {
+                        userLeaseOrder.setAgentProportion(0L);
                     }
 
 
@@ -179,8 +192,13 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     AgentAndHospitalNameVO agentAndHospitalNameVO = userLeaseOrderMapper.selectUserNameAndHospitalName(userLeaseOrder.getDeviceNumber());
                     userLeaseOrder.setDeviceType(deviceType.getDeviceTypeName());
                     userLeaseOrder.setLeaseTime(new Date());
+
+                    log.info("医院：{}",userLeaseOrder.getHospitalProportion());
+                    log.info("{}",totalProportionVO.getDiProportion());
+                    log.info("代理商：{}",userLeaseOrder.getAgentProportion());
                     int proportionCount = 100-(Integer.parseInt(String.valueOf(userLeaseOrder.getHospitalProportion()))
                             + totalProportionVO.getDiProportion() + Integer.parseInt(String.valueOf(userLeaseOrder.getAgentProportion())));
+
                     userLeaseOrder.setPlatformProportion(Long.parseLong(String.valueOf(proportionCount)));
 //                    userLeaseOrder.setHospitalId(String.valueOf(device.getHospitalId()));
 //                    userLeaseOrder.setAgentId(String.valueOf(device.getUserId()));
@@ -199,51 +217,6 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
 
 //                    redisServer.setCacheObject(orderValid+orderNumber,userLeaseOrder,300,TimeUnit.SECONDS);
                     System.out.println(userLeaseOrder.getRule()+"--前端传的--");
-                    //将订单信息存放到redis
-//                    System.out.println("新增内容");
-//                    UserLeaseOrder userLeaseOrder1 = userLeaseOrderMapper.selectUserLeaseOrderByOpenId(orderNumber);
-//                    System.out.println("订单编号："+orderNumber);
-//                    System.out.println(userLeaseOrder1.getDeviceRule());
-//                    String rule = userLeaseOrder1.getDeviceRule();
-//                    JSONArray objects = JSON.parseArray(rule);
-//                    Map<String, Object> map = new HashMap<>();
-//                    Map<String, Object> map1 = new HashMap<>();
-//                    for (int i = 0; i < objects.size(); i++) {
-//                        JSONObject jsonObject = JSON.parseObject(objects.get(i).toString());
-//                        int timeStatus = Integer.parseInt(jsonObject.get("time").toString());
-//                        if (timeStatus == 0){
-//                             map = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
-//                        }else {
-//                             map1 = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
-//                        }
-//                    }
-//                    System.out.println("开始判断");
-//                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-//                    String format = simpleDateFormat.format(userLeaseOrder1.getLeaseTime());
-//
-//                    Date parse = simpleDateFormat.parse(format);
-//                    Date startTime = simpleDateFormat.parse(map1.get("startTime").toString());
-//                    boolean before = parse.before(startTime);
-//                    System.out.println(parse+"下单时间");
-//                    System.out.println(startTime+"固定套餐时间");
-//                    System.out.println(before+"结果");
-//                    if (before){
-//                        long l = startTime.getTime() - parse.getTime();
-//                        long nd = 1000 * 24 * 60 * 60;
-//                        long nh = 1000 * 60 * 60;
-//                        long nm = 1000 * 60;
-//                        long ns = 1000;
-//                        long sec = l % nd % nh % nm / ns;
-//                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1,
-//                                new Long(sec).intValue(),TimeUnit.SECONDS);
-//                        System.out.println("存储到redis1");
-//                    }else {
-//                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);
-//                        System.out.println("存储到redis2");
-//                    }
-//                    redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);
-                    log.info("借床ok");
-
 
                     log.info("rows:{}",rows);
                     if (!rows.equals("1")){
@@ -280,6 +253,53 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     log.info("参数：{}",userLeaseOrder.getIsValid());
 
                     userLeaseOrderMapper.insertUserLeaseOrder(userLeaseOrder);
+
+                    //将订单信息存放到redis
+                    System.out.println("新增内容");
+                    UserLeaseOrder userLeaseOrder1 = userLeaseOrderMapper.selectUserLeaseOrderByOpenId(orderNumber);
+                    System.out.println("订单编号："+orderNumber);
+                    String rule = userLeaseOrder.getRule();
+                    JSONArray objects = JSON.parseArray(rule);
+                    Map<String, Object> map = new HashMap<>();
+                    Map<String, Object> map1 = new HashMap<>();
+                    for (int i = 0; i < objects.size(); i++) {
+                        JSONObject jsonObject = JSON.parseObject(objects.get(i).toString());
+                        int timeStatus = Integer.parseInt(jsonObject.get("time").toString());
+                        if (timeStatus == 0){
+                             map = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
+                        }else {
+                             map1 = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
+                        }
+                    }
+                    System.out.println("开始判断");
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+                    String format = simpleDateFormat.format(userLeaseOrder1.getLeaseTime());
+
+                    Date parse = simpleDateFormat.parse(format);
+                    Date startTime = simpleDateFormat.parse(map1.get("startTime").toString());
+                    boolean before = parse.before(startTime);
+                    System.out.println(parse+"下单时间");
+                    System.out.println(startTime+"固定套餐时间");
+                    System.out.println(before+"结果");
+                    if (before){
+                        long l = startTime.getTime() - parse.getTime();
+                        long nd = 1000 * 24 * 60 * 60;
+                        long nh = 1000 * 60 * 60;
+                        long nm = 1000 * 60;
+                        long ns = 1000;
+                        long sec = l % nd % nh % nm / ns;
+                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1,
+                                new Long(sec).intValue(), TimeUnit.SECONDS);
+                        System.out.println("存储到redis1");
+                    }else {
+                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);
+                        System.out.println("存储到redis2");
+                    }
+//                    redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);
+                    log.info("借床ok");
+
+
+
                     log.info("执行完");
 //                    return AjaxResult.success();
                 }

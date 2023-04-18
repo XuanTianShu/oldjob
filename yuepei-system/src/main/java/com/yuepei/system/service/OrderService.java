@@ -2,6 +2,7 @@ package com.yuepei.system.service;
 
 import com.yuepei.system.domain.Order;
 import com.yuepei.system.domain.vo.OrderDepositListVO;
+import com.yuepei.system.domain.vo.RechargeVO;
 
 import java.util.List;
 
@@ -60,4 +61,8 @@ public interface OrderService {
     List<OrderDepositListVO> depositList(OrderDepositListVO orderDepositListVO);
 
     String depositSum(OrderDepositListVO orderDepositListVO);
+
+    List<RechargeVO> recharge(RechargeVO rechargeVO);
+
+    String rechargeSum(RechargeVO rechargeVO);
 }

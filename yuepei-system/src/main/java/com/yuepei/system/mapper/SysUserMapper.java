@@ -166,4 +166,10 @@ public interface SysUserMapper
     List<SysUser> selectUserByHospitalIds(List<Long> hospitalIds);
 
     SysUser selectParentIdByUserId(@Param("userId") Long userId);
+
+    SysUser selectAdmin(@Param("userId") Long userId);
+
+    void batchUpdate(@Param("list") List<SysUser> list);
+
+    SysUser selectHospitalProportion(@Param("hospitalId") String hospitalId);
 }

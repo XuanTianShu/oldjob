@@ -2,6 +2,7 @@ package com.yuepei.system.service.impl;
 
 import com.yuepei.system.domain.Order;
 import com.yuepei.system.domain.vo.OrderDepositListVO;
+import com.yuepei.system.domain.vo.RechargeVO;
 import com.yuepei.system.mapper.OrderMapper;
 import com.yuepei.system.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +87,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public String depositSum(OrderDepositListVO orderDepositListVO) {
         return orderMapper.depositSum(orderDepositListVO);
+    }
+
+    @Override
+    public List<RechargeVO> recharge(RechargeVO rechargeVO) {
+        return orderMapper.recharge(rechargeVO);
+    }
+
+    @Override
+    public String rechargeSum(RechargeVO rechargeVO) {
+        return orderMapper.rechargeSum(rechargeVO);
     }
 
 }

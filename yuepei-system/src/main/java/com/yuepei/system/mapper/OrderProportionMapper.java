@@ -15,4 +15,20 @@ public interface OrderProportionMapper {
     List<DeviceInvestorAccount> selectInvestorAccount(@Param("orderProportionDetailList") List<OrderProportionDetail> orderProportionDetailList);
 
     void insertAgentAccountProportion(@Param("orderNumber") String orderNumber, @Param("deviceInvestorAccountList") List<DeviceInvestorAccount> deviceInvestorAccountList);
+
+    List<OrderProportionDetail> selectInvestorAccountProportion(@Param("orderNumber") String orderNumber);
+
+    List<OrderProportionDetail> selectInvestorProportion(@Param("orderNumber") String orderNumber);
+
+    List<OrderProportionDetail> selectAgentAccountProportion(@Param("orderNumber") String orderNumber);
+
+    List<OrderProportionDetail> selectAgentHospitalProportion(@Param("orderNumber") String orderNumber);
+
+    void updateAgentAccountProportion(@Param("list") List<OrderProportionDetail> agentAccountProportion);
+
+    void updateAgentHospitalProportion(@Param("list") List<OrderProportionDetail> agentHospitalProportion);
+
+    void updateInvestorProportion(@Param("list") List<OrderProportionDetail> investorProportion);
+
+    void updateInvestorAccountProportion(@Param("list") List<OrderProportionDetail> investorAccountProportion);
 }

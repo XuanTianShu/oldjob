@@ -162,7 +162,7 @@
         a.`investorProportion`,a.`hospitalProportion`,a.`agentProportion`,a.`platformProportion`,
         a.`pay_type`,a.`net_amount`,a.`coupon_price`,a.`status`,a.`play_time`,a.`choose`,a.`deposit`,
         a.`child`,a.`create_time`,a.`deposit_number`,b.rule,d.`device_mac`,d.`rows`,d.`device_address`,
-        a.is_valid,a.`pay_type`
+        a.is_valid,a.`pay_type`,a.`time_price`,a.`fixed_price`
         FROM user_lease_order a
         LEFT JOIN device_rule b ON a.`device_number` =  b.`device_number`
         INNER JOIN device d ON d.`device_number` = a.`device_number`
@@ -361,7 +361,7 @@
     </select>
     <select id="selectLeaseOrderDetails" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
-        where order_number=#{orderNumber}
+        where order_number = #{orderNumber} AND `status` = 2
     </select>
 
     <select id="selectRevenueStatistics" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">

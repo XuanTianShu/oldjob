@@ -2,6 +2,7 @@ package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.Deposit;
 import com.yuepei.system.domain.UserDepositOrder;
+import com.yuepei.system.domain.vo.OrderDepositListVO;
 import com.yuepei.system.domain.vo.UserDepositVO;
 import org.apache.ibatis.annotations.Param;
 
@@ -97,4 +98,6 @@ public interface UserDepositOrderMapper {
     void bathUpdateUserDeposit(@Param("userDepositVOList") List<UserDepositVO> userDepositVOList);
 
     void bathUpdateUserDeposits(@Param("userDepositVOList") List<UserDepositVO> userDepositVOList);
+
+    void updateDepositStatus(OrderDepositListVO orderDepositListVOt);
 }

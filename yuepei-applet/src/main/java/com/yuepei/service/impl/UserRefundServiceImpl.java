@@ -10,11 +10,9 @@ import com.yuepei.common.utils.StringUtils;
 import com.yuepei.common.utils.uuid.UUID;
 import com.yuepei.domain.Amount;
 import com.yuepei.system.domain.UserLeaseOrder;
-import com.yuepei.system.domain.vo.UserDepositVO;
-import com.yuepei.system.domain.vo.UserOrderVO;
+import com.yuepei.system.domain.vo.*;
 import com.yuepei.service.UserRefundService;
 import com.yuepei.system.domain.UserDepositOrder;
-import com.yuepei.system.domain.vo.UserIntegralBalanceDepositVo;
 import com.yuepei.system.mapper.UserDepositDetailMapper;
 import com.yuepei.system.mapper.UserDepositOrderMapper;
 import com.yuepei.system.mapper.UserLeaseOrderMapper;
@@ -182,28 +180,39 @@ public class UserRefundServiceImpl implements UserRefundService {
                 );
                 //商户订单号
                 String out_trade_no = (String) parseObject.get("out_trade_no");
+                String status = (String) parseObject.get("refund_status");
                 Object amount = parseObject.get("amount");
                 JSONObject jsonObject1 = JSONObject.parseObject(amount.toString());
                 Object price = jsonObject1.get("payer_refund");
-                //根据商户订单号查询到用户信息
-                UserDepositOrder userDepositOrder = userDepositOrderMapper.selectUserDepositOrderByOrderNumber(out_trade_no);
-                //新增用户押金详细
-                UserIntegralBalanceDepositVo userIntegralBalanceDepositVo = new UserIntegralBalanceDepositVo();
-                userIntegralBalanceDepositVo.setOpenid(userDepositOrder.getOpenid());
-                userIntegralBalanceDepositVo.setStatus(1);
-                userIntegralBalanceDepositVo.setOrderNumber(out_trade_no);
-                //有问题
-                userIntegralBalanceDepositVo.setSum(new BigDecimal(price.toString()).divide(new BigDecimal(100)));
+                if (status.equals("SUCCESS")){
+                    //根据商户订单号查询到用户信息
+                    UserDepositOrder userDepositOrder = userDepositOrderMapper.selectUserDepositOrderByOrderNumber(out_trade_no);
+                    //新增用户押金详细
+                    UserIntegralBalanceDepositVo userIntegralBalanceDepositVo = new UserIntegralBalanceDepositVo();
+                    userIntegralBalanceDepositVo.setOpenid(userDepositOrder.getOpenid());
+                    userIntegralBalanceDepositVo.setStatus(1);
+                    userIntegralBalanceDepositVo.setOrderNumber(out_trade_no);
+                    userIntegralBalanceDepositVo.setSum(new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100),2));
+                    userIntegralBalanceDepositVo.setCreateTime(DateUtils.getNowDate());
+                    userDepositDetailMapper.insertUserDepositDetail(userIntegralBalanceDepositVo);
 
-                userIntegralBalanceDepositVo.setCreateTime(DateUtils.getNowDate());
-                userDepositDetailMapper.insertUserDepositDetail(userIntegralBalanceDepositVo);
+                    //修改用户押金详细
+                    UserDepositOrder userDepositOrderList = new UserDepositOrder();
+                    userDepositOrderList.setDepositStatus(1);
+                    userDepositOrderList.setStatus(1);
+                    userDepositOrderList.setOrderNumber(out_trade_no);
+                    userDepositOrderList.setUpdateTime(new Date());
+                    userDepositOrderMapper.updateUserDepositOrder(userDepositOrderList);
+                }else {
+                    //修改用户押金详细
+                    UserDepositOrder userDepositOrderList = new UserDepositOrder();
+                    userDepositOrderList.setStatus(0);
+                    userDepositOrderList.setDepositStatus(1);
+                    userDepositOrderList.setOrderNumber(out_trade_no);
+                    userDepositOrderList.setUpdateTime(new Date());
+                    userDepositOrderMapper.updateUserDepositOrder(userDepositOrderList);
+                }
 
-                //修改用户押金详细
-                UserDepositOrder userDepositOrderList = new UserDepositOrder();
-                userDepositOrderList.setDepositStatus(1);
-                userDepositOrderList.setOrderNumber(out_trade_no);
-                userDepositOrderList.setUpdateTime(new Date());
-                userDepositOrderMapper.updateUserDepositOrder(userDepositOrderList);
                 //响应接口
                 hashMap.put("code", "SUCCESS");
                 hashMap.put("message", "成功");
@@ -282,7 +291,6 @@ public class UserRefundServiceImpl implements UserRefundService {
                     String transaction_id = resultMap.get("transaction_id");
                     String out_trade_no = resultMap.get("out_trade_no");
                     list.add(out_trade_no);
-                    String status = resultMap.get("status");
                 }
             }
             if (list.size() > 0){
@@ -323,15 +331,23 @@ public class UserRefundServiceImpl implements UserRefundService {
         return null;
     }
 
+    @Transactional
     @Override
     public AjaxResult orderRefund(UserLeaseOrder userLeaseOrder) {
         long l = new BigDecimal(String.valueOf(userLeaseOrder.getNetAmount())).multiply(BigDecimal.valueOf(100)).longValue();
-        if (l > 0){
-            UserDepositOrder userDepositOrder1 = new UserDepositOrder();
-            userDepositOrder1.setOrderNumber(userLeaseOrder.getOrderNumber());
-            userDepositOrder1.setStatus(4);
-            userDepositOrderMapper.updateUserDepositOrder(userDepositOrder1);
+        log.info("{}",userLeaseOrder.getNetAmount());
+        if (l <= 0){
+            UserLeaseOrder userLeaseOrder1 = new UserLeaseOrder();
+            userLeaseOrder1.setOrderNumber(userLeaseOrder.getOrderNumber());
+            userLeaseOrder1.setStatus("4");
+            userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder1);
         }else {
+            log.info("后台手动退款");
+            //将订单修改为退款中，防止重复操作
+            UserLeaseOrder userLeaseOrder1 = new UserLeaseOrder();
+            userLeaseOrder1.setOrderNumber(userLeaseOrder.getOrderNumber());
+            userLeaseOrder1.setStatus("3");
+            userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder1);
             String outTradeNo = UUID.randomUUID().toString().replace("-", "");
             HashMap<Object, Object> payMap = new HashMap<>();
             payMap.put("out_trade_no", userLeaseOrder.getOrderNumber());
@@ -364,28 +380,23 @@ public class UserRefundServiceImpl implements UserRefundService {
             // 4.解析response对象
             HashMap<String, String> resultMap = resolverResponse(response);
             if(resultMap != null) {
-                //将订单修改为退款中，防止重复操作
-                UserDepositOrder userDepositOrder1 = new UserDepositOrder();
-                userDepositOrder1.setOrderNumber(userLeaseOrder.getOrderNumber());
-                userDepositOrder1.setStatus(3);
-                userDepositOrderMapper.updateUserDepositOrder(userDepositOrder1);
                 //微信退款单号   --  等待后续操作
                 String refund_id = resultMap.get("refund_id");
                 String transaction_id = resultMap.get("transaction_id");
                 String out_trade_no = resultMap.get("out_trade_no");
-                String status = resultMap.get("status");
-                System.out.println(userLeaseOrder.getOrderNumber() + "--" + out_trade_no + "--" + status);
+                System.out.println(userLeaseOrder.getOrderNumber() + "--" + out_trade_no);
 //            userDepositOrder.setDeviceStatus("1");
 //            userDepositOrderMapper.updateUserDepositOrder(userDepositOrder);
             }
         }
 
-        return null;
+        return AjaxResult.success();
     }
 
+    @Transactional
     @Override
     public HashMap<String, String> orderRefundCallBack(HttpServletRequest request) throws GeneralSecurityException {
-        System.out.println("退款");
+        System.out.println("订单退款");
         HashMap params = requestUtils.requestParams(request);
         Map resource = (Map) params.get("resource");
 
@@ -402,14 +413,21 @@ public class UserRefundServiceImpl implements UserRefundService {
                     aesUtil.decryptToString(associated_data.getBytes(), nonce.getBytes(), ciphertext)
             );
             //商户订单号
+            log.info("订单：{}",parseObject.toString());
             String out_trade_no = (String) parseObject.get("out_trade_no");
-            Object amount = parseObject.get("amount");
-            JSONObject jsonObject1 = JSONObject.parseObject(amount.toString());
-            Object price = jsonObject1.get("payer_refund");
-            UserLeaseOrder userLeaseOrder = new UserLeaseOrder();
-            userLeaseOrder.setOrderNumber(out_trade_no);
-            userLeaseOrder.setStatus("4");
-            userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
+            String status = (String) parseObject.get("refund_status");
+            if (status.equals("SUCCESS")) {
+                UserLeaseOrder userLeaseOrder = new UserLeaseOrder();
+                userLeaseOrder.setOrderNumber(out_trade_no);
+                userLeaseOrder.setStatus("4");
+                userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
+            }else {
+                UserLeaseOrder userLeaseOrder = new UserLeaseOrder();
+                userLeaseOrder.setOrderNumber(out_trade_no);
+                userLeaseOrder.setStatus("2");
+                userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
+            }
+
             //响应接口
             hashMap.put("code", "SUCCESS");
             hashMap.put("message", "成功");
@@ -419,6 +437,130 @@ public class UserRefundServiceImpl implements UserRefundService {
             hashMap.put("message", "失败");
             return hashMap;
         }
+    }
+
+    @Override
+    public AjaxResult depositRefund(OrderDepositListVO orderDepositListVOt) {
+        log.info("后台押金手动退款");
+        long l = new BigDecimal(String.valueOf(orderDepositListVOt.getDepositNum())).multiply(BigDecimal.valueOf(100)).longValue();
+        String outTradeNo = UUID.randomUUID().toString().replace("-", "");
+        HashMap<Object, Object> payMap = new HashMap<>();
+        payMap.put("out_trade_no", orderDepositListVOt.getOrderNumber());
+        payMap.put("out_refund_no", outTradeNo);
+        payMap.put("reason", "押金退款");
+        payMap.put("notify_url","https://www.yp10000.com/prod-api/wechat/user/refund/depositRefundCallback");
+        Amount amount = new Amount();
+        amount.setTotal(l);
+        amount.setRefund(l);
+        amount.setCurrency("CNY");
+        payMap.put("amount", amount);
+
+        //请求地址
+        HttpPost httpPost = new HttpPost("https://api.mch.weixin.qq.com/v3/refund/domestic/refunds");
+        // 请求数据
+        Gson gson = new Gson();
+        String json = gson.toJson(payMap);
+        //设置请求信息
+        StringEntity stringEntity = new StringEntity(json, "utf-8");
+        stringEntity.setContentType("application/json");
+        httpPost.setEntity(stringEntity);
+        httpPost.setHeader("Accept", "application/json");
+        // 3.完成签名并执行请求
+        CloseableHttpResponse response = null;
+        try {
+            response = wxPayClient.execute(httpPost);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // 4.解析response对象
+        HashMap<String, String> resultMap = resolverResponse(response);
+        if(resultMap != null) {
+            //微信退款单号   --  等待后续操作
+            String refund_id = resultMap.get("refund_id");
+            String transaction_id = resultMap.get("transaction_id");
+            String out_trade_no = resultMap.get("out_trade_no");
+            String status = resultMap.get("status");
+            //将押金订单修改为退款中，防止重复操作
+            orderDepositListVOt.setStatus("3");
+            userDepositOrderMapper.updateDepositStatus(orderDepositListVOt);
+            System.out.println(orderDepositListVOt.getOrderNumber() + "--" + out_trade_no + "--" + status);
+//            userDepositOrder.setDeviceStatus("1");
+//            userDepositOrderMapper.updateUserDepositOrder(userDepositOrder);
+            return AjaxResult.success();
+        }
+        return null;
+    }
+
+    @Transactional
+    @Override
+    public HashMap<String, String> depositRefundCallback(HttpServletRequest request) throws GeneralSecurityException {
+        System.out.println("押金退款回调");
+        HashMap params = requestUtils.requestParams(request);
+        Map resource = (Map) params.get("resource");
+
+        Object stringBuffer = params.get("stringBuffer");
+        String associated_data = (String) resource.get("associated_data");
+        String nonce = (String) resource.get("nonce");
+        String ciphertext = (String) resource.get("ciphertext");
+
+        JSONObject parseObject;
+        boolean isTrue = wxCallBackUtils.parseWXCallBack(request, stringBuffer.toString());
+        if (isTrue) {
+            AesUtil aesUtil = new AesUtil(mchKey.getBytes());
+            parseObject = JSONObject.parseObject(
+                    aesUtil.decryptToString(associated_data.getBytes(), nonce.getBytes(), ciphertext)
+            );
+            //商户订单号
+            log.info("押金：{}",parseObject.toString());
+            String out_trade_no = (String) parseObject.get("out_trade_no");
+            String status = (String) parseObject.get("refund_status");
+            Object amount = parseObject.get("amount");
+            JSONObject jsonObject1 = JSONObject.parseObject(amount.toString());
+            Object price = jsonObject1.get("payer_refund");
+            if (status.equals("SUCCESS")) {
+                //修改押金订单
+                OrderDepositListVO orderDepositListVO = new OrderDepositListVO();
+                orderDepositListVO.setOrderNumber(out_trade_no);
+                orderDepositListVO.setDepositStatus("1");
+                orderDepositListVO.setStatus("1");
+                userDepositOrderMapper.updateDepositStatus(orderDepositListVO);
+                //添加押金明细
+                //根据商户订单号查询到用户信息
+                UserDepositOrder userDepositOrder = userDepositOrderMapper.selectUserDepositOrderByOrderNumber(out_trade_no);
+                //新增用户押金详细
+                UserIntegralBalanceDepositVo userIntegralBalanceDepositVo = new UserIntegralBalanceDepositVo();
+                userIntegralBalanceDepositVo.setOpenid(userDepositOrder.getOpenid());
+                userIntegralBalanceDepositVo.setStatus(1);
+                userIntegralBalanceDepositVo.setOrderNumber(out_trade_no);
+                userIntegralBalanceDepositVo.setSum(new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100),2));
+                userIntegralBalanceDepositVo.setCreateTime(DateUtils.getNowDate());
+                userDepositDetailMapper.insertUserDepositDetail(userIntegralBalanceDepositVo);
+            }else {
+                //修改押金订单
+                OrderDepositListVO orderDepositListVO = new OrderDepositListVO();
+                orderDepositListVO.setOrderNumber(out_trade_no);
+                orderDepositListVO.setDepositStatus("0");
+                orderDepositListVO.setStatus("1");
+                userDepositOrderMapper.updateDepositStatus(orderDepositListVO);
+            }
+
+            log.info("订单号：{}",out_trade_no);
+            //响应接口
+            hashMap.put("code", "SUCCESS");
+            hashMap.put("message", "成功");
+            return hashMap;
+        }else {
+            hashMap.put("code", "FAIL");
+            hashMap.put("message", "失败");
+            return hashMap;
+        }
+    }
+
+    @Transactional
+    @Override
+    public AjaxResult rechargeRefund(RechargeVO rechargeVO) {
+
+        return null;
     }
 
 

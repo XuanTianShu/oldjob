@@ -107,6 +107,14 @@
             where order_number = #{item.orderNumber}
         </foreach>
     </update>
+    <update id="updateDepositStatus">
+        update user_deposit_order
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null">status = #{status},</if>
+            <if test="depositStatus != null">deposit_status = #{depositStatus},</if>
+        </trim>
+        where order_number = #{orderNumber}
+    </update>
 
     <delete id="deleteUserDepositOrderById" parameterType="Long">
         delete from user_deposit_order where id = #{id}

@@ -13,6 +13,10 @@ public class OrderProportionDetail {
 
     private Long userId;
 
+    private Long HospitalId;
+
+    private Long parentId;
+
     private String proportion;
 
     private BigDecimal price;

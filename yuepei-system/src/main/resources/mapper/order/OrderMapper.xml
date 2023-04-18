@@ -4,6 +4,17 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yuepei.system.mapper.OrderMapper">
 
+    <resultMap id="rechargeResult" type="com.yuepei.system.domain.vo.RechargeVO">
+        <result property="status" column="status"/>
+        <result property="phoneNumber" column="phone_number"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="id" column="id"/>
+        <result property="outTradeNo" column="out_trade_no"/>
+        <result property="openid" column="openid"/>
+        <result property="price" column="price"/>
+        <result property="endTime" column="end_time"/>
+    </resultMap>
+
     <resultMap type="com.yuepei.system.domain.Order" id="OrderResult">
         <result property="id"    column="id"    />
         <result property="orderNumber" column="order_number"/>
@@ -26,8 +37,8 @@
         <result property="orderNumber" column="order_number"/>
         <result property="phoneNumber" column="phone_number"/>
         <result property="nickName" column="nick_name"/>
-        <result property="depositStatus" column="status"/>
-        <result property="depositNum" column="sum"/>
+        <result property="depositStatus" column="deposit_status"/>
+        <result property="depositNum" column="deposit_num"/>
     </resultMap>
 
     <sql id="selectOrderVo">
@@ -54,13 +65,14 @@
         where order_id = #{orderId}
     </select>
     <select id="depositList" resultMap="depositListResult">
-        SELECT udo.`id`,udo.`order_number`,su.`nick_name`,
-        su.`phone_number`,udo.sum,udo.status,
-        udo.`create_time` FROM user_deposit_detail AS udo
+        select udo.`id`,udo.`openid`,udo.`order_number`,udo.device_number
+        ,udo.deposit_num,udo.deposit_status,udo.create_time,udo.`status`,
+        su.`nick_name`,su.`phone_number`
+        from user_deposit_order as udo
         INNER JOIN sys_user AS su ON su.`openid` = udo.`openid`
         <where>
             <if test="depositStatus != null">
-                and udo.status = #{depositStatus}
+                and udo.deposit_status = #{depositStatus}
             </if>
             <if test="nickName != null">
                 and su.`nick_name` like concat('%', #{nickName}, '%')
@@ -68,21 +80,65 @@
             <if test="phoneNumber != null">
                 and su.`phone_number` = #{phoneNumber}
             </if>
+            and udo.`status` = 1
         </where>
         order by udo.`create_time` desc
     </select>
     <select id="depositSum" resultType="java.lang.String">
-        SELECT SUM(udo.`sum`) AS orderSum FROM user_deposit_detail AS udo
+        select sum(udo.deposit_num)
+        from user_deposit_order as udo
         INNER JOIN sys_user AS su ON su.`openid` = udo.`openid`
         <where>
             <if test="depositStatus != null">
-                and udo.status = #{depositStatus}
+                and udo.deposit_status = #{depositStatus}
             </if>
             <if test="nickName != null">
                 and su.`nick_name` like concat('%', #{nickName}, '%')
             </if>
             <if test="phoneNumber != null">
                 and su.`phone_number` = #{phoneNumber}
+            </if>
+            and udo.`status` = 1
+        </where>
+    </select>
+    <select id="recharge" resultMap="rechargeResult">
+        SELECT upo.id,upo.openid,upo.out_trade_no,
+        upo.price,upo.end_time,upo.status,su.nick_name,
+        su.phone_number
+        FROM `user_pay_order` AS upo
+        INNER JOIN sys_user AS su ON su.openid = upo.openid
+        <where>
+            <if test="status == null">
+                and upo.status IN(1,4)
+            </if>
+            <if test="status != null">
+                and upo.status = #{status}
+            </if>
+            <if test="phoneNumber != null">
+                and su.phone_number = #{phoneNumber}
+            </if>
+            <if test="nickName != null">
+                and su.nick_name = #{nickName}
+            </if>
+        </where>
+        order by upo.end_time desc
+    </select>
+    <select id="rechargeSum" resultType="java.lang.String">
+        SELECT sum(upo.price)
+        FROM `user_pay_order` AS upo
+        INNER JOIN sys_user AS su ON su.openid = upo.openid
+        <where>
+            <if test="status == null">
+                and upo.status IN(1,4)
+            </if>
+            <if test="status != null">
+                and upo.status = #{status}
+            </if>
+            <if test="phoneNumber != null">
+                and su.phone_number = #{phoneNumber}
+            </if>
+            <if test="nickName != null">
+                and su.nick_name = #{nickName}
             </if>
         </where>
     </select>

@@ -319,6 +319,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		</set>
 		where openid = #{openid}
 	</update>
+	<update id="batchUpdate" parameterType="java.util.List">
+		<foreach collection="list" item="item" separator=";">
+			UPDATE sys_user
+			SET balance = #{item.balance}
+			WHERE user_id = #{item.userId}
+		</foreach>
+	</update>
 
 	<delete id="deleteUserById" parameterType="Long">
  		update sys_user set del_flag = '2' where user_id = #{userId}
@@ -353,5 +360,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		select user_id, dept_id, user_name, balance, openid, integral, nick_name, email, avatar, phone_number, password, sex, status, del_flag, login_ip, login_date, create_by, create_time, remark,user_type,proportion,parent_id,hospital_id
 		from sys_user
 		where user_id=#{userId}
+	</select>
+    <select id="selectAdmin" resultMap="SysUserResult">
+		select * from sys_user where user_id = #{userId}
+	</select>
+    <select id="selectHospitalProportion" parameterType="String" resultMap="SysUserResult">
+		SELECT su.* FROM hospital_user AS hu
+							 INNER JOIN sys_user AS su ON su.`user_id` = hu.`user_name`
+		WHERE hu.`hospital_id` = #{hospitalId}
 	</select>
 </mapper>

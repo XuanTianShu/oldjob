@@ -114,6 +114,9 @@ public class CallBackServiceImpl implements CallBackService {
     private UserDiscountMapper userDiscountMapper;
 
     @Autowired
+    private OrderProportionMapper orderProportionMapper;
+
+    @Autowired
     private RedisServer redisServer;
 
     @Value("${coupon.order}")
@@ -142,6 +145,7 @@ public class CallBackServiceImpl implements CallBackService {
     public HashMap<String, String> payCallBack(HttpServletRequest request) throws GeneralSecurityException {
         HashMap params = requestUtils.requestParams(request);
 
+        log.info("充值回调");
         Map resource = (Map) params.get("resource");
 
         Object stringBuffer = params.get("stringBuffer");
@@ -164,26 +168,36 @@ public class CallBackServiceImpl implements CallBackService {
             JSONObject jsonObject = JSONObject.parseObject(payer.toString());
             Object openid = jsonObject.get("openid");
             if ("SUCCESS".equals(parseObject.get("trade_state"))) {
-
                 Object success_time = parseObject.get("success_time");
                 LocalDateTime parse = LocalDateTime.parse(success_time.toString(), DateTimeFormatter.ISO_DATE_TIME);
                 String out_trade_no = (String) parseObject.get("out_trade_no");
                 Date time = Date.from(parse.atZone(ZoneId.systemDefault()).toInstant());
                 userPayOrder.setEndTime(time);
+                Object amount = parseObject.get("amount");
+                JSONObject jsonObject1 = JSONObject.parseObject(amount.toString());
+                Object price = jsonObject1.get("payer_total");
+
+
+                log.info("更新余额");
+                SysUser user1 = userMapper.selectUserByOpenid(openid.toString());
+                BigDecimal balance = user1.getBalance();
+                BigDecimal divide = new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100),2);
+                user1.setBalance(balance.add(divide));
+                userMapper.updateUser(user1);
+                log.info("更新成功");
+
                 //用户充值订单
                 userPayOrder.setOpenid(openid.toString());
                 userPayOrder.setStatus(1);
                 userPayOrder.setOutTradeNo(out_trade_no);
                 userPayOrderMapper.updateUserPayOrder(userPayOrder);
 
-                Object amount = parseObject.get("amount");
-                JSONObject jsonObject1 = JSONObject.parseObject(amount.toString());
-                Object price = jsonObject1.get("payer_total");
+
                 //用户余额明细
                 userBalanceDetail.setOpenid(openid.toString());
-                BigDecimal divide1 = new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100), 2);
+//                BigDecimal divide1 = new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100), 2);
 //                userBalanceDetail.setSum(new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100),2));
-                userBalanceDetail.setSum(new BigDecimal(price.toString()).divide(new BigDecimal(100)));
+                userBalanceDetail.setSum(divide);
                 userBalanceDetail.setStatus(0);
                 userBalanceDetail.setCreateTime(DateUtils.getNowDate());
                 userBalanceDetailMapper.insertUserBalanceDetail(userBalanceDetail);
@@ -192,11 +206,11 @@ public class CallBackServiceImpl implements CallBackService {
 
                 for (int i = 0; i < payTypes.size(); i++) {
                     //如果充值金额 等于 系统设置的对应的金额 则赠送 积分
-                    if( price == payTypes.get(i).getPaySum()){
+                    if( divide.longValue() == payTypes.get(i).getPaySum()){
                         SysUser user = new SysUser();
                         user.setIntegral(payTypes.get(i).getIntegral());
 //                        user.setBalance(Long.parseLong(String.valueOf(new BigDecimal(price.toString()).divide(BigDecimal.valueOf(100),2))));
-                        user.setBalance(new BigDecimal(price.toString()));
+//                        user.setBalance(new BigDecimal(price.toString()));
                         user.setOpenid(openid.toString());
                         if(userMapper.updateUserIntegralByOpenid(user)>0){
                             //赠送积分成功  记录 赠送积分明细
@@ -257,6 +271,7 @@ public class CallBackServiceImpl implements CallBackService {
             LocalDateTime parse = LocalDateTime.parse(success_time.toString(), DateTimeFormatter.ISO_DATE_TIME);
             Date time = Date.from(parse.atZone(ZoneId.systemDefault()).toInstant());
             //订单号
+            log.info("parseObject:{}",parseObject.toString());
             String out_trade_no = (String) parseObject.get("out_trade_no");
             String transaction_id = (String) parseObject.get("transaction_id");
             if ("SUCCESS".equals(parseObject.get("trade_state"))) {
@@ -325,7 +340,7 @@ public class CallBackServiceImpl implements CallBackService {
             JSONObject jsonObject1 = JSONObject.parseObject(amount.toString());
             Long price = Long.parseLong(jsonObject1.get("payer_total").toString());
             log.info("实付金额：{}",price);
-
+            BigDecimal divide = new BigDecimal(price).divide(new BigDecimal(100), MathContext.DECIMAL64);
             //支付时间
             Object success_time = parseObject.get("success_time");
             System.out.println(success_time+"微信回调时间");
@@ -337,8 +352,9 @@ public class CallBackServiceImpl implements CallBackService {
             log.info("流水号：{}",out_trade_no);
             if ("SUCCESS".equals(parseObject.get("trade_state"))) {
                 Map<String, Object> cacheMap = redisCache.getCacheMap(out_trade_no);
+                log.info("测试：{}",cacheMap.toString());
                 //实付金额
-                userLeaseOrder.setNetAmount(new BigDecimal(price).divide(new BigDecimal(100),MathContext.DECIMAL64));
+                userLeaseOrder.setNetAmount(divide);
                 //付款时间
                 userLeaseOrder.setCreateTime(time);
                 //支付流水号
@@ -351,13 +367,155 @@ public class CallBackServiceImpl implements CallBackService {
                 userLeaseOrder.setDepositNumber("0");
                 //修改用户租赁信息
                 userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
-                if(cacheMap.get("couponId")!=null ||cacheMap.get("couponId")!= ""){
+                String couponId = (String) cacheMap.get("couponId");
+                if(couponId != null){
                     //扣除 优惠券
                     UserDiscount userDiscount = new UserDiscount();
                     userDiscount.setStatus(1L);
                     userDiscount.setUserId(Long.parseLong(String.valueOf(cacheMap.get("couponId"))));
                     userDiscountMapper.updateUserDiscount(userDiscount);
                 }
+
+                if (divide.longValue() > 0){
+                    //TODO 计算分成
+                    UserLeaseOrder userLeaseOrder1 = userLeaseOrderMapper.selectLeaseOrderDetails(userLeaseOrder.getOrderNumber());
+                    Long residue = divide.longValue();
+                    String agentId = userLeaseOrder1.getAgentId();
+                    List<SysUser> list = new ArrayList<>();
+                    //TODO 计算代理商分成
+                    if (!agentId.equals("0")){
+                        Long agentProportion = userLeaseOrder1.getAgentProportion();
+                        if (agentProportion != 0){
+                            //TODO 计算分成金额
+                            BigDecimal netAmount = new BigDecimal(String.valueOf(divide));
+                            BigDecimal bigDecimal = new BigDecimal(userLeaseOrder1.getAgentProportion());
+                            BigDecimal multiply = netAmount.multiply(bigDecimal);
+                            //TODO 添加分成金额到账号
+                            SysUser user1 = userMapper.selectUserById(Long.parseLong(agentId));
+                            if (user1 != null) {
+                                BigDecimal balance = user1.getBalance();
+                                user1.setBalance(balance.add(multiply));
+                                list.add(user1);
+                            }
+
+                            residue = new BigDecimal(residue).subtract(multiply).longValue();
+
+                            //TODO 代理商子账户
+                            List<OrderProportionDetail> agentAccountProportion = orderProportionMapper.selectAgentAccountProportion(userLeaseOrder.getOrderNumber());
+                            if (agentAccountProportion.size() > 0){
+                                //TODO 计算子账户分成
+                                for (int i = 0; i < agentAccountProportion.size(); i++) {
+                                    SysUser user2 = userMapper.selectUserById(agentAccountProportion.get(i).getUserId());
+                                    if (user2 != null) {
+                                        String proportion = agentAccountProportion.get(i).getProportion();
+                                        BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
+                                        user1.setBalance(user2.getBalance().add(multiply1));
+                                        agentAccountProportion.get(i).setPrice(multiply1);
+                                        list.add(user2);
+                                    }
+                                }
+                                //TODO 批量更新收益
+                                orderProportionMapper.updateAgentAccountProportion(agentAccountProportion);
+                            }
+
+                            //TODO 代理商医院
+                            List<OrderProportionDetail> agentHospitalProportion = orderProportionMapper.selectAgentHospitalProportion(userLeaseOrder.getOrderNumber());
+                            if (agentHospitalProportion.size() > 0) {
+                                for (int i = 0; i < agentHospitalProportion.size(); i++) {
+                                    String proportion = agentHospitalProportion.get(i).getProportion();
+                                    BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
+                                    agentHospitalProportion.get(i).setPrice(multiply1);
+                                    SysUser user2 = userMapper.selectUserById(agentHospitalProportion.get(i).getUserId());
+                                    if (user2 != null) {
+                                        user2.setBalance(user2.getBalance().add(multiply1));
+                                        list.add(user2);
+                                    }
+                                }
+                                //TODO 批量更新收益
+                                orderProportionMapper.updateAgentHospitalProportion(agentHospitalProportion);
+                            }
+                        }
+                    }
+
+
+                    //TODO 投资人
+                    List<OrderProportionDetail> investorProportion = orderProportionMapper.selectInvestorProportion(userLeaseOrder.getOrderNumber());
+                    if (investorProportion.size() > 0) {
+                        Long investorProportion1 = userLeaseOrder1.getInvestorProportion();
+                        BigDecimal netAmount = new BigDecimal(String.valueOf(divide));
+                        BigDecimal multiply = new BigDecimal(investorProportion1).multiply(netAmount);
+                        //TODO 投资人子账户
+                        List<OrderProportionDetail> investorAccountProportion = orderProportionMapper.selectInvestorAccountProportion(userLeaseOrder.getOrderNumber());
+                        if (investorAccountProportion.size() > 0){
+                            for (int i = 0; i < investorProportion.size(); i++) {
+                                String proportion = investorProportion.get(i).getProportion();
+                                BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
+                                residue = new BigDecimal(residue).subtract(multiply1).longValue();
+                                for (int k = 0; k < investorAccountProportion.size(); k++) {
+                                    if (investorProportion.get(i).getUserId().equals(investorAccountProportion.get(k).getParentId())){
+                                        BigDecimal multiply2 = multiply1.multiply(new BigDecimal(investorAccountProportion.get(k).getProportion()));
+                                        investorAccountProportion.get(k).setPrice(multiply2);
+                                        multiply1 = multiply1.subtract(multiply2);
+                                        SysUser user1 = userMapper.selectUserById(investorAccountProportion.get(k).getUserId());
+                                        if (user1 != null) {
+                                            user1.setBalance(user1.getBalance().add(multiply2));
+                                            list.add(user1);
+                                        }
+                                    }
+                                }
+                                investorProportion.get(i).setPrice(multiply1);
+                                SysUser user1 = userMapper.selectUserById(investorProportion.get(i).getUserId());
+                                if (user1 != null) {
+                                    user1.setBalance(user1.getBalance().add(multiply1));
+                                    list.add(user1);
+                                }
+                            }
+                            //TODO 批量更新收益
+                            orderProportionMapper.updateInvestorProportion(investorProportion);
+                            orderProportionMapper.updateInvestorAccountProportion(investorAccountProportion);
+                        }else {
+                            for (int i = 0; i < investorProportion.size(); i++) {
+                                String proportion = investorProportion.get(i).getProportion();
+                                BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
+                                residue = new BigDecimal(residue).subtract(multiply1).longValue();
+                                SysUser user1 = userMapper.selectUserById(investorProportion.get(i).getUserId());
+                                if (user1 != null) {
+                                    user1.setBalance(user1.getBalance().add(multiply1));
+                                    list.add(user1);
+                                }
+                            }
+                            //TODO 批量更新收益
+                            orderProportionMapper.updateInvestorProportion(investorProportion);
+                        }
+                    }
+
+                    //TODO 计算医院分成
+                    String hospitalId = userLeaseOrder1.getHospitalId();
+                    Long hospitalProportion = userLeaseOrder1.getHospitalProportion();
+                    if (!hospitalId.equals("0")){
+                        BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
+                        BigDecimal multiply = bigDecimal.multiply(new BigDecimal(hospitalProportion));
+                        SysUser sysUser = userMapper.selectHospitalProportion(hospitalId);
+                        if (sysUser != null){
+                            BigDecimal balance = sysUser.getBalance();
+                            sysUser.setBalance(balance.add(multiply));
+                            list.add(sysUser);
+                        }
+                    }
+
+                    SysUser sysUser = userMapper.selectAdmin(1L);
+                    BigDecimal add = sysUser.getBalance().add(new BigDecimal(residue));
+                    if (add.compareTo(BigDecimal.ZERO) == 0 || add.compareTo(BigDecimal.ZERO) > 0) {
+                        sysUser.setBalance(add);
+                        list.add(sysUser);
+                    }
+
+                    if (list.size() > 0){
+                        //TODO 批量更新
+                        userMapper.batchUpdate(list);
+                    }
+                }
+
                 //响应接口
                 hashMap.put("code", "SUCCESS");
                 hashMap.put("message", "成功");
@@ -413,11 +571,6 @@ public class CallBackServiceImpl implements CallBackService {
         userIntegralBalanceDepositVo.setCreateTime(new Date());
         userBalanceDetailMapper.insertUserBalanceDetail(userIntegralBalanceDepositVo);
 
-        //TODO 计算分成
-        UserLeaseOrder userLeaseOrder1 = userLeaseOrderMapper.selectLeaseOrderDetails(userLeaseOrder.getOrderNumber());
-
-
-
         //实付金额
         userLeaseOrder.setNetAmount(price);
         //付款时间
@@ -431,7 +584,157 @@ public class CallBackServiceImpl implements CallBackService {
         //押金订单
         userLeaseOrder.setDepositNumber("0");
         //修改用户租赁信息
-        return AjaxResult.success(userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder));
+        userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
+
+        if (price.longValue() > 0){
+            log.info("总金额：{}",price.longValue());
+            //TODO 计算分成
+            UserLeaseOrder userLeaseOrder1 = userLeaseOrderMapper.selectLeaseOrderDetails(userLeaseOrder.getOrderNumber());
+            Long residue = price.longValue();
+            String agentId = userLeaseOrder1.getAgentId();
+            List<SysUser> list = new ArrayList<>();
+
+            //TODO 计算代理商分成
+            if (!agentId.equals("0")){
+                Long agentProportion = userLeaseOrder1.getAgentProportion();
+                if (agentProportion != 0){
+                    //TODO 计算分成金额
+                    BigDecimal netAmount = new BigDecimal(String.valueOf(price));
+                    BigDecimal bigDecimal = new BigDecimal(userLeaseOrder1.getAgentProportion());
+                    BigDecimal multiply = netAmount.multiply(bigDecimal);
+                    //TODO 添加分成金额到账号
+                    SysUser user1 = userMapper.selectUserById(Long.parseLong(agentId));
+                    if (user1 != null){
+                        BigDecimal balance = user1.getBalance();
+                        user1.setBalance(balance.add(multiply));
+                        list.add(user1);
+                        log.info("代理商：{}",user1.getBalance());
+                    }
+
+                    residue = new BigDecimal(residue).subtract(multiply).longValue();
+
+                    //TODO 代理商子账户
+                    List<OrderProportionDetail> agentAccountProportion = orderProportionMapper.selectAgentAccountProportion(userLeaseOrder.getOrderNumber());
+                    if (agentAccountProportion.size() > 0){
+                        //TODO 计算子账户分成
+                        for (int i = 0; i < agentAccountProportion.size(); i++) {
+                            SysUser user2 = userMapper.selectUserById(agentAccountProportion.get(i).getUserId());
+                            if (user2 != null){
+                                String proportion = agentAccountProportion.get(i).getProportion();
+                                BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
+                                user2.setBalance(user2.getBalance().add(multiply1));
+                                log.info("代理商子账户：{}",user2.getBalance());
+                                agentAccountProportion.get(i).setPrice(multiply1);
+                                list.add(user2);
+                            }
+                        }
+                        //TODO 批量更新收益
+                        orderProportionMapper.updateAgentAccountProportion(agentAccountProportion);
+                    }
+
+                    //TODO 代理商医院
+                    List<OrderProportionDetail> agentHospitalProportion = orderProportionMapper.selectAgentHospitalProportion(userLeaseOrder.getOrderNumber());
+                    if (agentHospitalProportion.size() > 0) {
+                        for (int i = 0; i < agentHospitalProportion.size(); i++) {
+                            String proportion = agentHospitalProportion.get(i).getProportion();
+                            BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
+                            agentHospitalProportion.get(i).setPrice(multiply1);
+                            SysUser user2 = userMapper.selectUserById(agentHospitalProportion.get(i).getUserId());
+                            if (user2 != null){
+                                user2.setBalance(user2.getBalance().add(multiply1));
+                                list.add(user2);
+                                log.info("代理商医院：{}",user2.getBalance());
+                            }
+
+                        }
+                        //TODO 批量更新收益
+                        orderProportionMapper.updateAgentHospitalProportion(agentHospitalProportion);
+                    }
+                }
+            }
+
+
+            //TODO 投资人
+            List<OrderProportionDetail> investorProportion = orderProportionMapper.selectInvestorProportion(userLeaseOrder.getOrderNumber());
+            if (investorProportion.size() > 0) {
+                Long investorProportion1 = userLeaseOrder1.getInvestorProportion();
+                BigDecimal netAmount = new BigDecimal(String.valueOf(price.longValue()));
+                BigDecimal multiply = new BigDecimal(investorProportion1).multiply(netAmount);
+                //TODO 投资人子账户
+                List<OrderProportionDetail> investorAccountProportion = orderProportionMapper.selectInvestorAccountProportion(userLeaseOrder.getOrderNumber());
+                if (investorAccountProportion.size() > 0){
+                    for (int i = 0; i < investorProportion.size(); i++) {
+                        String proportion = investorProportion.get(i).getProportion();
+                        BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
+                        residue = new BigDecimal(residue).subtract(multiply1).longValue();
+                        for (int k = 0; k < investorAccountProportion.size(); k++) {
+                            if (investorProportion.get(i).getUserId().equals(investorAccountProportion.get(k).getParentId())){
+                                BigDecimal multiply2 = multiply1.multiply(new BigDecimal(investorAccountProportion.get(k).getProportion()));
+                                investorAccountProportion.get(k).setPrice(multiply2);
+                                multiply1 = multiply1.subtract(multiply2);
+                                SysUser user1 = userMapper.selectUserById(investorAccountProportion.get(k).getUserId());
+                                if (user1 != null){
+                                    user1.setBalance(user1.getBalance().add(multiply2));
+                                    list.add(user1);
+                                    log.info("投资人子账户：{}",user1.getBalance());
+                                }
+                            }
+                        }
+                        investorProportion.get(i).setPrice(multiply1);
+                        SysUser user1 = userMapper.selectUserById(investorProportion.get(i).getUserId());
+                        user1.setBalance(user1.getBalance().add(multiply1));
+                        list.add(user1);
+                        log.info("投资人：{}",user1.getBalance());
+                    }
+                    //TODO 批量更新收益
+                    orderProportionMapper.updateInvestorProportion(investorProportion);
+                    orderProportionMapper.updateInvestorAccountProportion(investorAccountProportion);
+                }else {
+                    for (int i = 0; i < investorProportion.size(); i++) {
+                        String proportion = investorProportion.get(i).getProportion();
+                        BigDecimal multiply1 = new BigDecimal(proportion).multiply(multiply);
+                        residue = new BigDecimal(residue).subtract(multiply1).longValue();
+                        SysUser user1 = userMapper.selectUserById(investorProportion.get(i).getUserId());
+                        if (user1 != null){
+                            user1.setBalance(user1.getBalance().add(multiply1));
+                            list.add(user1);
+                            log.info("投资人：{}",user1.getBalance());
+                        }
+                    }
+                    //TODO 批量更新收益
+                    orderProportionMapper.updateInvestorProportion(investorProportion);
+                }
+            }
+
+            //TODO 计算医院分成
+            String hospitalId = userLeaseOrder1.getHospitalId();
+            Long hospitalProportion = userLeaseOrder1.getHospitalProportion();
+            if (!hospitalId.equals("0")){
+                BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
+                BigDecimal multiply = bigDecimal.multiply(new BigDecimal(hospitalProportion));
+                SysUser sysUser = userMapper.selectHospitalProportion(hospitalId);
+                if (sysUser != null){
+                    BigDecimal balance = sysUser.getBalance();
+                    sysUser.setBalance(balance.add(multiply));
+                    list.add(sysUser);
+                    log.info("医院：{}",sysUser.getBalance());
+                }
+            }
+            SysUser sysUser = userMapper.selectAdmin(1L);
+            BigDecimal add = sysUser.getBalance().add(new BigDecimal(residue));
+            if (add.compareTo(BigDecimal.ZERO) == 0 || add.compareTo(BigDecimal.ZERO) > 0){
+                sysUser.setBalance(add);
+                list.add(sysUser);
+                log.info("平台：{}",sysUser.getBalance());
+            }
+
+            if (list.size() > 0){
+                log.info("批量更新");
+                //TODO 批量更新
+                userMapper.batchUpdate(list);
+            }
+        }
+        return AjaxResult.success();
     }
 
     @Override
@@ -627,7 +930,7 @@ public class CallBackServiceImpl implements CallBackService {
                                         long keyExpire = redisServer.getKeyExpire(orderPrefix + userLeaseOrder.getOrderNumber());
                                         System.out.println(keyExpire+"过期时间");
                                         BigDecimal bigDecimal = new BigDecimal(hashMap.get("price").toString());
-                                        if (keyExpire != -1){
+                                        if (keyExpire >= 0){
                                             if (before){
                                                 userLeaseOrder.setTimePrice(bigDecimal.multiply(new BigDecimal(time)));
                                             }

@@ -21,4 +21,6 @@ public class OrderDepositListVO {
     private String depositStatus;
 
     private Date createTime;
+
+    private String status;
 }
