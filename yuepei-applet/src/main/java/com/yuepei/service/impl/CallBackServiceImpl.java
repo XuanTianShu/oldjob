@@ -930,37 +930,83 @@ public class CallBackServiceImpl implements CallBackService {
 
                                 Date parse = simpleDateFormat.parse(format);
                                 Date startTime = simpleDateFormat.parse(objectMap.get("startTime").toString());
+                                Date endTime = simpleDateFormat.parse(objectMap.get("endTime").toString());
                                 BigDecimal price = new BigDecimal(objectMap.get("price").toString());
                                 System.out.println(price + "固定套餐的价格");
                                 boolean before = parse.before(startTime);
                                 System.out.println(parse+"下单时间");
-                                System.out.println(startTime+"固定套餐时间");
+                                System.out.println(startTime+"固定套餐开始时间");
+                                System.out.println(endTime+"固定套餐结束时间");
                                 System.out.println(before+"结果");
                                 if (substring.equals("D")){
                                     userLeaseOrder.setRestoreTime(new Date());
                                     userLeaseOrder.setStatus("1");
                                     int time = 0;
+                                    log.info("现在时间：{}",new Date().getTime());
                                     long l = new Date().getTime() - userLeaseOrder.getLeaseTime().getTime();
+                                    String format1 = simpleDateFormat.format(new Date());
+                                    Date parse2 = simpleDateFormat.parse(format1);
+                                    log.info("现在时间的时分秒的时间戳：{}",parse2);
+                                    log.info("使用时长：{}",l);
+                                    Date leaseTime = userLeaseOrder.getLeaseTime();
+                                    String currentTime = new SimpleDateFormat("HH:mm:ss").format(leaseTime);
+                                    Date parse1 = simpleDateFormat.parse(currentTime);
+
+                                    /**
+                                     * 16:29:16.480 [http-nio-8005-exec-43] INFO  c.y.s.i.CallBackServiceImpl - [bluetoothCallback,957] - 固定套餐:Sun Jan 01 19:15:00 CST 2023
+                                     * 16:29:16.480 [http-nio-8005-exec-43] INFO  c.y.s.i.CallBackServiceImpl - [bluetoothCallback,958] - 下单套餐:Wed Apr 19 14:28:06 CST 2023
+                                     * 16:29:16.481 [http-nio-8005-exec-43] INFO  c.y.s.i.CallBackServiceImpl - [bluetoothCallback,959] - 固定套餐时间戳：1672571700000
+                                     * 16:29:16.481 [http-nio-8005-exec-43] INFO  c.y.s.i.CallBackServiceImpl - [bluetoothCallback,960] - 下单套餐时间戳：1681885686000
+                                     */
                                     long nd = 1000 * 24 * 60 * 60;
                                     long nh = 1000 * 60 * 60;
                                     long nm = 1000 * 60;
                                     long ns = 1000;
+                                    long k = startTime.getTime() - parse1.getTime();
+                                    if (parse2.getTime() > startTime.getTime()){
+                                        log.info("固定套餐之内");
+                                        // 计算差多少天
+                                        long day = k / nd;
+                                        // 计算差多少小时
+                                        long hour = k % nd / nh;
+                                        // 计算差多少分钟
+                                        long min = k % nd % nh / nm;
+                                        if (day != 0){
+                                            time += day * 24;
+                                        }
+                                        if (hour != 0){
+                                            time += hour;
+                                        }
+                                        if (min > 0){
+                                            time += 1;
+                                        }
+                                    }else {
+                                        log.info("计时套餐之内");
+                                        // 计算差多少天
+                                        long day = l / nd;
+                                        // 计算差多少小时
+                                        long hour = l % nd / nh;
+                                        // 计算差多少分钟
+                                        long min = l % nd % nh / nm;
+                                        log.info("day:{}",day);
+                                        log.info("hour:{}",hour);
+                                        log.info("min:{}",min);
+                                        if (day != 0){
+                                            time += day * 24;
+                                        }
+                                        if (hour != 0){
+                                            time += hour;
+                                        }
+                                        if (min > 0){
+                                            time += 1;
+                                        }
+                                    }
+                                    log.info("固定套餐:{}",startTime);
+                                    log.info("下单套餐:{}",parse1);
+                                    log.info("固定套餐时间戳：{}",startTime.getTime());
+                                    log.info("下单套餐时间戳：{}",parse1.getTime());
 
-                                    // 计算差多少天
-                                    long day = l / nd;
-                                    // 计算差多少小时
-                                    long hour = l % nd / nh;
-                                    // 计算差多少分钟
-                                    long min = l % nd % nh / nm;
-                                    if (day != 0){
-                                        time += day * 24;
-                                    }
-                                    if (hour != 0){
-                                        time += hour;
-                                    }
-                                    if (min > 0){
-                                        time += time+1;
-                                    }
+
                                     userLeaseOrder.setPlayTime(String.valueOf(l));
                                     log.info("还床使用时长：{}",userLeaseOrder.getPlayTime());
                                     long valid = l / ns;
@@ -970,9 +1016,12 @@ public class CallBackServiceImpl implements CallBackService {
                                         long keyExpire = redisServer.getKeyExpire(orderPrefix + userLeaseOrder.getOrderNumber());
                                         System.out.println(keyExpire+"过期时间");
                                         BigDecimal bigDecimal = new BigDecimal(hashMap.get("price").toString());
+                                        //TODO 重新计算
                                         if (keyExpire >= 0){
                                             if (before){
-                                                userLeaseOrder.setTimePrice(bigDecimal.multiply(new BigDecimal(time)));
+                                                log.info("使用的小时为：{}",time);
+                                                BigDecimal multiply = bigDecimal.multiply(new BigDecimal(time));
+                                                userLeaseOrder.setTimePrice(multiply);
                                                 log.info("定时费用：{}",userLeaseOrder.getTimePrice());
                                             }
                                         }else {
