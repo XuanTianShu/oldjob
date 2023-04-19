@@ -222,10 +222,11 @@
         <result property="proportion" column="proportion"/>
         <result property="netAmount" column="net_amount"/>
         <result property="leaseTime" column="lease_time"/>
+        <result property="hospitalId" column="hospitalId"/>
     </resultMap>
 
     <sql id="selectOrderProportionDetail">
-        select opd.user_id,opd.order_number,opd.proportion,ulo.net_amount,ulo.lease_time
+        select opd.user_id,opd.order_number,opd.proportion,ulo.net_amount,ulo.lease_time,ulo.hospitalId
         from order_proportion_detail opd
         left join user_lease_order ulo on opd.order_number = ulo.order_number
     </sql>
