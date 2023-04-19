@@ -1,8 +1,10 @@
 package com.yuepei.system.service.commandDelivery;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.Item;
 import com.yuepei.system.utils.Constant;
@@ -31,7 +33,7 @@ import java.util.Objects;
  */
 public class CreateDeviceCommand {
 
-    public static void unlocking(Device device) throws Exception {
+    public static AjaxResult unlocking(Device device) throws Exception {
         String num="1";
         String Onoff= "1";
         // Two-Way Authentication
@@ -65,21 +67,24 @@ public class CreateDeviceCommand {
         }else {
             //TODO 打开所有锁（一拖五专用）
             if (device.getDeviceTypeId() == 5 || device.getDeviceTypeId() == 4){
-                String rows = device.getRows();
-                ObjectMapper objectMapper = new ObjectMapper();
-                List<Item> itemList;
-                itemList = objectMapper.readValue(rows, new TypeReference<List<Item>>() {
-                });
-                for (int i = Objects.requireNonNull(itemList).size() - 1; i >= 0; i--) {
-                    //0可用1故障2租赁中
-                    if (itemList.get(i).getStatus() == 0){
-
-                    }
-                }
+//                String rows = device.getRows();
+//                ObjectMapper objectMapper = new ObjectMapper();
+//                List<Item> itemList;
+//                itemList = objectMapper.readValue(rows, new TypeReference<List<Item>>() {
+//                });
+//                HashMap<String, Object> map = new HashMap<>();
+//                for (int i = Objects.requireNonNull(itemList).size() - 1; i >= 0; i--) {
+//                    //0可用1故障2租赁中
+//                    if (itemList.get(i).getStatus() == 0){
+//                        map.put("value",itemList.get(i).getIndex());
+//                        String string = JSONObject.toJSONString(map);
+//                        paras_1  = JsonUtil.convertObject2ObjectNode(string);
+//                    }
+//                }
+                paras_1 = JsonUtil.convertObject2ObjectNode("{\"value\":\"0\"}");
             }
         }
-        ObjectNode paras_0 = JsonUtil.convertObject2ObjectNode("{\"value\":\"0\"}");
-
+//        ObjectNode paras_0 = JsonUtil.convertObject2ObjectNode("{\"value\":\"0\"}");
         Map<String, Object> paramCommand = new HashMap<>();
         if(num.equals("0")){//01 guangdia
             paramCommand.put("serviceId", serviceId_GuangDian);
@@ -88,11 +93,11 @@ public class CreateDeviceCommand {
             paramCommand.put("serviceId", serviceId_streetLight);
             paramCommand.put("method", method_CLEAR_GETDATA);
         }
-        if(Onoff.equals("1")) {
+//        if(Onoff.equals("1")) {
             paramCommand.put("paras", paras_1);
-        }else {
-            paramCommand.put("paras", paras_0);
-        }
+//        }else {
+//            paramCommand.put("paras", paras_0);
+//        }
 
         Map<String, Object> paramCreateDeviceCommand = new HashMap<>();
         paramCreateDeviceCommand.put("deviceId", device.getTelecomId());
@@ -110,11 +115,44 @@ public class CreateDeviceCommand {
         HttpResponse responseCreateDeviceCommand = httpsUtil.doPostJson(urlCreateDeviceCommand, header, jsonRequest);
 
         String responseBody = httpsUtil.getHttpResponseBody(responseCreateDeviceCommand);
-
-        System.out.println("CreateDeviceCommand, response content:");
-        System.out.println(responseCreateDeviceCommand.getStatusLine());
-        System.out.println(responseBody);
-        System.out.println();
+        if (responseBody != null){
+            /**
+             * {"commandId":"0e344774e64f4eefacb7ddf31f29b16c",    设备命令 ID。
+             * "appId":"ad1ddd68e3f941b78389ba11584917f9",   第三方应用的身份标识，用于唯一标识一个应用。开发者可通过该标识来指定哪个应用来调用物联网平台的开放 API。
+             * "deviceId":"917faaf1-0083-4df9-9186-89f8362277e3",   下发命令的设备 ID，用于唯一标识一个设备
+             * "command":{"serviceId":"VehicleDetectorBasic",
+             * "method":"SET_DEVICE_LEVEL",
+             * "paras":{"value":"3"}},
+             * "callbackUrl":"https://www.yp10000.com/prod-api/wechat/user/refund/unlocking",命令状态变化通知地址，当命令状态变化时（执行失败，执行成功，超时，发送，已送达）会通知第三方应用
+             * "expireTime":0,  下发命令的超时时间，单位为秒，表示设备命令在创建后 expireTime 秒内有效，超过这个时间范围后命令将不再下发，如果未设置则默认为 48 小时（86400s*2）
+             * "status":"SENT",下发命令的状态。
+             *  PENDING 表示未下发
+             *  EXPIRED 表示命令已经过期
+             *  SUCCESSFUL 表示命令已经成功执行
+             *  FAILED 表示命令执行失败
+             *  TIMEOUT 表示命令下发执行超时
+             *  CANCELED 表示命令已经被撤销执行
+             *  DELIVERED 表示命令已送达设备
+             *  SENT 表示命令正在下发
+             * "creationTime":"20230419T030228Z", 命令的创建时间
+             * "platformIssuedTime":"20230419T030228Z",  平台发送命令的时间
+             * "issuedTimes":0,  平台发送命令的次数
+             * "maxRetransmit":3}  命令下发最大重传次数
+             */
+            JSONObject parse = JSONObject.parse(responseBody);
+            String status = String.valueOf(parse.get("status"));
+            if (status.equals("SENT")){
+                return AjaxResult.success("开锁命令下发中！");
+            }else if (status.equals("DELIVERED")){
+                return AjaxResult.success("命令已送达！");
+            }else if (status.equals("SUCCESSFUL")){
+                return AjaxResult.success("命令已执行！");
+            }else {
+                return AjaxResult.error("开锁命令下发失败！");
+            }
+        }else {
+            return AjaxResult.error("操作失败！");
+        }
     }
 
     /**

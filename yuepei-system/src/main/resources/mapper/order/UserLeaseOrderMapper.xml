@@ -361,7 +361,7 @@
     </select>
     <select id="selectLeaseOrderDetails" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
         <include refid="selectUserLeaseOrderVo"/>
-        where order_number = #{orderNumber} AND `status` = 2
+        where order_number = #{orderNumber}
     </select>
 
     <select id="selectRevenueStatistics" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">

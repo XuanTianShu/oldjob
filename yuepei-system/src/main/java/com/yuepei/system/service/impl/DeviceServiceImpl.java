@@ -254,6 +254,7 @@ public class DeviceServiceImpl implements DeviceService {
         JSONArray objects = JSON.parseArray(device.getInvestorId());
         List<Long> list = objects.toJavaList(Long.class);
         log.info("{}",device.getInvestorId());
+        log.info("地址：{}",device.getDeviceFullAddress());
         if (list.size() > 0){
             System.out.println("执行");
             deviceInvestorMapper.delByInvestorId(device.getDeviceNumber());
@@ -275,7 +276,6 @@ public class DeviceServiceImpl implements DeviceService {
             deviceAgentMapper.del(device.getDeviceNumber());
         }
         if (device.getHospitalId() != 0 && device.getHospitalId() != null){
-            device.setDeviceFullAddress("0");
             Device device1 = deviceMapper.selectDeviceByDeviceId(device.getDeviceId());
 //            deviceInvestorMapper.deleteByInvestorId(device1.getDeviceNumber());
             deviceHospitalMapper.del(String.valueOf(device.getDeviceNumber()));
@@ -289,6 +289,7 @@ public class DeviceServiceImpl implements DeviceService {
             deviceHospitalMapper.del(String.valueOf(device.getDeviceNumber()));
         }
         deviceInvestorMapper.updateProportion(device.getDeviceNumber());
+        log.info("device:{}",device.getDeviceFullAddress());
         return deviceMapper.updateDevice(device);
     }
 
@@ -441,6 +442,11 @@ public class DeviceServiceImpl implements DeviceService {
     public int updateProportion(Device device) {
         deviceInvestorMapper.updateProportion(device.getDeviceNumber());
         return deviceMapper.updateProportion(device);
+    }
+
+    @Override
+    public List<HospitalVO> selectHospital(Long[] longs1) {
+        return deviceMapper.selectHospital(longs1);
     }
 
 }

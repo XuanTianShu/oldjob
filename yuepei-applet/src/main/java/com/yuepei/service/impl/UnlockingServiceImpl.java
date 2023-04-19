@@ -43,8 +43,7 @@ public class UnlockingServiceImpl implements UnlockingService {
         log.info("设备信息：{}",device.getTelecomId());
         log.info("锁号：{}",device.getLock());
         try {
-            CreateDeviceCommand.unlocking(device);
-            return AjaxResult.success();
+            return CreateDeviceCommand.unlocking(device);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -55,8 +54,7 @@ public class UnlockingServiceImpl implements UnlockingService {
     public AjaxResult AllUnlocking(Device device) {
         log.info("设备信息：{}",device.getTelecomId());
         try {
-            CreateDeviceCommand.unlocking(device);
-            return AjaxResult.success();
+            return CreateDeviceCommand.unlocking(device);
         } catch (Exception e) {
             e.printStackTrace();
         }

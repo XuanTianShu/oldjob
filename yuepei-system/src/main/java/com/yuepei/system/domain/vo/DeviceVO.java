@@ -53,4 +53,8 @@ public class DeviceVO extends BaseEntity {
     private List<String> depositList;
 
     private Integer exists;
+
+    private String bed;
+
+    private String istrative;
 }

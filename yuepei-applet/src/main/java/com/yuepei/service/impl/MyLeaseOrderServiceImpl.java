@@ -290,8 +290,11 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                         long nm = 1000 * 60;
                         long ns = 1000;
                         long sec = l % nd % nh % nm / ns;
+                        long valid = l / ns;
+                        log.info("sec:{}",sec);
+                        log.info("valid:{}",valid);
                         redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1,
-                                new Long(sec).intValue(), TimeUnit.SECONDS);
+                                new Long(valid).intValue(), TimeUnit.SECONDS);
                         System.out.println("存储到redis1");
                     }else {
                         redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);

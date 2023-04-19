@@ -154,43 +154,54 @@ public class HospitalServiceImpl implements HospitalService {
         Long[] one = new Long[50];
         Long[] two = new Long[50];
         Long[] three = new Long[50];
+        Long[] four = new Long[50];
         if (device.getDeviceNumber() != null){
             Device deviceNumber = deviceMapper.selectDeviceByDeviceNumber(device.getDeviceNumber());
             List<HospitalVO> hospital = hospitalMapper.selectTreeOne(deviceNumber.getHospitalId());
-            objectHashMap.put("hospital_one",hospital);
+            objectHashMap.put("hospital_five",hospital);
             for (int i = 0; i < hospital.size(); i++) {
                 one[i] = hospital.get(i).getHospitalId();
             }
             List<HospitalVO> hospitals = hospitalMapper.selectTree(one);
-            objectHashMap.put("hospital_two",hospitals);
+            objectHashMap.put("hospital_one",hospitals);
             for (int y = 0; y < hospitals.size(); y++) {
                 two[y] = hospitals.get(y).getHospitalId();
             }
             List<HospitalVO> hospitalVOS = hospitalMapper.selectTree(two);
-            objectHashMap.put("hospital_three",hospitalVOS);
+            objectHashMap.put("hospital_two",hospitalVOS);
             for (int l = 0; l < hospitalVOS.size(); l++) {
                 three[l] = hospitalVOS.get(l).getHospitalId();
             }
             List<HospitalVO> hospitalVOS1 = hospitalMapper.selectTree(three);
-            objectHashMap.put("hospital_four",hospitalVOS1);
+            objectHashMap.put("hospital_three",hospitalVOS1);
+            for (int m = 0; m < hospitalVOS1.size(); m++) {
+                four[m] = hospitalVOS1.get(m).getHospitalId();
+            }
+            List<HospitalVO> hospitalVOS2 = hospitalMapper.selectTree(four);
+            objectHashMap.put("hospital_four",hospitalVOS2);
         }else {
             List<HospitalVO> hospital = hospitalMapper.selectTreeOne(device.getHospitalId());
-            objectHashMap.put("hospital_one",hospital);
+            objectHashMap.put("hospital_five",hospital);
             for (int i = 0; i < hospital.size(); i++) {
                 one[i] = hospital.get(i).getHospitalId();
             }
             List<HospitalVO> hospitals = hospitalMapper.selectTree(one);
-            objectHashMap.put("hospital_two",hospitals);
+            objectHashMap.put("hospital_one",hospitals);
             for (int y = 0; y < hospitals.size(); y++) {
                 two[y] = hospitals.get(y).getHospitalId();
             }
             List<HospitalVO> hospitalVOS = hospitalMapper.selectTree(two);
-            objectHashMap.put("hospital_three",hospitalVOS);
+            objectHashMap.put("hospital_two",hospitalVOS);
             for (int l = 0; l < hospitalVOS.size(); l++) {
                 three[l] = hospitalVOS.get(l).getHospitalId();
             }
             List<HospitalVO> hospitalVOS1 = hospitalMapper.selectTree(three);
-            objectHashMap.put("hospital_four",hospitalVOS1);
+            objectHashMap.put("hospital_three",hospitalVOS1);
+            for (int m = 0; m < hospitalVOS1.size(); m++) {
+                four[m] = hospitalVOS1.get(m).getHospitalId();
+            }
+            List<HospitalVO> hospitalVOS2 = hospitalMapper.selectTree(four);
+            objectHashMap.put("hospital_four",hospitalVOS2);
         }
         return objectHashMap;
     }

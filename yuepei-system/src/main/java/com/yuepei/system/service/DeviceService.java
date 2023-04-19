@@ -140,5 +140,7 @@ public interface DeviceService {
     TotalProportionVO totalProportion2(Device device);
 
     int updateProportion(Device device);
+
+    List<HospitalVO> selectHospital(Long[] longs1);
 }
 
