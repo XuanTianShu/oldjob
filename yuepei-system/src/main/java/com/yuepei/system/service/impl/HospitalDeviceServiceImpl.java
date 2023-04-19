@@ -280,7 +280,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrderList.clear();
             userLeaseOrderList.addAll(collect);
         }
-        return userLeaseOrderList;
+        List<UserLeaseOrderVo> collect = userLeaseOrderList.stream().filter(map -> !map.getStatus().equals("3")).collect(Collectors.toList());
+        return collect;
     }
 
     @Override
