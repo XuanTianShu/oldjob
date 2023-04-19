@@ -206,9 +206,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 e.printStackTrace();
             }
             userLeaseOrders.stream().forEach(map->{
-                UserLeaseOrder userLeaseOrder = userLeaseOrderMapper.selectUserLeaseOrderByOpenId(map.getOrderNumber());
-                Device device = hospitalDeviceMapper.selectDeviceByTypeNumber(userLeaseOrder.getDeviceNumber());
-                Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(device.getHospitalId());
+                Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(map.getHospitalId()));
                 OrderVo orderVo = new OrderVo();
                 orderVo.setLeaseTime(dateFormat.format(map.getLeaseTime()));
                 orderVo.setHospitalName(hospital.getHospitalName());
@@ -246,6 +244,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setLeaseTime(dateFormat.format(map.getLeaseTime()));
+                Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(map.getHospitalId()));
+                orderVo.setHospitalName(hospital.getHospitalName());
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
                 orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
@@ -288,6 +288,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setLeaseTime(dateFormat.format(map.getLeaseTime()));
+                Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(map.getHospitalId()));
+                orderVo.setHospitalName(hospital.getHospitalName());
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
                 orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
@@ -306,6 +308,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setLeaseTime(dateFormat.format(map.getLeaseTime()));
+                Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(map.getHospitalId()));
+                orderVo.setHospitalName(hospital.getHospitalName());
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
                 orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
@@ -630,7 +634,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             userLeaseOrderList.addAll(collect);
         }
         userLeaseOrderVoList.addAll(userLeaseOrderList);
-        return userLeaseOrderVoList;
+        List<UserLeaseOrderVo> collect = userLeaseOrderVoList.stream().filter(map -> !map.getStatus().equals("3")).collect(Collectors.toList());
+        return collect;
     }
 
     @Override
@@ -674,7 +679,9 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         userLeaseOrderVo.setUserName(sysUser.getUserName());
         userLeaseOrderVo.setProportion(sysUser.getProportion());
         userLeaseOrderVo.setAgentName(sysUser.getNickName());
-        userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
+        if (hospital!=null){
+            userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
+        }
         if (userLeaseOrder.getStatus().equals("0")){
             Long date = new Date().getTime();
             Long lease = userLeaseOrderVo.getLeaseTime().getTime();
@@ -744,11 +751,6 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                                 }else {
                                     userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1+1)).add(bigDecimal));
                                 }
-                            }else {
-                                Object price = jsonObject.get("price");
-                                BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                                userLeaseOrderVo.setContent(bigDecimal+device.getContent());
-                                userLeaseOrderVo.setEvaluate(bigDecimal);
                             }
                         }
                     }else {

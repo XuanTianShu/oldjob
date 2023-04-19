@@ -378,7 +378,8 @@ public class AgentServiceImpl implements AgentService {
             userLeaseOrderList.addAll(collect);
         }
         userLeaseOrderVoList.addAll(userLeaseOrderList);
-        return userLeaseOrderVoList;
+        List<UserLeaseOrderVo> collect = userLeaseOrderVoList.stream().filter(map -> !map.getStatus().equals("3")).collect(Collectors.toList());
+        return collect;
     }
 
     @Override

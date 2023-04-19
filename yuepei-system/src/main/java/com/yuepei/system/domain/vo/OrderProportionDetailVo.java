@@ -22,4 +22,6 @@ public class OrderProportionDetailVo {
     private Date leaseTime;
 
     private BigDecimal netAmount;
+
+    private String hospitalId;
 }

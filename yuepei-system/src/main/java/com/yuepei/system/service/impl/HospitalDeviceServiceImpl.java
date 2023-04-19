@@ -280,7 +280,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrderList.clear();
             userLeaseOrderList.addAll(collect);
         }
-        return userLeaseOrderList;
+        List<UserLeaseOrderVo> collect = userLeaseOrderList.stream().filter(map -> !map.getStatus().equals("3")).collect(Collectors.toList());
+        return collect;
     }
 
     @Override
@@ -296,7 +297,9 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         userLeaseOrderVo.setUserName(sysUser1.getUserName());
         userLeaseOrderVo.setProportion(sysUser1.getProportion());
         userLeaseOrderVo.setAgentName(sysUser1.getNickName());
-        userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
+        if (hospital!=null){
+            userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
+        }
         if (userLeaseOrder.getStatus().equals("0")){
             Long date = new Date().getTime();
             Long lease = userLeaseOrderVo.getLeaseTime().getTime();
@@ -366,11 +369,6 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
                                 }else {
                                     userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1+1)).add(bigDecimal));
                                 }
-                            }else {
-                                Object price = jsonObject.get("price");
-                                BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                                userLeaseOrderVo.setContent(bigDecimal+device.getContent());
-                                userLeaseOrderVo.setEvaluate(bigDecimal);
                             }
                         }
                     }else {
