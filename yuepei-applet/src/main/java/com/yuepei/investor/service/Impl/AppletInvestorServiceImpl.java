@@ -748,11 +748,6 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                                 }else {
                                     userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1+1)).add(bigDecimal));
                                 }
-                            }else {
-                                Object price = jsonObject.get("price");
-                                BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                                userLeaseOrderVo.setContent(bigDecimal+device.getContent());
-                                userLeaseOrderVo.setEvaluate(bigDecimal);
                             }
                         }
                     }else {
