@@ -678,7 +678,9 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         userLeaseOrderVo.setUserName(sysUser.getUserName());
         userLeaseOrderVo.setProportion(sysUser.getProportion());
         userLeaseOrderVo.setAgentName(sysUser.getNickName());
-        userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
+        if (hospital!=null){
+            userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
+        }
         if (userLeaseOrder.getStatus().equals("0")){
             Long date = new Date().getTime();
             Long lease = userLeaseOrderVo.getLeaseTime().getTime();

@@ -296,7 +296,9 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         userLeaseOrderVo.setUserName(sysUser1.getUserName());
         userLeaseOrderVo.setProportion(sysUser1.getProportion());
         userLeaseOrderVo.setAgentName(sysUser1.getNickName());
-        userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
+        if (hospital!=null){
+            userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
+        }
         if (userLeaseOrder.getStatus().equals("0")){
             Long date = new Date().getTime();
             Long lease = userLeaseOrderVo.getLeaseTime().getTime();
