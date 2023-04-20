@@ -1,5 +1,6 @@
 package com.yuepei.system.mapper;
 
+import com.yuepei.common.core.domain.entity.SysRole;
 import com.yuepei.system.domain.Device;
 import com.yuepei.system.domain.Hospital;
 import com.yuepei.system.domain.UserLeaseOrder;
@@ -21,4 +22,6 @@ public interface AgentMapper {
     List<Device> selectDeviceByHospitalIdLike(@Param("userId") Long userId,@Param("numberOrAddress") String numberOrAddress);
 
     void insertHospital(Hospital hospital);
+
+    SysRole selectUserRole();
 }

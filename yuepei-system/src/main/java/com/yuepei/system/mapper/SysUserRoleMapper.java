@@ -61,4 +61,6 @@ public interface SysUserRoleMapper
      * @return 结果
      */
     public int deleteUserRoleInfos(@Param("roleId") Long roleId, @Param("userIds") Long[] userIds);
+
+    void insertUserRole(@Param("roleId") Long roleId,@Param("userId") Long userId);
 }

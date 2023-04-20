@@ -2,6 +2,7 @@ package com.yuepei.web.agent.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
+import com.yuepei.common.core.domain.entity.SysRole;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.utils.SecurityUtils;
 import com.yuepei.system.domain.*;
@@ -52,6 +53,9 @@ public class AgentServiceImpl implements AgentService {
 
     @Autowired
     private SysUserFeedbackMapper sysUserFeedbackMapper;
+
+    @Autowired
+    private SysUserRoleMapper sysUserRoleMapper;
 
     @Override
     public DeviceManageVo selectAgentInfo(Long userId,Long hospitalId,Long utilizationRate) {
@@ -333,6 +337,8 @@ public class AgentServiceImpl implements AgentService {
         user1.setProportion(hospitalAgentVo.getDivided());
         user1.setHospitalId(hospital.getHospitalId());
         sysUserMapper.insertSysUser(user1);
+        SysRole sysRole = agentMapper.selectUserRole();
+        sysUserRoleMapper.insertUserRole(sysRole.getRoleId(),user1.getUserId());
         //对设备进行修改
         deviceMapper.updateDeviceList(hospitalAgentVo.getDeviceNumber(),hospitalAgentVo.getHospitalAddress(),hospital.getHospitalId(),sysUser.getUserId());
         return "添加成功";
