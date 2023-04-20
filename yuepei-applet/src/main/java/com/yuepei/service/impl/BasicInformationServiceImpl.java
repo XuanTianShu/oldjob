@@ -7,6 +7,7 @@ import com.yuepei.common.utils.StringUtils;
 import com.yuepei.common.utils.sms.AliSMS;
 import com.yuepei.service.BasicInformationService;
 import com.yuepei.system.mapper.SysUserMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,7 @@ import java.util.concurrent.TimeUnit;
  * @author ：AK
  * @create ：2022/12/20 10:35
  **/
+@Slf4j
 @Service
 public class BasicInformationServiceImpl implements BasicInformationService {
 
@@ -74,8 +76,9 @@ public class BasicInformationServiceImpl implements BasicInformationService {
                 return AjaxResult.error("原手机号不对");
             }
         }
+
         SysUser user = sysUserMapper.selectUserByPhoneNumber(newPhoneNumber);
-        if(StringUtils.isNull(user)){
+        if(user == null){
             String randomNum = aliSMS.getRandomNum(6);
             redisCache.setCacheObject(newPhoneNumber, randomNum, 300, TimeUnit.SECONDS);
             if (aliSMS.sendSmsCode(newPhoneNumber,randomNum)) {

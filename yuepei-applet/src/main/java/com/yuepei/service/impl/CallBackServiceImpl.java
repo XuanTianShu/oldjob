@@ -1021,11 +1021,15 @@ public class CallBackServiceImpl implements CallBackService {
                                             if (before){
                                                 log.info("使用的小时为：{}",time);
                                                 BigDecimal multiply = bigDecimal.multiply(new BigDecimal(time));
-                                                userLeaseOrder.setTimePrice(multiply);
+                                                BigDecimal add = userLeaseOrder.getTimePrice().add(multiply);
+                                                log.info("定时套餐使用总费用：{}",add);
+                                                userLeaseOrder.setTimePrice(add);
                                                 log.info("定时费用：{}",userLeaseOrder.getTimePrice());
                                             }
                                         }else {
-                                            userLeaseOrder.setFixedPrice(price);
+                                            BigDecimal add = userLeaseOrder.getFixedPrice().add(price);
+                                            log.info("固定套餐使用总费用：{}",add);
+                                            userLeaseOrder.setFixedPrice(add);
                                             log.info("固定费用：{}",userLeaseOrder.getTimePrice());
                                         }
                                     }else {

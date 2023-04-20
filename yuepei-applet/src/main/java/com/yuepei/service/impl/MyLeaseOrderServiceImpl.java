@@ -279,9 +279,10 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
 
                     Date parse = simpleDateFormat.parse(format);
                     Date startTime = simpleDateFormat.parse(map1.get("startTime").toString());
+                    Date endTime = simpleDateFormat.parse(map1.get("endTime").toString());
                     boolean before = parse.before(startTime);
                     System.out.println(parse+"下单时间");
-                    System.out.println(startTime+"固定套餐时间");
+                    System.out.println(startTime+"固定套餐开始时间");
                     System.out.println(before+"结果");
                     if (before){
                         long l = startTime.getTime() - parse.getTime();
@@ -293,11 +294,12 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                         long valid = l / ns;
                         log.info("sec:{}",sec);
                         log.info("valid:{}",valid);
-                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1,
+                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber()+"_0",userLeaseOrder1,
                                 new Long(valid).intValue(), TimeUnit.SECONDS);
                         System.out.println("存储到redis1");
                     }else {
-                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);
+
+                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber()+"_1",userLeaseOrder1);
                         System.out.println("存储到redis2");
                     }
 //                    redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);
