@@ -704,73 +704,20 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             }else {
                 userLeaseOrderVo.setPlayTime(day+"天"+hour+"小时"+minute+"分钟"+second+"秒");
             }
-            Date leaseTime = userLeaseOrderVo.getLeaseTime();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-            SimpleDateFormat Format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-            Date date1 = new Date();
-            String leaseTime1 = Format.format(leaseTime);
-            String newDate = Format.format(date1);
-            String format = dateFormat.format(leaseTime);
-            String format1 = dateFormat.format(date1);
             JSONArray deviceRule = JSON.parseArray(userLeaseOrder.getDeviceRule());
-            BigDecimal price1 = BigDecimal.ZERO;
             for (int i = 0; i < deviceRule.size(); i++) {
                 JSONObject jsonObject = deviceRule.getJSONObject(i);
                 Integer time1 = (Integer) jsonObject.get("time");
                 String startTime = (String) jsonObject.get("startTime");
-                try {
-                    Date parse = dateFormat.parse(format);
-                    Date start = dateFormat.parse(startTime);
-                    Date now = dateFormat.parse(format1);
-                    Date parse1 = Format.parse(leaseTime1);
-                    Date parse2 = Format.parse(newDate);
-                    if (start.compareTo(parse)==1){
-                        if (time1==0){
-                            Long time2 = new Date(parse2.getTime() - parse1.getTime()).getTime();
-                            Long minute1 = time2 / 1000 / 60 / 60;
-                            Long minute2 = time2 / 1000 / 60 % 60 ;
-                            Object price = jsonObject.get("price");
-                            BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                            userLeaseOrderVo.setContent(bigDecimal+device.getContent());
-                            price1=price1.add(bigDecimal);
-                            if (minute2<10){
-                                userLeaseOrderVo.setEvaluate(bigDecimal.multiply(new BigDecimal(minute1)));
-                            }else {
-                                userLeaseOrderVo.setEvaluate(bigDecimal.multiply(new BigDecimal(minute1+1)));
-                            }
-                        }else if (time1==1){
-                            if (now.compareTo(start)==1){
-                                Long time2 = new Date(start.getTime() - parse.getTime()).getTime();
-                                Long minute1 = time2 / 1000 / 60 / 60;
-                                Long minute2 = time2 / 1000 / 60 % 60 ;
-                                Object price = jsonObject.get("price");
-                                BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                                userLeaseOrderVo.setContent(bigDecimal+device.getContent());
-                                if (minute2<10){
-                                    userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1)).add(bigDecimal));
-                                }else {
-                                    userLeaseOrderVo.setEvaluate(price1.multiply(new BigDecimal(minute1+1)).add(bigDecimal));
-                                }
-                            }
-                        }
-                    }else {
-                        if (time1==0){
-                            Long time2 = new Date(parse2.getTime() - parse1.getTime()).getTime();
-                            Long minute1 = time2 / 1000 / 60 /60 ;
-                            Long minute2 = time2 / 1000 / 60 % 60 ;
-                            Object price = jsonObject.get("price");
-                            BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                            userLeaseOrderVo.setContent(bigDecimal+device.getContent());
-                            price1=price1.add(bigDecimal);
-                            if (minute2<10){
-                                userLeaseOrderVo.setEvaluate(bigDecimal.multiply(new BigDecimal(minute1)));
-                            }else {
-                                userLeaseOrderVo.setEvaluate(bigDecimal.multiply(new BigDecimal(minute1+1)));
-                            }
-                        }
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
+                String endTime = (String) jsonObject.get("endTime");
+                if (time1==0){
+                    Object price = jsonObject.get("price");
+                    BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
+                    userLeaseOrderVo.setContent(bigDecimal+device.getContent());
+                }else if (time1==1){
+                    Object price = jsonObject.get("price");
+                    BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
+                    userLeaseOrderVo.setEstimateAmount("("+startTime+"~"+endTime+")  "+bigDecimal);
                 }
             }
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
