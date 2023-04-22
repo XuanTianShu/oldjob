@@ -296,11 +296,11 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
         BeanUtils.copyProperties(userLeaseOrder, userLeaseOrderVo);
         userLeaseOrderVo.setUserName(sysUser1.getUserName());
-        if (sysUser1.getUserType()=="04"){
+        if (sysUser1.getUserType().equals("04")){
             userLeaseOrderVo.setProportion(userLeaseOrder.getHospitalProportion());
-        }else if (sysUser1.getUserType()=="05"){
+        }else if (sysUser1.getUserType().equals("05")){
             userLeaseOrderVo.setProportion(userLeaseOrder.getAgentProportion());
-        }else if (sysUser1.getUserType()=="03"){
+        }else if (sysUser1.getUserType().equals("03")){
             userLeaseOrderVo.setProportion(userLeaseOrder.getInvestorProportion());
         }
         userLeaseOrderVo.setAgentName(sysUser1.getNickName());

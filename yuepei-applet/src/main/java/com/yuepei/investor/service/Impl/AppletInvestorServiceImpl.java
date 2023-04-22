@@ -683,11 +683,11 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
         BeanUtils.copyProperties(userLeaseOrder, userLeaseOrderVo);
         userLeaseOrderVo.setUserName(sysUser.getUserName());
-        if (sysUser.getUserType()=="04"){
+        if (sysUser.getUserType().equals("04")){
             userLeaseOrderVo.setProportion(userLeaseOrder.getHospitalProportion());
-        }else if (sysUser.getUserType()=="05"){
+        }else if (sysUser.getUserType().equals("05")){
             userLeaseOrderVo.setProportion(userLeaseOrder.getAgentProportion());
-        }else if (sysUser.getUserType()=="03"){
+        }else if (sysUser.getUserType().equals("03")){
             userLeaseOrderVo.setProportion(userLeaseOrder.getInvestorProportion());
         }
         userLeaseOrderVo.setAgentName(sysUser.getNickName());
