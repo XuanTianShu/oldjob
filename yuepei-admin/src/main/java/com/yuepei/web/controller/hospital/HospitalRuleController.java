@@ -55,7 +55,7 @@ public class HospitalRuleController extends BaseController
     /**
      * 获取该设备套餐详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:rule:query')")
+    @PreAuthorize("@ss.hasAnyPermi('system:rule:query,system:device:list')")
     @GetMapping(value = "/{deviceNumber}")
     public AjaxResult getInfo(@PathVariable("deviceNumber") String deviceNumber)
     {
@@ -88,7 +88,7 @@ public class HospitalRuleController extends BaseController
     /**
      * 修改设备套餐
      */
-    @PreAuthorize("@ss.hasPermi('system:rule:edit')")
+    @PreAuthorize("@ss.hasAnyPermi('system:rule:edit,system:device:edit')")
     @Log(title = "设备套餐", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody DeviceRule deviceRule)

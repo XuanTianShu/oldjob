@@ -16,6 +16,7 @@ import java.util.Date;
  * @author ohy
  * @date 2023-03-01
  */
+@Data
 public class DiscountRecord extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
@@ -50,6 +51,8 @@ public class DiscountRecord extends BaseEntity
     /** 医院名称 */
     @Excel(name = "医院名称")
     private String hospitalname;
+
+    private String hospitalId;
 
     /** 1兑换券2优惠券 */
     @Excel(name = "1兑换券2优惠券")

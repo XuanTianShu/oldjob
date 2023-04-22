@@ -7,6 +7,7 @@ import com.yuepei.system.domain.vo.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 　　　　 ┏┓       ┏┓+ +
@@ -125,9 +126,9 @@ public interface DeviceService {
 
     List<AgentPersonnelVO> agentPersonnel(String deviceNumber);
 
-    List<HospitalPersonnelVO> hospitalPersonnel(String deviceNumber);
+    Map<String,Object> hospitalPersonnel(String deviceNumber);
 
-    List<InvestorPersonnelVO> investorPersonnel(String deviceNumber);
+    Map<String,Object> investorPersonnel(String deviceNumber);
 
     TotalProportionVO getDeviceProportion(String deviceNumber);
 
@@ -142,5 +143,7 @@ public interface DeviceService {
     int updateProportion(Device device);
 
     List<HospitalVO> selectHospital(Long[] longs1);
+
+    AjaxResult updatePersonnelProportion(PersonnelProportionVO personnelProportionVO);
 }
 

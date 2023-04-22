@@ -3,6 +3,7 @@ package com.yuepei.system.service.impl;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.yuepei.common.annotation.DataScope;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.exception.ServiceException;
@@ -24,9 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Validator;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * 　　　　 ┏┓       ┏┓+ +
@@ -107,6 +106,7 @@ public class DeviceServiceImpl implements DeviceService {
      * @return 设备
      */
     @Override
+    @DataScope(userAlias = "d",deptAlias = "d")
     public List<Device> selectDeviceList(Device device)
     {
         return deviceMapper.selectDeviceList(device);
@@ -402,13 +402,29 @@ public class DeviceServiceImpl implements DeviceService {
     }
 
     @Override
-    public List<HospitalPersonnelVO> hospitalPersonnel(String deviceNumber) {
-        return deviceMapper.hospitalPersonnel(deviceNumber);
+    public Map<String,Object> hospitalPersonnel(String deviceNumber) {
+        Map<String, Object> map = new HashMap<>();
+        List<HospitalPersonnelVO> hospitalPersonnelVOS = deviceMapper.hospitalPersonnel(deviceNumber);
+        if (hospitalPersonnelVOS.get(0).getType().equals("1")){
+            //SELECT (100 - IFNULL(SUM(proportion),0)) AS totalProportion
+            //        FROM sys_user
+            //        WHERE parent_id = (SELECT user_id FROM device
+            //        WHERE device_number = #{deviceNumber})
+            String proportion = deviceMapper.selectAgentProportion(deviceNumber);
+            map.put("agentHospitalProportion",proportion);
+        }
+        map.put("hospitalPersonnel",hospitalPersonnelVOS);
+        return map;
     }
 
     @Override
-    public List<InvestorPersonnelVO> investorPersonnel(String deviceNumber) {
-        return deviceMapper.investorPersonnel(deviceNumber);
+    public Map<String,Object> investorPersonnel(String deviceNumber) {
+        Map<String, Object> map = new HashMap<>();
+        List<InvestorPersonnelVO> investorPersonnelVOS = deviceMapper.investorPersonnel(deviceNumber);
+        String proportion = deviceMapper.investorProportion(deviceNumber);
+        map.put("investorPersonnel",investorPersonnelVOS);
+        map.put("investorProportion",proportion);
+        return map;
     }
 
     @Override
@@ -447,6 +463,24 @@ public class DeviceServiceImpl implements DeviceService {
     @Override
     public List<HospitalVO> selectHospital(Long[] longs1) {
         return deviceMapper.selectHospital(longs1);
+    }
+
+    @Override
+    public AjaxResult updatePersonnelProportion(PersonnelProportionVO personnelProportionVO) {
+        if (personnelProportionVO.getHospitalId() != null){
+            deviceHospitalMapper.updateHospital(personnelProportionVO);
+        }
+        if (personnelProportionVO.getInvestorId() != null){
+            deviceInvestorMapper.updateInvestor(personnelProportionVO);
+        }
+        if (personnelProportionVO.getAgentId() != null){
+            deviceAgentMapper.updateAgent(personnelProportionVO);
+        }
+        if (personnelProportionVO.getAgentId() == null && personnelProportionVO.getHospitalId() == null &&
+                personnelProportionVO.getInvestorId() == null){
+            deviceMapper.updateInvestor(personnelProportionVO);
+        }
+        return AjaxResult.success();
     }
 
 }

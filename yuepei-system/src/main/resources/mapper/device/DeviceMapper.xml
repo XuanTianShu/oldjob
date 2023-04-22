@@ -25,6 +25,7 @@
         <result property="userId" column="user_id"/>
         <result property="investorProportion" column="investor_proportion"/>
         <result property="agentProportion" column="agentProportion"/>
+        <result property="hospitalProportion" column="hospitalProportion"/>
         <result property="telecomId" column="telecom_id"/>
         <result property="masterKey" column="masterKey"/>
         <result property="productId" column="productId"/>
@@ -69,6 +70,7 @@
         <result property="hospitalName" column="hospitalName"/>
         <result property="content" column="content"/>
         <result property="userId" column="user_id"/>
+        <result property="hospitalProportion" column="hospitalProportion"/>
     </resultMap>
 
     <resultMap id="DeviceInvestorResult" type="com.yuepei.system.domain.vo.DeviceInvestorVO">
@@ -101,6 +103,7 @@
         <result property="hospitalId" column="hospital_id"/>
         <result property="investorProportion" column="investorProportion"/>
         <result property="phoneNumber" column="phone_number"/>
+        <result property="type" column="type"/>
     </resultMap>
 
     <resultMap id="investorPersonnelResult" type="investorPersonnelVO">
@@ -136,12 +139,13 @@
         SELECT d.device_id, d.device_type_id, d.device_number,d.device_iot_number,d.device_mac,d.user_id,
         d.device_deposit, d.billing_id,d.hospital_id, d.device_qR_code, d.device_address,d.content,
         d.device_full_address,d.`rows`,d.heart_time, d.create_time, d.status,d.investor_id,
-        d.electric,d.electric_early,IFNULL(su.`nick_name`,'无') AS agentName,
+        d.electric,IFNULL(dh.`proportion`,0) AS hospitalProportion,d.electric_early,IFNULL(su.`nick_name`,'无') AS agentName,
         IFNULL(s.`nick_name`,'无') AS hospitalName FROM device AS d
         LEFT JOIN sys_user AS su ON su.`user_id` = d.`user_id`
         LEFT JOIN hospital_user AS hu ON hu.`hospital_id` = d.`hospital_id`
         LEFT JOIN sys_user AS s ON s.`user_name` = hu.`user_name`
         LEFT JOIN device_investor AS di ON di.device_number = d.device_number
+        LEFT JOIN device_hospital AS dh ON dh.`device_number` = d.`device_number`
         <where>
             <if test="deviceTypeId !=null"> and d.device_type_id = #{deviceTypeId}</if>
             <if test="deviceNumber != null "> and d.device_number = #{deviceNumber}</if>
@@ -149,6 +153,7 @@
             <if test="status != null "> and d.status = #{status}</if>
             <if test="userId != null"> and d.user_id = #{userId}</if>
             <if test="investorId != null"> and di.investor_id in (#{investorId})</if>
+            ${params.dataScope}
         </where>
         GROUP BY d.device_id
     </select>
@@ -170,9 +175,11 @@
         d.device_full_address,d.`rows`,d.heart_time,
         d.create_time, d.status,d.investor_id,d.electric,
         d.electric_early,d.user_id,d.investor_proportion,d.telecom_id,
+        IFNULL(dh.proportion,0) AS hospitalProportion,
         dg.`proportion` AS agentProportion FROM device AS d
         LEFT JOIN device_agent AS dg ON dg.`device_number` = d.`device_number`
         LEFT JOIN sys_user AS su ON su.`user_id` = dg.`agent_id`
+        LEFT JOIN device_hospital AS dh ON dh.`device_number` = d.`device_number`
         where d.device_id = #{deviceId}
     </select>
 
@@ -361,6 +368,13 @@
         update device set investor_proportion = #{investorProportion}
         where device_number = #{deviceNumber}
     </update>
+    <update id="updateInvestor">
+        update device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="proportion != null">investor_proportion = #{proportion},</if>
+        </trim>
+        where device_number = #{deviceNumber}
+    </update>
 
     <delete id="deleteDeviceByDeviceId" parameterType="Long">
         delete from device where device_id = #{deviceId}
@@ -437,13 +451,12 @@
         WHERE d.`device_number` = #{deviceNumber} AND su.`parent_id` = 0
     </select>
     <select id="hospitalPersonnel" parameterType="String" resultMap="hospitalPersonnelResult">
-        SELECT h.hospital_id,h.hospital_name,h.proportion,su.`phone_number`,
-        su.`user_name`,su.`nick_name`,
-        IFNULL(d.`investor_proportion`,0) AS investorProportion FROM device AS d
-        INNER JOIN device_hospital AS dh ON d.`device_number` = dh.device_number
-        INNER JOIN hospital AS h ON h.`hospital_id` = dh.hospital_id
-        INNER JOIN hospital_user AS hu ON hu.`hospital_id` = h.`hospital_id`
-        INNER JOIN sys_user AS su ON su.`user_id` = hu.`user_name`
+        SELECT h.hospital_id,su.`user_name`,su.`nick_name`,
+               d.`investor_proportion`,su.`phone_number`,
+               h.hospital_name,h.proportion,h.type FROM device AS d
+                                                            INNER JOIN device_hospital AS dh ON dh.device_number = d.`device_number`
+                                                            INNER JOIN hospital AS h ON h.hospital_id = dh.hospital_id
+                                                            INNER JOIN sys_user AS su ON su.`hospital_id` = d.`hospital_id`
         WHERE d.`device_number` = #{deviceNumber} AND su.`user_type` = '04'
     </select>
     <select id="investorPersonnel" parameterType="String" resultMap="investorPersonnelResult">
@@ -506,6 +519,15 @@
         <foreach item="deviceNumber" collection="array" open="(" separator="," close=")">
             #{deviceNumber}
         </foreach>
+    </select>
+    <select id="investorProportion" resultType="java.lang.String">
+        select investor_proportion from device where device_number = #{deviceNumber}
+    </select>
+    <select id="selectAgentProportion" resultType="java.lang.String">
+        SELECT (100 - IFNULL(SUM(proportion),0)) AS totalProportion
+                      FROM sys_user
+                      WHERE parent_id = (SELECT user_id FROM device
+                      WHERE device_number = #{deviceNumber})
     </select>
 
 </mapper>

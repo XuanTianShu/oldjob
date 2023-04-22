@@ -19,9 +19,12 @@ import com.yuepei.utils.ResultEnum;
 import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -137,12 +140,13 @@ public class HospitalController extends BaseController {
     /**
      * 查询医院列表
      */
-    @PreAuthorize("@ss.hasPermi('device:hospital:list')")
+//    @PreAuthorize("@ss.hasPermi('device:hospital:list')")
+    @PreAuthorize("@ss.hasAnyRoles('hospital,agent')")
     @GetMapping("/list")
     public AjaxResult list(Hospital hospital)
     {
-        List<Hospital> list = hospitalService.selectHospitalList(hospital);
-        return AjaxResult.success(list);
+        List<Hospital> hospitals = hospitalService.selectHospitalList(hospital);
+        return AjaxResult.success(hospitals);
     }
 
     /**
@@ -207,6 +211,11 @@ public class HospitalController extends BaseController {
     @GetMapping("/queryTreeByDeviceNumber")
     public AjaxResult queryTreeByDeviceNumber(Device device){
         return AjaxResult.success(hospitalService.queryTreeByDeviceNumber(device));
+    }
+
+    @GetMapping("/queryTreeByUser/{hospitalId}")
+    public AjaxResult queryTreeByUser(@PathVariable("hospitalId") Long hospitalId){
+        return AjaxResult.success(hospitalService.queryTreeByUser(hospitalId));
     }
 
 

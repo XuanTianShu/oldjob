@@ -127,6 +127,7 @@
             <if test="payType != null  and payType != ''"> and lo.pay_type = #{payType}</if>
             <if test="status != null  and status != ''"> and lo.status = #{status}</if>
             <if test="playTime != null  and playTime != ''"> and lo.play_time = #{playTime}</if>
+            ${params.dataScope}
         </where>
         GROUP BY lo.`id` ORDER BY lo.lease_time DESC
     </select>
@@ -375,21 +376,22 @@
     </select>
 
     <select id="selectDayOrder" resultType="com.yuepei.system.domain.vo.OrderSumAndMoneyVO">
-        SELECT (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1) AS `todayOrderNum`,
-        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1) AS todayOrderMoney,
-        (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1) AS `sevenDayOrderNum`,
-        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1) AS sevenDayOrderMoney,
-        (SELECT COUNT(1) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1) AS thirtyDayOrderNum,
-        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1) AS thirtyDayOrderMoney
+        SELECT (SELECT IFNULL(COUNT(1),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS `todayOrderNum`,
+        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS todayOrderMoney,
+        (SELECT IFNULL(COUNT(1),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS `sevenDayOrderNum`,
+        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS sevenDayOrderMoney,
+        (SELECT IFNULL(COUNT(1),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS thirtyDayOrderNum,
+        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS thirtyDayOrderMoney
     </select>
     <select id="selectConditionOrder" resultType="com.yuepei.system.domain.vo.ConditionOrderVO">
-        SELECT (SELECT IFNULL(SUM(net_amount),0) FROM user_lease_order
+        SELECT (SELECT IFNULL(SUM(lo.net_amount),0) FROM user_lease_order as lo
             <where>
-                and is_valid = 1
-                <if test="deviceNumber != null  and deviceNumber != ''"> and device_number = #{deviceNumber}</if>
-                <if test="payType != null  and payType != ''"> and pay_type = #{payType}</if>
-                <if test="status != null  and status != ''"> and status = #{status}</if>
-                <if test="outTradeNo != null and outTradeNo != ''"> and out_trade_no = #{outTradeNo},</if>
+                and lo.is_valid = 1
+                <if test="deviceNumber != null  and deviceNumber != ''"> and lo.device_number = #{deviceNumber}</if>
+                <if test="payType != null  and payType != ''"> and lo.pay_type = #{payType}</if>
+                <if test="status != null  and status != ''"> and lo.status = #{status}</if>
+                <if test="outTradeNo != null and outTradeNo != ''"> and lo.out_trade_no = #{outTradeNo}</if>
+                ${params.dataScope}
             </where>) AS conditionOrderMoney,
         (SELECT COUNT(1) FROM user_lease_order AS lo
         INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`
@@ -402,7 +404,8 @@
                 <if test="deviceNumber != null  and deviceNumber != ''"> and lo.device_number = #{deviceNumber}</if>
                 <if test="payType != null  and payType != ''"> and lo.pay_type = #{payType}</if>
                 <if test="status != null  and status != ''"> and lo.status = #{status}</if>
-                <if test="outTradeNo != null and outTradeNo != ''"> and lo.out_trade_no = #{outTradeNo},</if>
+                <if test="outTradeNo != null and outTradeNo != ''"> and lo.out_trade_no = #{outTradeNo}</if>
+                ${params.dataScope}
             </where>) AS conditionOrderNum
     </select>
     <select id="selectUserLeaseOrderByDeviceNumber" parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">

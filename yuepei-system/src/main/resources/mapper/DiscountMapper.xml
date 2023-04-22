@@ -27,7 +27,8 @@
 
     <sql id="selectDiscountVo">
         <!--select id, discount_name, money, threshold_id, period, status, sent_num, unbilled_num, is_status, create_time, update_time from discount-->
-        SELECT d.id, d.discount_name, d.money, d.threshold_id, d.period, d.status, IFNULL(dt.`threshold_name`,'无') AS threshold_name,d.hospital_id,
+        SELECT d.id, d.discount_name, d.money, d.threshold_id, d.period, d.status,
+               IFNULL(dt.`threshold_name`,'无') AS threshold_name,d.hospital_id,
         d.sent_num, d.unbilled_num, d.is_status, d.create_time,d.integral,d.is_jyb, d.update_time FROM discount AS d
         LEFT JOIN `discount_threshold` AS dt ON dt.`Id` = d.`threshold_id`
     </sql>
@@ -40,22 +41,35 @@
     <select id="selectDiscountList" parameterType="Discount" resultMap="DiscountResult">
         <if test="isJyb == 1">
             <include refid="selectJYBVo"/>
+            <where>
+                <if test="discountName != null  and discountName != ''"> and d.discount_name like concat('%', #{discountName}, '%')</if>
+                <if test="money != null "> and d.money = #{money}</if>
+                <if test="thresholdId != null "> and d.threshold_id = #{thresholdId}</if>
+                <if test="period != null "> and d.period = #{period}</if>
+                <if test="status != null "> and d.status = #{status}</if>
+                <if test="sentNum != null "> and d.sent_num = #{sentNum}</if>
+                <if test="isJyb != null "> and d.is_jyb = #{isJyb}</if>
+                <if test="unbilledNum != null "> and d.unbilled_num = #{unbilledNum}</if>
+                <if test="isStatus != null "> and d.is_status = #{isStatus}</if>
+                <if test="hospitalId != null"> and d.hospital_id = #{hospitalId}</if>
+                ${params.dataScope}
+            </where>
         </if>
         <if test="isJyb == 2">
             <include refid="selectDiscountVo"/>
+            <where>
+                <if test="discountName != null  and discountName != ''"> and d.discount_name like concat('%', #{discountName}, '%')</if>
+                <if test="money != null "> and d.money = #{money}</if>
+                <if test="thresholdId != null "> and d.threshold_id = #{thresholdId}</if>
+                <if test="period != null "> and d.period = #{period}</if>
+                <if test="status != null "> and d.status = #{status}</if>
+                <if test="sentNum != null "> and d.sent_num = #{sentNum}</if>
+                <if test="isJyb != null "> and d.is_jyb = #{isJyb}</if>
+                <if test="unbilledNum != null "> and d.unbilled_num = #{unbilledNum}</if>
+                <if test="isStatus != null "> and d.is_status = #{isStatus}</if>
+                <if test="hospitalId != null"> and d.hospital_id = #{hospitalId}</if>
+            </where>
         </if>
-        <where>
-            <if test="discountName != null  and discountName != ''"> and d.discount_name like concat('%', #{discountName}, '%')</if>
-            <if test="money != null "> and d.money = #{money}</if>
-            <if test="thresholdId != null "> and d.threshold_id = #{thresholdId}</if>
-            <if test="period != null "> and d.period = #{period}</if>
-            <if test="status != null "> and d.status = #{status}</if>
-            <if test="sentNum != null "> and d.sent_num = #{sentNum}</if>
-            <if test="isJyb != null "> and d.is_jyb = #{isJyb}</if>
-            <if test="unbilledNum != null "> and d.unbilled_num = #{unbilledNum}</if>
-            <if test="isStatus != null "> and d.is_status = #{isStatus}</if>
-            <if test="hospitalId != null"> and d.hospital_id = #{hospitalId}</if>
-        </where>
     </select>
 
     <select id="selectDiscountById" parameterType="Long" resultMap="DiscountResult">

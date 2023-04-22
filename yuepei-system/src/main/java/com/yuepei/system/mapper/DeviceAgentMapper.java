@@ -1,6 +1,7 @@
 package com.yuepei.system.mapper;
 
 import com.yuepei.system.domain.DeviceAgent;
+import com.yuepei.system.domain.vo.PersonnelProportionVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface DeviceAgentMapper {
     void deleteByDeviceNumber(@Param("deviceNumber") String deviceNumber);
 
     void deleteByDeviceNumbers(List<String> list);
+
+    void updateAgent(PersonnelProportionVO personnelProportionVO);
 }

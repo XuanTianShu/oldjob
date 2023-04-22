@@ -1,5 +1,6 @@
 package com.yuepei.system.service.impl;
 
+import com.yuepei.common.annotation.DataScope;
 import com.yuepei.system.domain.Order;
 import com.yuepei.system.domain.vo.OrderDepositListVO;
 import com.yuepei.system.domain.vo.RechargeVO;
@@ -80,6 +81,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @DataScope(deptAlias = "h",userAlias = "h")
     public List<OrderDepositListVO> depositList(OrderDepositListVO orderDepositListVO) {
         return orderMapper.depositList(orderDepositListVO);
     }

@@ -24,6 +24,13 @@
             <if test="proportion != null">#{proportion},</if>
         </trim>
     </insert>
+    <update id="updateHospital">
+        update device_hospital
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="proportion != null">proportion = #{proportion},</if>
+        </trim>
+        where device_number = #{deviceNumber} and hospital_id = #{hospitalId}
+    </update>
     <delete id="del">
         delete from device_hospital where device_number = #{deviceNumber}
     </delete>

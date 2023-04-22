@@ -64,14 +64,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </sql>
 
     <select id="selectUserList" parameterType="com.yuepei.common.core.domain.entity.SysUser" resultMap="SysUserResult">
-		select u.user_id, u.dept_id, u.nick_name,u.proportion, u.user_name, u.email, u.avatar, u.phone_number, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader from sys_user u
+		select u.user_id, u.dept_id, u.nick_name,u.proportion, u.user_name, u.email, u.avatar, u.phone_number, u.sex,
+		       u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark, d.dept_name, d.leader,u.user_type from sys_user u
 		left join sys_dept d on u.dept_id = d.dept_id
 		where u.del_flag = '0'
 		<if test="userId != null and userId != 0">
 			AND u.user_id = #{userId}
 		</if>
-		<if test="userType != null and userType != ''">
+		<if test="userType != null and userType != '' and userType != 00">
 			and u.user_type = #{userType}
+		</if>
+		<if test="userType == 00">
+			and u.user_type != '01'
 		</if>
 		<if test="userName != null and userName != ''">
 			AND u.user_name like concat('%', #{userName}, '%')
@@ -365,8 +369,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		select * from sys_user where user_id = #{userId}
 	</select>
     <select id="selectHospitalProportion" parameterType="String" resultMap="SysUserResult">
-		SELECT su.* FROM hospital_user AS hu
-							 INNER JOIN sys_user AS su ON su.`user_id` = hu.`user_name`
-		WHERE hu.`hospital_id` = #{hospitalId}
+		SELECT su.* FROM sys_user AS su
+							 LEFT JOIN hospital_user  AS hu ON hu.`user_name` =  su.`user_id`
+		WHERE su.`hospital_id` = #{hospitalId}
 	</select>
 </mapper>

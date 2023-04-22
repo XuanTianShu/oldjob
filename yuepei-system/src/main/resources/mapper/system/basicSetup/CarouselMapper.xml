@@ -7,7 +7,7 @@
     <resultMap type="com.yuepei.system.domain.Carousel" id="CarouselResult">
         <result property="carouselId"    column="carousel_id"    />
         <result property="carouselTop"    column="carousel_top"    />
-        <result property="carouselBottom"    column="carousel_bottom"    />
+        <result property="carouselBottom"    column="carousel_bottom"/>
         <result property="createTime"    column="create_time"    />
     </resultMap>
 

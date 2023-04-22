@@ -40,12 +40,15 @@ public class AgentUserController extends BaseController {
     /**
      * 查询代理用户管理列表
      */
-    @PreAuthorize("@ss.hasPermi('system:agentUser:list')")
+    @PreAuthorize("@ss.hasPermi('system:device:list')")
+//    @PreAuthorize("@ss.hasPermi('system:agentUser:list')")
+//    @PreAuthorize("@ss.hasAnyRoles('hospital')")
     @GetMapping("/list")
     public TableDataInfo list(SysUser user)
     {
         startPage();
-        List<SysUser> list = userService.selectWechatUserList(user);
+//        List<SysUser> list = userService.selectWechatUserList(user);
+        List<SysUser> list = investorUserService.selectInvestorUserList(user);
         return getDataTable(list);
     }
 

@@ -21,6 +21,13 @@
             <if test="agentProportion != null">#{agentProportion},</if>
         </trim>
     </insert>
+    <update id="updateAgent">
+        update device_agent
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="proportion != null">proportion = #{proportion},</if>
+        </trim>
+        where agent_id = #{agentId} and device_number = #{deviceNumber}
+    </update>
     <delete id="del">
         delete from device_agent where device_number = #{deviceNumber}
     </delete>

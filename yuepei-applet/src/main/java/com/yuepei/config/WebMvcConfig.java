@@ -60,7 +60,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/wechat/user/maintenance/**",
                         "/wechat/user/refund/orderRefundCallBack",
                         "/wechat/user/refund/depositRefundCallback",
-                        "/wechat/user/refund/depositRefund");
+                        "/wechat/user/refund/depositRefund",
+                        "/wechat/user/discount/list");
     }
 
     @Bean

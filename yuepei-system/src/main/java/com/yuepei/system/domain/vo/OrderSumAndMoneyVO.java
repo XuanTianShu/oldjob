@@ -1,11 +1,12 @@
 package com.yuepei.system.domain.vo;
 
+import com.yuepei.common.core.domain.BaseEntity;
 import lombok.Data;
 
 import java.math.BigDecimal;
 
 @Data
-public class OrderSumAndMoneyVO {
+public class OrderSumAndMoneyVO extends BaseEntity {
 
     /** 今日订单数量 */
     private BigDecimal todayOrderNum;

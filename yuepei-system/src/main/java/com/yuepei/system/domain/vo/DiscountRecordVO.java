@@ -31,6 +31,8 @@ public class DiscountRecordVO extends BaseEntity {
     @Excel(name = "用户名称")
     private String uNickName;
 
+    private String userName;
+
     /** 金额 */
     @Excel(name = "金额")
     private BigDecimal price;
@@ -46,4 +48,6 @@ public class DiscountRecordVO extends BaseEntity {
     /** 发放时间 */
     @Excel(name = "发放时间")
     private Date grantTime;
+
+    private String hospitalId;
 }

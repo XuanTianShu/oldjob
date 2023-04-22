@@ -1,5 +1,6 @@
 package com.yuepei.system.service.impl;
 
+import com.yuepei.common.annotation.DataScope;
 import com.yuepei.system.domain.Discount;
 import com.yuepei.system.domain.DiscountRecord;
 import com.yuepei.system.domain.DiscountThreshold;
@@ -44,6 +45,7 @@ public class DiscountRecordServiceImpl implements IDiscountRecordService
      * @return 优惠券发放记录
      */
     @Override
+    @DataScope(deptAlias = "dr",userAlias = "dr")
     public List<DiscountRecordVO> selectDiscountRecordList(DiscountRecordVO discountRecordVO)
     {
         return discountRecordMapper.selectDiscountRecordList(discountRecordVO);

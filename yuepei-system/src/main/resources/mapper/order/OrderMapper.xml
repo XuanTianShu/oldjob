@@ -65,11 +65,13 @@
         where order_id = #{orderId}
     </select>
     <select id="depositList" resultMap="depositListResult">
-        select udo.`id`,udo.`openid`,udo.`order_number`,udo.device_number
+        SELECT udo.`id`,udo.`openid`,udo.`order_number`,udo.device_number
         ,udo.deposit_num,udo.deposit_status,udo.create_time,udo.`status`,
         su.`nick_name`,su.`phone_number`
-        from user_deposit_order as udo
+        FROM user_deposit_order AS udo
         INNER JOIN sys_user AS su ON su.`openid` = udo.`openid`
+        LEFT JOIN device AS d ON d.`device_number` = udo.`device_number`
+        LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
         <where>
             <if test="depositStatus != null">
                 and udo.deposit_status = #{depositStatus}
@@ -81,13 +83,16 @@
                 and su.`phone_number` = #{phoneNumber}
             </if>
             and udo.`status` = 1
+            ${params.dataScope}
         </where>
         order by udo.`create_time` desc
     </select>
     <select id="depositSum" resultType="java.lang.String">
         select sum(udo.deposit_num)
-        from user_deposit_order as udo
+        FROM user_deposit_order AS udo
         INNER JOIN sys_user AS su ON su.`openid` = udo.`openid`
+        LEFT JOIN device AS d ON d.`device_number` = udo.`device_number`
+        LEFT JOIN hospital AS h ON h.`hospital_id` = d.`hospital_id`
         <where>
             <if test="depositStatus != null">
                 and udo.deposit_status = #{depositStatus}
@@ -99,6 +104,7 @@
                 and su.`phone_number` = #{phoneNumber}
             </if>
             and udo.`status` = 1
+            ${params.dataScope}
         </where>
     </select>
     <select id="recharge" resultMap="rechargeResult">

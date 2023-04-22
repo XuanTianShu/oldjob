@@ -1,10 +1,7 @@
 package com.yuepei.system.service;
 
 import com.yuepei.common.core.domain.entity.SysUser;
-import com.yuepei.system.domain.Device;
-import com.yuepei.system.domain.DeviceHospital;
-import com.yuepei.system.domain.DeviceInvestor;
-import com.yuepei.system.domain.Hospital;
+import com.yuepei.system.domain.*;
 import com.yuepei.system.domain.vo.BindingHospitalVO;
 import com.yuepei.system.domain.vo.DeviceInvestorVO;
 import com.yuepei.system.domain.vo.HospitalVO;
@@ -122,4 +119,6 @@ public interface HospitalService {
     int deleteDeviceById(Long id);
 
     int selectBindHospitalCount(Long[] deviceIds);
+
+    List<HospitalVO> queryTreeByUser(Long hospitalId);
 }

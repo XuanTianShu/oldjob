@@ -96,19 +96,22 @@ public class EwmInLockController {
         }else  {
             device.setDepositList(depositList);
         }
-        log.info("{}",device.getDeviceFullAddress());
         Long[] longs = new Long[]{};
-        JSONArray objects = JSON.parseArray(device.getDeviceFullAddress());
-        List<Long> list = objects.toJavaList(Long.class);
-        Long[] longs1 = list.toArray(longs);
-        List<HospitalVO> voList = deviceService.selectHospital(longs1);
-        for (int i = 0; i < voList.size(); i++) {
-            String hospitalName = voList.get(i).getHospitalName();
-            if (i == 1){
-                device.setIstrative(hospitalName);
-            }
-            if (i == 3){
-                device.setBed(hospitalName);
+        if (!device.getDeviceFullAddress().equals("0")){
+            JSONArray objects = JSON.parseArray(device.getDeviceFullAddress());
+            List<Long> list = objects.toJavaList(Long.class);
+            if (list.size() > 0){
+                Long[] longs1 = list.toArray(longs);
+                List<HospitalVO> voList = deviceService.selectHospital(longs1);
+                for (int i = 0; i < voList.size(); i++) {
+                    String hospitalName = voList.get(i).getHospitalName();
+                    if (i == 1){
+                        device.setIstrative(hospitalName);
+                    }
+                    if (i == 3){
+                        device.setBed(hospitalName);
+                    }
+                }
             }
         }
         return AjaxResult.success(device);

@@ -47,7 +47,7 @@ public interface MyLeaseOrderService {
      */
     List<UserLeaseOrder> leaseOrderList(LeaseOrderVO leaseOrderVO);
 
-    OrderSumAndMoneyVO selectDayOrder();
+    OrderSumAndMoneyVO selectDayOrder(LeaseOrderVO leaseOrderVO);
 
     ConditionOrderVO selectConditionOrder(LeaseOrderVO leaseOrderVO);
 }

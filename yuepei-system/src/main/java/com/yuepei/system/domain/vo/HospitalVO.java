@@ -1,12 +1,13 @@
 package com.yuepei.system.domain.vo;
 
 import com.yuepei.common.annotation.Excel;
+import com.yuepei.common.core.domain.BaseEntity;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class HospitalVO {
+public class HospitalVO extends BaseEntity {
     /** 主键 */
     private Long hospitalId;
 

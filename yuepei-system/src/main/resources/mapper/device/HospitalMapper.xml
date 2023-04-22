@@ -142,6 +142,7 @@
             <if test="hospitalId != null"> and h.hospital_id = #{hospitalId}</if>
             <if test="hospitalName != null  and hospitalName != ''"> and h.hospital_name like concat('%', #{hospitalName}, '%')</if>
             <if test="parentId != null "> and h.parent_id = #{parentId}</if>
+            ${params.dataScope}
         </where>
     </select>
     <select id="userList" parameterType="com.yuepei.common.core.domain.entity.SysUser" resultMap="SysUserResult">

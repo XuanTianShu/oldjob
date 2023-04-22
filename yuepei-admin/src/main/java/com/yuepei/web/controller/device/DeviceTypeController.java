@@ -57,7 +57,8 @@ public class DeviceTypeController extends BaseController {
     /**
      * 查询设备类型列表
      */
-    @PreAuthorize("@ss.hasPermi('device:deviceType:list')")
+//    @PreAuthorize("@ss.hasPermi('device:deviceType:list')")
+    @PreAuthorize("@ss.hasAnyRoles('hospital,agent')")
     @GetMapping("/list")
     public TableDataInfo list(DeviceType deviceType)
     {

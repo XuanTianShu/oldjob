@@ -38,6 +38,7 @@ server:
 logging:
   level:
     com.ruoyi: info
+    com.yuepei.system.mapper: debug
     org.springframework: info
 
 # 用户配置

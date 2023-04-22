@@ -100,7 +100,7 @@ public interface UserLeaseOrderMapper {
 
     List<UserLeaseOrder> selectRevenueStatistics(@Param("deviceNumber") List<String> deviceNumber,@Param("hospitalId") Long hospitalId);
 
-    OrderSumAndMoneyVO selectDayOrder();
+    OrderSumAndMoneyVO selectDayOrder(LeaseOrderVO leaseOrderVO);
 
     ConditionOrderVO selectConditionOrder(LeaseOrderVO leaseOrderVO);
 

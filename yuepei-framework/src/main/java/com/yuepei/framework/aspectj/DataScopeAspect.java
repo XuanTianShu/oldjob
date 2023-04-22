@@ -2,6 +2,8 @@ package com.yuepei.framework.aspectj;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -23,6 +25,7 @@ import com.yuepei.framework.security.context.PermissionContextHolder;
  */
 @Aspect
 @Component
+@Slf4j
 public class DataScopeAspect
 {
     /**
@@ -31,24 +34,29 @@ public class DataScopeAspect
     public static final String DATA_SCOPE_ALL = "1";
 
     /**
-     * 自定数据权限
+     * 医院权限
      */
     public static final String DATA_SCOPE_CUSTOM = "2";
 
     /**
-     * 部门数据权限
+     * 代理商权限
      */
     public static final String DATA_SCOPE_DEPT = "3";
 
     /**
-     * 部门及以下数据权限
+     * 投资人权限
      */
     public static final String DATA_SCOPE_DEPT_AND_CHILD = "4";
 
     /**
-     * 仅本人数据权限
+     * 运维权限
      */
     public static final String DATA_SCOPE_SELF = "5";
+
+    /**
+     * 普通权限
+     */
+    public static final String DATA_SCOPE_COMMON = "6";
 
     /**
      * 数据权限过滤关键字
@@ -58,6 +66,7 @@ public class DataScopeAspect
     @Before("@annotation(controllerDataScope)")
     public void doBefore(JoinPoint point, DataScope controllerDataScope) throws Throwable
     {
+        log.info("point:{}",point.getArgs());
         clearDataScope(point);
         handleDataScope(point, controllerDataScope);
     }
@@ -118,7 +127,7 @@ public class DataScopeAspect
             }
             else if (DATA_SCOPE_DEPT.equals(dataScope))
             {
-                sqlString.append(StringUtils.format(" OR {}.dept_id = {} ", deptAlias, user.getDeptId()));
+                sqlString.append(StringUtils.format(" OR {}.user_id = {} ", deptAlias, user.getUserId()));
             }
             else if (DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope))
             {
@@ -130,12 +139,19 @@ public class DataScopeAspect
             {
                 if (StringUtils.isNotBlank(userAlias))
                 {
-                    sqlString.append(StringUtils.format(" OR {}.user_id = {} ", userAlias, user.getUserId()));
+                    if (userAlias.equals("lo")){
+                        sqlString.append(StringUtils.format(" and {}.hospitalId = {} ", userAlias, user.getHospitalId()));
+                    }else if (userAlias.equals("user")){
+                        sqlString.append(StringUtils.format(" and hospitalId = {} ",user.getHospitalId()));
+                    }else{
+                        sqlString.append(StringUtils.format(" and {}.hospital_id = {} ", userAlias, user.getHospitalId()));
+                    }
+
                 }
                 else
                 {
                     // 数据权限为仅本人且没有userAlias别名不查询任何数据
-                    sqlString.append(StringUtils.format(" OR {}.dept_id = 0 ", deptAlias));
+                    sqlString.append(StringUtils.format(" OR {}.hospital_id = 0 ", deptAlias));
                 }
             }
             conditions.add(dataScope);
@@ -157,6 +173,7 @@ public class DataScopeAspect
      */
     private void clearDataScope(final JoinPoint joinPoint)
     {
+        System.out.println("-------------"+joinPoint.getArgs()[0]+"-----------------------------------------");
         Object params = joinPoint.getArgs()[0];
         if (StringUtils.isNotNull(params) && params instanceof BaseEntity)
         {

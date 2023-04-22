@@ -1,11 +1,12 @@
 package com.yuepei.system.domain.vo;
 
+import com.yuepei.common.core.domain.BaseEntity;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class OrderDepositListVO {
+public class OrderDepositListVO extends BaseEntity {
     private Long id;
 
     private String orderNumber;

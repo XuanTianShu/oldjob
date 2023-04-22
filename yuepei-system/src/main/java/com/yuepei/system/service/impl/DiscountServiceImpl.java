@@ -1,5 +1,6 @@
 package com.yuepei.system.service.impl;
 
+import com.yuepei.common.annotation.DataScope;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.common.utils.DateUtils;
@@ -77,6 +78,7 @@ public class DiscountServiceImpl implements IDiscountService
      * @return 优惠券
      */
     @Override
+    @DataScope(deptAlias = "d",userAlias = "d")
     public List<Discount> selectDiscountList(Discount discount)
     {
         return discountMapper.selectDiscountList(discount);
@@ -140,8 +142,6 @@ public class DiscountServiceImpl implements IDiscountService
     @Transactional(rollbackFor = Exception.class)
     @Override
     public AjaxResult updateUserIntegral(Long discountId, SysUser user) {
-        System.out.println(user.getOpenid()+"==================openid");
-        System.out.println(discountId+"=======================discountId");
         try {
             SysUser sysUser = sysUserMapper.selectUserByOpenid(user.getOpenid());
             Discount discount = discountMapper.selectDiscountById(discountId);
@@ -164,6 +164,7 @@ public class DiscountServiceImpl implements IDiscountService
                 discountRecord.setIsJyb(1L);
                 discountRecord.setHospitalname(hospital.getHospitalName());
                 discountRecord.setPrice(discount.getMoney());
+                discountRecord.setHospitalId(String.valueOf(hospital.getHospitalId()));
                 discountRecordMapper.insertDiscountRecord(discountRecord);
 
                 //添加用户消费积分明细

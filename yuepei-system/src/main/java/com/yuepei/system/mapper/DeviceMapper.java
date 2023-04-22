@@ -155,4 +155,10 @@ public interface DeviceMapper {
     int updateProportion(Device device);
 
     List<HospitalVO> selectHospital(Long[] longs1);
+
+    String investorProportion(@Param("deviceNumber") String deviceNumber);
+
+    String selectAgentProportion(@Param("deviceNumber") String deviceNumber);
+
+    void updateInvestor(PersonnelProportionVO personnelProportionVO);
 }

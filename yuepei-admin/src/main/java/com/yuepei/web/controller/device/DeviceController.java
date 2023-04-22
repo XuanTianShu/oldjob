@@ -9,13 +9,14 @@ import com.yuepei.common.enums.BusinessType;
 import com.yuepei.common.utils.poi.ExcelUtil;
 import com.yuepei.service.UnlockingService;
 import com.yuepei.system.domain.Device;
-import com.yuepei.system.domain.vo.TotalProportionVO;
+import com.yuepei.system.domain.vo.*;
 import com.yuepei.system.mapper.CarouselMapper;
 import com.yuepei.system.mapper.InstructionsMapper;
 import com.yuepei.system.service.*;
 import com.yuepei.utils.DictionaryEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.aspectj.weaver.loadtime.Aj;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -296,6 +297,7 @@ public class DeviceController extends BaseController {
      * 修改设备
      */
     @PreAuthorize("@ss.hasPermi('system:device:edit')")
+//    @PreAuthorize("@ss.hasAnyRoles('hospital')")
     @Log(title = "设备管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody Device device)
@@ -354,9 +356,19 @@ public class DeviceController extends BaseController {
     public AjaxResult getPersonnelDetails(@RequestParam("deviceNumber") String deviceNumber){
         Map<String,Object> map = new HashMap<>();
         map.put("agentPersonnel",deviceService.agentPersonnel(deviceNumber));
-        map.put("hospitalPersonnel",deviceService.hospitalPersonnel(deviceNumber));
-        map.put("investorPersonnel",deviceService.investorPersonnel(deviceNumber));
+        map.put("hospitalList",deviceService.hospitalPersonnel(deviceNumber));
+        map.put("investorList",deviceService.investorPersonnel(deviceNumber));
         return AjaxResult.success(map);
+    }
+
+    /**
+     * 详情人员比例修改
+     * @param personnelProportionVO
+     * @return
+     */
+    @PostMapping("/updatePersonnelProportion")
+    public AjaxResult updatePersonnelProportion(@RequestBody PersonnelProportionVO personnelProportionVO){
+        return AjaxResult.success(deviceService.updatePersonnelProportion(personnelProportionVO));
     }
 
     /**

@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.yuepei.common.annotation.DataScope;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.system.domain.Item;
 import com.yuepei.service.MyLeaseOrderService;
@@ -397,13 +398,15 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
      * @return
      */
     @Override
+    @DataScope(deptAlias = "lo",userAlias = "lo")
     public List<UserLeaseOrder> leaseOrderList(LeaseOrderVO leaseOrderVO) {
         return userLeaseOrderMapper.leaseOrderList(leaseOrderVO);
     }
 
     @Override
-    public OrderSumAndMoneyVO selectDayOrder() {
-        return userLeaseOrderMapper.selectDayOrder();
+    @DataScope(userAlias = "user",deptAlias = "user")
+    public OrderSumAndMoneyVO selectDayOrder(LeaseOrderVO leaseOrderVO) {
+        return userLeaseOrderMapper.selectDayOrder(leaseOrderVO);
     }
 
     @Override

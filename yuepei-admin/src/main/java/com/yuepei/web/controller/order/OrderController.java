@@ -86,12 +86,13 @@ public class OrderController extends BaseController {
     @GetMapping("/leaseList")
     public AjaxResult LeaseList(LeaseOrderVO leaseOrderVO){
         startPage();
-        List<UserLeaseOrder> list = myLeaseOrderService.leaseOrderList(leaseOrderVO);
-        OrderSumAndMoneyVO orderSumAndMoneyVO = myLeaseOrderService.selectDayOrder();
-        ConditionOrderVO conditionOrderVO = myLeaseOrderService.selectConditionOrder(leaseOrderVO);
         Map<String,Object> map = new HashMap<>();
+        List<UserLeaseOrder> list = myLeaseOrderService.leaseOrderList(leaseOrderVO);
         map.put("leaseList",getDataTable(list));
+        OrderSumAndMoneyVO orderSumAndMoneyVO = myLeaseOrderService.selectDayOrder(new LeaseOrderVO());
         map.put("todayOrder",orderSumAndMoneyVO);
+        System.out.println(orderSumAndMoneyVO.getTodayOrderMoney()+"--------");
+        ConditionOrderVO conditionOrderVO = myLeaseOrderService.selectConditionOrder(leaseOrderVO);
         map.put("conditionOrder",conditionOrderVO);
         return AjaxResult.success(map);
     }

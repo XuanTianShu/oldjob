@@ -34,6 +34,13 @@
     <update id="updateProportion">
         UPDATE device_investor SET proportion = 0 WHERE device_number = #{deviceNumber}
     </update>
+    <update id="updateInvestor">
+        update device_investor
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="proportion != null">proportion = #{proportion},</if>
+        </trim>
+        where investor_id = #{investorId} and device_number = #{deviceNumber}
+    </update>
 
     <delete id="delByInvestorId" parameterType="String">
         delete from device_investor where device_number = #{deviceNumber}

@@ -51,7 +51,9 @@ public class InvestorUserController extends BaseController
     /**
      * 查询投资人管理列表
      */
-    @PreAuthorize("@ss.hasPermi('system:investorUser:list')")
+//    @PreAuthorize("@ss.hasPermi('system:investorUser:list')")
+//    @PreAuthorize("@ss.hasAnyRoles('hospital')")
+    @PreAuthorize("@ss.hasPermi('system:device:list')")
     @GetMapping("/list")
     public TableDataInfo list(SysUser user)
     {
