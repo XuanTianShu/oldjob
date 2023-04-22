@@ -13,8 +13,6 @@ import java.util.Date;
 public class Withdrawal {
     private Long id;
     private Long userId;
-    /**订单编号*/
-    private String orderNumber;
     /**角色类别*/
     private String role;
     /**角色名称 */

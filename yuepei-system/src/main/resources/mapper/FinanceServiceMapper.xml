@@ -164,7 +164,7 @@
         <include refid="selectStatisticsByPlatformHospitalVo"/>
     </select>
     <insert id="insertWithdrawalApplication">
-        insert into withdrawal(user_id,order_number,role,role_name,amount,withdrawal_information,received,apply_time,handle_time)
-        values(#{userId},#{orderNumber},#{role},#{roleName},#{amount},#{withdrawalInformation},#{received},#{applyTime},#{handleTime})
+        insert into withdrawal(user_id,role,role_name,amount,withdrawal_information,received,apply_time,handle_time)
+        values(#{userId},#{role},#{roleName},#{amount},#{withdrawalInformation},#{received},#{applyTime},#{handleTime})
     </insert>
 </mapper>

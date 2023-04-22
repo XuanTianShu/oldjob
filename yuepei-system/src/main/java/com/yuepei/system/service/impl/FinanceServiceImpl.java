@@ -87,10 +87,9 @@ public class FinanceServiceImpl implements FinanceService {
     public String withdrawalApplication(Withdrawal withdrawal) {
         SysUser sysUser = sysUserMapper.selectUserById(withdrawal.getUserId());
         Bank bank = sysUserMapper.selectBank(withdrawal.getUserId());
-        withdrawal.setOrderNumber(UUID.randomUUID().toString().replace("-", ""));
         withdrawal.setRole(sysUser.getUserType());
         withdrawal.setRoleName(sysUser.getNickName());
-        withdrawal.setWithdrawalInformation("开户人："+bank.getAccountHolder()+" 银行名称："+bank.getBankName()+" 银行卡号："+bank.getBankNumber());
+        withdrawal.setWithdrawalInformation("开户人："+bank.getAccountHolder()+" 名称："+bank.getBankName()+" 银行卡号："+bank.getBankNumber());
         withdrawal.setReceived(1L);
         withdrawal.setApplyTime(new Date());
         financeServiceMapper.insertWithdrawalApplication(withdrawal);
