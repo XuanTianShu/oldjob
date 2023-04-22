@@ -281,7 +281,8 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
             userLeaseOrderList.addAll(collect);
         }
         List<UserLeaseOrderVo> collect = userLeaseOrderList.stream().filter(map -> !map.getStatus().equals("3")).collect(Collectors.toList());
-        return collect;
+        List<UserLeaseOrderVo> collect1 = collect.stream().sorted(Comparator.comparing(UserLeaseOrderVo::getLeaseTime).reversed()).collect(Collectors.toList());
+        return collect1;
     }
 
     @Override
@@ -295,7 +296,6 @@ public class HospitalDeviceServiceImpl implements HospitalDeviceService {
         UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
         BeanUtils.copyProperties(userLeaseOrder, userLeaseOrderVo);
         userLeaseOrderVo.setUserName(sysUser1.getUserName());
-        userLeaseOrderVo.setProportion(sysUser1.getProportion());
         userLeaseOrderVo.setAgentName(sysUser1.getNickName());
         if (hospital!=null){
             userLeaseOrderVo.setHospitalName(hospital.getHospitalName());

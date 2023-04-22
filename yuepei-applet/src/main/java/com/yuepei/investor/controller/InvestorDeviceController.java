@@ -3,6 +3,7 @@ package com.yuepei.investor.controller;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.investor.service.AppletInvestorService;
+import com.yuepei.system.domain.Bank;
 import com.yuepei.system.domain.vo.FeedbackInfoVo;
 import com.yuepei.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,4 +152,14 @@ public class InvestorDeviceController {
         SysUser user = tokenUtils.analysis(request);
         return AjaxResult.success(appletInvestorService.investorLeaseOrderDetails(orderNumber,user.getUserId()));
     }
+
+    /**绑定银行卡*/
+    @PostMapping("/bindingBank")
+    public AjaxResult bindingBank(HttpServletRequest request,
+                                  @RequestBody Bank bank){
+        SysUser user = tokenUtils.analysis(request);
+        return AjaxResult.success(appletInvestorService.bindingBank(user.getUserId(),bank));
+    }
+
+
 }
