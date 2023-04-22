@@ -53,5 +53,7 @@ public interface AppletInvestorService {
 
     UserLeaseOrderVo investorLeaseOrderDetails(String orderNumber, Long userId);
 
-    String bindingBank(Long userId, Bank bank);
+    String bindingBank(Bank bank);
+
+    String selectBank(Long userId);
 }

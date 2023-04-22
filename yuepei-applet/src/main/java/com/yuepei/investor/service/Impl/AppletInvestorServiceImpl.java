@@ -832,8 +832,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     }
 
     @Override
-    public String bindingBank(Long userId, Bank bank) {
-        bank.setUserId(userId);
+    public String bindingBank(Bank bank) {
         if (checkBankCard(bank.getBankNumber())){
             appletInvestorMapper.bindingBank(bank);
             return "银行卡绑定成功";
@@ -881,5 +880,13 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             luhmSum += k;
         }
         return (luhmSum % 10 == 0) ? '0' : (char) ((10 - luhmSum % 10) + '0');
+    }
+
+    @Override
+    public String selectBank(Long userId) {
+        Bank bank = sysUserMapper.selectBank(userId);
+        String substring = bank.getBankNumber().substring(bank.getBankNumber().length() - 4);
+        String bankInfo = bank.getBankName()+"("+substring+")";
+        return bankInfo;
     }
 }

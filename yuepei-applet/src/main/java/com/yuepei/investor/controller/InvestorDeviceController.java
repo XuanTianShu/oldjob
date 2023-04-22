@@ -5,6 +5,7 @@ import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.investor.service.AppletInvestorService;
 import com.yuepei.system.domain.Bank;
 import com.yuepei.system.domain.vo.FeedbackInfoVo;
+import com.yuepei.system.mapper.SysUserMapper;
 import com.yuepei.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -155,11 +156,14 @@ public class InvestorDeviceController {
 
     /**绑定银行卡*/
     @PostMapping("/bindingBank")
-    public AjaxResult bindingBank(HttpServletRequest request,
-                                  @RequestBody Bank bank){
-        SysUser user = tokenUtils.analysis(request);
-        return AjaxResult.success(appletInvestorService.bindingBank(user.getUserId(),bank));
+    public AjaxResult bindingBank(@RequestBody Bank bank){
+        return AjaxResult.success(appletInvestorService.bindingBank(bank));
     }
 
-
+    /**查询当前登录人绑定的银行卡*/
+    @GetMapping("/selectBank")
+    public AjaxResult selectBank(HttpServletRequest request){
+        SysUser user = tokenUtils.analysis(request);
+        return AjaxResult.success(appletInvestorService.selectBank(user.getUserId()));
+    }
 }
