@@ -24,4 +24,6 @@ public class OrderProportionDetailVo {
     private BigDecimal netAmount;
 
     private String hospitalId;
+
+    private BigDecimal price;
 }

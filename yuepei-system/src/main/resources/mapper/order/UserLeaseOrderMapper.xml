@@ -79,12 +79,37 @@
         <result property="depositNumber" column="deposit_number"/>
     </resultMap>
 
+    <resultMap id="OrderProportionDetailVoResult" type="OrderProportionDetailVo">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="proportion" column="proportion"/>
+        <result property="netAmount" column="net_amount"/>
+        <result property="leaseTime" column="lease_time"/>
+        <result property="hospitalId" column="hospitalId"/>
+        <result property="price" column="price"/>
+    </resultMap>
+
     <sql id="selectUserLeaseOrderVo">
         select id, openid, order_number, device_number, device_type, lease_time,
                lease_address, restore_time, restore_address, price, pay_type,
                net_amount, coupon_price, status, play_time,create_time,child,choose,investorProportion,
                agentProportion,hospitalProportion,platformProportion,device_rule,deposit,time_price,fixed_price,hospitalId,investorId,agentId
         from user_lease_order
+    </sql>
+
+    <sql id="selectUserLeaseOrderByAgentVo">
+        select id, openid, order_number, device_number, device_type, lease_time,
+               lease_address, restore_time, restore_address, price, pay_type,
+               net_amount, coupon_price, status, play_time,create_time,child,choose,
+               agentProportion as proportion,hospitalId,investorId,agentId
+        from user_lease_order
+    </sql>
+
+    <sql id="selectUserLeaseOrderByAccountAgentId">
+        select oaad.user_id,oaad.order_number,oaad.proportion,ulo.net_amount,ulo.lease_time,ulo.hospitalId,oaad.price
+        from order_agent_account_detail oaad
+        left join user_lease_order ulo on oaad.order_number = ulo.order_number
     </sql>
 
     <sql id="selectLeaseOrderVO">
@@ -471,8 +496,13 @@
                `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
         FROM `user_lease_order` where device_number = #{deviceNumber} and `status` = 0
     </select>
-    <select id="selectUserLeaseOrderByAgentId"  parameterType="UserLeaseOrder" resultMap="UserLeaseOrderResult">
-        <include refid="selectUserLeaseOrderVo"/>
+    <select id="selectUserLeaseOrderByAccountAgentId"  parameterType="OrderProportionDetailVo" resultMap="OrderProportionDetailVoResult">
+        <include refid="selectUserLeaseOrderByAccountAgentId"/>
+        where ulo.status = 2
+        and oaad.user_id=#{userId}
+    </select>
+    <select id="selectUserLeaseOrderByAgentId" parameterType="OrderProportionDetailVo" resultMap="OrderProportionDetailVoResult">
+        <include refid="selectUserLeaseOrderByAgentVo"/>
         where status = 2
         and agentId=#{userId}
     </select>
