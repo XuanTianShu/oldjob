@@ -213,4 +213,14 @@ public class InvestorUserServiceImpl implements IInvestorUserService
         }
         return investorUserMapper.deleteDeviceById(id);
     }
+
+    @Override
+    public List<SysUser> selectInvestorAccountUserList(SysUser user) {
+        return investorUserMapper.selectInvestorAccountUserList(user);
+    }
+
+    @Override
+    public TotalProportionVO accountProportion(DeviceInvestor deviceInvestor) {
+        return investorUserMapper.accountProportion(deviceInvestor);
+    }
 }

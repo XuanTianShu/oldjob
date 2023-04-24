@@ -62,6 +62,15 @@ public class InvestorUserController extends BaseController
         return getDataTable(list);
     }
 
+    @PreAuthorize("@ss.hasPermi('system:device:list')")
+    @GetMapping("/accountList")
+    public TableDataInfo accountList(SysUser user)
+    {
+        startPage();
+        List<SysUser> list = investorUserService.selectInvestorAccountUserList(user);
+        return getDataTable(list);
+    }
+
     /**
      * 投资设备
      * @param deviceInvestor
@@ -242,5 +251,11 @@ public class InvestorUserController extends BaseController
     public AjaxResult delDevice(@PathVariable Long id)
     {
         return toAjax(investorUserService.deleteDeviceById(id));
+    }
+
+    @GetMapping("/accountProportion")
+    public AjaxResult accountProportion(DeviceInvestor deviceInvestor){
+        TotalProportionVO totalProportion = investorUserService.accountProportion(deviceInvestor);
+        return AjaxResult.success(totalProportion);
     }
 }

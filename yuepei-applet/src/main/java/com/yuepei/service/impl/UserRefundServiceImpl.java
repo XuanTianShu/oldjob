@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.wechat.pay.contrib.apache.httpclient.util.AesUtil;
 import com.yuepei.common.core.domain.AjaxResult;
 import com.yuepei.common.core.domain.entity.SysUser;
+import com.yuepei.common.core.redis.RedisCache;
 import com.yuepei.common.exception.ServiceException;
 import com.yuepei.common.utils.DateUtils;
 import com.yuepei.common.utils.StringUtils;
@@ -75,6 +76,9 @@ public class UserRefundServiceImpl implements UserRefundService {
 
     @Autowired
     public CloseableHttpClient wxPayClient;
+
+    @Autowired
+    private RedisCache redisCache;
 
     @Autowired
     private WXCallBackUtils wxCallBackUtils;
@@ -339,7 +343,6 @@ public class UserRefundServiceImpl implements UserRefundService {
     @Transactional
     @Override
     public AjaxResult orderRefund(UserLeaseOrder userLeaseOrder) {
-        //TODO 优惠券退回
         long l = new BigDecimal(String.valueOf(userLeaseOrder.getNetAmount())).multiply(BigDecimal.valueOf(100)).longValue();
         log.info("{}",userLeaseOrder.getNetAmount());
         if (l <= 0){
@@ -349,11 +352,14 @@ public class UserRefundServiceImpl implements UserRefundService {
             userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder1);
         }else {
             if (userLeaseOrder.getPayType().equals("2")){
+                //TODO 优惠券退回
+                //TODO 扣除分成金额
+                log.info(userLeaseOrder.getCouponId()+"优惠券id");
+                log.info(userLeaseOrder.getOrderNumber()+"订单号");
                 SysUser sysUser = sysUserMapper.selectUserByOpenid(userLeaseOrder.getOpenid());
-
                 BigDecimal balance = sysUser.getBalance();
-                BigDecimal add = balance.add(new BigDecimal(l));
-                sysUser.setBalance(balance.add(add));
+                BigDecimal add = balance.add(userLeaseOrder.getNetAmount());
+                sysUser.setBalance(add);
                 sysUserMapper.updateUser(sysUser);
 
                 UserLeaseOrder userLeaseOrder1 = new UserLeaseOrder();
@@ -437,6 +443,13 @@ public class UserRefundServiceImpl implements UserRefundService {
             String out_trade_no = (String) parseObject.get("out_trade_no");
             String status = (String) parseObject.get("refund_status");
             if (status.equals("SUCCESS")) {
+//                Map<String, Object> cacheMap = redisCache.getCacheMap(out_trade_no);
+//                log.info("测试：{}",cacheMap.toString());
+                //TODO 优惠券退回
+                //TODO 扣除分成金额
+//                log.info(userLeaseOrder.getCouponId()+"优惠券id");
+                log.info(out_trade_no+"订单号");
+
                 UserLeaseOrder userLeaseOrder = new UserLeaseOrder();
                 userLeaseOrder.setOrderNumber(out_trade_no);
                 userLeaseOrder.setStatus("4");

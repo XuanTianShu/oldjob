@@ -158,6 +158,7 @@ public class WechatCreateOrderServiceImpl implements WechatCreateOrderService {
             userDiscountMapper.updateUserDiscount(userDiscount);
             UserLeaseOrder userLeaseOrder1 = new UserLeaseOrder();
             userLeaseOrder1.setOrderNumber(userLeaseOrder.getOrderNumber());
+            userLeaseOrder1.setCouponId(String.valueOf(couponId));
             userLeaseOrder1.setCouponPrice(new BigDecimal(String.valueOf(userDiscount1.getPrice())).multiply(new BigDecimal(100)).longValue());
             userLeaseOrder1.setPrice(userLeaseOrder.getPrice().add(userDiscount1.getPrice()));
             userLeaseOrderMapper.updateUserLeaseOrder(userLeaseOrder1);

@@ -39,7 +39,7 @@
         </foreach>
     </insert>
     <insert id="insertAgentAccountProportion">
-        insert into order_investor_acount_detail(order_number,user_id,proportion,parent_id) values
+        insert into order_investor_account_detail(order_number,user_id,proportion,parent_id) values
         <foreach item="item" index="index" collection="deviceInvestorAccountList" separator=",">
             (#{orderNumber},#{item.userId},#{item.proportion},#{item.parentId})
         </foreach>
@@ -67,20 +67,20 @@
     </update>
     <update id="updateInvestorAccountProportion" parameterType="java.util.List">
         <foreach collection="list" item="item" separator=";">
-            UPDATE order_investor_acount_detail
+            UPDATE order_investor_account_detail
             SET price = #{item.price}
             WHERE id = #{item.id}
         </foreach>
     </update>
     <select id="selectInvestorAccount" resultMap="deviceInverstorAccountResult">
         SELECT user_id,proportion,parent_id FROM sys_user
-        WHERE parent_id IN
+        WHERE del_flag = '0' and parent_id IN
         <foreach item="item" collection="orderProportionDetailList" open="(" separator="," close=")">
             #{item.userId}
         </foreach>
     </select>
     <select id="selectInvestorAccountProportion" parameterType="String" resultMap="OrderProportionDetailResult">
-        select id,order_number,user_id,parent_id,proportion,price from `order_investor_acount_detail`
+        select id,order_number,user_id,parent_id,proportion,price from `order_investor_account_detail`
         where order_number = #{orderNumber}
     </select>
     <select id="selectInvestorProportion" parameterType="String" resultMap="OrderProportionDetailResult">

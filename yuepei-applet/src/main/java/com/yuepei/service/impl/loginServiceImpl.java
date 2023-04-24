@@ -112,6 +112,7 @@ public class loginServiceImpl implements LoginService {
             sysUser.setOpenid(openid);
             return ajax.put(Constants.TOKEN, tokenUtils.createToken(sysUserList));
         }else {
+            sysUser.setNickName("微信用户");
             sysUser.setOpenid(openid);
             sysUser.setRoleId(2L);
             userService.insertUser(sysUser);

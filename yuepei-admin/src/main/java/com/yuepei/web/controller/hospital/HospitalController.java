@@ -257,7 +257,7 @@ public class HospitalController extends BaseController {
                 return AjaxResult.error("超过最大分配比例");
             }
         }else {
-            if (Integer.parseInt(bindingHospitalVO.getType()) > 100){
+            if (Integer.parseInt(bindingHospitalVO.getProportion()) > 50){
                 return AjaxResult.error("超过最大分配比例");
             }
         }
@@ -293,7 +293,7 @@ public class HospitalController extends BaseController {
                 return AjaxResult.error("超过最大分配比例");
             }
         }else {
-            if (Integer.parseInt(bindingHospitalVO.getType()) > 100){
+            if (Integer.parseInt(bindingHospitalVO.getProportion()) > 50){
                 return AjaxResult.error("超过最大分配比例");
             }
         }

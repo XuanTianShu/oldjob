@@ -66,6 +66,7 @@
         <result property="restoreTime" column="restore_time"/>
         <result property="choose" column="choose"/>
         <result property="child" column="child"/>
+        <result property="couponId" column="coupon_id"/>
         <result property="investorProportion" column="investorProportion"/>
         <result property="agentProportion" column="agentProportion"/>
         <result property="hospitalProportion" column="hospitalProportion"/>
@@ -125,7 +126,7 @@
         INNER JOIN device AS d ON d.`device_number` = lo.`device_number`
         INNER JOIN sys_user AS su ON su.`user_id` = d.`user_id`
         INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`-->
-        SELECT lo.id,u.`nick_name`,u.`phone_number`, lo.order_number,
+        SELECT lo.id,lo.openid,u.`nick_name`,u.`phone_number`, lo.order_number,
         lo.device_number, lo.device_type, lo.lease_time,
         lo.lease_address,lo.choose,lo.child,
         IFNULL(h.`hospital_name`,'无') AS hospitalName,
@@ -134,7 +135,7 @@
         IFNULL(su.`user_name`,'无') AS agentName,
         lo.play_time,lo.create_time,lo.investorProportion,
         lo.agentProportion,lo.`agentHospitalProportion`
-        ,lo.hospitalProportion,lo.platformProportion
+        ,lo.hospitalProportion,lo.platformProportion,lo.coupon_id
         FROM user_lease_order AS lo
         INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`
         LEFT JOIN hospital AS h ON h.`hospital_id` = lo.`hospitalId`
@@ -326,6 +327,7 @@
             <if test="agentProportion != null">agentProportion = #{agentProportion},</if>
             <if test="platformProportion != null">platformProportion = #{platformProportion},</if>
             <if test="depositNumber != null">deposit_number = #{depositNumber},</if>
+            <if test="couponId != null">coupon_id = #{couponId},</if>
         </trim>
         where order_number = #{orderNumber}
     </update>

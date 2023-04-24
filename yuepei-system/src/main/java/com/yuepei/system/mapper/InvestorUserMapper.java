@@ -79,4 +79,8 @@ public interface InvestorUserMapper
     TotalProportionVO totalProportion3(DeviceInvestor deviceInvestor);
 
     TotalProportionVO totalProportion4(DeviceInvestor deviceInvestor);
+
+    List<SysUser> selectInvestorAccountUserList(SysUser user);
+
+    TotalProportionVO accountProportion(DeviceInvestor deviceInvestor);
 }

@@ -86,4 +86,6 @@ public class LeaseOrderVO extends BaseEntity {
 
     private String agentHospitalProportion;
 
+    private String couponId;
+
 }

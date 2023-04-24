@@ -445,7 +445,7 @@
     </select>
     <select id="agentPersonnel" parameterType="String" resultMap="agentPersonnelResult">
         SELECT su.`user_id`,su.`user_name`,su.`nick_name`,
-               su.`proportion`,su.`phone_number` FROM device AS d
+               dg.`proportion`,su.`phone_number` FROM device AS d
                                                           LEFT JOIN device_agent AS dg ON dg.`device_number` = d.`device_number`
                                                           LEFT JOIN sys_user AS su ON su.`user_id` = dg.`agent_id`
         WHERE d.`device_number` = #{deviceNumber} AND su.`parent_id` = 0
@@ -453,7 +453,7 @@
     <select id="hospitalPersonnel" parameterType="String" resultMap="hospitalPersonnelResult">
         SELECT h.hospital_id,su.`user_name`,su.`nick_name`,
                d.`investor_proportion`,su.`phone_number`,
-               h.hospital_name,h.proportion,h.type FROM device AS d
+               h.hospital_name,dh.proportion,h.type FROM device AS d
                                                             INNER JOIN device_hospital AS dh ON dh.device_number = d.`device_number`
                                                             INNER JOIN hospital AS h ON h.hospital_id = dh.hospital_id
                                                             INNER JOIN sys_user AS su ON su.`hospital_id` = d.`hospital_id`

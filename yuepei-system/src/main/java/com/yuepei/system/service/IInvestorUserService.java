@@ -72,4 +72,8 @@ public interface IInvestorUserService
     int deleteDeviceByIds(Long[] ids);
 
     int deleteDeviceById(Long id);
+
+    List<SysUser> selectInvestorAccountUserList(SysUser user);
+
+    TotalProportionVO accountProportion(DeviceInvestor deviceInvestor);
 }
