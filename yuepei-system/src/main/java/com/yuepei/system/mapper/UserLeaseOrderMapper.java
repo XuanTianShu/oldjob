@@ -128,7 +128,9 @@ public interface UserLeaseOrderMapper {
 
     void deleteUserLeaseOrderByOrderNumber(@Param("orderNumber") String orderNumber);
 
-    List<UserLeaseOrder> selectUserLeaseOrderByAgentId(@Param("userId") String userId);
+    List<OrderProportionDetailVo> selectUserLeaseOrderByAccountAgentId(@Param("userId") Long userId);
+
+    List<OrderProportionDetailVo> selectUserLeaseOrderByAgentId(@Param("userId") Long userId);
 
     List<UserLeaseOrder> selectUserLeaseOrderByAgentId(@Param("deviceNumbers")List<String> deviceNumbers, @Param("userId") String userId);
 

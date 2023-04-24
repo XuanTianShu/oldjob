@@ -773,11 +773,18 @@ public class AgentServiceImpl implements AgentService {
         }
     }
 
-    public TotalVo revenueStatistics(SysUser user,int statistics){
+    public TotalVo revenueStatistics(SysUser user,int statistics, int type){
         TotalVo totalVo = new TotalVo();
         List<OrderVo> orderVos = new ArrayList<>();
+        List<OrderProportionDetailVo> userLeaseOrderList = new ArrayList<>();
         if (statistics == 1) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(String.valueOf(user.getUserId()));
+            if (type==0){
+                List<OrderProportionDetailVo> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByAccountAgentId(user.getUserId());
+                userLeaseOrderList.addAll(userLeaseOrders);
+            }else {
+                List<OrderProportionDetailVo> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(user.getUserId());
+                userLeaseOrderList.addAll(userLeaseOrders);
+            }
             Date dNow = new Date();   //当前时间
             Date dBefore = new Date();
             Calendar calendar = Calendar.getInstance(); //得到日历
@@ -787,12 +794,12 @@ public class AgentServiceImpl implements AgentService {
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
             String defaultStartDate = sdf.format(dBefore);    //格式化前一天
             String now = sdf.format(dNow);
-            List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
+            List<OrderProportionDetailVo> userLeaseOrders = new ArrayList<>();
             try {
                 //使用SimpleDateFormat的parse()方法生成Date
                 Date date = sdf.parse(defaultStartDate);
                 Date parse = sdf.parse(now);
-                List<UserLeaseOrder> userLeaseOrder = userLeaseOrderList.stream()
+                List<OrderProportionDetailVo> userLeaseOrder = userLeaseOrderList.stream()
                         .filter(s->s.getLeaseTime().getTime()<parse.getTime())
                         .filter(s->s.getLeaseTime().getTime()>date.getTime())
                         .collect(Collectors.toList());
@@ -805,8 +812,12 @@ public class AgentServiceImpl implements AgentService {
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setNetAmount(decimal);
-                orderVo.setDividendRatio(map.getAgentProportion());
-                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getAgentProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
+                if (type==0){
+                    orderVo.setIncomeAmount(map.getPrice());
+                }else {
+                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100)));
+                }
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -816,15 +827,21 @@ public class AgentServiceImpl implements AgentService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else if (statistics == 2) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(String.valueOf(user.getUserId()));
+            if (type==0){
+                List<OrderProportionDetailVo> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByAccountAgentId(user.getUserId());
+                userLeaseOrderList.addAll(userLeaseOrders);
+            }else {
+                List<OrderProportionDetailVo> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(user.getUserId());
+                userLeaseOrderList.addAll(userLeaseOrders);
+            }
             Date dNow = new Date();   //当前时间
             SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
             String format = sdf.format(dNow);
-            List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
+            List<OrderProportionDetailVo> userLeaseOrders = new ArrayList<>();
             try {
                 //使用SimpleDateFormat的parse()方法生成Date
                 Date date = sdf.parse(format);
-                List<UserLeaseOrder> userLeaseOrder = userLeaseOrderList.stream()
+                List<OrderProportionDetailVo> userLeaseOrder = userLeaseOrderList.stream()
                         .filter(s->s.getLeaseTime().getTime()>=date.getTime())
                         .collect(Collectors.toList());
                 userLeaseOrders.addAll(userLeaseOrder);
@@ -836,8 +853,12 @@ public class AgentServiceImpl implements AgentService {
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setNetAmount(decimal);
-                orderVo.setDividendRatio(map.getAgentProportion());
-                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getAgentProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
+                if (type==0){
+                    orderVo.setIncomeAmount(map.getPrice());
+                }else {
+                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100)));
+                }
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -847,7 +868,13 @@ public class AgentServiceImpl implements AgentService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else if (statistics == 3) {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(String.valueOf(user.getUserId()));
+            if (type==0){
+                List<OrderProportionDetailVo> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByAccountAgentId(user.getUserId());
+                userLeaseOrderList.addAll(userLeaseOrders);
+            }else {
+                List<OrderProportionDetailVo> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(user.getUserId());
+                userLeaseOrderList.addAll(userLeaseOrders);
+            }
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             // 获取前月的第一天
             Calendar cale = Calendar.getInstance();
@@ -859,12 +886,12 @@ public class AgentServiceImpl implements AgentService {
             cale.add(Calendar.MONTH, 1);
             cale.set(Calendar.DAY_OF_MONTH, 0);
             String lastDay = format.format(cale.getTime());
-            List<UserLeaseOrder> userLeaseOrders = new ArrayList<>();
+            List<OrderProportionDetailVo> userLeaseOrders = new ArrayList<>();
             try {
                 //使用SimpleDateFormat的parse()方法生成Date
                 Date first = format.parse(firstDay);
                 Date last = format.parse(lastDay);
-                List<UserLeaseOrder> userLeaseOrder = userLeaseOrderList.stream()
+                List<OrderProportionDetailVo> userLeaseOrder = userLeaseOrderList.stream()
                         .filter(s->s.getLeaseTime().getTime()>=first.getTime())
                         .filter(s->s.getLeaseTime().getTime()<=last.getTime())
                         .collect(Collectors.toList());
@@ -877,8 +904,12 @@ public class AgentServiceImpl implements AgentService {
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setNetAmount(decimal);
-                orderVo.setDividendRatio(map.getAgentProportion());
-                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getAgentProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
+                if (type==0){
+                    orderVo.setIncomeAmount(map.getPrice());
+                }else {
+                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100)));
+                }
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -888,14 +919,24 @@ public class AgentServiceImpl implements AgentService {
             totalVo.setDividendAmount(dividendAmount);
             totalVo.setOrderVos(orderVos);
         } else {
-            List<UserLeaseOrder> userLeaseOrderList = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(String.valueOf(user.getUserId()));
+            if (type==0){
+                List<OrderProportionDetailVo> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByAccountAgentId(user.getUserId());
+                userLeaseOrderList.addAll(userLeaseOrders);
+            }else {
+                List<OrderProportionDetailVo> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByAgentId(user.getUserId());
+                userLeaseOrderList.addAll(userLeaseOrders);
+            }
             userLeaseOrderList.stream().forEach(map->{
                 OrderVo orderVo = new OrderVo();
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setNetAmount(decimal);
-                orderVo.setDividendRatio(map.getAgentProportion());
-                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getAgentProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
+                if (type==0){
+                    orderVo.setIncomeAmount(map.getPrice());
+                }else {
+                    orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100)));
+                }
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -917,12 +958,12 @@ public class AgentServiceImpl implements AgentService {
             BigDecimal orderAmount = new BigDecimal(0);
             BigDecimal dividendAmount = new BigDecimal(0);
             List<Integer> effectiveOrder = new ArrayList<>();
-            TotalVo total = revenueStatistics(sysUser,statistics);
+            TotalVo total = revenueStatistics(sysUser,statistics,0);
             if (total!=null){
                 BeanUtils.copyProperties(total,totalVo);
                 orderVo.addAll(total.getOrderVos());
                 totalVo.setOrderAmount(orderAmount.add(total.getOrderAmount()));
-                totalVo.setDividendAmount(dividendAmount.add(total.getDividendAmount().multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100))));
+                totalVo.setDividendAmount(dividendAmount.add(total.getDividendAmount()));
                 effectiveOrder.add(total.getEffectiveOrder());
                 int sum = 0;
                 for (Integer integer : effectiveOrder) {
@@ -937,21 +978,15 @@ public class AgentServiceImpl implements AgentService {
             deviceList.stream().forEach(map->{
                 hospitalIds.add(map.getHospitalId());
             });
-            List<Long> collect = hospitalIds.stream().distinct().collect(Collectors.toList());
-            List<SysUser> sysUsers = sysUserMapper.selectUserByHospitalIds(collect);
             List<OrderVo> orderVo = new ArrayList<>();
             BigDecimal orderAmount = BigDecimal.ZERO;
-            BigDecimal dividendAmount = BigDecimal.ZERO;
             List<Integer> effectiveOrder = new ArrayList<>();
-            TotalVo total = revenueStatistics(sysUser,statistics);
+            TotalVo total = revenueStatistics(sysUser,statistics,1);
             if (total!=null){
-                for (SysUser user : sysUsers) {
-                    dividendAmount=dividendAmount.add(total.getDividendAmount().multiply(new BigDecimal(user.getProportion())).divide(new BigDecimal(100)));
-                }
                 BeanUtils.copyProperties(total,totalVo);
                 orderVo.addAll(total.getOrderVos());
                 totalVo.setOrderAmount(orderAmount.add(total.getOrderAmount()));
-                totalVo.setDividendAmount(total.getDividendAmount().subtract(dividendAmount));
+                totalVo.setDividendAmount(total.getDividendAmount());
                 effectiveOrder.add(total.getEffectiveOrder());
                 int sum = 0;
                 for (Integer integer : effectiveOrder) {
