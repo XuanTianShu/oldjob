@@ -58,7 +58,7 @@ public class InvestorUserServiceImpl implements IInvestorUserService
      * @return 投资人管理
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
+    @DataScope(deptAlias = "u", userAlias = "u")
     public List<SysUser> selectInvestorUserList(SysUser user)
     {
         return investorUserMapper.selectInvestorUserList(user);

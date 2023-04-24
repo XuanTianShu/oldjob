@@ -127,7 +127,16 @@ public class DataScopeAspect
             }
             else if (DATA_SCOPE_DEPT.equals(dataScope))
             {
-                sqlString.append(StringUtils.format(" OR {}.user_id = {} ", deptAlias, user.getUserId()));
+                if (StringUtils.isNotBlank(deptAlias)){
+                    System.out.println("执行");
+                    if (deptAlias.equals("h")){
+                        sqlString.append(StringUtils.format(" and d.user_id = {}",user.getUserId()));
+                    }else if (deptAlias.equals("u")){
+                        sqlString.append(StringUtils.format(" or {}.parent_id = {}",deptAlias,user.getUserId()));
+                    }
+                }else {
+                    sqlString.append(StringUtils.format(" and agentId = {} ", user.getUserId()));
+                }
             }
             else if (DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope))
             {
@@ -143,7 +152,7 @@ public class DataScopeAspect
                         sqlString.append(StringUtils.format(" and {}.hospitalId = {} ", userAlias, user.getHospitalId()));
                     }else if (userAlias.equals("user")){
                         sqlString.append(StringUtils.format(" and hospitalId = {} ",user.getHospitalId()));
-                    }else{
+                    }else  {
                         sqlString.append(StringUtils.format(" and {}.hospital_id = {} ", userAlias, user.getHospitalId()));
                     }
 
@@ -163,6 +172,7 @@ public class DataScopeAspect
             if (StringUtils.isNotNull(params) && params instanceof BaseEntity)
             {
                 BaseEntity baseEntity = (BaseEntity) params;
+//                baseEntity.getParams().put(DATA_SCOPE,  sqlString.substring(0));
                 baseEntity.getParams().put(DATA_SCOPE, " AND (" + sqlString.substring(4) + ")");
             }
         }
