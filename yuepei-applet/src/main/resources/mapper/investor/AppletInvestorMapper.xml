@@ -257,4 +257,7 @@
         where CONCAT(IFNULL(order_number,''),IFNULL(device_number,'')) LIKE concat('%',#{nameOrNumber},'%')
         and investorId LIKE concat('%"',#{investorId},'"%')
     </select>
+    <insert id="bindingBank">
+        insert into bank(user_id,account_holder,bank_name,bank_number) values (#{userId},#{accountHolder},#{bankName},#{bankNumber})
+    </insert>
 </mapper>

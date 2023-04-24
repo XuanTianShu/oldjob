@@ -94,14 +94,6 @@ public class UserLeaseOrderVo {
 
     private String depositNumber;
 
-    private Long investorProportion;
-
-    private Long hospitalProportion;
-
-    private Long agentProportion;
-
-    private Long platformProportion;
-
     private Long electric;
 
     private String deviceMac;

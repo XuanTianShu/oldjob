@@ -3,6 +3,7 @@ package com.yuepei.system.mapper;
 import java.util.List;
 
 import com.yuepei.common.core.domain.entity.SysRole;
+import com.yuepei.system.domain.Bank;
 import org.apache.ibatis.annotations.Param;
 import com.yuepei.common.core.domain.entity.SysUser;
 import org.apache.ibatis.annotations.Select;
@@ -172,4 +173,6 @@ public interface SysUserMapper
     void batchUpdate(@Param("list") List<SysUser> list);
 
     SysUser selectHospitalProportion(@Param("hospitalId") String hospitalId);
+
+    Bank selectBank(@Param("userId") Long userId);
 }

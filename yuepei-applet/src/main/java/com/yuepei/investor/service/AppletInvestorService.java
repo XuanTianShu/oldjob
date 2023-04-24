@@ -3,6 +3,7 @@ package com.yuepei.investor.service;
 import com.yuepei.common.core.domain.entity.SysUser;
 import com.yuepei.investor.domain.vo.InvestorDeviceManageVo;
 import com.yuepei.investor.domain.vo.InvestorHospitalVO;
+import com.yuepei.system.domain.Bank;
 import com.yuepei.system.domain.DeviceType;
 import com.yuepei.system.domain.vo.*;
 
@@ -51,4 +52,8 @@ public interface AppletInvestorService {
     List<UserLeaseOrderVo> investorLeaseOrder(Long userId, String status, String deviceDepartment, String deviceTypeName, String nameOrNumber);
 
     UserLeaseOrderVo investorLeaseOrderDetails(String orderNumber, Long userId);
+
+    String bindingBank(Bank bank);
+
+    String selectBank(Long userId);
 }

@@ -3,6 +3,7 @@ package com.yuepei.investor.mapper;
 import com.yuepei.investor.domain.vo.InvestorHospitalVO;
 import com.yuepei.investor.domain.vo.InvestorOrderVO;
 import com.yuepei.investor.domain.vo.InvestorRevenueVO;
+import com.yuepei.system.domain.Bank;
 import com.yuepei.system.domain.OrderProportionDetail;
 import com.yuepei.system.domain.UserLeaseOrder;
 import com.yuepei.system.domain.vo.OrderProportionDetailVo;
@@ -105,4 +106,6 @@ public interface AppletInvestorMapper {
     List<OrderProportionDetailVo> selectOrderProtionDetail(@Param("userId") Long userId);
 
     List<UserLeaseOrder> selectUserLeaseOrderByOrderNumber(@Param("nameOrNumber") String nameOrNumber,@Param("investorId") String investorId);
+
+    void bindingBank(Bank bank);
 }

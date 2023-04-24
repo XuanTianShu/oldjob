@@ -47,6 +47,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
 
     /**
      * 首页
+     *
      * @param user
      * @param investorHospitalVO
      * @return
@@ -57,17 +58,18 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         //医院
         List<InvestorHospitalVO> hospitalList = appletInvestorMapper.selectHospitalByInvestorId(user.getUserId());
         //设备数量
-        int deviceCount = appletInvestorMapper.selectDeviceCountByInvestorId(user.getUserId(),investorHospitalVO.getHospitalId());
+        int deviceCount = appletInvestorMapper.selectDeviceCountByInvestorId(user.getUserId(), investorHospitalVO.getHospitalId());
         //设备总收益
-        BigDecimal deviceEarning = appletInvestorMapper.selectDeviceEarningsByInvestorId(user.getUserId(),investorHospitalVO.getHospitalId());
-        map.put("hospitalList",hospitalList);
-        map.put("deviceCount",deviceCount);
-        map.put("deviceEarning",deviceEarning);
+        BigDecimal deviceEarning = appletInvestorMapper.selectDeviceEarningsByInvestorId(user.getUserId(), investorHospitalVO.getHospitalId());
+        map.put("hospitalList", hospitalList);
+        map.put("deviceCount", deviceCount);
+        map.put("deviceEarning", deviceEarning);
         return map;
     }
 
     /**
      * 昨日营收
+     *
      * @param user
      * @param hospitalId
      * @return
@@ -75,8 +77,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     @Override
     public Map<String, Object> yesterdayRevenue(SysUser user, Long hospitalId) {
         Map<String, Object> map = new HashMap<>();
-        InvestorRevenueVO investorRevenueVO = appletInvestorMapper.yesterdayRevenue(user.getUserId(),hospitalId);
-        List<InvestorOrderVO> investorOrderVOList = appletInvestorMapper.yesterdayRevenueList(user.getUserId(),hospitalId);
+        InvestorRevenueVO investorRevenueVO = appletInvestorMapper.yesterdayRevenue(user.getUserId(), hospitalId);
+        List<InvestorOrderVO> investorOrderVOList = appletInvestorMapper.yesterdayRevenueList(user.getUserId(), hospitalId);
         investorRevenueVO.setInvestorOrderVOList(investorOrderVOList);
         map.put("revenueVO", investorRevenueVO);
         return map;
@@ -84,6 +86,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
 
     /**
      * 今日营收
+     *
      * @param user
      * @param hospitalId
      * @return
@@ -91,8 +94,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     @Override
     public Map<String, Object> todayRevenue(SysUser user, Long hospitalId) {
         Map<String, Object> map = new HashMap<>();
-        InvestorRevenueVO investorRevenueVO = appletInvestorMapper.todayRevenue(user.getUserId(),hospitalId);
-        List<InvestorOrderVO> investorOrderVOList = appletInvestorMapper.todayRevenueList(user.getUserId(),hospitalId);
+        InvestorRevenueVO investorRevenueVO = appletInvestorMapper.todayRevenue(user.getUserId(), hospitalId);
+        List<InvestorOrderVO> investorOrderVOList = appletInvestorMapper.todayRevenueList(user.getUserId(), hospitalId);
         investorRevenueVO.setInvestorOrderVOList(investorOrderVOList);
         map.put("revenueVO", investorRevenueVO);
         return map;
@@ -100,6 +103,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
 
     /**
      * 本月营收
+     *
      * @param user
      * @param hospitalId
      * @return
@@ -107,8 +111,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     @Override
     public Map<String, Object> monthRevenue(SysUser user, Long hospitalId) {
         Map<String, Object> map = new HashMap<>();
-        InvestorRevenueVO investorRevenueVO = appletInvestorMapper.monthRevenue(user.getUserId(),hospitalId);
-        List<InvestorOrderVO> investorOrderVOList = appletInvestorMapper.monthRevenueList(user.getUserId(),hospitalId);
+        InvestorRevenueVO investorRevenueVO = appletInvestorMapper.monthRevenue(user.getUserId(), hospitalId);
+        List<InvestorOrderVO> investorOrderVOList = appletInvestorMapper.monthRevenueList(user.getUserId(), hospitalId);
         investorRevenueVO.setInvestorOrderVOList(investorOrderVOList);
         map.put("revenueVO", investorRevenueVO);
         return map;
@@ -116,6 +120,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
 
     /**
      * 累计营收
+     *
      * @param user
      * @param hospitalId
      * @return
@@ -123,8 +128,8 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     @Override
     public Map<String, Object> accumulativeRevenue(SysUser user, Long hospitalId) {
         Map<String, Object> map = new HashMap<>();
-        InvestorRevenueVO investorRevenueVO = appletInvestorMapper.accumulativeRevenue(user.getUserId(),hospitalId);
-        List<InvestorOrderVO> investorOrderVOList = appletInvestorMapper.accumulativeRevenueList(user.getUserId(),hospitalId);
+        InvestorRevenueVO investorRevenueVO = appletInvestorMapper.accumulativeRevenue(user.getUserId(), hospitalId);
+        List<InvestorOrderVO> investorOrderVOList = appletInvestorMapper.accumulativeRevenueList(user.getUserId(), hospitalId);
         investorRevenueVO.setInvestorOrderVOList(investorOrderVOList);
         map.put("revenueVO", investorRevenueVO);
         return map;
@@ -134,9 +139,9 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     public List<HospitalVO> selectHospitalName(Long userId) {
         List<HospitalVO> hospitalVOS = new ArrayList<>();
         List<Device> deviceList = hospitalDeviceMapper.selectInvestorId(userId);
-        deviceList.stream().forEach(map->{
+        deviceList.stream().forEach(map -> {
             HospitalVO hospitalVO = new HospitalVO();
-            if (map.getHospitalId()!=0){
+            if (map.getHospitalId() != 0) {
                 Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(map.getHospitalId());
                 hospitalVO.setHospitalId(map.getHospitalId());
                 hospitalVO.setHospitalName(hospital.getHospitalName());
@@ -151,21 +156,21 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     public IndexVo indexPage(Long userId, Long hospitalId) {
         IndexVo indexVo = new IndexVo();
         List<Device> deviceList = hospitalDeviceMapper.selectInvestorId(userId);
-        if (hospitalId!=null){
+        if (hospitalId != null) {
             List<Device> collect = deviceList.stream().filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
             deviceList.clear();
             deviceList.addAll(collect);
         }
         List<UserLeaseOrderVo> userLeaseOrderVos = new ArrayList<>();
         List<String> deviceNumbers = new ArrayList<>();
-        deviceList.stream().forEach(map->{
+        deviceList.stream().forEach(map -> {
             deviceNumbers.add(map.getDeviceNumber());
         });
-        if (deviceNumbers.size()!=0){
-            List<UserLeaseOrder> userLeaseOrder = appletInvestorMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
-            userLeaseOrder.stream().forEach(i->{
+        if (deviceNumbers.size() != 0) {
+            List<UserLeaseOrder> userLeaseOrder = appletInvestorMapper.selectUserLeaseOrderByDevices(deviceNumbers, String.valueOf(userId));
+            userLeaseOrder.stream().forEach(i -> {
                 UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
-                BeanUtils.copyProperties(i,userLeaseOrderVo);
+                BeanUtils.copyProperties(i, userLeaseOrderVo);
                 userLeaseOrderVos.add(userLeaseOrderVo);
             });
         }
@@ -189,7 +194,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             calendar.setTime(dNow);//把当前时间赋给日历
             calendar.add(Calendar.DAY_OF_MONTH, -1);  //设置为前一天
             dBefore = calendar.getTime();   //得到前一天的时间
-            SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
             String defaultStartDate = sdf.format(dBefore);    //格式化前一天
             String now = sdf.format(dNow);
             List<OrderProportionDetailVo> userLeaseOrders = new ArrayList<>();
@@ -198,14 +203,14 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 Date date = sdf.parse(defaultStartDate);
                 Date parse = sdf.parse(now);
                 List<OrderProportionDetailVo> userLeaseOrder = orders.stream()
-                        .filter(s->s.getLeaseTime().getTime()<parse.getTime())
-                        .filter(s->s.getLeaseTime().getTime()>date.getTime())
+                        .filter(s -> s.getLeaseTime().getTime() < parse.getTime())
+                        .filter(s -> s.getLeaseTime().getTime() > date.getTime())
                         .collect(Collectors.toList());
                 userLeaseOrders.addAll(userLeaseOrder);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            userLeaseOrders.stream().forEach(map->{
+            userLeaseOrders.stream().forEach(map -> {
                 Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(Long.valueOf(map.getHospitalId()));
                 OrderVo orderVo = new OrderVo();
                 orderVo.setLeaseTime(dateFormat.format(map.getLeaseTime()));
@@ -214,7 +219,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 BigDecimal decimal = map.getNetAmount();
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
-                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP));
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -226,20 +231,20 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         } else if (statistics == 2) {
             List<OrderProportionDetailVo> orders = appletInvestorMapper.selectOrderProtionDetail(userId);
             Date dNow = new Date();   //当前时间
-            SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); //设置时间格式
             String format = sdf.format(dNow);
             List<OrderProportionDetailVo> userLeaseOrders = new ArrayList<>();
             try {
                 //使用SimpleDateFormat的parse()方法生成Date
                 Date date = sdf.parse(format);
                 List<OrderProportionDetailVo> userLeaseOrder = orders.stream()
-                        .filter(s->s.getLeaseTime().getTime()>=date.getTime())
+                        .filter(s -> s.getLeaseTime().getTime() >= date.getTime())
                         .collect(Collectors.toList());
                 userLeaseOrders.addAll(userLeaseOrder);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            userLeaseOrders.stream().forEach(map->{
+            userLeaseOrders.stream().forEach(map -> {
                 OrderVo orderVo = new OrderVo();
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
@@ -248,7 +253,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 orderVo.setHospitalName(hospital.getHospitalName());
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
-                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP));
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -276,14 +281,14 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 Date first = format.parse(firstDay);
                 Date last = format.parse(lastDay);
                 List<OrderProportionDetailVo> userLeaseOrder = orders.stream()
-                        .filter(s->s.getLeaseTime().getTime()>=first.getTime())
-                        .filter(s->s.getLeaseTime().getTime()<=last.getTime())
+                        .filter(s -> s.getLeaseTime().getTime() >= first.getTime())
+                        .filter(s -> s.getLeaseTime().getTime() <= last.getTime())
                         .collect(Collectors.toList());
                 userLeaseOrders.addAll(userLeaseOrder);
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            userLeaseOrders.stream().forEach(map->{
+            userLeaseOrders.stream().forEach(map -> {
                 OrderVo orderVo = new OrderVo();
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
@@ -292,7 +297,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 orderVo.setHospitalName(hospital.getHospitalName());
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
-                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP));
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -303,7 +308,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             totalVo.setOrderVos(orderVos);
         } else {
             List<OrderProportionDetailVo> orders = appletInvestorMapper.selectOrderProtionDetail(userId);
-            orders.stream().forEach(map->{
+            orders.stream().forEach(map -> {
                 OrderVo orderVo = new OrderVo();
                 orderVo.setOrderNumber(map.getOrderNumber());
                 BigDecimal decimal = map.getNetAmount();
@@ -312,7 +317,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 orderVo.setHospitalName(hospital.getHospitalName());
                 orderVo.setNetAmount(decimal);
                 orderVo.setDividendRatio(Long.valueOf(map.getProportion()));
-                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
+                orderVo.setIncomeAmount(decimal.multiply(new BigDecimal(map.getProportion())).divide(new BigDecimal(100), 2, BigDecimal.ROUND_HALF_UP));
                 orderVos.add(orderVo);
             });
             totalVo.setEffectiveOrder(orderVos.size());
@@ -353,7 +358,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     public List<DeviceType> selectDeviceType(Long userId) {
         List<DeviceType> deviceTypes = new ArrayList<>();
         List<Device> deviceList = hospitalDeviceMapper.selectInvestorId(userId);
-        deviceList.stream().forEach(map->{
+        deviceList.stream().forEach(map -> {
             DeviceType deviceType = deviceTypeMapper.selectDeviceTypeByDeviceTypeId(map.getDeviceTypeId());
             deviceTypes.add(deviceType);
         });
@@ -364,33 +369,33 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     @Override
     public List<HospitalVO> selectDeviceTypeByHospital(Long userId, Long deviceTypeId) {
         List<HospitalVO> hospitalVOS = new ArrayList<>();
-        if (deviceTypeId==null){
+        if (deviceTypeId == null) {
             List<Device> deviceList = hospitalDeviceMapper.selectInvestorId(userId);
             List<Long> hospitalIds = new ArrayList<>();
-            deviceList.stream().forEach(map->{
+            deviceList.stream().forEach(map -> {
                 hospitalIds.add(map.getHospitalId());
             });
             List<Long> hospitalIdList = hospitalIds.stream().distinct().collect(Collectors.toList());
             List<Hospital> hospitals = hospitalDeviceMapper.selectHospitalByHospitalIds(hospitalIdList);
-            hospitals.stream().forEach(map->{
+            hospitals.stream().forEach(map -> {
                 HospitalVO hospitalVO = new HospitalVO();
-                BeanUtils.copyProperties(map,hospitalVO);
+                BeanUtils.copyProperties(map, hospitalVO);
                 hospitalVO.setDepartmentList(selectDeviceTypeByDepartment(map.getHospitalId()));
                 hospitalVOS.add(hospitalVO);
             });
             return hospitalVOS;
-        }else {
+        } else {
             List<Device> deviceList = hospitalDeviceMapper.selectInvestorId(userId);
             List<Device> collect = deviceList.stream().filter(map -> map.getDeviceTypeId() == deviceTypeId).collect(Collectors.toList());
             List<Long> hospitalIds = new ArrayList<>();
-            collect.stream().forEach(map->{
+            collect.stream().forEach(map -> {
                 hospitalIds.add(map.getHospitalId());
             });
             List<Long> hospitalIdList = hospitalIds.stream().distinct().collect(Collectors.toList());
             List<Hospital> hospitals = hospitalDeviceMapper.selectHospitalByHospitalIds(hospitalIdList);
-            hospitals.stream().forEach(map->{
+            hospitals.stream().forEach(map -> {
                 HospitalVO hospitalVO = new HospitalVO();
-                BeanUtils.copyProperties(map,hospitalVO);
+                BeanUtils.copyProperties(map, hospitalVO);
                 hospitalVO.setDepartmentList(selectDeviceTypeByDepartment(map.getHospitalId()));
                 hospitalVOS.add(hospitalVO);
             });
@@ -402,11 +407,11 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         List<String> departments = new ArrayList<>();
         List<Hospital> hospitals = hospitalDeviceMapper.selectHospitalByParentId(hospitalId);
         List<Hospital> hospitalList = new ArrayList<>();
-        hospitals.stream().forEach(map->{
+        hospitals.stream().forEach(map -> {
             List<Hospital> hospital = hospitalDeviceMapper.selectHospitalByParentId(map.getHospitalId());
             hospitalList.addAll(hospital);
         });
-        hospitalList.stream().forEach(map->{
+        hospitalList.stream().forEach(map -> {
             departments.add(map.getHospitalName());
         });
         List<String> collect = departments.stream().distinct().collect(Collectors.toList());
@@ -419,7 +424,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         List<Device> device = hospitalDeviceMapper.selectInvestorId(userId);
         List<DeviceDetailsVo> deviceDetailsVos = new ArrayList<>();
-        device.stream().forEach(map->{
+        device.stream().forEach(map -> {
             DeviceDetailsVo detailsVo = new DeviceDetailsVo();
             String device_full_address = map.getDeviceFullAddress();
             if (!map.getDeviceFullAddress().equals("0")) {
@@ -429,7 +434,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 detailsVo.setDeviceDepartmentName(Department.getHospitalName());
             }
             Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(map.getHospitalId());
-            if (hospital!=null){
+            if (hospital != null) {
                 detailsVo.setHospitalId(hospital.getHospitalId());
                 detailsVo.setHospitalName(hospital.getHospitalName());
             }
@@ -440,43 +445,43 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             detailsVo.setDeviceTypeId(map.getDeviceTypeId());
             deviceDetailsVos.add(detailsVo);
         });
-        if (deviceTypeId!=null){
+        if (deviceTypeId != null) {
             List<DeviceDetailsVo> collect = deviceDetailsVos.stream()
-                    .filter(map -> map.getDeviceTypeId()!=null)
+                    .filter(map -> map.getDeviceTypeId() != null)
                     .filter(map -> map.getDeviceTypeId().equals(deviceTypeId)).collect(Collectors.toList());
             deviceDetailsVos.clear();
             deviceDetailsVos.addAll(collect);
 
         }
-        if (hospitalId!=null){
+        if (hospitalId != null) {
             List<DeviceDetailsVo> collect = deviceDetailsVos.stream()
-                    .filter(map -> map.getHospitalId()!=null)
+                    .filter(map -> map.getHospitalId() != null)
                     .filter(map -> map.getHospitalId().equals(hospitalId)).collect(Collectors.toList());
             deviceDetailsVos.clear();
             deviceDetailsVos.addAll(collect);
 
         }
-        if (!departmentName.equals("")){
+        if (!departmentName.equals("")) {
             List<DeviceDetailsVo> collect = deviceDetailsVos.stream()
-                    .filter(map -> map.getDeviceDepartmentName()!=null)
+                    .filter(map -> map.getDeviceDepartmentName() != null)
                     .filter(map -> map.getDeviceDepartmentName().equals(departmentName)).collect(Collectors.toList());
             deviceDetailsVos.clear();
             deviceDetailsVos.addAll(collect);
         }
         List<String> deviceNumbers = new ArrayList<>();
-        deviceDetailsVos.stream().forEach(map->{
+        deviceDetailsVos.stream().forEach(map -> {
             deviceNumbers.add(map.getDeviceNumber());
         });
         List<BigDecimal> decimals = new ArrayList<>();
-        if (deviceNumbers.size()!=0){
-            List<UserLeaseOrder> userLeaseOrderList = appletInvestorMapper.selectUserLeaseOrderByDevices(deviceNumbers,String.valueOf(userId));
-            userLeaseOrderList.stream().forEach(map->{
+        if (deviceNumbers.size() != 0) {
+            List<UserLeaseOrder> userLeaseOrderList = appletInvestorMapper.selectUserLeaseOrderByDevices(deviceNumbers, String.valueOf(userId));
+            userLeaseOrderList.stream().forEach(map -> {
                 decimals.add(map.getNetAmount());
             });
         }
         BigDecimal decimal = BigDecimal.ZERO;
         for (BigDecimal price : decimals) {
-            decimal=decimal.add(price);
+            decimal = decimal.add(price);
         }
 //        deviceManageVo.setDeviceAmount(decimal.multiply(new BigDecimal(sysUser.getProportion())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP));
         deviceManageVo.setDeviceAmount(decimal);
@@ -505,9 +510,9 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     public Long selectProportion(Long userId) {
         List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
         Long proportion = 50L;
-        if (sysUsers.size()==0){
+        if (sysUsers.size() == 0) {
             return proportion;
-        }else {
+        } else {
             for (SysUser sysUser : sysUsers) {
                 proportion = proportion - sysUser.getProportion();
             }
@@ -518,15 +523,15 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     @Override
     public List<SubAccountManageVo> investorSubAccount(Long userId) {
         List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
-        if (sysUsers.isEmpty()){
+        if (sysUsers.isEmpty()) {
             return null;
         }
         List<SubAccountManageVo> subAccountManageVoList = new ArrayList<>();
-        sysUsers.stream().forEach(map->{
+        sysUsers.stream().forEach(map -> {
             SubAccountManageVo subAccountManageVo = new SubAccountManageVo();
             List<Device> deviceList = hospitalDeviceMapper.selectInvestorId(map.getUserId());
             List<Hospital> hospitals = new ArrayList<>();
-            deviceList.stream().forEach(i->{
+            deviceList.stream().forEach(i -> {
                 Hospital hospital = hospitalDeviceMapper.selectHospitalByHospitalName(i.getHospitalId());
                 hospitals.add(hospital);
             });
@@ -562,9 +567,9 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     public List<FeedbackInfoVo> investorUploadsFileList(Long userId) {
         List<FeedbackInfoVo> infoVoList = new ArrayList<>();
         List<SysUserFeedback> userFeedbackList = sysUserFeedbackMapper.selectSysUserFeedbackByUserId(userId);
-        userFeedbackList.stream().forEach(map->{
+        userFeedbackList.stream().forEach(map -> {
             FeedbackInfoVo feedbackInfoVo = new FeedbackInfoVo();
-            BeanUtils.copyProperties(map,feedbackInfoVo);
+            BeanUtils.copyProperties(map, feedbackInfoVo);
             List<List<String>> lists = JSON.parseObject(map.getFeedbackUrl(), new TypeReference<List<List<String>>>() {
             });
             List<String> arrayList = new ArrayList<>();
@@ -583,7 +588,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     public FeedbackInfoVo investorUploadsFileListDetails(Long feedbackId) {
         SysUserFeedback sysUserFeedback = sysUserFeedbackMapper.selectSysUserFeedbackById(feedbackId);
         FeedbackInfoVo feedbackInfoVo = new FeedbackInfoVo();
-        BeanUtils.copyProperties(sysUserFeedback,feedbackInfoVo);
+        BeanUtils.copyProperties(sysUserFeedback, feedbackInfoVo);
         List<List<String>> lists = JSON.parseObject(sysUserFeedback.getFeedbackUrl(), new TypeReference<List<List<String>>>() {
         });
         List<String> arrayList = new ArrayList<>();
@@ -596,14 +601,14 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         return feedbackInfoVo;
     }
 
-    public List<UserLeaseOrderVo> selectLeaseOrderList(Long userId,String deviceDepartment,String deviceTypeName,String nameOrNumber){
+    public List<UserLeaseOrderVo> selectLeaseOrderList(Long userId, String deviceDepartment, String deviceTypeName, String nameOrNumber) {
         List<UserLeaseOrderVo> userLeaseOrderVoList = new ArrayList<>();
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         List<UserLeaseOrder> leaseOrders = new ArrayList<>();
-        if (!nameOrNumber.equals("")){
-            List<UserLeaseOrder> userLeaseOrders = appletInvestorMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber,String.valueOf(sysUser.getUserId()));
+        if (!nameOrNumber.equals("")) {
+            List<UserLeaseOrder> userLeaseOrders = appletInvestorMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber, String.valueOf(sysUser.getUserId()));
             leaseOrders.addAll(userLeaseOrders);
-        }else {
+        } else {
             List<UserLeaseOrder> userLeaseOrders = userLeaseOrderMapper.selectUserLeaseOrderByInvestor(String.valueOf(sysUser.getUserId()));
             leaseOrders.addAll(userLeaseOrders);
         }
@@ -612,10 +617,10 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             BeanUtils.copyProperties(a, b);
             return b;
         }).collect(Collectors.toList());
-        if (leaseOrders==null){
+        if (leaseOrders == null) {
             return userLeaseOrderList;
         }
-        userLeaseOrderList.stream().forEach(map->{
+        userLeaseOrderList.stream().forEach(map -> {
             Device device = hospitalDeviceMapper.selectDeviceByTypeNumber(map.getDeviceNumber());
             String deviceFullAddress = device.getDeviceFullAddress();
             if (!deviceFullAddress.equals("0")) {
@@ -624,11 +629,12 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 map.setDepartment(department.getHospitalName());
             }
         });
-        if (!deviceDepartment.equals("")){
+        if (!deviceDepartment.equals("")) {
             List<UserLeaseOrderVo> collect = userLeaseOrderList.stream().filter(map -> map.getDepartment().equals(deviceDepartment)).collect(Collectors.toList());
             userLeaseOrderList.clear();
             userLeaseOrderList.addAll(collect);
-        }if (!deviceTypeName.equals("")){
+        }
+        if (!deviceTypeName.equals("")) {
             List<UserLeaseOrderVo> collect = userLeaseOrderList.stream().filter(map -> map.getDeviceType().equals(deviceTypeName)).collect(Collectors.toList());
             userLeaseOrderList.clear();
             userLeaseOrderList.addAll(collect);
@@ -642,23 +648,23 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     public List<UserLeaseOrderVo> investorLeaseOrder(Long userId, String status, String deviceDepartment, String deviceTypeName, String nameOrNumber) {
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         List<UserLeaseOrderVo> userLeaseOrderVoList = new ArrayList<>();
-        if (sysUser.getParentId()!=0){
+        if (sysUser.getParentId() != 0) {
             List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(userId, deviceDepartment, deviceTypeName, nameOrNumber);
             userLeaseOrderVoList.addAll(userLeaseOrderVos);
-        }else {
+        } else {
             List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
             sysUsers.add(sysUser);
-            sysUsers.stream().forEach(map->{
+            sysUsers.stream().forEach(map -> {
                 List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(map.getUserId(), deviceDepartment, deviceTypeName, nameOrNumber);
-                if (userLeaseOrderVos.size()!=0){
+                if (userLeaseOrderVos.size() != 0) {
                     userLeaseOrderVoList.addAll(userLeaseOrderVos);
                 }
             });
         }
-        if (status.equals("")){
+        if (status.equals("")) {
             List<UserLeaseOrderVo> collect = userLeaseOrderVoList.stream().sorted(Comparator.comparing(UserLeaseOrderVo::getLeaseTime).reversed()).collect(Collectors.toList());
             return collect;
-        }else {
+        } else {
             List<UserLeaseOrderVo> collect = userLeaseOrderVoList.stream()
                     .filter(map -> map.getStatus().equals(status))
                     .sorted(Comparator.comparing(UserLeaseOrderVo::getLeaseTime).reversed()).collect(Collectors.toList());
@@ -677,32 +683,38 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
         UserLeaseOrderVo userLeaseOrderVo = new UserLeaseOrderVo();
         BeanUtils.copyProperties(userLeaseOrder, userLeaseOrderVo);
         userLeaseOrderVo.setUserName(sysUser.getUserName());
-        userLeaseOrderVo.setProportion(sysUser.getProportion());
+        if (sysUser.getUserType().equals("04")){
+            userLeaseOrderVo.setProportion(userLeaseOrder.getHospitalProportion());
+        }else if (sysUser.getUserType().equals("05")){
+            userLeaseOrderVo.setProportion(userLeaseOrder.getAgentProportion());
+        }else if (sysUser.getUserType().equals("03")){
+            userLeaseOrderVo.setProportion(userLeaseOrder.getInvestorProportion());
+        }
         userLeaseOrderVo.setAgentName(sysUser.getNickName());
-        if (hospital!=null){
+        if (hospital != null) {
             userLeaseOrderVo.setHospitalName(hospital.getHospitalName());
         }
-        if (userLeaseOrder.getStatus().equals("0")){
+        if (userLeaseOrder.getStatus().equals("0")) {
             Long date = new Date().getTime();
             Long lease = userLeaseOrderVo.getLeaseTime().getTime();
             //已使用时长、使用时长
             Long time = new Date(date - lease).getTime();
-            Long day = time/1000/60/60/24;
-            Long hour = time/1000/60/60%24;
-            Long minute = time/1000/60%60;
-            Long second = time/1000%60;
-            if (day==0){
-                if (hour==0){
-                    if (minute==0){
-                        userLeaseOrderVo.setPlayTime(second+"秒");
-                    }else {
-                        userLeaseOrderVo.setPlayTime(minute+"分钟"+second+"秒");
+            Long day = time / 1000 / 60 / 60 / 24;
+            Long hour = time / 1000 / 60 / 60 % 24;
+            Long minute = time / 1000 / 60 % 60;
+            Long second = time / 1000 % 60;
+            if (day == 0) {
+                if (hour == 0) {
+                    if (minute == 0) {
+                        userLeaseOrderVo.setPlayTime(second + "秒");
+                    } else {
+                        userLeaseOrderVo.setPlayTime(minute + "分钟" + second + "秒");
                     }
-                }else {
-                    userLeaseOrderVo.setPlayTime(hour+"小时"+minute+"分钟"+second+"秒");
+                } else {
+                    userLeaseOrderVo.setPlayTime(hour + "小时" + minute + "分钟" + second + "秒");
                 }
-            }else {
-                userLeaseOrderVo.setPlayTime(day+"天"+hour+"小时"+minute+"分钟"+second+"秒");
+            } else {
+                userLeaseOrderVo.setPlayTime(day + "天" + hour + "小时" + minute + "分钟" + second + "秒");
             }
             JSONArray deviceRule = JSON.parseArray(userLeaseOrder.getDeviceRule());
             for (int i = 0; i < deviceRule.size(); i++) {
@@ -710,55 +722,54 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
                 Integer time1 = (Integer) jsonObject.get("time");
                 String startTime = (String) jsonObject.get("startTime");
                 String endTime = (String) jsonObject.get("endTime");
-                if (time1==0){
+                if (time1 == 0) {
                     Object price = jsonObject.get("price");
                     BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                    userLeaseOrderVo.setContent(bigDecimal+device.getContent());
-                }else if (time1==1){
+                    userLeaseOrderVo.setContent(bigDecimal + device.getContent());
+                } else if (time1 == 1) {
                     Object price = jsonObject.get("price");
                     BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                    userLeaseOrderVo.setEstimateAmount("("+startTime+"~"+endTime+")  "+bigDecimal);
+                    userLeaseOrderVo.setEstimateAmount("(" + startTime + "~" + endTime + ")  " + bigDecimal);
                 }
             }
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
             userLeaseOrderVo.setLeaseTime(userLeaseOrder.getLeaseTime());
             userLeaseOrderVo.setLeaseAddress(userLeaseOrder.getLeaseAddress());
             userLeaseOrderVo.setOrderNumber(userLeaseOrder.getOrderNumber());
-        }
-        else if (userLeaseOrder.getStatus().equals("1")){
+        } else if (userLeaseOrder.getStatus().equals("1")) {
             Long time = Long.valueOf(userLeaseOrderVo.getPlayTime());
-            Long day = time/1000/60/60/24;
-            Long hour = time/1000/60/60%24;
-            Long minute = time/1000/60%60;
-            Long second = time/1000%60;
-            if (day==0){
-                if (hour==0){
-                    if (minute==0){
-                        userLeaseOrderVo.setPlayTime(second+"秒");
-                    }else {
-                        userLeaseOrderVo.setPlayTime(minute+"分钟"+second+"秒");
+            Long day = time / 1000 / 60 / 60 / 24;
+            Long hour = time / 1000 / 60 / 60 % 24;
+            Long minute = time / 1000 / 60 % 60;
+            Long second = time / 1000 % 60;
+            if (day == 0) {
+                if (hour == 0) {
+                    if (minute == 0) {
+                        userLeaseOrderVo.setPlayTime(second + "秒");
+                    } else {
+                        userLeaseOrderVo.setPlayTime(minute + "分钟" + second + "秒");
                     }
-                }else {
-                    userLeaseOrderVo.setPlayTime(hour+"小时"+minute+"分钟"+second+"秒");
+                } else {
+                    userLeaseOrderVo.setPlayTime(hour + "小时" + minute + "分钟" + second + "秒");
                 }
-            }else {
-                userLeaseOrderVo.setPlayTime(day+"天"+hour+"小时"+minute+"分钟"+second+"秒");
+            } else {
+                userLeaseOrderVo.setPlayTime(day + "天" + hour + "小时" + minute + "分钟" + second + "秒");
             }
             userLeaseOrderVo.setPrice(userLeaseOrder.getPrice());
             JSONArray deviceRule = JSON.parseArray(userLeaseOrder.getDeviceRule());
             for (int i = 0; i < deviceRule.size(); i++) {
                 JSONObject jsonObject = deviceRule.getJSONObject(i);
                 Integer time1 = (Integer) jsonObject.get("time");
-                if (time1==0){
+                if (time1 == 0) {
                     Object price = jsonObject.get("price");
                     BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                    userLeaseOrderVo.setContent(bigDecimal+device.getContent());
-                }else {
+                    userLeaseOrderVo.setContent(bigDecimal + device.getContent());
+                } else {
                     String start = String.valueOf(jsonObject.get("startTime"));
                     String end = String.valueOf(jsonObject.get("endTime"));
                     Object price = jsonObject.get("price");
                     BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                    userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+bigDecimal);
+                    userLeaseOrderVo.setEstimateAmount("(" + start + "~" + end + ")  " + bigDecimal);
                 }
             }
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
@@ -770,41 +781,40 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             userLeaseOrderVo.setOrderNumber(userLeaseOrder.getOrderNumber());
             userLeaseOrderVo.setStatus(userLeaseOrder.getStatus());
             userLeaseOrderVo.setNetAmount(userLeaseOrder.getNetAmount());
-        }
-        else {
+        } else {
             Long time = Long.valueOf(userLeaseOrderVo.getPlayTime());
-            Long day = time/1000/60/60/24;
-            Long hour = time/1000/60/60%24;
-            Long minute = time/1000/60%60;
-            Long second = time/1000%60;
-            if (day==0){
-                if (hour==0){
-                    if (minute==0){
-                        userLeaseOrderVo.setPlayTime(second+"秒");
-                    }else {
-                        userLeaseOrderVo.setPlayTime(minute+"分钟"+second+"秒");
+            Long day = time / 1000 / 60 / 60 / 24;
+            Long hour = time / 1000 / 60 / 60 % 24;
+            Long minute = time / 1000 / 60 % 60;
+            Long second = time / 1000 % 60;
+            if (day == 0) {
+                if (hour == 0) {
+                    if (minute == 0) {
+                        userLeaseOrderVo.setPlayTime(second + "秒");
+                    } else {
+                        userLeaseOrderVo.setPlayTime(minute + "分钟" + second + "秒");
                     }
-                }else {
-                    userLeaseOrderVo.setPlayTime(hour+"小时"+minute+"分钟"+second+"秒");
+                } else {
+                    userLeaseOrderVo.setPlayTime(hour + "小时" + minute + "分钟" + second + "秒");
                 }
-            }else {
-                userLeaseOrderVo.setPlayTime(day+"天"+hour+"小时"+minute+"分钟"+second+"秒");
+            } else {
+                userLeaseOrderVo.setPlayTime(day + "天" + hour + "小时" + minute + "分钟" + second + "秒");
             }
             userLeaseOrderVo.setPrice(userLeaseOrder.getPrice());
             JSONArray deviceRule = JSON.parseArray(userLeaseOrder.getDeviceRule());
             for (int i = 0; i < deviceRule.size(); i++) {
                 JSONObject jsonObject = deviceRule.getJSONObject(i);
                 Integer time1 = (Integer) jsonObject.get("time");
-                if (time1==0){
+                if (time1 == 0) {
                     Object price = jsonObject.get("price");
                     BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                    userLeaseOrderVo.setContent(bigDecimal+device.getContent());
-                }else {
+                    userLeaseOrderVo.setContent(bigDecimal + device.getContent());
+                } else {
                     String start = String.valueOf(jsonObject.get("startTime"));
                     String end = String.valueOf(jsonObject.get("endTime"));
                     Object price = jsonObject.get("price");
                     BigDecimal bigDecimal = new BigDecimal(String.valueOf(price));
-                    userLeaseOrderVo.setEstimateAmount("("+start+"~"+end+")  "+bigDecimal);
+                    userLeaseOrderVo.setEstimateAmount("(" + start + "~" + end + ")  " + bigDecimal);
                 }
             }
             userLeaseOrderVo.setDepositNum(new BigDecimal(userLeaseOrder.getDeposit()));
@@ -819,5 +829,64 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
             userLeaseOrderVo.setNetAmount(userLeaseOrder.getNetAmount());
         }
         return userLeaseOrderVo;
+    }
+
+    @Override
+    public String bindingBank(Bank bank) {
+        if (checkBankCard(bank.getBankNumber())){
+            appletInvestorMapper.bindingBank(bank);
+            return "银行卡绑定成功";
+        }else {
+            return "请重新输入银行卡号";
+        }
+    }
+
+    /**
+    校验过程：
+    1、从卡号最后一位数字开始，逆向将奇数位(1、3、5等等)相加。
+    2、从卡号最后一位数字开始，逆向将偶数位数字，先乘以2（如果乘积为两位数，将个位十位数字相加，即将其减去9），再求和。
+    3、将奇数位总和加上偶数位总和，结果应该可以被10整除。
+    */
+    public boolean checkBankCard(String bankCard) {
+        if (bankCard.length() < 15 || bankCard.length() > 19) {
+            return false;
+        }
+        char bit = getBankCardCheckCode(bankCard.substring(0, bankCard.length() - 1));
+        if (bit == 'N') {
+            return false;
+        }
+        return bankCard.charAt(bankCard.length() - 1) == bit;
+    }
+    /**
+     * 从不含校验位的银行卡卡号采用 Luhm 校验算法获得校验位
+     *
+     * @param nonCheckCodeBankCard
+     * @return
+     */
+    public char getBankCardCheckCode(String nonCheckCodeBankCard) {
+        if (nonCheckCodeBankCard == null || nonCheckCodeBankCard.trim().length() == 0
+                || !nonCheckCodeBankCard.matches("\\d+")) {
+            //如果传的不是数据返回N
+            return 'N';
+        }
+        char[] chs = nonCheckCodeBankCard.trim().toCharArray();
+        int luhmSum = 0;
+        for (int i = chs.length - 1, j = 0; i >= 0; i--, j++) {
+            int k = chs[i] - '0';
+            if (j % 2 == 0) {
+                k *= 2;
+                k = k / 10 + k % 10;
+            }
+            luhmSum += k;
+        }
+        return (luhmSum % 10 == 0) ? '0' : (char) ((10 - luhmSum % 10) + '0');
+    }
+
+    @Override
+    public String selectBank(Long userId) {
+        Bank bank = sysUserMapper.selectBank(userId);
+        String substring = bank.getBankNumber().substring(bank.getBankNumber().length() - 4);
+        String bankInfo = bank.getBankName()+"("+substring+")";
+        return bankInfo;
     }
 }

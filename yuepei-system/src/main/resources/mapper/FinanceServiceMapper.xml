@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuepei.system.mapper.FinanceServiceMapper">
+
+    <resultMap id="RevenueStatisticsDetailsVoResult" type="RevenueStatisticsDetailsVo">
+        <result property="userId" column="user_id"/>
+        <result property="nickName" column="nick_name"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="deviceNumber" column="device_number"/>
+        <result property="proportion" column="proportion"/>
+        <result property="price" column="price"/>
+        <result property="amount" column="amount"/>
+        <result property="couponPrice" column="coupon_price"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <sql id="selectRevenueStatisticsVo">
+        select opd.user_id,su.nick_name,opd.order_number,ulo.device_number,opd.proportion,opd.price,IFNULL(ulo.net_amount,0) as amount,IFNULL(ulo.coupon_price,0)as coupon_price,opd.create_time
+        from order_proportion_detail opd
+        left join user_lease_order ulo on opd.order_number = ulo.order_number
+        left join sys_user su on su.user_id = opd.user_id
+        UNION ALL
+        select oiad.user_id,su.nick_name,oiad.order_number,ulo.device_number,oiad.proportion,oiad.price,IFNULL(ulo.net_amount,0) as amount,IFNULL(ulo.coupon_price,0)as coupon_price,oiad.create_time
+        from order_investor_acount_detail oiad
+        left join user_lease_order ulo on oiad.order_number = ulo.order_number
+        left join sys_user su on su.user_id = oiad.user_id
+    </sql>
+
+    <sql id="selectAgentIncomeStatisticsVo">
+        select oaad.user_id,su.nick_name,oaad.order_number,ulo.device_number,oaad.proportion,oaad.price,IFNULL(ulo.net_amount,0) as amount,IFNULL(ulo.coupon_price,0)as coupon_price,oaad.create_time
+        from order_agent_account_detail oaad
+        left join user_lease_order ulo on oaad.order_number = ulo.order_number
+        left join sys_user su on su.user_id = oaad.user_id
+    </sql>
+
+    <sql id="selectHospitalIncomeStatisticsVo">
+        select oahd.user_id,su.nick_name,oahd.order_number,ulo.device_number,oahd.proportion,oahd.price,IFNULL(ulo.net_amount,0) as amount,IFNULL(ulo.coupon_price,0)as coupon_price,oahd.create_time
+        from order_agent_hospital_detail oahd
+        left join user_lease_order ulo on oahd.order_number = ulo.order_number
+        left join sys_user su on su.user_id = oahd.user_id
+    </sql>
+
+    <resultMap id="RevenueStatisticsVoResult" type="RevenueStatisticsVo">
+        <result property="businessAmount" column="businessAmount"/>
+        <result property="paidAmount" column="paidAmount"/>
+        <result property="discountAmount" column="discountAmount"/>
+        <result property="platformDivision" column="platformDivision"/>
+        <result property="investorDivision" column="investorDivision"/>
+        <result property="agentDivision" column="agentDivision"/>
+        <result property="hospitalDivision" column="hospitalDivision"/>
+        <result property="orderSum" column="orderSum"/>
+        <result property="nickName" column="nickName"/>
+        <result property="userId" column="userId"/>
+    </resultMap>
+
+    <sql id="selectStatisticsByYearVo">
+        select DATE_FORMAT(lease_time,'%Y')year,COUNT(id) orderSum,
+               SUM(price)as businessAmount,SUM(net_amount)as paidAmount,
+               SUM(coupon_price)as discountAmount,
+               SUM((net_amount*platformProportion/100))as platformDivision,
+               SUM((net_amount*investorProportion/100))as investorDivision,
+               SUM((net_amount*agentProportion/100))as agentDivision,
+               SUM((net_amount*hospitalProportion/100))as hospitalDivision
+        from user_lease_order GROUP BY year
+    </sql>
+
+    <sql id="selectStatisticsByMonthVo">
+        select DATE_FORMAT(lease_time,'%Y-%m')month,COUNT(id) orderSum,
+               SUM(price)as businessAmount,SUM(net_amount)as paidAmount,
+               SUM(coupon_price)as discountAmount,
+               SUM((net_amount*platformProportion/100))as platformDivision,
+               SUM((net_amount*investorProportion/100))as investorDivision,
+               SUM((net_amount*agentProportion/100))as agentDivision,
+               SUM((net_amount*hospitalProportion/100))as hospitalDivision
+        from user_lease_order GROUP BY month
+    </sql>
+
+    <sql id="selectStatisticsByDayVo">
+        select DATE_FORMAT(lease_time,'%Y-%m-%d')day,COUNT(id) orderSum,
+               SUM(price)as businessAmount,SUM(net_amount)as paidAmount,
+               SUM(coupon_price)as discountAmount,
+               SUM((net_amount*platformProportion/100))as platformDivision,
+               SUM((net_amount*investorProportion/100))as investorDivision,
+               SUM((net_amount*agentProportion/100))as agentDivision,
+               SUM((net_amount*hospitalProportion/100))as hospitalDivision
+        from user_lease_order GROUP BY day
+    </sql>
+
+    <sql id="selectStatisticsByInvestorVo">
+        select opd.user_id,su.nick_name,COUNT(ulo.order_number) orderSum,
+               SUM(ulo.price)as businessAmount,SUM(ulo.net_amount)as paidAmount,
+               SUM(ulo.coupon_price)as discountAmount,
+               SUM(opd.price)as investorDivision
+        from user_lease_order ulo
+                 left join order_proportion_detail opd on ulo.order_number = opd.order_number
+                 left join sys_user su on opd.user_id = su.user_id
+        group by su.nick_name
+    </sql>
+
+    <sql id="selectStatisticsByAgentVo">
+        select oaad.user_id,su.nick_name,COUNT(ulo.order_number) orderSum,
+               SUM(ulo.price)as businessAmount,SUM(ulo.net_amount)as paidAmount,
+               SUM(ulo.coupon_price)as discountAmount,
+               SUM(oaad.price)as agentDivision
+        from user_lease_order ulo
+                 left join order_agent_account_detail oaad on ulo.order_number = oaad.order_number
+                 left join sys_user su on oaad.user_id = su.user_id
+        group by su.nick_name
+    </sql>
+
+    <sql id="selectStatisticsByHospitalVo">
+        select oahd.user_id,su.nick_name,COUNT(ulo.order_number) orderSum,
+               SUM(ulo.price)as businessAmount,SUM(ulo.net_amount)as paidAmount,
+               SUM(ulo.coupon_price)as discountAmount,
+               SUM(oahd.price)as hospitalDivision
+        from user_lease_order ulo
+                 left join order_agent_hospital_detail oahd on ulo.order_number = oahd.order_number
+                 left join sys_user su on oahd.user_id = su.user_id
+        group by su.nick_name
+    </sql>
+
+    <sql id="selectStatisticsByPlatformHospitalVo">
+        select su.user_id,su.nick_name,COUNT(ulo.order_number) orderSum,
+               SUM(ulo.price)as businessAmount,SUM(ulo.net_amount)as paidAmount,
+               SUM(ulo.coupon_price)as discountAmount,
+               SUM((ulo.net_amount*ulo.agentHospitalProportion/100))as hospitalDivision
+        from user_lease_order ulo
+                 left join sys_user su on ulo.hospitalId = su.hospital_id
+        group by su.nick_name
+    </sql>
+
+    <select id="selectRevenueStatistics" parameterType="RevenueStatisticsDetailsVo" resultMap="RevenueStatisticsDetailsVoResult">
+        <include refid="selectRevenueStatisticsVo"/>
+    </select>
+
+    <select id="selectAgentIncomeStatistics" parameterType="RevenueStatisticsDetailsVo" resultMap="RevenueStatisticsDetailsVoResult">
+        <include refid="selectAgentIncomeStatisticsVo"/>
+    </select>
+
+    <select id="selectHospitalIncomeStatistics" parameterType="RevenueStatisticsDetailsVo" resultMap="RevenueStatisticsDetailsVoResult">
+        <include refid="selectHospitalIncomeStatisticsVo"/>
+    </select>
+    <select id="selectStatisticsByYear" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
+        <include refid="selectStatisticsByYearVo"/>
+    </select>
+    <select id="selectStatisticsByMonth" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
+        <include refid="selectStatisticsByMonthVo"/>
+    </select>
+    <select id="selectStatisticsByDay" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
+        <include refid="selectStatisticsByDayVo"/>
+    </select>
+    <select id="selectStatisticsByInvestor" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
+        <include refid="selectStatisticsByInvestorVo"/>
+    </select>
+    <select id="selectStatisticsByAgent" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
+        <include refid="selectStatisticsByAgentVo"/>
+    </select>
+    <select id="selectStatisticsByHospital" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
+        <include refid="selectStatisticsByHospitalVo"/>
+    </select>
+    <select id="selectStatisticsByPlatformHospital" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
+        <include refid="selectStatisticsByPlatformHospitalVo"/>
+    </select>
+    <insert id="insertWithdrawalApplication">
+        insert into withdrawal(user_id,role,role_name,amount,withdrawal_information,received,apply_time,handle_time)
+        values(#{userId},#{role},#{roleName},#{amount},#{withdrawalInformation},#{received},#{applyTime},#{handleTime})
+    </insert>
+</mapper>

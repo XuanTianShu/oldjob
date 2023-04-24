@@ -53,6 +53,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="status"       column="role_status"    />
     </resultMap>
 
+	<resultMap id="BankResult" type="Bank">
+		<result property="id" column="id"/>
+		<result property="userId" column="user_id"/>
+		<result property="accountHolder" column="account_holder"/>
+		<result property="bankName" column="bank_name"/>
+		<result property="bankNumber" column="bank_number"/>
+	</resultMap>
+
 	<sql id="selectUserVo">
         select u.user_id, u.dept_id, u.user_name, u.balance, u.openid, u.integral, u.nick_name, u.email, u.avatar, u.phone_number, u.password, u.sex, u.status, u.del_flag, u.login_ip, u.login_date, u.create_by, u.create_time, u.remark,u.user_type,u.proportion,u.parent_id,u.hospital_id,
         d.dept_id, d.parent_id, d.ancestors, d.dept_name, d.order_num, d.leader, d.status as dept_status,
@@ -372,5 +380,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		SELECT su.* FROM sys_user AS su
 							 LEFT JOIN hospital_user  AS hu ON hu.`user_name` =  su.`user_id`
 		WHERE su.`hospital_id` = #{hospitalId}
+	</select>
+	<select id="selectBank" parameterType="Bank" resultMap="BankResult">
+		select id,user_id,account_holder,bank_name,bank_number from bank where user_id=#{userId}
 	</select>
 </mapper>

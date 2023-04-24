@@ -73,6 +73,29 @@
         <result property="content" column="content"></result>
     </resultMap>
 
+    <resultMap type="com.yuepei.common.core.domain.entity.SysRole" id="SysRoleResult">
+        <id     property="roleId"             column="role_id"               />
+        <result property="roleName"           column="role_name"             />
+        <result property="roleKey"            column="role_key"              />
+        <result property="roleSort"           column="role_sort"             />
+        <result property="dataScope"          column="data_scope"            />
+        <result property="menuCheckStrictly"  column="menu_check_strictly"   />
+        <result property="deptCheckStrictly"  column="dept_check_strictly"   />
+        <result property="status"             column="status"                />
+        <result property="delFlag"            column="del_flag"              />
+        <result property="createBy"           column="create_by"             />
+        <result property="createTime"         column="create_time"           />
+        <result property="updateBy"           column="update_by"             />
+        <result property="updateTime"         column="update_time"           />
+        <result property="remark"             column="remark"                />
+    </resultMap>
+
+    <sql id="selectRoleVo">
+        select distinct role_id, role_name, role_key, role_sort, data_scope, menu_check_strictly, dept_check_strictly,
+                        status, del_flag, create_time, remark
+        from sys_role
+    </sql>
+
     <sql id="selectUserLeaseOrderVo">
         select id, openid, order_number, device_number, device_type, lease_time,
                lease_address, restore_time, restore_address, price, pay_type,
@@ -112,6 +135,10 @@
         <include refid="selectDevice"/>
         where user_id = #{userId}
         and (device_number=#{numberOrAddress} or device_address=#{numberOrAddress})
+    </select>
+    <select id="selectUserRole" parameterType="SysRole" resultMap="SysRoleResult">
+        <include refid="selectRoleVo"/>
+        where role_key = "hospital"
     </select>
 
     <insert id="insertHospital" parameterType="Hospital" useGeneratedKeys="true" keyProperty="hospitalId">
