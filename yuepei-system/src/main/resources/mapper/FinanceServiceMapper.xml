@@ -19,27 +19,33 @@
     <sql id="selectRevenueStatisticsVo">
         select opd.user_id,su.nick_name,opd.order_number,ulo.device_number,opd.proportion,opd.price,IFNULL(ulo.net_amount,0) as amount,IFNULL(ulo.coupon_price,0)as coupon_price,opd.create_time
         from order_proportion_detail opd
-        left join user_lease_order ulo on opd.order_number = ulo.order_number
-        left join sys_user su on su.user_id = opd.user_id
+        inner join user_lease_order ulo on opd.order_number = ulo.order_number
+        inner join sys_user su on su.user_id = opd.user_id
         UNION ALL
         select oiad.user_id,su.nick_name,oiad.order_number,ulo.device_number,oiad.proportion,oiad.price,IFNULL(ulo.net_amount,0) as amount,IFNULL(ulo.coupon_price,0)as coupon_price,oiad.create_time
-        from order_investor_acount_detail oiad
-        left join user_lease_order ulo on oiad.order_number = ulo.order_number
-        left join sys_user su on su.user_id = oiad.user_id
+        from order_investor_account_detail oiad
+        inner join user_lease_order ulo on oiad.order_number = ulo.order_number
+        inner join sys_user su on su.user_id = oiad.user_id
     </sql>
 
     <sql id="selectAgentIncomeStatisticsVo">
         select oaad.user_id,su.nick_name,oaad.order_number,ulo.device_number,oaad.proportion,oaad.price,IFNULL(ulo.net_amount,0) as amount,IFNULL(ulo.coupon_price,0)as coupon_price,oaad.create_time
         from order_agent_account_detail oaad
-        left join user_lease_order ulo on oaad.order_number = ulo.order_number
-        left join sys_user su on su.user_id = oaad.user_id
+        inner join user_lease_order ulo on oaad.order_number = ulo.order_number
+        inner join sys_user su on su.user_id = oaad.user_id
     </sql>
 
     <sql id="selectHospitalIncomeStatisticsVo">
-        select oahd.user_id,su.nick_name,oahd.order_number,ulo.device_number,oahd.proportion,oahd.price,IFNULL(ulo.net_amount,0) as amount,IFNULL(ulo.coupon_price,0)as coupon_price,oahd.create_time
+        select h.hospital_id as userId,h.hospital_name as nickName,oahd.order_number,ulo.device_number,oahd.proportion,oahd.price,IFNULL(ulo.net_amount,0) as amount,IFNULL(ulo.coupon_price,0)as coupon_price,oahd.create_time
         from order_agent_hospital_detail oahd
-        left join user_lease_order ulo on oahd.order_number = ulo.order_number
-        left join sys_user su on su.user_id = oahd.user_id
+        inner join user_lease_order ulo on oahd.order_number = ulo.order_number
+        inner join sys_user su on su.user_id = oahd.user_id
+        inner join hospital h on su.hospital_id = h.hospital_id
+    </sql>
+
+    <sql id="selectDeviceStatisticsVo">
+        select order_number,device_number,price,IFNULL(net_amount,0) as amount,IFNULL(coupon_price,0)as coupon_price,create_time
+        from user_lease_order
     </sql>
 
     <resultMap id="RevenueStatisticsVoResult" type="RevenueStatisticsVo">
@@ -53,39 +59,43 @@
         <result property="orderSum" column="orderSum"/>
         <result property="nickName" column="nickName"/>
         <result property="userId" column="userId"/>
+        <result property="payType" column="payType"/>
+        <result property="agentId" column="agentId"/>
+        <result property="hospitalId" column="hospitalId"/>
+        <result property="deviceNumber" column="deviceNumber"/>
     </resultMap>
 
     <sql id="selectStatisticsByYearVo">
-        select DATE_FORMAT(lease_time,'%Y')year,COUNT(id) orderSum,
+        select DATE_FORMAT(lease_time,'%Y')nickName,COUNT(id) orderSum,
                SUM(price)as businessAmount,SUM(net_amount)as paidAmount,
                SUM(coupon_price)as discountAmount,
                SUM((net_amount*platformProportion/100))as platformDivision,
                SUM((net_amount*investorProportion/100))as investorDivision,
                SUM((net_amount*agentProportion/100))as agentDivision,
                SUM((net_amount*hospitalProportion/100))as hospitalDivision
-        from user_lease_order GROUP BY year
+        from user_lease_order
     </sql>
 
     <sql id="selectStatisticsByMonthVo">
-        select DATE_FORMAT(lease_time,'%Y-%m')month,COUNT(id) orderSum,
+        select DATE_FORMAT(lease_time,'%Y-%m')nickName,COUNT(id) orderSum,
                SUM(price)as businessAmount,SUM(net_amount)as paidAmount,
                SUM(coupon_price)as discountAmount,
                SUM((net_amount*platformProportion/100))as platformDivision,
                SUM((net_amount*investorProportion/100))as investorDivision,
                SUM((net_amount*agentProportion/100))as agentDivision,
                SUM((net_amount*hospitalProportion/100))as hospitalDivision
-        from user_lease_order GROUP BY month
+        from user_lease_order
     </sql>
 
     <sql id="selectStatisticsByDayVo">
-        select DATE_FORMAT(lease_time,'%Y-%m-%d')day,COUNT(id) orderSum,
+        select DATE_FORMAT(lease_time,'%Y-%m-%d')nickName,COUNT(id) orderSum,
                SUM(price)as businessAmount,SUM(net_amount)as paidAmount,
                SUM(coupon_price)as discountAmount,
                SUM((net_amount*platformProportion/100))as platformDivision,
                SUM((net_amount*investorProportion/100))as investorDivision,
                SUM((net_amount*agentProportion/100))as agentDivision,
                SUM((net_amount*hospitalProportion/100))as hospitalDivision
-        from user_lease_order GROUP BY day
+        from user_lease_order
     </sql>
 
     <sql id="selectStatisticsByInvestorVo">
@@ -94,9 +104,16 @@
                SUM(ulo.coupon_price)as discountAmount,
                SUM(opd.price)as investorDivision
         from user_lease_order ulo
-                 left join order_proportion_detail opd on ulo.order_number = opd.order_number
-                 left join sys_user su on opd.user_id = su.user_id
-        group by su.nick_name
+                 inner join order_proportion_detail opd on ulo.order_number = opd.order_number
+                 inner join sys_user su on opd.user_id = su.user_id
+        union all
+        select oiad.user_id,su.nick_name,COUNT(ulo.order_number) orderSum,
+               SUM(ulo.price)as businessAmount,SUM(ulo.net_amount)as paidAmount,
+               SUM(ulo.coupon_price)as discountAmount,
+               SUM(oiad.price)as investorDivision
+        from user_lease_order ulo
+                 inner join order_investor_account_detail oiad on ulo.order_number = oiad.order_number
+                 inner join sys_user su on oiad.user_id = su.user_id
     </sql>
 
     <sql id="selectStatisticsByAgentVo">
@@ -105,30 +122,29 @@
                SUM(ulo.coupon_price)as discountAmount,
                SUM(oaad.price)as agentDivision
         from user_lease_order ulo
-                 left join order_agent_account_detail oaad on ulo.order_number = oaad.order_number
-                 left join sys_user su on oaad.user_id = su.user_id
-        group by su.nick_name
+                 inner join order_agent_account_detail oaad on ulo.order_number = oaad.order_number
+                 inner join sys_user su on oaad.user_id = su.user_id
     </sql>
 
     <sql id="selectStatisticsByHospitalVo">
-        select oahd.user_id,su.nick_name,COUNT(ulo.order_number) orderSum,
+        select oahd.user_id,h.hospital_name as nick_name,COUNT(ulo.order_number) orderSum,
                SUM(ulo.price)as businessAmount,SUM(ulo.net_amount)as paidAmount,
                SUM(ulo.coupon_price)as discountAmount,
                SUM(oahd.price)as hospitalDivision
         from user_lease_order ulo
-                 left join order_agent_hospital_detail oahd on ulo.order_number = oahd.order_number
-                 left join sys_user su on oahd.user_id = su.user_id
-        group by su.nick_name
+                 inner join order_agent_hospital_detail oahd on ulo.order_number = oahd.order_number
+                 inner join sys_user su on oahd.user_id = su.user_id
+                 inner join hospital h on su.hospital_id = h.hospital_id
     </sql>
 
     <sql id="selectStatisticsByPlatformHospitalVo">
-        select su.user_id,su.nick_name,COUNT(ulo.order_number) orderSum,
+        select su.user_id,h.hospital_name as nick_name,COUNT(ulo.order_number) orderSum,
                SUM(ulo.price)as businessAmount,SUM(ulo.net_amount)as paidAmount,
                SUM(ulo.coupon_price)as discountAmount,
                SUM((ulo.net_amount*ulo.agentHospitalProportion/100))as hospitalDivision
         from user_lease_order ulo
-                 left join sys_user su on ulo.hospitalId = su.hospital_id
-        group by su.nick_name
+                 inner join sys_user su on ulo.hospitalId = su.hospital_id
+                 inner join hospital h on su.hospital_id = h.hospital_id
     </sql>
 
     <select id="selectRevenueStatistics" parameterType="RevenueStatisticsDetailsVo" resultMap="RevenueStatisticsDetailsVoResult">
@@ -142,29 +158,231 @@
     <select id="selectHospitalIncomeStatistics" parameterType="RevenueStatisticsDetailsVo" resultMap="RevenueStatisticsDetailsVoResult">
         <include refid="selectHospitalIncomeStatisticsVo"/>
     </select>
+
+
+    <select id="selectDeviceStatistics" parameterType="RevenueStatisticsDetailsVo" resultMap="RevenueStatisticsDetailsVoResult">
+        <include refid="selectDeviceStatisticsVo"/>
+    </select>
+
     <select id="selectStatisticsByYear" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
         <include refid="selectStatisticsByYearVo"/>
+        <where>
+            <if test="payType!=null and payType!= ''">
+                and pay_type = #{payType}
+            </if>
+            <if test="agentId!=null and agentId!= ''">
+                and agentId = #{agentId}
+            </if>
+            <if test="hospitalId!=null and hospitalId!= ''">
+                and hospitalId = #{hospitalId}
+            </if>
+            <if test="deviceNumber!=null and deviceNumber!= ''">
+                and device_number = #{deviceNumber}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and create_time &lt;= #{endTime}
+            </if>
+        </where>
+        GROUP BY nickName
     </select>
+
     <select id="selectStatisticsByMonth" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
         <include refid="selectStatisticsByMonthVo"/>
+        <where>
+            <if test="payType!=null and payType!=''">
+                and pay_type = #{payType}
+            </if>
+            <if test="agentId!=null and agentId!=''">
+                and agentId = #{agentId}
+            </if>
+            <if test="hospitalId!=null and hospitalId!=''">
+                and hospitalId = #{hospitalId}
+            </if>
+            <if test="deviceNumber!=null and deviceNumber!=''">
+                and device_number = #{deviceNumber}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and create_time &lt;= #{endTime}
+            </if>
+        </where>
+        GROUP BY nickName
     </select>
+
     <select id="selectStatisticsByDay" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
         <include refid="selectStatisticsByDayVo"/>
+        <where>
+            <if test="payType!=null and payType!=''">
+                and pay_type = #{payType}
+            </if>
+            <if test="agentId!=null and agentId!=''">
+                and agentId = #{agentId}
+            </if>
+            <if test="hospitalId!=null and hospitalId!=''">
+                and hospitalId = #{hospitalId}
+            </if>
+            <if test="deviceNumber!=null and deviceNumber!=''">
+                and device_number = #{deviceNumber}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and create_time &lt;= #{endTime}
+            </if>
+        </where>
+        GROUP BY nickName
     </select>
+
     <select id="selectStatisticsByInvestor" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
         <include refid="selectStatisticsByInvestorVo"/>
+        <where>
+            <if test="payType!=null and payType!=''">
+                and ulo.pay_type = #{payType}
+            </if>
+            <if test="agentId!=null and agentId!=''">
+                and ulo.agentId = #{agentId}
+            </if>
+            <if test="hospitalId!=null and hospitalId!=''">
+                and ulo.hospitalId = #{hospitalId}
+            </if>
+            <if test="deviceNumber!=null and deviceNumber!=''">
+                and ulo.device_number = #{deviceNumber}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and ulo.create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and ulo.create_time &lt;= #{endTime}
+            </if>
+        </where>
+        group by su.nick_name
     </select>
+
     <select id="selectStatisticsByAgent" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
         <include refid="selectStatisticsByAgentVo"/>
+        <where>
+            <if test="payType!=null and payType!=''">
+                and ulo.pay_type = #{payType}
+            </if>
+            <if test="agentId!=null and agentId!=''">
+                and ulo.agentId = #{agentId}
+            </if>
+            <if test="hospitalId!=null and hospitalId!=''">
+                and ulo.hospitalId = #{hospitalId}
+            </if>
+            <if test="deviceNumber!=null and deviceNumber!=''">
+                and ulo.device_number = #{deviceNumber}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and ulo.create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and ulo.create_time &lt;= #{endTime}
+            </if>
+        </where>
+        group by su.nick_name
     </select>
+
     <select id="selectStatisticsByHospital" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
         <include refid="selectStatisticsByHospitalVo"/>
+        <where>
+            <if test="payType!=null and payType!=''">
+                and ulo.pay_type = #{payType}
+            </if>
+            <if test="agentId!=null and agentId!=''">
+                and ulo.agentId = #{agentId}
+            </if>
+            <if test="hospitalId!=null and hospitalId!=''">
+                and ulo.hospitalId = #{hospitalId}
+            </if>
+            <if test="deviceNumber!=null and deviceNumber!=''">
+                and ulo.device_number = #{deviceNumber}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and ulo.create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and ulo.create_time &lt;= #{endTime}
+            </if>
+        </where>
+        group by su.nick_name
     </select>
+
     <select id="selectStatisticsByPlatformHospital" parameterType="RevenueStatisticsVo" resultMap="RevenueStatisticsVoResult">
         <include refid="selectStatisticsByPlatformHospitalVo"/>
+        <where>
+            <if test="payType!=null and payType!=''">
+                and ulo.pay_type = #{payType}
+            </if>
+            <if test="agentId!=null and agentId!=''">
+                and ulo.agentId = #{agentId}
+            </if>
+            <if test="hospitalId!=null and hospitalId!=''">
+                and ulo.hospitalId = #{hospitalId}
+            </if>
+            <if test="deviceNumber!=null and deviceNumber!=''">
+                and ulo.device_number = #{deviceNumber}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and ulo.create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null and endTime != ''">
+                and ulo.create_time &lt;= #{endTime}
+            </if>
+        </where>
+        group by su.nick_name
     </select>
+
+    <resultMap id="WithdrawalResult" type="withdrawal">
+        <result property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="orderNumber" column="order_number"/>
+        <result property="role" column="role"/>
+        <result property="roleName" column="role_name"/>
+        <result property="amount" column="amount"/>
+        <result property="withdrawalInformation" column="withdrawal_information"/>
+        <result property="received" column="received"/>
+        <result property="status" column="status"/>
+        <result property="applyTime" column="apply_time"/>
+        <result property="handleTime" column="handle_time"/>
+    </resultMap>
+
+    <sql id="selectWithdrawalStatisticsVo">
+        select id,user_id,order_number,role,role_name,amount,withdrawal_information,received,status,apply_time,handle_time from withdrawal
+    </sql>
+
     <insert id="insertWithdrawalApplication">
-        insert into withdrawal(user_id,role,role_name,amount,withdrawal_information,received,apply_time,handle_time)
-        values(#{userId},#{role},#{roleName},#{amount},#{withdrawalInformation},#{received},#{applyTime},#{handleTime})
+        insert into withdrawal(order_number,user_id,role,role_name,amount,withdrawal_information,received,apply_time,handle_time)
+        values(#{orderNumber},#{userId},#{role},#{roleName},#{amount},#{withdrawalInformation},#{received},#{applyTime},#{handleTime})
     </insert>
+
+    <select id="selectWithdrawalStatistics" parameterType="Withdrawal" resultMap="WithdrawalResult">
+        <include refid="selectWithdrawalStatisticsVo"/>
+        <where>
+            <if test="userId!=null">
+                and user_id=#{userId}
+            </if>
+            <if test="status!=null">
+                and status=#{status}
+            </if>
+            <if test="startApplyTime!=null and startApplyTime!=''">
+                and apply_time &gt;= {startApplyTime}
+            </if>
+            <if test="endApplyTime!=null and endApplyTime!=''">
+                and apply_time &lt;= #{endApplyTime}
+            </if>
+            <if test="startHandleTime!=null and startHandleTime!=''">
+                and handle_time &gt;= #{startHandleTime}
+            </if>
+            <if test="endHandleTime!=null and endHandleTime!=''">
+                and handle_time &lt;= #{endHandleTime}
+            </if>
+        </where>
+    </select>
 </mapper>

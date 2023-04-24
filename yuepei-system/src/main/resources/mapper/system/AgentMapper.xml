@@ -145,4 +145,7 @@
         insert into hospital(hospital_name,parent_id,type)
         values (#{hospitalName},#{parentId},#{type})
     </insert>
+    <insert id="insertAgentHospital">
+        insert into agent_hospital(agent_id,hospital_id) values (#{userId},#{hospitalId})
+    </insert>
 </mapper>

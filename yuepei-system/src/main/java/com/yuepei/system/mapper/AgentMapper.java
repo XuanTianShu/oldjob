@@ -24,4 +24,6 @@ public interface AgentMapper {
     void insertHospital(Hospital hospital);
 
     SysRole selectUserRole();
+
+    void insertAgentHospital(@Param("userId") Long userId,@Param("hospitalId") Long hospitalId);
 }

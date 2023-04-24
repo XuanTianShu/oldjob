@@ -28,6 +28,16 @@ public class RevenueStatisticsVo {
     private BigDecimal hospitalDivision;
     /**订单数量*/
     private int orderSum;
+    /**统计类别*/
     private String nickName;
+    /**用户id*/
     private Long userId;
+    /**支付方式*/
+    private int payType;
+    /**代理商id*/
+    private Long agentId;
+    /**医院id*/
+    private Long hospitalId;
+    /**设备编号*/
+    private String deviceNumber;
 }
