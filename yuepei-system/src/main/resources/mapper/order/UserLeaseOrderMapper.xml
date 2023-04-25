@@ -42,6 +42,8 @@
         <result property="hospitalId" column="hospitalId"/>
         <result property="investorId" column="investorId"/>
         <result property="agentId" column="agentId"/>
+        <result property="timeTimestamp" column="time_timestamp"/>
+        <result property="fixedTimestamp" column="fixed_timestamp"/>
     </resultMap>
 
     <resultMap id="LeaseOrderResult" type="LeaseOrderVO">
@@ -230,6 +232,8 @@
             <if test="investorId != null">investorId,</if>
             <if test="hospitalId != null">hospitalId,</if>
             <if test="agentId != null">agentId,</if>
+            <if test="timeTimestamp != null">time_timestamp,</if>
+            <if test="fixedTimestamp != null">fixed_timestamp,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="openid != null">#{openid},</if>
@@ -260,6 +264,8 @@
             <if test="investorId != null">#{investorId},</if>
             <if test="hospitalId != null">#{hospitalId},</if>
             <if test="agentId != null">#{agentId},</if>
+            <if test="timeTimestamp != null">#{timeTimestamp},</if>
+            <if test="fixedTimestamp != null">#{fixedTimestamp},</if>
         </trim>
     </insert>
     <insert id="insertOrderProportionDeatail">
@@ -328,6 +334,10 @@
             <if test="platformProportion != null">platformProportion = #{platformProportion},</if>
             <if test="depositNumber != null">deposit_number = #{depositNumber},</if>
             <if test="couponId != null">coupon_id = #{couponId},</if>
+            <if test="fixedPrice != null">fixed_price = #{fixedPrice},</if>
+            <if test="fixedTimestamp != null">fixed_timestamp = #{fixedTimestamp},</if>
+            <if test="timePrice != null">time_price = #{timePrice},</if>
+            <if test="timeTimestamp != null">time_timestamp = #{timeTimestamp},</if>
         </trim>
         where order_number = #{orderNumber}
     </update>
@@ -484,7 +494,8 @@
         FROM `user_lease_order` where order_number = #{orderNumber}
     </select>
     <select id="selectOrderByDeviceNumber" resultMap="UserLeaseOrderResult">
-        SELECT `id`,`openid`,`order_number`,`device_number`,`out_trade_no`,`device_rule`,`device_type`,`lease_time`,`lease_address`,
+        SELECT `id`,`openid`,`order_number`,`device_number`,`out_trade_no`,`device_rule`,`device_type`,`lease_time`,`lease_address`,IFNULL(time_timestamp,0) AS time_timestamp,
+               IFNULL(fixed_timestamp,0) AS fixed_timestamp,
                `restore_time`,`restore_address`,`time_price`,`fixed_price`,`price`,`investorProportion`,`hospitalProportion`,`agentProportion`,
                `platformProportion`,`pay_type`,`net_amount`,`coupon_price`,`status`,`play_time`,`choose`,`child`,`deposit`,`create_time`,`deposit_number`,`is_valid`
         FROM `user_lease_order` where child = #{substring1} and `status` = 0 and is_valid = 1

@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.security.*;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
@@ -961,100 +962,65 @@ public class CallBackServiceImpl implements CallBackService {
                                     userLeaseOrder.setRestoreTime(new Date());
                                     userLeaseOrder.setStatus("1");
                                     int time = 0;
-                                    log.info("现在时间：{}",new Date().getTime());
                                     long l = new Date().getTime() - userLeaseOrder.getLeaseTime().getTime();
-                                    String format1 = simpleDateFormat.format(new Date());
-                                    Date parse2 = simpleDateFormat.parse(format1);
-                                    log.info("现在时间的时分秒的时间戳：{}",parse2);
-                                    log.info("使用时长：{}",l);
-                                    Date leaseTime = userLeaseOrder.getLeaseTime();
-                                    String currentTime = new SimpleDateFormat("HH:mm:ss").format(leaseTime);
-                                    Date parse1 = simpleDateFormat.parse(currentTime);
-
-                                    /**
-                                     * 16:29:16.480 [http-nio-8005-exec-43] INFO  c.y.s.i.CallBackServiceImpl - [bluetoothCallback,957] - 固定套餐:Sun Jan 01 19:15:00 CST 2023
-                                     * 16:29:16.480 [http-nio-8005-exec-43] INFO  c.y.s.i.CallBackServiceImpl - [bluetoothCallback,958] - 下单套餐:Wed Apr 19 14:28:06 CST 2023
-                                     * 16:29:16.481 [http-nio-8005-exec-43] INFO  c.y.s.i.CallBackServiceImpl - [bluetoothCallback,959] - 固定套餐时间戳：1672571700000
-                                     * 16:29:16.481 [http-nio-8005-exec-43] INFO  c.y.s.i.CallBackServiceImpl - [bluetoothCallback,960] - 下单套餐时间戳：1681885686000
-                                     */
-                                    long nd = 1000 * 24 * 60 * 60;
-                                    long nh = 1000 * 60 * 60;
-                                    long nm = 1000 * 60;
                                     long ns = 1000;
-                                    long k = startTime.getTime() - parse1.getTime();
-                                    if (parse2.getTime() > startTime.getTime()){
-                                        log.info("固定套餐之内");
-                                        // 计算差多少天
-                                        long day = k / nd;
-                                        // 计算差多少小时
-                                        long hour = k % nd / nh;
-                                        // 计算差多少分钟
-                                        long min = k % nd % nh / nm;
-                                        if (day != 0){
-                                            time += day * 24;
-                                        }
-                                        if (hour != 0){
-                                            time += hour;
-                                        }
-                                        if (min > 0){
-                                            time += 1;
-                                        }
-                                    }else {
-                                        log.info("计时套餐之内");
-                                        // 计算差多少天
-                                        long day = l / nd;
-                                        // 计算差多少小时
-                                        long hour = l % nd / nh;
-                                        // 计算差多少分钟
-                                        long min = l % nd % nh / nm;
-                                        log.info("day:{}",day);
-                                        log.info("hour:{}",hour);
-                                        log.info("min:{}",min);
-                                        if (day != 0){
-                                            time += day * 24;
-                                        }
-                                        if (hour != 0){
-                                            time += hour;
-                                        }
-                                        if (min > 0){
-                                            time += 1;
-                                        }
-                                    }
-                                    log.info("固定套餐:{}",startTime);
-                                    log.info("下单套餐:{}",parse1);
-                                    log.info("固定套餐时间戳：{}",startTime.getTime());
-                                    log.info("下单套餐时间戳：{}",parse1.getTime());
-
-
                                     userLeaseOrder.setPlayTime(String.valueOf(l));
                                     log.info("还床使用时长：{}",userLeaseOrder.getPlayTime());
                                     long valid = l / ns;
                                     log.info("还床使用多少秒钟：{}",valid);
                                     if (valid > 600){
                                         //收费
-                                        long keyExpire = redisServer.getKeyExpire(orderPrefix + userLeaseOrder.getOrderNumber());
-                                        System.out.println(keyExpire+"过期时间");
+                                        long keyExpire = redisServer.getKeyExpire(orderPrefix + userLeaseOrder.getOrderNumber()+"_1");
+                                        long keyExpire1 = redisServer.getKeyExpire(orderPrefix + userLeaseOrder.getOrderNumber()+"_0");
+                                        log.info("过期时间:{}",keyExpire);
+                                        log.info("过期时间:{}",keyExpire1);
                                         BigDecimal bigDecimal = new BigDecimal(hashMap.get("price").toString());
                                         //TODO 重新计算
                                         if (keyExpire >= 0){
-                                            if (before){
-                                                log.info("使用的小时为：{}",time);
-                                                BigDecimal multiply = bigDecimal.multiply(new BigDecimal(time));
-                                                BigDecimal add = userLeaseOrder.getTimePrice().add(multiply);
-                                                log.info("定时套餐使用总费用：{}",add);
-                                                userLeaseOrder.setTimePrice(add);
-                                                log.info("定时费用：{}",userLeaseOrder.getTimePrice());
+                                            log.info("当前固定套餐");
+                                            BigDecimal timePrice = userLeaseOrder.getTimePrice();
+                                            BigDecimal add = timePrice.add(price);
+                                            userLeaseOrder.setTimePrice(add);
+                                        }else if (keyExpire1 >= 0){
+                                            log.info("当前计时套餐");
+                                            long l1 = Long.parseLong(userLeaseOrder.getTimeTimestamp());
+                                            long l2 = l1 - keyExpire1;
+                                            long nd = 24 * 60 * 60;
+                                            long nh = 60 * 60;
+                                            long nm = 60;
+                                            // 计算差多少天
+                                            long day = l2 / nd;
+                                            // 计算差多少小时
+                                            long hour = l2 % nd / nh;
+                                            // 计算差多少分钟
+                                            long min = l2 % nd % nh / nm;
+                                            log.info("day:{}",day);
+                                            log.info("hour:{}",hour);
+                                            log.info("min:{}",min);
+                                            if (day != 0){
+                                                time += day * 24;
                                             }
-                                        }else {
-                                            BigDecimal add = userLeaseOrder.getFixedPrice().add(price);
-                                            log.info("固定套餐使用总费用：{}",add);
-                                            userLeaseOrder.setFixedPrice(add);
-                                            log.info("固定费用：{}",userLeaseOrder.getTimePrice());
+                                            if (hour != 0){
+                                                time += hour;
+                                            }
+                                            if (min > 0){
+                                                time += 1;
+                                            }
+                                            log.info("多少个小时：{}",time);
+                                            DecimalFormat decimalFormat = new DecimalFormat("0.00");
+                                            BigDecimal multiply = bigDecimal.multiply(new BigDecimal(String.valueOf(time)));
+                                            BigDecimal timePrice = userLeaseOrder.getTimePrice();
+                                            userLeaseOrder.setTimePrice(timePrice.add(new BigDecimal(decimalFormat.format(multiply))));
                                         }
+                                        BigDecimal add = userLeaseOrder.getTimePrice().add(userLeaseOrder.getFixedPrice());
+                                        userLeaseOrder.setPrice(add);
+                                        redisServer.deleteObject(orderPrefix+userLeaseOrder.getOrderNumber()+"_0");
+                                        redisServer.deleteObject(orderPrefix+userLeaseOrder.getOrderNumber()+"_1");
                                     }else {
                                         log.info("订单未超过10分钟免费");
                                         //免费
-                                        redisServer.deleteObject(orderPrefix+userLeaseOrder.getOrderNumber());
+                                        redisServer.deleteObject(orderPrefix+userLeaseOrder.getOrderNumber()+"_0");
+                                        redisServer.deleteObject(orderPrefix+userLeaseOrder.getOrderNumber()+"_1");
                                         userLeaseOrder.setPrice(new BigDecimal(0));
                                         userLeaseOrder.setTimePrice(new BigDecimal(0));
                                         userLeaseOrder.setFixedPrice(new BigDecimal(0));

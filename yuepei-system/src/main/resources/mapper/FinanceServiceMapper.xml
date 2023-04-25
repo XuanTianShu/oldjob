@@ -23,7 +23,7 @@
         left join sys_user su on su.user_id = opd.user_id
         UNION ALL
         select oiad.user_id,su.nick_name,oiad.order_number,ulo.device_number,oiad.proportion,oiad.price,IFNULL(ulo.net_amount,0) as amount,IFNULL(ulo.coupon_price,0)as coupon_price,oiad.create_time
-        from order_investor_acount_detail oiad
+        from order_investor_account_detail oiad
         left join user_lease_order ulo on oiad.order_number = ulo.order_number
         left join sys_user su on su.user_id = oiad.user_id
     </sql>

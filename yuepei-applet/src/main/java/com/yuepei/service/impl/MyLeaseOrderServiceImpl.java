@@ -1,4 +1,5 @@
 package com.yuepei.service.impl;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -255,11 +256,9 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                     }
                     log.info("参数：{}",userLeaseOrder.getIsValid());
 
-                    userLeaseOrderMapper.insertUserLeaseOrder(userLeaseOrder);
-
                     //将订单信息存放到redis
                     System.out.println("新增内容");
-                    UserLeaseOrder userLeaseOrder1 = userLeaseOrderMapper.selectUserLeaseOrderByOpenId(orderNumber);
+//                    UserLeaseOrder userLeaseOrder1 = userLeaseOrderMapper.selectUserLeaseOrderByOpenId(orderNumber);
                     System.out.println("订单编号："+orderNumber);
                     String rule = userLeaseOrder.getRule();
                     JSONArray objects = JSON.parseArray(rule);
@@ -269,42 +268,166 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
                         JSONObject jsonObject = JSON.parseObject(objects.get(i).toString());
                         int timeStatus = Integer.parseInt(jsonObject.get("time").toString());
                         if (timeStatus == 0){
+                            //TODO 计时套餐
                              map = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
                         }else {
+                            //TODO 固定套餐
                              map1 = (Map<String,Object>)JSON.parseObject(objects.get(i).toString());
                         }
                     }
-                    System.out.println("开始判断");
-                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
-                    String format = simpleDateFormat.format(userLeaseOrder1.getLeaseTime());
-
-                    Date parse = simpleDateFormat.parse(format);
-                    Date startTime = simpleDateFormat.parse(map1.get("startTime").toString());
-                    Date endTime = simpleDateFormat.parse(map1.get("endTime").toString());
-                    boolean before = parse.before(startTime);
-                    System.out.println(parse+"下单时间");
-                    System.out.println(startTime+"固定套餐开始时间");
-                    System.out.println(before+"结果");
-                    if (before){
-                        long l = startTime.getTime() - parse.getTime();
-                        long nd = 1000 * 24 * 60 * 60;
-                        long nh = 1000 * 60 * 60;
-                        long nm = 1000 * 60;
-                        long ns = 1000;
-                        long sec = l % nd % nh % nm / ns;
-                        long valid = l / ns;
-                        log.info("sec:{}",sec);
-                        log.info("valid:{}",valid);
-                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber()+"_0",userLeaseOrder1,
-                                new Long(valid).intValue(), TimeUnit.SECONDS);
-                        System.out.println("存储到redis1");
+                    log.info("开始计算套餐");
+                    String m = "HH:mm:ss";
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+                    SimpleDateFormat simpleDateFormat1 = new SimpleDateFormat("HH:mm:ss");
+                    simpleDateFormat1.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+                    //范围开始时间
+                    String string = map1.get("startTime").toString();
+                    Date parse2 = simpleDateFormat1.parse(string);
+                    String currentTime = new SimpleDateFormat("HH:mm:ss").format(parse2);
+                    Date parse1 = simpleDateFormat1.parse(currentTime);
+                    String format1 = simpleDateFormat1.format(parse1);
+                    //范围结束时间
+                    String string1 = map1.get("endTime").toString();
+                    Date parse3 = simpleDateFormat1.parse(string1);
+                    String format = new SimpleDateFormat("HH:mm:ss").format(parse3);
+                    Date parse = simpleDateFormat1.parse(format);
+                    log.info("开始判断固定套餐是否跨天");
+                    if (parse1.getTime() > parse.getTime()){
+                        log.info("跨天");
+                        SimpleDateFormat sdfYMD = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.set(Calendar.SECOND,0); //这是将当天的【秒】设置为0
+                        calendar.set(Calendar.MINUTE,0); //这是将当天的【分】设置为0
+                        calendar.set(Calendar.HOUR_OF_DAY,0); //这是将当天的【时】设置为0
+                        calendar.setTime(parse);
+                        String ymd = sdfYMD.format(calendar.getTime()); //2021-02-24 00:00:00
+                        log.info("指定的时间:{}",ymd);
+                        Long tommowStamp = calendar.getTimeInMillis() + 86400000; //86400000 一天的毫秒值
+                        String sj = sdfYMD.format(new Date(tommowStamp));
+                        Date parse4 = simpleDateFormat.parse(sj);
+                        log.info("指定开始时间:{}",parse1);
+                        log.info("指定第二天的时间:{}",parse4);
+                        log.info("结束判断固定套餐是否跨天");
+                        log.info("开始判断当前时间是否在固定套餐时间之内");
+                        //当前时间
+                        Date nowTime = new SimpleDateFormat(m).parse(simpleDateFormat1.format(new Date()));
+                        //范围开始时间
+//                        Date startTime = new SimpleDateFormat(m).parse(format1);
+                        //范围结束时间
+//                        Date endTime = new SimpleDateFormat(m).parse(simpleDateFormat1.format(parse));
+                        log.info("当前：{}，开始：{}，结束：{}",nowTime.getTime(), parse1.getTime(), parse4.getTime());
+                        log.info("当前：{}，开始：{}，结束：{}",nowTime, parse1, parse4);
+                        boolean in = DateUtil.isIn(nowTime, parse1, parse4);
+                        log.info("结束判断当前时间是否在固定套餐时间之内");
+                        if (in){
+                            //TODO 进入固定套餐
+                            log.info("进入固定套餐");
+                            //TODO 当前时间和固定套餐结束时间计算多少秒钟
+                            long l = parse4.getTime() - nowTime.getTime();
+                            long valid = l / 1000;
+                            userLeaseOrder.setFixedTimestamp(String.valueOf(valid));
+                            log.info("秒钟：{}",valid);
+                            redisServer.setCacheObject(orderPrefix+orderNumber+"_1",orderNumber,new Long(valid).intValue(),TimeUnit.SECONDS);
+                        }else {
+                            //TODO 进入计时套餐
+                            log.info("进入计时套餐");
+                            //TODO 当前时间和固定套餐开始时间计算多少秒钟
+                            long l = parse1.getTime() - nowTime.getTime();
+                            long valid = l / 1000;
+                            userLeaseOrder.setTimeTimestamp(String.valueOf(valid));
+                            log.info("秒钟：{}",valid);
+                            redisServer.setCacheObject(orderPrefix+orderNumber+"_0",orderNumber,new Long(valid).intValue(),TimeUnit.SECONDS);
+                        }
                     }else {
-
-                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber()+"_1",userLeaseOrder1);
-                        System.out.println("存储到redis2");
+                        log.info("不跨天");
+                        //当前时间
+                        Date nowTime = new SimpleDateFormat(m).parse(simpleDateFormat1.format(new Date()));
+                        //范围开始时间
+                        Date startTime = new SimpleDateFormat(m).parse(format1);
+                        //范围结束时间
+                        Date endTime = new SimpleDateFormat(m).parse(simpleDateFormat1.format(parse));
+                        log.info("当前：{}，开始：{}，结束：{}",nowTime.getTime(), startTime.getTime(), endTime.getTime());
+                        log.info("当前：{}，开始：{}，结束：{}",nowTime, startTime, endTime);
+                        boolean in = DateUtil.isIn(nowTime, startTime, endTime);
+                        log.info("结束判断当前时间是否在固定套餐时间之内");
+                        if (in){
+                            //TODO 进入固定套餐
+                            log.info("进入固定套餐");
+                            //TODO 当前时间和固定套餐结束时间计算多少秒钟
+                            long l = endTime.getTime() - nowTime.getTime();
+                            long valid = l / 1000;
+                            userLeaseOrder.setFixedTimestamp(String.valueOf(valid));
+                            log.info("秒钟：{}",valid);
+                            redisServer.setCacheObject(orderPrefix+orderNumber+"_1",orderNumber,new Long(valid).intValue(),TimeUnit.SECONDS);
+                        }else {
+                            //TODO 进入计时套餐
+                            log.info("进入计时套餐");
+                            //TODO 当前时间和固定套餐开始时间计算多少秒钟
+                            if (nowTime.getTime() > startTime.getTime()){
+                                SimpleDateFormat sdfYMD = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                Calendar calendar = Calendar.getInstance();
+                                calendar.set(Calendar.SECOND,0); //这是将当天的【秒】设置为0
+                                calendar.set(Calendar.MINUTE,0); //这是将当天的【分】设置为0
+                                calendar.set(Calendar.HOUR_OF_DAY,0); //这是将当天的【时】设置为0
+                                calendar.setTime(startTime);
+                                String ymd = sdfYMD.format(calendar.getTime()); //2021-02-24 00:00:00
+                                log.info("指定的时间:{}",ymd);
+                                Long tommowStamp = calendar.getTimeInMillis() + 86400000; //86400000 一天的毫秒值
+                                String sj = sdfYMD.format(new Date(tommowStamp));
+                                Date parse4 = simpleDateFormat.parse(sj);
+                                log.info("指定开始时间:{}",parse1);
+                                log.info("指定第二天的时间:{}",parse4);
+                                log.info("结束判断固定套餐是否跨天");
+                                log.info("开始判断当前时间是否在固定套餐时间之内");
+                                long l = parse4.getTime() - nowTime.getTime();
+                                long valid = l / 1000;
+                                userLeaseOrder.setTimeTimestamp(String.valueOf(valid));
+                                log.info("秒钟：{}",valid);
+                                redisServer.setCacheObject(orderPrefix+orderNumber+"_0",orderNumber,new Long(valid).intValue(),TimeUnit.SECONDS);
+                            }else {
+                                long l = startTime.getTime() - nowTime.getTime();
+                                long valid = l / 1000;
+                                userLeaseOrder.setTimeTimestamp(String.valueOf(valid));
+                                log.info("秒钟：{}",valid);
+                                redisServer.setCacheObject(orderPrefix+orderNumber+"_0",orderNumber,new Long(valid).intValue(),TimeUnit.SECONDS);
+                            }
+                        }
                     }
+
+
+//                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:ss");
+//                    String format = simpleDateFormat.format(userLeaseOrder1.getLeaseTime());
+//                    Date parse = simpleDateFormat.parse(format);
+//                    Date startTime = simpleDateFormat.parse(map1.get("startTime").toString());
+//                    Date endTime = simpleDateFormat.parse(map1.get("endTime").toString());
+//                    boolean before = parse.before(startTime);
+//                    System.out.println(parse+"下单时间");
+//                    System.out.println(startTime+"固定套餐开始时间");
+//                    System.out.println(before+"结果");
+//                    if (before){
+//                        long l = startTime.getTime() - parse.getTime();
+//                        long nd = 1000 * 24 * 60 * 60;
+//                        long nh = 1000 * 60 * 60;
+//                        long nm = 1000 * 60;
+//                        long ns = 1000;
+//                        long sec = l % nd % nh % nm / ns;
+//                        long valid = l / ns;
+//                        log.info("sec:{}",sec);
+//                        log.info("valid:{}",valid);
+//                        //TODO 计时套餐
+//                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber()+"_0",userLeaseOrder1,
+//                                new Long(valid).intValue(), TimeUnit.SECONDS);
+//                        System.out.println("存储到redis1");
+//                    }else {
+//                        //TODO 固定套餐
+//
+//                        redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber()+"_1",userLeaseOrder1);
+//                        System.out.println("存储到redis2");
+//                    }
 //                    redisServer.setCacheObject(orderPrefix+userLeaseOrder1.getOrderNumber(),userLeaseOrder1);
                     log.info("借床ok");
+                    userLeaseOrderMapper.insertUserLeaseOrder(userLeaseOrder);
 
 
 

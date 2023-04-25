@@ -136,4 +136,8 @@ public class UserLeaseOrder extends BaseEntity {
     private String agentHospitalProportion;
 
     private String couponId;
+
+    private String timeTimestamp;
+
+    private String fixedTimestamp;
 }
