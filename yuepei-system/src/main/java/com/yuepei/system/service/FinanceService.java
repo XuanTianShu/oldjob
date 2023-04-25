@@ -3,9 +3,12 @@ package com.yuepei.system.service;
 import com.yuepei.system.domain.Withdrawal;
 import com.yuepei.system.domain.vo.RevenueStatisticsDetailsVo;
 import com.yuepei.system.domain.vo.RevenueStatisticsVo;
+import com.yuepei.system.domain.vo.SelectListVo;
+import com.yuepei.system.domain.vo.WithdrawalVo;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author zzy
@@ -24,5 +27,19 @@ public interface FinanceService {
 
     String withdrawalApplication(Withdrawal withdrawal);
 
-    List<Withdrawal> withdrawalStatistics(Long userId, Long status, String startApplyTime, String endApplyTime, String startHandleTime, String endHandleTime);
+    String byRejecting(String orderNumber, int type);
+
+    List<Withdrawal> roleWithdrawalStatistics(String role, Long userId, Long status, String startApplyTime, String endApplyTime, String startHandleTime, String endHandleTime);
+
+    WithdrawalVo withdrawalStatistics(String orderNumber);
+
+    List<SelectListVo> selectInvestor();
+
+    List<SelectListVo> selectAgent();
+
+    List<SelectListVo> selectHospital();
+
+    List<String> selectDevice();
+
+    List<Withdrawal> selectWithdrawalList();
 }

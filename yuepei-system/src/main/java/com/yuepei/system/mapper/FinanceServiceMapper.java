@@ -5,6 +5,7 @@ import com.yuepei.system.domain.vo.RevenueStatisticsDetailsVo;
 import com.yuepei.system.domain.vo.RevenueStatisticsVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,5 +37,11 @@ public interface FinanceServiceMapper {
 
     void insertWithdrawalApplication(Withdrawal withdrawal);
 
-    List<Withdrawal> selectWithdrawalStatistics(@Param("userId") Long userId,@Param("status") Long status,@Param("startApplyTime") String startApplyTime,@Param("endApplyTime") String endApplyTime,@Param("startHandleTime") String startHandleTime,@Param("endHandleTime") String endHandleTime);
+    void updateWithdrawal(Withdrawal withdrawal);
+
+    Withdrawal selectWithdrawalByOrderNumber(@Param("orderNumber") String orderNumber);
+
+    List<Withdrawal> selectRoleWithdrawalStatistics(@Param("userId") Long userId,@Param("status") Long status,@Param("startApplyTime") String startApplyTime,@Param("endApplyTime") String endApplyTime,@Param("startHandleTime") String startHandleTime,@Param("endHandleTime") String endHandleTime);
+
+    List<Withdrawal> selectWithdrawalStatistics();
 }

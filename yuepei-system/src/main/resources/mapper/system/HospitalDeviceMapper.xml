@@ -223,4 +223,11 @@
         where status=2
         and hospitalId=#{hospitalId}
     </select>
+    <select id="selectHospitalList" parameterType="Hospital" resultMap="HospitalResult">
+        <include refid="selectHospital"/>
+        where parent_id = '0'
+    </select>
+    <select id="selectDeviceList" parameterType="Device" resultMap="DeviceTypeDetailsResult">
+        <include refid="selectDevice"/>
+    </select>
 </mapper>

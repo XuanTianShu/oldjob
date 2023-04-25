@@ -169,4 +169,6 @@ public interface SysUserMapper
     SysUser selectParentIdByUserId(@Param("userId") Long userId);
 
     Bank selectBank(@Param("userId") Long userId);
+
+    List<SysUser> selectUserByUserType(@Param("userType")String userType);
 }
