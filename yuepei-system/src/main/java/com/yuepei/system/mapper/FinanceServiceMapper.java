@@ -5,6 +5,7 @@ import com.yuepei.system.domain.vo.RevenueStatisticsDetailsVo;
 import com.yuepei.system.domain.vo.RevenueStatisticsVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -18,19 +19,29 @@ public interface FinanceServiceMapper {
 
     List<RevenueStatisticsDetailsVo> selectHospitalIncomeStatistics();
 
-    List<RevenueStatisticsVo> selectStatisticsByYear();
+    List<RevenueStatisticsDetailsVo> selectDeviceStatistics();
 
-    List<RevenueStatisticsVo> selectStatisticsByMonth();
+    List<RevenueStatisticsVo> selectStatisticsByYear(@Param("payType") String payType,@Param("agentId") String agentId,@Param("hospitalId") String hospitalId,@Param("deviceNumber") String deviceNumber,@Param("startTime") String startTime,@Param("endTime") String endTime);
 
-    List<RevenueStatisticsVo> selectStatisticsByDay();
+    List<RevenueStatisticsVo> selectStatisticsByMonth(@Param("payType") String payType,@Param("agentId") String agentId,@Param("hospitalId") String hospitalId,@Param("deviceNumber") String deviceNumber,@Param("startTime") String startTime,@Param("endTime") String endTime);
 
-    List<RevenueStatisticsVo> selectStatisticsByInvestor();
+    List<RevenueStatisticsVo> selectStatisticsByDay(@Param("payType") String payType,@Param("agentId") String agentId,@Param("hospitalId") String hospitalId,@Param("deviceNumber") String deviceNumber,@Param("startTime") String startTime,@Param("endTime") String endTime);
 
-    List<RevenueStatisticsVo> selectStatisticsByAgent();
+    List<RevenueStatisticsVo> selectStatisticsByInvestor(@Param("payType") String payType,@Param("agentId") String agentId,@Param("hospitalId") String hospitalId,@Param("deviceNumber") String deviceNumber,@Param("startTime") String startTime,@Param("endTime") String endTime);
 
-    List<RevenueStatisticsVo> selectStatisticsByHospital();
+    List<RevenueStatisticsVo> selectStatisticsByAgent(@Param("payType") String payType,@Param("agentId") String agentId,@Param("hospitalId") String hospitalId,@Param("deviceNumber") String deviceNumber,@Param("startTime") String startTime,@Param("endTime") String endTime);
 
-    List<RevenueStatisticsVo> selectStatisticsByPlatformHospital();
+    List<RevenueStatisticsVo> selectStatisticsByHospital(@Param("payType") String payType,@Param("agentId") String agentId,@Param("hospitalId") String hospitalId,@Param("deviceNumber") String deviceNumber,@Param("startTime") String startTime,@Param("endTime") String endTime);
+
+    List<RevenueStatisticsVo> selectStatisticsByPlatformHospital(@Param("payType") String payType,@Param("agentId") String agentId,@Param("hospitalId") String hospitalId,@Param("deviceNumber") String deviceNumber,@Param("startTime") String startTime,@Param("endTime") String endTime);
 
     void insertWithdrawalApplication(Withdrawal withdrawal);
+
+    void updateWithdrawal(Withdrawal withdrawal);
+
+    Withdrawal selectWithdrawalByOrderNumber(@Param("orderNumber") String orderNumber);
+
+    List<Withdrawal> selectRoleWithdrawalStatistics(@Param("userId") Long userId,@Param("status") Long status,@Param("startApplyTime") String startApplyTime,@Param("endApplyTime") String endApplyTime,@Param("startHandleTime") String startHandleTime,@Param("endHandleTime") String endHandleTime);
+
+    List<Withdrawal> selectWithdrawalStatistics();
 }

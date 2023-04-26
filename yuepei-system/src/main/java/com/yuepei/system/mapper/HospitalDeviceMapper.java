@@ -42,4 +42,8 @@ public interface HospitalDeviceMapper {
     List<Long> selectAgentAddHospital(@Param("userId") Long userId);
 
     List<UserLeaseOrder> selectUserLeaseOrderByHospitalId(@Param("hospitalId") String hospitalId);
+
+    List<Hospital> selectHospitalList();
+
+    List<Device> selectDeviceList();
 }

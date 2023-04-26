@@ -175,4 +175,6 @@ public interface SysUserMapper
     SysUser selectHospitalProportion(@Param("hospitalId") String hospitalId);
 
     Bank selectBank(@Param("userId") Long userId);
+
+    List<SysUser> selectUserByUserType(@Param("userType")String userType);
 }

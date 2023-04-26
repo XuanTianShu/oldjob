@@ -337,6 +337,7 @@ public class AgentServiceImpl implements AgentService {
         user1.setProportion(hospitalAgentVo.getDivided());
         user1.setHospitalId(hospital.getHospitalId());
         sysUserMapper.insertSysUser(user1);
+        agentMapper.insertAgentHospital(sysUser.getUserId(),hospital.getHospitalId());
         SysRole sysRole = agentMapper.selectUserRole();
         sysUserRoleMapper.insertUserRole(sysRole.getRoleId(),user1.getUserId());
         //对设备进行修改

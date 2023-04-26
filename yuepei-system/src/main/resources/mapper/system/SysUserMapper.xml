@@ -384,4 +384,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	<select id="selectBank" parameterType="Bank" resultMap="BankResult">
 		select id,user_id,account_holder,bank_name,bank_number from bank where user_id=#{userId}
 	</select>
+
+	<select id="selectUserByUserType" parameterType="SysUser" resultMap="SysUserResult">
+		select user_id,nick_name,user_name from sys_user where user_type = #{userType}
+	</select>
 </mapper>
