@@ -128,11 +128,13 @@ public class DataScopeAspect
             else if (DATA_SCOPE_DEPT.equals(dataScope))
             {
                 if (StringUtils.isNotBlank(deptAlias)){
-                    System.out.println("执行");
+                    System.out.println("执行1");
                     if (deptAlias.equals("h")){
                         sqlString.append(StringUtils.format(" and d.user_id = {}",user.getUserId()));
                     }else if (deptAlias.equals("u")){
                         sqlString.append(StringUtils.format(" or {}.parent_id = {}",deptAlias,user.getUserId()));
+                    }else if (deptAlias.equals("user")){
+//                        sqlString.append(StringUtils.format(""));
                     }
                 }else {
                     sqlString.append(StringUtils.format(" and agentId = {} ", user.getUserId()));
@@ -140,9 +142,28 @@ public class DataScopeAspect
             }
             else if (DATA_SCOPE_DEPT_AND_CHILD.equals(dataScope))
             {
-                sqlString.append(StringUtils.format(
-                        " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
-                        deptAlias, user.getDeptId(), user.getDeptId()));
+                if (StringUtils.isNotBlank(userAlias)){
+                    if (userAlias.equals("d")){
+                        sqlString.append(StringUtils.format(
+                                " and di.investor_id in ({})",
+                                 user.getUserId()));
+                    }else if (userAlias.equals("lo")){
+                        log.info("lo条件执行");
+                        sqlString.append(StringUtils.format(
+                                " and (opd.`user_id` = {} OR oiad.`user_id` = {})",user.getUserId(),user.getUserId()
+                        ));
+                    }else if (userAlias.equals("user")){
+                        log.info("user条件执行");
+                        sqlString.append(StringUtils.format(
+                                " and (opd.`user_id` = {} OR oiad.`user_id` = {})",user.getUserId(),user.getUserId()
+                        ));
+                    }else {
+                        log.info("没有条件执行");
+                        sqlString.append(StringUtils.format(
+                                " OR {}.dept_id IN ( SELECT dept_id FROM sys_dept WHERE dept_id = {} or find_in_set( {} , ancestors ) )",
+                                deptAlias, user.getDeptId(), user.getDeptId()));
+                    }
+                }
             }
             else if (DATA_SCOPE_SELF.equals(dataScope))
             {

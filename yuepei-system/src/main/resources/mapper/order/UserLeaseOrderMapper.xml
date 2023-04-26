@@ -142,6 +142,8 @@
         INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`
         LEFT JOIN hospital AS h ON h.`hospital_id` = lo.`hospitalId`
         LEFT JOIN sys_user AS su ON su.`user_id` = lo.`agentId`
+        LEFT JOIN `order_proportion_detail` AS opd ON opd.`order_number` = lo.`order_number`
+        LEFT JOIN `order_investor_account_detail` AS oiad ON oiad.`order_number` = lo.`order_number`
     </sql>
 
     <select id="leaseOrderList" parameterType="LeaseOrderVO" resultMap="LeaseOrderResult">
@@ -153,7 +155,7 @@
             <if test="deviceType != null  and deviceType != ''"> and lo.device_type = #{deviceType}</if>
             <if test="leaseTime != null "> and lo.lease_time = #{leaseTime}</if>
             <if test="payType != null  and payType != ''"> and lo.pay_type = #{payType}</if>
-            <if test="status != null  and status != ''"> and lo.status = #{status}</if>
+            <if test="status != null"> and lo.status = #{status}</if>
             <if test="playTime != null  and playTime != ''"> and lo.play_time = #{playTime}</if>
             ${params.dataScope}
         </where>
@@ -413,34 +415,76 @@
     </select>
 
     <select id="selectDayOrder" resultType="com.yuepei.system.domain.vo.OrderSumAndMoneyVO">
-        SELECT (SELECT IFNULL(COUNT(1),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS `todayOrderNum`,
+        SELECT (SELECT IFNULL(COUNT(1),0) FROM user_lease_order AS ulo
+        LEFT JOIN `order_proportion_detail` AS opd ON opd.order_number = ulo.order_number
+        LEFT JOIN `order_investor_account_detail` AS oiad ON oiad.order_number = ulo.order_number
+        WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= ulo.lease_time
+        AND ulo.`status` = 2 AND ulo.is_valid = 1 ${params.dataScope}) AS `todayOrderNum`,
+
+        (SELECT IFNULL(SUM(ulo.net_amount),0.00) FROM user_lease_order as ulo
+        LEFT JOIN `order_proportion_detail` AS opd ON opd.order_number = ulo.order_number
+        LEFT JOIN `order_investor_account_detail` AS oiad ON oiad.order_number = ulo.order_number
+        WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= ulo.create_time AND ulo.`status` = 2
+        and ulo.is_valid = 1 ${params.dataScope}) AS todayOrderMoney,
+
+        (SELECT IFNULL(COUNT(1),0) FROM user_lease_order as ulo
+        LEFT JOIN `order_proportion_detail` AS opd ON opd.order_number = ulo.order_number
+        LEFT JOIN `order_investor_account_detail` AS oiad ON oiad.order_number = ulo.order_number
+        WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= ulo.lease_time AND ulo.`status` = 2 and ulo.is_valid = 1  ${params.dataScope}) AS `sevenDayOrderNum`,
+
+        (SELECT IFNULL(SUM(ulo.net_amount),0.00) FROM user_lease_order as ulo
+        LEFT JOIN `order_proportion_detail` AS opd ON opd.order_number = ulo.order_number
+        LEFT JOIN `order_investor_account_detail` AS oiad ON oiad.order_number = ulo.order_number
+        WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= ulo.create_time AND ulo.`status` = 2 and ulo.is_valid = 1  ${params.dataScope}) AS sevenDayOrderMoney,
+
+        (SELECT IFNULL(COUNT(1),0) FROM user_lease_order as ulo
+        LEFT JOIN `order_proportion_detail` AS opd ON opd.order_number = ulo.order_number
+        LEFT JOIN `order_investor_account_detail` AS oiad ON oiad.order_number = ulo.order_number
+        WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= ulo.lease_time
+        AND ulo.`status` = 2 and ulo.is_valid = 1 ${params.dataScope}) AS thirtyDayOrderNum,
+
+        (SELECT IFNULL(SUM(ulo.net_amount),0.00) FROM user_lease_order as ulo
+        LEFT JOIN `order_proportion_detail` AS opd ON opd.order_number = ulo.order_number
+        LEFT JOIN `order_investor_account_detail` AS oiad ON oiad.order_number = ulo.order_number
+        WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= ulo.create_time AND ulo.`status` = 2 and ulo.is_valid = 1 ${params.dataScope}) as thirtyDayOrderNum,
+
+        (SELECT IFNULL(SUM(ulo.net_amount),0.00) FROM user_lease_order as ulo
+        LEFT JOIN `order_proportion_detail` AS opd ON opd.order_number = ulo.order_number
+        LEFT JOIN `order_investor_account_detail` AS oiad ON oiad.order_number = ulo.order_number
+        WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= ulo.create_time
+        AND ulo.`status` = 2 and ulo.is_valid = 1 ${params.dataScope}) AS thirtyDayOrderMoney
+        <!--SELECT (SELECT IFNULL(COUNT(1),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS `todayOrderNum`,
         (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 0 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS todayOrderMoney,
         (SELECT IFNULL(COUNT(1),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS `sevenDayOrderNum`,
         (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 7 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS sevenDayOrderMoney,
         (SELECT IFNULL(COUNT(1),0) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= lease_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS thirtyDayOrderNum,
-        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS thirtyDayOrderMoney
+        (SELECT IFNULL(SUM(net_amount),0.00) FROM user_lease_order WHERE DATE_SUB(CURDATE(), INTERVAL 29 DAY) &lt;= create_time AND `status` = 2 and is_valid = 1 ${params.dataScope}) AS thirtyDayOrderMoney-->
     </select>
     <select id="selectConditionOrder" resultType="com.yuepei.system.domain.vo.ConditionOrderVO">
         SELECT (SELECT IFNULL(SUM(lo.net_amount),0) FROM user_lease_order as lo
-            <where>
+        LEFT JOIN `order_proportion_detail` AS opd ON opd.order_number = lo.order_number
+        LEFT JOIN `order_investor_account_detail` AS oiad ON oiad.order_number = lo.order_number
+        <where>
                 and lo.is_valid = 1
                 <if test="deviceNumber != null  and deviceNumber != ''"> and lo.device_number = #{deviceNumber}</if>
                 <if test="payType != null  and payType != ''"> and lo.pay_type = #{payType}</if>
-                <if test="status != null  and status != ''"> and lo.status = #{status}</if>
+                <if test="status != null"> and lo.status = #{status}</if>
                 <if test="outTradeNo != null and outTradeNo != ''"> and lo.out_trade_no = #{outTradeNo}</if>
                 ${params.dataScope}
             </where>) AS conditionOrderMoney,
-        (SELECT COUNT(1) FROM user_lease_order AS lo
+        (SELECT COUNT(DISTINCT(lo.id)) FROM user_lease_order AS lo
         INNER JOIN sys_user AS u ON lo.`openid` = u.`openid`
         INNER JOIN device AS d ON d.`device_number` = lo.`device_number`
         INNER JOIN hospital AS h ON d.`hospital_id` = h.`hospital_id`
         INNER JOIN agent_hospital AS ah ON ah.`hospital_id` = h.`hospital_id`
         INNER JOIN sys_user AS su ON su.`user_id` = ah.`agent_id`
-            <where>
+        LEFT JOIN `order_proportion_detail` AS opd ON opd.order_number = lo.order_number
+        LEFT JOIN `order_investor_account_detail` AS oiad ON oiad.order_number = lo.order_number
+        <where>
                 and lo.is_valid = 1
                 <if test="deviceNumber != null  and deviceNumber != ''"> and lo.device_number = #{deviceNumber}</if>
                 <if test="payType != null  and payType != ''"> and lo.pay_type = #{payType}</if>
-                <if test="status != null  and status != ''"> and lo.status = #{status}</if>
+                <if test="status != null"> and lo.status = #{status}</if>
                 <if test="outTradeNo != null and outTradeNo != ''"> and lo.out_trade_no = #{outTradeNo}</if>
                 ${params.dataScope}
             </where>) AS conditionOrderNum

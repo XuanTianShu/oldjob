@@ -527,12 +527,13 @@ public class MyLeaseOrderServiceImpl implements MyLeaseOrderService {
     }
 
     @Override
-    @DataScope(userAlias = "user",deptAlias = "")
+    @DataScope(userAlias = "user",deptAlias = "user")
     public OrderSumAndMoneyVO selectDayOrder(LeaseOrderVO leaseOrderVO) {
         return userLeaseOrderMapper.selectDayOrder(leaseOrderVO);
     }
 
     @Override
+    @DataScope(userAlias = "user",deptAlias = "user")
     public ConditionOrderVO selectConditionOrder(LeaseOrderVO leaseOrderVO) {
         return userLeaseOrderMapper.selectConditionOrder(leaseOrderVO);
     }

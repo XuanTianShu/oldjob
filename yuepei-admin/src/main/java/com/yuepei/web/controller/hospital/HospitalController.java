@@ -141,7 +141,7 @@ public class HospitalController extends BaseController {
      * 查询医院列表
      */
 //    @PreAuthorize("@ss.hasPermi('device:hospital:list')")
-    @PreAuthorize("@ss.hasAnyRoles('hospital,agent')")
+    @PreAuthorize("@ss.hasAnyRoles('hospital,agent,investor')")
     @GetMapping("/list")
     public AjaxResult list(Hospital hospital)
     {

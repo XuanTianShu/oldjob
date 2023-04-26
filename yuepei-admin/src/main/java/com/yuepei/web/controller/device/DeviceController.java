@@ -268,7 +268,7 @@ public class DeviceController extends BaseController {
     /**
      * 获取设备详细信息
      */
-    @PreAuthorize("@ss.hasPermi('system:device:query')")
+    @PreAuthorize("@ss.hasAnyRoles('hospital,agent,investor')")
     @GetMapping(value = "/{deviceId}")
     public AjaxResult getInfo(@PathVariable("deviceId") Long deviceId)
     {

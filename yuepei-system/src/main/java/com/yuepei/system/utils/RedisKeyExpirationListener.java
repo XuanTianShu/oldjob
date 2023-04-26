@@ -109,6 +109,7 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                         log.info("固定套餐结束");
                         log.info("开始转计时套餐");
                         BigDecimal bigDecimal = new BigDecimal(map1.get("price").toString());
+                        log.info("固定套餐的费用：{}",bigDecimal);
                         //TODO 固定套餐到自动转为计时套餐
 
                         Date parse = simpleDateFormat1.parse(endTime);
@@ -138,7 +139,7 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                             log.info("指定的时间:{}",ymd);
                             Long tommowStamp = calendar.getTimeInMillis() + 86400000; //86400000 一天的毫秒值
                             String sj = sdfYMD.format(new Date(tommowStamp));
-                            Date parse4 = simpleDateFormat.parse(sj);
+                            Date parse4 = sdfYMD.parse(sj);
                             log.info("指定开始时间:{}",parse3);
                             log.info("指定第二天的时间:{}",parse4);
                             log.info("结束判断固定套餐是否跨天");
@@ -164,7 +165,9 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                             log.info("转计时之后的时间戳：{}",userLeaseOrder.getFixedTimestamp());
                             redisServer.setCacheObject(orderPrefix+substring+"_0",substring,new Long(valid).intValue(),TimeUnit.SECONDS);
                         }
-
+                        log.info("修改订单信息");
+                        userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
+                        log.info("计时转成功");
                     }else if (substring1.equals("0")){
                         //TODO 计时套餐
                         log.info("计时套餐结束");
@@ -290,10 +293,10 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                             //TODO 当前时间和固定套餐结束时间计算多少秒钟
                             redisServer.setCacheObject(orderPrefix+substring+"_1",orderNumber,new Long(valid).intValue(),TimeUnit.SECONDS);
                         }
+                        log.info("修改订单信息");
+                        userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
                         log.info("固定转成功");
                     }
-                    log.info("修改订单信息");
-                    userLeaseOrderMapper.updateUserLeaseOrderByOrderNumber(userLeaseOrder);
                 }
                 log.info("结束修改订单状态");
             } else if (key.startsWith(userCouponPrefix)) {

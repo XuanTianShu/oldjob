@@ -85,6 +85,7 @@ public class OrderController extends BaseController {
     @PreAuthorize("@ss.hasPermi('order:order:list')")
     @GetMapping("/leaseList")
     public AjaxResult LeaseList(LeaseOrderVO leaseOrderVO){
+        System.out.println("status:"+leaseOrderVO.getStatus());
         startPage();
         Map<String,Object> map = new HashMap<>();
         List<UserLeaseOrder> list = myLeaseOrderService.leaseOrderList(leaseOrderVO);
