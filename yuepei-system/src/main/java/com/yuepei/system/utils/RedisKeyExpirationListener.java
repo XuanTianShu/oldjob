@@ -122,6 +122,9 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                         log.info("结束时间：{}",parse1);
 
                         Date nowTime = new SimpleDateFormat(m).parse(simpleDateFormat1.format(new Date()));
+                        log.info("当天时间：{}",nowTime);
+
+                        log.info("当前：{}--开始：{}---结束：{}",nowTime.getTime(),parse3.getTime(),parse1.getTime());
 
                         if (nowTime.getTime() > parse3.getTime()){
                             log.info("跨天");
@@ -146,7 +149,9 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                             long valid = l / 1000;
                             BigDecimal fixedPrice1 = userLeaseOrder.getFixedPrice();
                             userLeaseOrder.setFixedPrice(fixedPrice1.add(bigDecimal));
-                            userLeaseOrder.setTimeTimestamp(String.valueOf(valid));
+                            log.info("转计时之后的费用：{}",userLeaseOrder.getFixedPrice());
+                            userLeaseOrder.setFixedTimestamp(String.valueOf(valid));
+                            log.info("转计时之后的时间戳：{}",userLeaseOrder.getFixedTimestamp());
                             redisServer.setCacheObject(orderPrefix+substring+"_0",substring,new Long(valid).intValue(),TimeUnit.SECONDS);
                         }else {
                             log.info("不跨天");
@@ -154,7 +159,9 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                             long valid = l / 1000;
                             BigDecimal fixedPrice1 = userLeaseOrder.getFixedPrice();
                             userLeaseOrder.setFixedPrice(fixedPrice1.add(bigDecimal));
-                            userLeaseOrder.setTimeTimestamp(String.valueOf(valid));
+                            log.info("转计时之后的费用：{}",userLeaseOrder.getFixedPrice());
+                            userLeaseOrder.setFixedTimestamp(String.valueOf(valid));
+                            log.info("转计时之后的时间戳：{}",userLeaseOrder.getFixedTimestamp());
                             redisServer.setCacheObject(orderPrefix+substring+"_0",substring,new Long(valid).intValue(),TimeUnit.SECONDS);
                         }
 
@@ -176,8 +183,31 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                         Date parse2 = simpleDateFormat.parse(s1);
                         Date parse3 = simpleDateFormat.parse(startTime);
                         Date parse5 = simpleDateFormat.parse(endTime);
-                        long l = parse3.getTime() - parse2.getTime();
+                        long l = 0L;
                         log.info("{}======{}",parse3,parse2);
+                        //TODO 判断是否跨天
+                        if (parse3.getTime() < parse2.getTime()){
+                            log.info("下单开始时间和固定开始时间比较跨天");
+                            SimpleDateFormat sdfYMD = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                            Calendar calendar = Calendar.getInstance();
+                            calendar.set(Calendar.SECOND,0); //这是将当天的【秒】设置为0
+                            calendar.set(Calendar.MINUTE,0); //这是将当天的【分】设置为0
+                            calendar.set(Calendar.HOUR_OF_DAY,0); //这是将当天的【时】设置为0
+                            calendar.setTime(parse2);
+                            String ymd = sdfYMD.format(calendar.getTime()); //2021-02-24 00:00:00
+                            log.info("指定的时间:{}",ymd);
+                            Long tommowStamp = calendar.getTimeInMillis() + 86400000; //86400000 一天的毫秒值
+                            String sj = sdfYMD.format(new Date(tommowStamp));
+                            Date parse4 = simpleDateFormat.parse(sj);
+                            log.info("指定开始时间:{}",parse2);
+                            log.info("指定第二天的时间:{}",parse4);
+                            log.info("结束判断固定套餐是否跨天");
+                            log.info("开始判断当前时间是否在固定套餐时间之内");
+                            l = parse4.getTime() - parse3.getTime();
+                        }else {
+                            log.info("下单开始时间和固定开始时间比较不跨天");
+                            l = parse3.getTime() - parse2.getTime();
+                        }
 
                         int time = 0;
 
@@ -223,7 +253,7 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                         log.info("{}---{}----{}",parse1,parse,parse6);
                         log.info("{}---{}----{}",parse1.getTime(),parse.getTime(),parse6.getTime());
                         if (parse.getTime() > parse6.getTime()){
-                            log.info("跨天");
+                            log.info("固定开始时间和结束时间跨天");
                             SimpleDateFormat sdfYMD = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                             Calendar calendar = Calendar.getInstance();
                             calendar.set(Calendar.SECOND,0); //这是将当天的【秒】设置为0
@@ -249,7 +279,7 @@ public class RedisKeyExpirationListener extends KeyExpirationEventMessageListene
                             //TODO 当前时间和固定套餐结束时间计算多少秒钟
                             redisServer.setCacheObject(orderPrefix+substring+"_1",orderNumber,new Long(valid).intValue(), TimeUnit.SECONDS);
                         }else {
-                            log.info("不跨天");
+                            log.info("固定开始时间和结束时间不跨天");
                             long l1 = parse6.getTime() - parse.getTime();
                             log.info("{}",l1);
                             long valid = l1 / 1000;

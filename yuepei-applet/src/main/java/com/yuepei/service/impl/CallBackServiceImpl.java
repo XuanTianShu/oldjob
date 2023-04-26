@@ -976,12 +976,12 @@ public class CallBackServiceImpl implements CallBackService {
                                         log.info("过期时间:{}",keyExpire1);
                                         BigDecimal bigDecimal = new BigDecimal(hashMap.get("price").toString());
                                         //TODO 重新计算
-                                        if (keyExpire >= 0){
+                                        if (keyExpire > 0){
                                             log.info("当前固定套餐");
-                                            BigDecimal timePrice = userLeaseOrder.getTimePrice();
+                                            BigDecimal timePrice = userLeaseOrder.getFixedPrice();
                                             BigDecimal add = timePrice.add(price);
                                             userLeaseOrder.setTimePrice(add);
-                                        }else if (keyExpire1 >= 0){
+                                        }else if (keyExpire1 > 0){
                                             log.info("当前计时套餐");
                                             long l1 = Long.parseLong(userLeaseOrder.getTimeTimestamp());
                                             long l2 = l1 - keyExpire1;

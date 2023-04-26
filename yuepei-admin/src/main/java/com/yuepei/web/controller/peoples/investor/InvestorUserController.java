@@ -15,6 +15,7 @@ import com.yuepei.system.domain.DeviceInvestor;
 import com.yuepei.system.domain.InvestorUser;
 import com.yuepei.system.domain.vo.DeviceInvestorVO;
 import com.yuepei.system.domain.vo.TotalProportionVO;
+import com.yuepei.system.mapper.InvestorUserMapper;
 import com.yuepei.system.mapper.SysUserMapper;
 import com.yuepei.system.service.DeviceInvestorService;
 import com.yuepei.system.service.IInvestorUserService;
@@ -43,6 +44,9 @@ public class InvestorUserController extends BaseController
     private IInvestorUserService investorUserService;
 
     @Autowired
+    private InvestorUserMapper investorUserMapper;
+
+    @Autowired
     private ISysUserService userService;
 
     @Autowired
@@ -60,6 +64,13 @@ public class InvestorUserController extends BaseController
         startPage();
         List<SysUser> list = investorUserService.selectInvestorUserList(user);
         return getDataTable(list);
+    }
+
+    @PreAuthorize("@ss.hasPermi('system:device:list')")
+    @GetMapping("/investorList")
+    public AjaxResult investorList(SysUser user){
+
+        return AjaxResult.success(investorUserMapper.selectInvestorUserList(user));
     }
 
     @PreAuthorize("@ss.hasPermi('system:device:list')")
