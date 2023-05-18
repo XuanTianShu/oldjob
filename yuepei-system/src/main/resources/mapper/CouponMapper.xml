@@ -40,10 +40,10 @@
     </select>
 
 
-    <select id="selectCoupon" resultMap="CouponResult">
-        <include refid="selectCouponVo"/>
-        where coupon_type = 1
-    </select>
+<!--    <select id="selectCoupon" resultMap="CouponResultCouponResult">-->
+<!--        <include refid="selectCouponVo"/>-->
+<!--        where coupon_type = 1-->
+<!--    </select>-->
 
     <select id="selectCouponById" parameterType="Long" resultMap="CouponResult">
         <include refid="selectCouponVo"/>

@@ -604,6 +604,7 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     public List<UserLeaseOrderVo> selectLeaseOrderList(Long userId, String deviceDepartment, String deviceTypeName, String nameOrNumber) {
         List<UserLeaseOrderVo> userLeaseOrderVoList = new ArrayList<>();
         SysUser sysUser = sysUserMapper.selectUserById(userId);
+        if(null==sysUser) return null;
         List<UserLeaseOrder> leaseOrders = new ArrayList<>();
         if (!nameOrNumber.equals("")) {
             List<UserLeaseOrder> userLeaseOrders = appletInvestorMapper.selectUserLeaseOrderByOrderNumber(nameOrNumber, String.valueOf(sysUser.getUserId()));
@@ -648,14 +649,17 @@ public class AppletInvestorServiceImpl implements AppletInvestorService {
     public List<UserLeaseOrderVo> investorLeaseOrder(Long userId, String status, String deviceDepartment, String deviceTypeName, String nameOrNumber) {
         SysUser sysUser = sysUserMapper.selectUserById(userId);
         List<UserLeaseOrderVo> userLeaseOrderVoList = new ArrayList<>();
+
         if (sysUser.getParentId() != 0) {
             List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(userId, deviceDepartment, deviceTypeName, nameOrNumber);
+            if(null==userLeaseOrderVos)
             userLeaseOrderVoList.addAll(userLeaseOrderVos);
         } else {
             List<SysUser> sysUsers = sysUserMapper.selectUserByParentId(userId);
             sysUsers.add(sysUser);
             sysUsers.stream().forEach(map -> {
                 List<UserLeaseOrderVo> userLeaseOrderVos = selectLeaseOrderList(map.getUserId(), deviceDepartment, deviceTypeName, nameOrNumber);
+                if(null==userLeaseOrderVos) return;
                 if (userLeaseOrderVos.size() != 0) {
                     userLeaseOrderVoList.addAll(userLeaseOrderVos);
                 }
